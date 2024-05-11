@@ -1,0 +1,36 @@
+﻿<Page
+    x:Class="TewiMP.Pages.SettingHotKeyPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Pages"
+    xmlns:controls="using:TewiMP.Controls"
+    xmlns:cc="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
+
+    <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None" Padding="0,0,0,12">
+
+        <ListView.Header>
+            <Grid x:Name="HeaderBaseGrid">
+                <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1"/>
+                <TextBlock x:Name="HeaderBaseTextBlock" Text="编辑热键" Style="{ThemeResource TBHeader}"/>
+            </Grid>
+        </ListView.Header>
+
+        <cc:SettingsCard Header="尝试重新应用热键" Margin="0,4,4,0"
+                         Description="如果此程序被其它程序占用的热键被释放，重新注册可以使之前被占用的热键恢复在此程序的功能">
+            <Button Content="重新应用" Click="Button_Click"/>
+        </cc:SettingsCard>
+
+        <cc:SettingsCard Header="重置热键键位" Margin="0,4,4,0"
+                         Description="将热键键位恢复到程序默认">
+            <Button Content="重置键位" Click="Button_Click_1"/>
+        </cc:SettingsCard>
+
+        <controls:HotKeyPresenter/>
+
+    </ListView>
+</Page>

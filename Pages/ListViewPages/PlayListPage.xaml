@@ -1,0 +1,301 @@
+﻿<Page
+    x:Class="TewiMP.Pages.ListViewPages.PlayListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Pages.ListViewPages"
+    xmlns:controls="using:TewiMP.Controls"
+    xmlns:data="using:TewiMP.DataEditor"
+    xmlns:helper="using:TewiMP.Helpers"
+    xmlns:c="using:CommunityToolkit.WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Loaded="Page_Loaded" Unloaded="Page_Unloaded"
+    SizeChanged="Page_SizeChanged">
+
+    <Page.Resources>
+    </Page.Resources>
+    
+    <Grid x:Name="root">
+        <ListView
+            SelectionMode="None"
+            x:Name="ItemsList"
+            Padding="0">
+            <ListView.Resources>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="ListViewItem">
+                                <ListViewItemPresenter
+                                    Padding="0"
+                                    ContentTransitions="{TemplateBinding ContentTransitions}"
+                                    Control.IsTemplateFocusTarget="True"
+                                    FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
+                                    FocusVisualPrimaryBrush="{TemplateBinding FocusVisualPrimaryBrush}"
+                                    FocusVisualPrimaryThickness="{TemplateBinding FocusVisualPrimaryThickness}"
+                                    FocusVisualSecondaryBrush="{TemplateBinding FocusVisualSecondaryBrush}"
+                                    FocusVisualSecondaryThickness="{TemplateBinding FocusVisualSecondaryThickness}"
+                                    SelectionCheckMarkVisualEnabled="{ThemeResource ListViewItemSelectionCheckMarkVisualEnabled}"
+                                    CheckBrush="{ThemeResource ListViewItemCheckBrush}"
+                                    CheckBoxBrush="{ThemeResource ListViewItemCheckBoxBrush}"
+                                    DragBackground="{ThemeResource ListViewItemDragBackground}"
+                                    DragForeground="{ThemeResource ListViewItemDragForeground}"
+                                    FocusBorderBrush="{ThemeResource ListViewItemFocusBorderBrush}"
+                                    FocusSecondaryBorderBrush="{ThemeResource ListViewItemFocusSecondaryBorderBrush}"
+                                    PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}"
+                                    PointerOverBackground="{ThemeResource ListViewItemBackgroundPointerOver}"
+                                    PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}"
+                                    SelectedBackground="{ThemeResource ListViewItemBackgroundSelected}"
+                                    SelectedForeground="{ThemeResource ListViewItemForegroundSelected}"
+                                    SelectedPointerOverBackground="{ThemeResource ListViewItemBackgroundSelectedPointerOver}"
+                                    PressedBackground="{ThemeResource ListViewItemBackgroundPressed}"
+                                    SelectedPressedBackground="{ThemeResource ListViewItemBackgroundSelectedPressed}"
+                                    DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
+                                    DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
+                                    ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
+                                    CheckMode="{ThemeResource ListViewItemCheckMode}"
+                                    CornerRadius="{ThemeResource ListViewItemCornerRadius}"
+                                    CheckPressedBrush="{ThemeResource ListViewItemCheckPressedBrush}"
+                                    CheckDisabledBrush="{ThemeResource ListViewItemCheckDisabledBrush}"
+                                    CheckBoxPointerOverBrush="{ThemeResource ListViewItemCheckBoxPointerOverBrush}"
+                                    CheckBoxPressedBrush="{ThemeResource ListViewItemCheckBoxPressedBrush}"
+                                    CheckBoxDisabledBrush="{ThemeResource ListViewItemCheckBoxDisabledBrush}"
+                                    CheckBoxSelectedBrush="{ThemeResource ListViewItemCheckBoxSelectedBrush}"
+                                    CheckBoxSelectedPointerOverBrush="{ThemeResource ListViewItemCheckBoxSelectedPointerOverBrush}"
+                                    CheckBoxSelectedPressedBrush="{ThemeResource ListViewItemCheckBoxSelectedPressedBrush}"
+                                    CheckBoxSelectedDisabledBrush="{ThemeResource ListViewItemCheckBoxSelectedDisabledBrush}"
+                                    CheckBoxBorderBrush="{ThemeResource ListViewItemCheckBoxBorderBrush}"
+                                    CheckBoxPointerOverBorderBrush="{ThemeResource ListViewItemCheckBoxPointerOverBorderBrush}"
+                                    CheckBoxPressedBorderBrush="{ThemeResource ListViewItemCheckBoxPressedBorderBrush}"
+                                    CheckBoxDisabledBorderBrush="{ThemeResource ListViewItemCheckBoxDisabledBorderBrush}"
+                                    CheckBoxCornerRadius="{ThemeResource ListViewItemCheckBoxCornerRadius}"
+                                    SelectionIndicatorCornerRadius="{ThemeResource ListViewItemSelectionIndicatorCornerRadius}"
+                                    SelectionIndicatorVisualEnabled="{ThemeResource ListViewItemSelectionIndicatorVisualEnabled}"
+                                    SelectionIndicatorBrush="{ThemeResource ListViewItemSelectionIndicatorBrush}"
+                                    SelectionIndicatorPointerOverBrush="{ThemeResource ListViewItemSelectionIndicatorPointerOverBrush}"
+                                    SelectionIndicatorPressedBrush="{ThemeResource ListViewItemSelectionIndicatorPressedBrush}"
+                                    SelectionIndicatorDisabledBrush="{ThemeResource ListViewItemSelectionIndicatorDisabledBrush}"
+                                    SelectedDisabledBackground="{ThemeResource ListViewItemBackgroundSelectedDisabled}">
+                                </ListViewItemPresenter>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListView.Resources>
+            <ListView.ItemTemplate>
+                <DataTemplate x:DataType="helper:SongItemBindBase">
+                    <controls:MusicDataItem Margin="16,1"/>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+            <ListView.Header>
+                <Grid
+                    x:Name="ItemsList_Header_Root"
+                    Margin="0,0,0,3"
+                    VerticalAlignment="Top">
+                    <Border
+                        x:Name="ItemsList_Header_ImageInfo_BackgroundFill"
+                        Background="{ThemeResource AcrylicNormal}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1" Margin="-4,-4,-4,0"
+                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                    <Grid x:Name="ItemsList_Header_Info_Base" Margin="16">
+                        <Grid
+                            x:Name="ItemsList_Header_Image_Root"
+                            SizeChanged="ItemsList_Header_Image_Root_SizeChanged"
+                            VerticalAlignment="Top"
+                            HorizontalAlignment="Left"
+                            Height="280">
+                            <Rectangle x:Name="ItemsList_Header_Image_Shadow"/>
+                            <controls:ImageEx
+                                x:Name="ItemsList_Header_Image"
+                                CornerRadius="8"
+                                BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                                BorderThickness="0">
+                                <c:Effects.Shadow>
+                                    <c:AttachedDropShadow BlurRadius="50" Color="#30000000" CastTo="{x:Bind ItemsList_Header_Image_Shadow}" Offset="0,3"/>
+                                </c:Effects.Shadow>
+                            </controls:ImageEx>
+                        </Grid>
+                        <Grid x:Name="ItemsList_Header_Info_Root">
+                            <Grid 
+                                x:Name="ItemsList_Header_Info_Root_SizeChanger"
+                                HorizontalAlignment="Left">
+                                <StackPanel x:Name="ItemsList_Header_Info_StackPanel">
+                                    <TextBlock
+                                        x:Name="ItemsList_Header_Info_TitleTextBlock"
+                                        Text="Title"
+                                        Style="{ThemeResource SubTBHeader}"/>
+                                    <TextBlock x:Name="ItemsList_Header_Info_OtherTextBlock" Text="Other"/>
+                                </StackPanel>
+                                <CommandBar
+                                    x:Name="ItemsList_Header_Info_CommandBar"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    DefaultLabelPosition="Right"
+                                    Margin="0,0,0,0"
+                                    AccessKey="Z">
+                                    <CommandBar.SecondaryCommands>
+                                        <AppBarElementContainer 
+                                            AllowFocusOnInteraction="True"
+                                            x:Name="SortComboBoxParent">
+                                            <ComboBox
+                                                x:Name="SortComboBox"
+                                                SelectionChanged="SortComboBox_SelectionChanged"
+                                                Header="排序方式"
+                                                AccessKey="X"
+                                                Margin="12, 4">
+                                            </ComboBox>
+                                        </AppBarElementContainer>
+                                    </CommandBar.SecondaryCommands>
+                                    <AppBarButton
+                                        Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                                        Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                        BorderThickness="0,0,0,1"
+                                        Label="全部播放（Alt+Q）"
+                                        ToolTipService.ToolTip="播放歌单内的所有歌曲"
+                                        Click="AppBarButton_Click" Tag="playAll">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xEE4A;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Label="刷新"
+                                        ToolTipService.ToolTip="刷新"
+                                        Click="AppBarButton_Click" Tag="refresh">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xE72C;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarToggleButton
+                                        Click="AppBarToggleButton_Click"
+                                        Label="多选" Tag="multiSelect"
+                                        ToolTipService.ToolTip="多选">
+                                        <AppBarToggleButton.Icon>
+                                            <FontIcon Glyph="&#xE762;"/>
+                                        </AppBarToggleButton.Icon>
+                                    </AppBarToggleButton>
+                                    <AppBarToggleButton
+                                        Click="AppBarToggleButton_Click"
+                                        Label="排序" Tag="move"
+                                        ToolTipService.ToolTip="拖动音乐控件以重新排序">
+                                        <AppBarToggleButton.Icon>
+                                            <FontIcon Glyph="&#xEA37;"/>
+                                        </AppBarToggleButton.Icon>
+                                    </AppBarToggleButton>
+                                    <AppBarButton
+                                        Label="添加本地文件"
+                                        ToolTipService.ToolTip="添加本地文件"
+                                        Click="AppBarButton_Click" Tag="addLocal">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xE8E5;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Label="搜索"
+                                        ToolTipService.ToolTip="搜索播放列表中的歌曲"
+                                        Click="AppBarButton_Click" Tag="search">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xE721;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    
+                                    <AppBarButton
+                                        Click="multiButton_Click"
+                                        Tag="multi_selectAll"
+                                        Label="选中全部"
+                                        ToolTipService.ToolTip="选中全部">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xE8B3;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Click="multiButton_Click"
+                                        Tag="multi_selectReverse"
+                                        Label="反选"
+                                        ToolTipService.ToolTip="反选">
+                                        <AppBarButton.Icon>
+                                            <PathIcon Data="{StaticResource 反选}"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Click="multiButton_Click"
+                                        Tag="multi_deleteSelect"
+                                        Label="删除选中歌曲"
+                                        ToolTipService.ToolTip="删除选中歌曲">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xE74D;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Click="multiButton_Click"
+                                        Tag="multi_downloadSelect"
+                                        Label="下载选中歌曲"
+                                        ToolTipService.ToolTip="下载选中歌曲">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xE896;"/>
+                                        </AppBarButton.Icon>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Click="multiButton_Click"
+                                        Tag="multi_addSelectToPlayList"
+                                        Label="添加选中歌曲到播放列表中"
+                                        ToolTipService.ToolTip="添加选中歌曲到播放列表中">
+                                        <AppBarButton.Flyout>
+                                            <MenuFlyout Opening="multi_addSelectToPlayList_flyout_Opening" Closed="multi_addSelectToPlayList_flyout_Closed"/>
+                                        </AppBarButton.Flyout>
+                                        <Viewbox Width="9" Margin="2,0,0,0">
+                                            <Grid>
+                                                <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
+                                                            VerticalAlignment="Top"/>
+                                                <FontIcon Glyph="&#xE90B;"
+                                                            VerticalAlignment="Bottom"/>
+                                            </Grid>
+                                        </Viewbox>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Click="multiButton_Click"
+                                        Tag="multi_addSelectToPlaying"
+                                        Label="添加选中歌曲到正在播放的列表中"
+                                        ToolTipService.ToolTip="添加选中歌曲到正在播放的列表中">
+                                        <Viewbox Width="9" Margin="2,0,0,0" VerticalAlignment="Center">
+                                            <Grid>
+                                                <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
+                                                            VerticalAlignment="Top"/>
+                                                <FontIcon Glyph="&#xEE4A;"
+                                                            VerticalAlignment="Bottom"/>
+                                            </Grid>
+                                        </Viewbox>
+                                    </AppBarButton>
+                                </CommandBar>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                    <Grid x:Name="ItemsList_Header_Foot_Root">
+                        <controls:ScrollFootButton
+                            x:Name="ItemsList_Header_Foot_Buttons"
+                            VerticalAlignment="Bottom"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                    <Grid 
+                        x:Name="ItemList_Header_Search_Root"
+                        VerticalAlignment="Bottom" >
+                        <controls:ScrollViewerSearchControl
+                            x:Name="ItemList_Header_Search_Control"
+                            Margin="16,0" IsOpen="False"/>
+                    </Grid>
+                </Grid>
+            </ListView.Header>
+            <ListView.Footer>
+                <Grid>
+                    <TextBlock
+                        Text="到底了~"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Bottom"
+                        Margin="4,4,4,52" x:Name="AtListBottomTb"
+                        Foreground="{ThemeResource TextFillColorSecondary}"/>
+                </Grid>
+            </ListView.Footer>
+        </ListView>
+    </Grid>
+</Page>

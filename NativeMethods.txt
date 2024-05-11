@@ -1,0 +1,3 @@
+﻿RegisterHotKey
+SetWindowLongPtr
+CallWindowProc

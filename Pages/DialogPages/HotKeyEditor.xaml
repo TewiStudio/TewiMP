@@ -1,0 +1,25 @@
+<UserControl
+    x:Class="TewiMP.Pages.DialogPages.HotKeyEditor"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Pages.DialogPages"
+    xmlns:controls="using:TewiMP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid x:Name="Root"
+          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1"
+          Background="{ThemeResource LayerOnAccentAcrylicFillColorDefaultBrush}" Padding="12"
+          CornerRadius="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="NowHotKeyText" Text="当前热键："/>
+        <controls:KeyControl x:Name="HotKeyViewer" Grid.Row="2" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+        <TextBlock Text="只能记录以 Win、Ctrl、Shift 开头的热键" Grid.Row="3" FontSize="12" HorizontalAlignment="Center" Margin="0,12,0,0"/>
+    </Grid>
+</UserControl>

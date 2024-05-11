@@ -1,0 +1,42 @@
+<Button
+    x:Class="TewiMP.Controls.SongHistoryCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" Padding="0" Style="{ThemeResource DefaultButtonStyle}"
+    Background="Transparent" BorderBrush="Transparent" Click="Button_Click">
+    <Grid>
+        <Rectangle x:Name="BackgroundRectangle" Fill="{ThemeResource SongHistoryCardBackground}" Visibility="Collapsed"/>
+        <Grid Padding="12,0">
+            <Grid.Resources>
+                <Style TargetType="TextBlock">
+                    <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Border Margin="0,0,12,0" Width="38">
+                <TextBlock Text="{Binding Count}" HorizontalAlignment="Center"/>
+            </Border>
+            <TextBlock x:Name="countTb" Text="{Binding MusicData.Title}" Margin="0,0,12,0" Grid.Column="1"/>
+            <Button Grid.Column="2" Margin="0,0,12,0" Padding="8,12" Background="Transparent" BorderThickness="0"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <TextBlock Text="{Binding MusicData.ArtistName}"/>
+            </Button>
+            <Button Grid.Column="3" Margin="0,0,12,0" Padding="8,12" Background="Transparent" BorderThickness="0"
+                                HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                <TextBlock Text="{Binding MusicData.Album}"/>
+            </Button>
+            <TextBlock Text="{Binding Time}" Grid.Column="4" Width="160"/>
+        </Grid>
+    </Grid>
+</Button>

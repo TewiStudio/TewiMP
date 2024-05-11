@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="TewiMP.Controls.MusicDataFlyout"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Unloaded="UserControl_Unloaded">
+    <UserControl.Resources>
+        <MenuFlyout
+            x:Name="root"
+            Opened="root_Opened"
+            Closed="root_Closed">
+            <MenuFlyoutItem x:Name="TitleTextblock" IsEnabled="False"/>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem 
+                Text="播放"
+                Tag="play"
+                Click="MenuFlyoutItem_Click"
+                AccessKey="Q">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon x:Name="PlayingIconMenu" Glyph="&#xE768;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Text="添加到播放中列表"
+                Tag="addToPlayingList"
+                Click="MenuFlyoutItem_Click"
+                AccessKey="W">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE710;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Text="下一首播放"
+                Tag="setToNextPlay"
+                Click="MenuFlyoutItem_Click"
+                AccessKey="E">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE893;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem
+                Text="从列表中删除"
+                Tag="deleteFromPlaylist"
+                Click="MenuFlyoutItem_Click"
+                AccessKey="R"
+                x:Name="DeleteFromPlaylistItem">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE74D;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSubItem
+                Text="添加到播放列表"
+                x:Name="AddToPlayListSubItems"
+                Loaded="AddToPlayListSubItems_Loaded"
+                Unloaded="AddToPlayListSubItems_Unloaded"
+                AccessKey="T">
+                <MenuFlyoutSubItem.Icon>
+                    <FontIcon Glyph="&#xE90B;"/>
+                </MenuFlyoutSubItem.Icon>
+            </MenuFlyoutSubItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutSubItem
+                x:Name="ArtistItem"
+                Text="艺术家"
+                AccessKey="S"
+                Loaded="ArtistItem_Loaded"
+                Unloaded="ArtistItem_Unloaded">
+                <MenuFlyoutSubItem.Icon>
+                    <FontIcon Glyph="&#xE77B;"/>
+                </MenuFlyoutSubItem.Icon>
+            </MenuFlyoutSubItem>
+            <MenuFlyoutItem
+                Tag="album"
+                Text="专辑"
+                Click="MenuFlyoutItem_Click"
+                x:Name="AlbumItem"
+                AccessKey="D">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE93C;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem
+                Text="下载"
+                Tag="download"
+                Click="MenuFlyoutItem_Click"
+                AccessKey="A"
+                Visibility="{Binding ElementName=LinkItem,Path=Visibility}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE896;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSubItem
+                Text="去搜索"
+                AccessKey="Z">
+                <MenuFlyoutSubItem.Icon>
+                    <FontIcon Glyph="&#xE721;"/>
+                </MenuFlyoutSubItem.Icon>
+                <MenuFlyoutItem
+                    Text="在软件内搜索"
+                    Click="MenuFlyoutItem_Click"
+                    Tag="search_software">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE721;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem
+                    Text="去网站上搜索..."
+                    Click="MenuFlyoutItem_Click"
+                    Tag="search_websiteSearch">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xF6FA;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem
+                    Text="浏览其网站..."
+                    Click="MenuFlyoutItem_Click"
+                    Tag="search_website"
+                    Visibility="{Binding ElementName=LinkItem,Path=Visibility}">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xEB41;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem
+                    Text="复制标题"
+                    Click="MenuFlyoutItem_Click"
+                    Tag="search_copy">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE8C8;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+            </MenuFlyoutSubItem>
+            <MenuFlyoutItem
+                Text="获取直链..."
+                Click="MenuFlyoutItem_Click"
+                Tag="link"
+                AccessKey="X"
+                x:Name="LinkItem">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE71B;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem
+                Text="浏览本地文件..."
+                Click="MenuFlyoutItem_Click"
+                Tag="exploreLocalFile"
+                x:Name="ExploreLocalFileItem"
+                AccessKey="C">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE8DA;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Text="选择其它应用打开..."
+                Click="MenuFlyoutItem_Click"
+                Tag="openWithOtherSoftware"
+                Visibility="{Binding ElementName=ExploreLocalFileItem,Path=Visibility}"
+                AccessKey="V">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xECAA;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem
+                Text="从列表中删除并删除其文件"
+                Click="MenuFlyoutItem_Click"
+                Visibility="{Binding ElementName=ExploreLocalFileItem,Path=Visibility}"
+                AccessKey="B"
+                Tag="deleteFile">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE74D;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator Visibility="{Binding ElementName=ExploreLocalFileItem,Path=Visibility}"/>
+            <MenuFlyoutItem
+                Text="预缓存"
+                Click="MenuFlyoutItem_Click"
+                AccessKey="A"
+                Visibility="{Binding ElementName=LinkItem,Path=Visibility}"
+                Tag="cache">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xEDA2;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem 
+                Text="删除缓存"
+                Click="MenuFlyoutItem_Click"
+                AccessKey="A"
+                Visibility="{Binding ElementName=LinkItem,Path=Visibility}"
+                Tag="cacheDelete">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xECC9;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator Visibility="{Binding ElementName=LinkItem,Path=Visibility}"/>
+            <MenuFlyoutItem
+                Text="详细信息..."
+                Click="MenuFlyoutItem_Click"
+                AccessKey="N"
+                Tag="info">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE946;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+    </UserControl.Resources>
+</UserControl>

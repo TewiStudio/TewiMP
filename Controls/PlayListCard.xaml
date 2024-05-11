@@ -1,0 +1,64 @@
+﻿<Grid
+    x:Class="TewiMP.Controls.PlayListCard"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" Background="Transparent"
+    Loaded="UILoaded" Unloaded="UIUnloaded"
+    PointerEntered="Grid_PointerEntered" PointerExited="Grid_PointerExited"
+    PointerPressed="Grid_PointerPressed" PointerReleased="Grid_PointerReleased"
+    RightTapped="Grid_RightTapped" Holding="Grid_Holding" AccessKeyInvoked="Grid_AccessKeyInvoked">
+
+    <Grid.Transitions>
+        <TransitionCollection>
+            <RepositionThemeTransition/>
+        </TransitionCollection>
+    </Grid.Transitions>
+
+    <Grid.Resources>
+        <MenuFlyout x:Name="FlyoutMenu">
+            <MenuFlyoutItem x:Name="EditPlayListButton" Icon="edit" Text="编辑" Click="EditPlayListButton_Click"/>
+            <MenuFlyoutItem x:Name="RefreshPlayListButton" Icon="refresh" Text="更新" Click="MenuFlyoutItem_Click_1"/>
+            <MenuFlyoutItem Text="删除" Click="MenuFlyoutItem_Click" Foreground="{ThemeResource SystemFillColorCriticalBrush}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE74D;" Foreground="{ThemeResource SystemFillColorCriticalBrush}"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+    </Grid.Resources>
+
+    <Rectangle x:Name="ShadowBaseRectangle"/>
+    <Border CornerRadius="8"
+            BorderThickness="1"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+        <Grid CornerRadius="7">
+            <local:ImageEx x:Name="PlayListImage" Stretch="UniformToFill" PointInBehavior="OnlyLightUp"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="8"/>
+            <Grid IsHitTestVisible="False"
+                      VerticalAlignment="Bottom">
+                <Grid Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                          BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                          BorderThickness="1" CornerRadius="8"
+                          Padding="8" Margin="4"
+                      HorizontalAlignment="Left">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <local:AutoScrollViewer>
+                        <TextBlock x:Name="TextBaseTb"
+                                   Text="{Binding ListShowName}"/>
+                    </local:AutoScrollViewer>
+                    <local:AutoScrollViewer Grid.Row="1">
+                        <TextBlock FontSize="12">
+                        <Run Text="{Binding Songs.Count}"/>首歌曲
+                        </TextBlock>
+                    </local:AutoScrollViewer>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Border>
+</Grid>

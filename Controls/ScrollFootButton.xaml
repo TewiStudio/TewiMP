@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="TewiMP.Controls.ScrollFootButton"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    MaxHeight="42" MinHeight="42">
+    <UserControl.Resources>
+        <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Width" Value="40"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel
+            Orientation="Horizontal"
+            BorderThickness="1" CornerRadius="4"
+            Background="{ThemeResource AcrylicNormal}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+            <Button
+                x:FieldModifier="Public" x:Name="PositionToBottom_Button"
+                AccessKey="C" CornerRadius="4,0,0,4"
+                ToolTipService.ToolTip="滚动到底部">
+                <AnimatedIcon>
+                    <AnimatedIcon.Source>
+                        <m:AnimatedChevronDownSmallVisualSource/>
+                    </AnimatedIcon.Source>
+                </AnimatedIcon>
+            </Button>
+            <Button
+                x:FieldModifier="Public" x:Name="PositionToTop_Button"
+                AccessKey="V" CornerRadius="0,4,4,0"
+                ToolTipService.ToolTip="滚动到顶部">
+                <AnimatedIcon
+                    ui:VisualExtensions.RotationAngleInDegrees="180"
+                    ui:VisualExtensions.CenterPoint="9,9">
+                    <AnimatedIcon.Source>
+                        <m:AnimatedChevronDownSmallVisualSource/>
+                    </AnimatedIcon.Source>
+                </AnimatedIcon>
+            </Button>
+        </StackPanel>
+        <Border
+            BorderThickness="1" CornerRadius="4" Margin="4,0,0,0"
+            Background="{ThemeResource AcrylicNormal}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+            Grid.Column="1">
+            <Button
+                x:FieldModifier="Public" x:Name="PositionToNowPlaying_Button"
+                AccessKey="N"
+                ToolTipService.ToolTip="滚动到当前正在播放的歌曲">
+                <FontIcon Glyph="&#xE759;" FontSize="16"/>
+            </Button>
+        </Border>
+    </Grid>
+</UserControl>

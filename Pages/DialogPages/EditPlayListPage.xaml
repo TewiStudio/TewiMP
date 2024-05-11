@@ -1,0 +1,24 @@
+﻿<Page
+    x:Class="TewiMP.Pages.DialogPages.EditPlayListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Pages.DialogPages"
+    xmlns:cc="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" Loaded="Page_Loaded">
+    <Grid>
+        <ScrollView>
+            <StackPanel Orientation="Vertical"
+                        Spacing="12">
+                <TextBox Header="名称" x:Name="Name_TB"
+                         PlaceholderText="在这里输入此播放列表的名称"/>
+                <cc:WrapPanel Orientation="Horizontal" HorizontalSpacing="8" VerticalSpacing="8">
+                    <TextBox Header="图片地址" Padding="6" x:Name="ImagePath_TB"
+                             PlaceholderText="默认图片地址"/>
+                    <Button Content="选择图片" VerticalAlignment="Bottom" Click="Button_Click"/>
+                </cc:WrapPanel>
+            </StackPanel>
+        </ScrollView>
+    </Grid>
+</Page>

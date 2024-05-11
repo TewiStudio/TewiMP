@@ -1,0 +1,39 @@
+<Grid
+    x:Class="TewiMP.Controls.NotifyItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" SizeChanged="sizeChanged" Loaded="Grid_Loaded" Unloaded="unloaded"
+    DataContextChanged="Grid_DataContextChanged" HorizontalAlignment="Center"
+    Background="{ThemeResource AcrylicNormal}" BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+    BorderThickness="1" CornerRadius="4" Margin="24,0" MaxWidth="1800">
+    <Grid x:Name="BackgroundColorControl" CornerRadius="4">
+        <Rectangle Fill="{ThemeResource SystemFillColorSuccessBackgroundBrush}"/>
+        <Rectangle Fill="{ThemeResource SystemFillColorCautionBackgroundBrush}"/>
+        <Rectangle Fill="{ThemeResource SystemFillColorCriticalBackgroundBrush}"/>
+    </Grid>
+    <Grid Padding="12">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid VerticalAlignment="Center" Grid.Row="0"
+              Margin="0,0,12,0">
+            <FontIcon x:Name="IconControlBackground" Glyph="&#xF136;" FontSize="20"
+                      Foreground="{ThemeResource SystemAccentColorDark1}"/>
+            <FontIcon x:Name="IconControl" Glyph="&#xF13E;" FontSize="20"/>
+            <ProgressRing x:Name="IconLoading" Visibility="Collapsed"
+                          Width="20" Height="20"/>
+        </Grid>
+        <TextBlock x:Name="TitleTextBlox" Text="Title" FontSize="14" Grid.Row="0" Grid.Column="1" FontWeight="Black"
+                   TextWrapping="Wrap" HorizontalAlignment="Stretch"/>
+        <TextBlock x:Name="MessageTextBlock" Text="Message" Grid.Row="1" Grid.Column="1" Margin="0,2,0,0"
+                   TextWrapping="Wrap" HorizontalAlignment="Stretch"/>
+    </Grid>
+</Grid>

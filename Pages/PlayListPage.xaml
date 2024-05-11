@@ -1,0 +1,73 @@
+﻿<Page
+    x:Class="TewiMP.Pages.PlayListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP"
+    xmlns:c="using:TewiMP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:data="using:TewiMP.DataEditor"
+    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
+    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:cc="using:TewiMP.Controls"
+    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
+
+    <GridView x:Name="BaseGridView"
+              SelectionMode="None"
+              Loaded="BaseGridView_Loaded"
+              animations:Connected.ListItemKey="listItem"
+              animations:Connected.ListItemElementName="ItemThumbnail"
+              animations:ItemsReorderAnimation.Duration="00:00:00.2000000">
+        <GridView.Header>
+            <Grid x:Name="BaseGridView_HeaderGrid">
+                <Border x:Name="BaseGridView_HeaderRectangle" Background="{ThemeResource AcrylicNormal}"    
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1"/>
+                <TextBlock x:Name="BaseGridView_HeaderTextBlock" Text="播放列表" Style="{ThemeResource TBHeader}"/>
+                <CommandBar VerticalAlignment="Bottom" Margin="0,0,10,-6" Background="Transparent"
+                            OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
+                    <AppBarButton Label="排序" AccessKey="L" Click="AppBarButton_Click_2">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE8CB;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE72C;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarButton Label="添加/导入" AccessKey="A" Click="AppBarButton_Click_1">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE710;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                </CommandBar>
+            </Grid>
+        </GridView.Header>
+        <ItemsView x:Name="ItemsViewer" SelectionMode="None" Margin="16,12,12,0"
+                   HorizontalAlignment="Center" VerticalAlignment="Center">
+            <ItemsView.Resources>
+                <SolidColorBrush x:Key="ItemContainerPointerOverBackground" Color="Transparent"/>
+                <SolidColorBrush x:Key="ItemContainerPressedBackground" Color="Transparent"/>
+            </ItemsView.Resources>
+            <ItemsView.Layout>
+                <LinedFlowLayout ItemsStretch="Fill" LineHeight="320" LineSpacing="12" MinItemSpacing="12"/>
+            </ItemsView.Layout>
+            <ItemsView.ItemTemplate>
+                <DataTemplate x:DataType="data:MusicListData">
+                    <ItemContainer>
+                        <cc:PlayListCard/>
+                    </ItemContainer>
+                </DataTemplate>
+            </ItemsView.ItemTemplate>
+        </ItemsView>
+        <!--
+        <GridView.ItemTemplate>
+            <DataTemplate>
+                <g x:Name="ItemThumbnail"></g>
+            </DataTemplate>
+        </GridView.ItemTemplate>-->
+    </GridView>
+
+</Page>

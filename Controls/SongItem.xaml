@@ -1,0 +1,305 @@
+﻿<Grid
+    x:Class="TewiMP.Controls.SongItem"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    mc:Ignorable="d" Loaded="Grid_Loaded" KeyUp="SongItem_KeyUp"
+    RightTapped="Button_RightTapped" Background="{x:Null}" x:FieldModifier="Public" 
+    PointerPressed="Grid_PointerPressed" PointerReleased="Grid_PointerReleased"
+    PointerEntered="Grid_PointerEntered" PointerExited="Grid_PointerExited"
+    Holding="Grid_Holding" x:Name="root"
+    AccessKeyInvoked="root_AccessKeyInvoked" MinHeight="58">
+    
+    <Grid.Resources>
+        <MenuFlyout x:Name="rmf" Opening="rmf_Opening" Opened="rmf_Opened" Closed="rmf_Closed">
+            <MenuFlyoutItem Text="{x:Bind MusicData.Title, Mode=OneWay}" IsEnabled="False"/>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem Text="播放" Click="MenuFlyoutItem_Click_2" AccessKey="Q">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon x:Name="PlayingIconMenu" Glyph="&#xE768;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="添加到播放中列表" Click="AddPlay_Click" AccessKey="W">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE710;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="下一首播放" Click="NextPlay_Click" AccessKey="E">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE893;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem x:Name="DeleteFlyoutBtn" Text="从列表中删除" Click="DeleteFlyoutBtn_Click" AccessKey="R" Tag="0">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE74D;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSubItem x:Name="AddToPlayListSubItems" Text="添加到播放列表" Loaded="AddToPlayListSubItems_Loaded" AccessKey="T">
+                <MenuFlyoutSubItem.Icon>
+                    <FontIcon Glyph="&#xE90B;"/>
+                </MenuFlyoutSubItem.Icon>
+                </MenuFlyoutSubItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutSubItem x:Name="rmfs" Text="艺术家" AccessKey="S">
+                <MenuFlyoutSubItem.Icon>
+                    <FontIcon Glyph="&#xE77B;"/>
+                </MenuFlyoutSubItem.Icon>
+            </MenuFlyoutSubItem>
+            <MenuFlyoutItem x:Name="rmfi" Text="专辑" Click="mfi_Click" AccessKey="D">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE93C;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem Text="下载" Click="Download_Click" AccessKey="A" x:Name="Menuflyout_DownloadItem">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE896;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSubItem Text="去搜索" AccessKey="Z">
+                <MenuFlyoutSubItem.Icon>
+                    <FontIcon Glyph="&#xE721;"/>
+                </MenuFlyoutSubItem.Icon>
+                <MenuFlyoutItem Text="在软件内搜索" Click="Search_Click" Tag="0">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE721;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="去网站上搜索..." Click="Search_Click" Tag="1">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xF6FA;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="浏览其网站..." Click="Search_Click" Tag="2" x:Name="MenuFlyout_BrowseSiteItem">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xEB41;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+                <MenuFlyoutItem Text="复制标题" Click="Search_Click" Tag="3">
+                    <MenuFlyoutItem.Icon>
+                        <FontIcon Glyph="&#xE8C8;"/>
+                    </MenuFlyoutItem.Icon>
+                </MenuFlyoutItem>
+            </MenuFlyoutSubItem>
+            <MenuFlyoutItem Text="获取直链..." Click="MenuFlyoutItem_Click" x:Name="MenuFlyout_GetUriItem" AccessKey="X">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE71B;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator/>
+            <MenuFlyoutItem Text="浏览本地文件..." Click="MenuFlyoutItem_Click_1" x:Name="MenuFlyout_BrowseFileItem" AccessKey="C">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE8DA;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="选择其它应用打开..." Click="MenuFlyout_OpenFileItem_Click" x:Name="MenuFlyout_OpenFileItem" AccessKey="V">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xECAA;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="从列表中删除并删除其文件" Click="DeleteFlyoutBtn_Click" x:Name="DeleteFileFlyoutBtn" Visibility="{Binding ElementName=MenuFlyout_OpenFileItem,Path=Visibility}" AccessKey="B" Tag="1">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE74D;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator Visibility="{Binding ElementName=MenuFlyout_OpenFileItem,Path=Visibility}"/>
+            <MenuFlyoutItem Text="预缓存" Click="Menuflyout_CacheItem_Click" AccessKey="A" x:Name="Menuflyout_CacheItem">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xEDA2;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutItem Text="删除缓存" Click="Menuflyout_DeleteCacheItem_Click" AccessKey="A" x:Name="Menuflyout_DeleteCacheItem"
+                            Visibility="{Binding ElementName=Menuflyout_CacheItem,Path=Visibility}">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xECC9;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+            <MenuFlyoutSeparator Visibility="{Binding ElementName=Menuflyout_CacheItem,Path=Visibility}"/>
+            <MenuFlyoutItem Text="详细信息..." Click="Info_Click" AccessKey="N">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE946;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+
+        <MenuFlyout x:Name="mf" Opening="mf_Opening">
+            <MenuFlyoutSubItem x:Name="mfs" Text="艺术家">
+                <MenuFlyoutSubItem.Icon>
+                    <FontIcon Glyph="&#xE77B;"/>
+                </MenuFlyoutSubItem.Icon>
+            </MenuFlyoutSubItem>
+            <MenuFlyoutItem x:Name="mfi" Text="专辑" Click="mfi_Click">
+                <MenuFlyoutItem.Icon>
+                    <FontIcon Glyph="&#xE93C;"/>
+                </MenuFlyoutItem.Icon>
+            </MenuFlyoutItem>
+        </MenuFlyout>
+        
+    </Grid.Resources>
+
+    <Border HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            BorderThickness="0"
+            CornerRadius="0"
+            Background="Transparent"
+            x:Name="rootBorder">
+        <Grid>
+            <Rectangle x:Name="BackgroundBaseGrid"
+                       RadiusX="8" RadiusY="8"
+                       Fill="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                       Stroke="{ThemeResource ControlElevationBorderBrush}"
+                       StrokeThickness="1"
+                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <Rectangle x:Name="StrokeBase"
+                       RadiusX="8" RadiusY="8"
+                       Fill="{x:Null}"
+                       Stroke="{ThemeResource AccentFillColorDefaultBrush}"
+                       StrokeThickness="2"
+                       VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+            <Rectangle HorizontalAlignment="Left"
+                       Width="3"
+                       Fill="{ThemeResource SystemColorControlAccentBrush}"
+                       Margin="3,20"
+                       RadiusX="1.5" RadiusY="1.5"
+                       x:Name="PlayingThemeRectangle"
+                       Opacity="0">
+                <Rectangle.OpacityTransition>
+                    <ScalarTransition/>
+                </Rectangle.OpacityTransition>
+            </Rectangle>
+            <Grid x:Name="BaseGrid">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Grid x:Name="InfoRoot" Opacity="1" x:FieldModifier="Public"
+                      Background="Transparent"
+                      Tapped="Grid_Tapped"
+                      DoubleTapped="Grid_DoubleTapped"
+                      Padding="8">
+                    <Grid.OpacityTransition>
+                        <ScalarTransition/>
+                    </Grid.OpacityTransition>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid x:Name="AlbumImage_BaseGrid"
+                          Width="58"
+                          Height="58">
+                        <Border x:Name="AlbumImage_BaseBorder"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                IsHitTestVisible="False" x:FieldModifier="Public"
+                                CornerRadius="0">
+                            <Grid>
+                                <Border Visibility="{Binding ElementName=AlbumImage, Path=Visibility}"
+                                        BorderThickness="1"
+                                        BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                                        CornerRadius="4">
+                                    <local:ImageEx x:Name="AlbumImage"
+                                                   PointInBehavior="None"
+                                                   CornerRadius="3"/>
+                                </Border>
+                                <Grid Width="58" Height="58" x:Name="FileNotExistsRoot" Visibility="Collapsed"
+                                      CornerRadius="4"
+                                      BorderThickness="1"
+                                      BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+                                    <Rectangle Fill="{ThemeResource SystemFillColorCriticalBackgroundBrush}"
+                                               RadiusX="4" RadiusY="4"/>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <FontIcon Glyph="&#xE7BA;" FontSize="20" VerticalAlignment="Bottom" Margin="0,0,0,2"/>
+                                        <TextBlock Text="找不到文件" FontSize="10" HorizontalAlignment="Center" VerticalAlignment="Bottom"/>
+                                    </StackPanel>
+                                </Grid>
+                                <Grid x:Name="PlayingIconRoot" Visibility="Collapsed" Background="{ThemeResource AcrylicNormal}">
+                                    <FontIcon Glyph="&#xF61F;" FontSize="48" Foreground="{ThemeResource AccentAAFillColorTertiaryBrush}" VerticalAlignment="Center"/>
+                                </Grid>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                    <Grid VerticalAlignment="Center"
+                          HorizontalAlignment="Left"
+                          Margin="12,0,0,0"
+                          Grid.Column="1"
+                          RasterizationScale="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock x:Name="TitleTextBlock"
+                                   x:FieldModifier="Public"
+                                   IsHitTestVisible="False"
+                                   TextTrimming="CharacterEllipsis"
+                                   Grid.Row="0"
+                                   Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"
+                                   FontSize="13">
+                            <Run Text="{Binding MusicData.Count}"/>.
+                            <Run Text="{Binding MusicData.Title}"
+                                 Foreground="{ThemeResource ApplicationForegroundThemeBrush}"
+                                 FontSize="14"/>
+                            <Run/>
+                            <Run Text="{Binding MusicData.Title2}"/>
+                        </TextBlock>
+                        <Grid Grid.Row="1" HorizontalAlignment="Left">
+                            <Button BorderThickness="0"
+                                    Background="Transparent"
+                                    Margin="0,0,0,0"
+                                    Padding="0"
+                                    x:Name="InfoButton"
+                                    Flyout="{ThemeResource mf}"
+                                    Content=" "
+                                    HorizontalAlignment="Stretch">
+                                <Button.Resources>
+                                    <ResourceDictionary>
+                                        <ResourceDictionary.ThemeDictionaries>
+                                            <ResourceDictionary x:Key="Dark">
+                                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#15FFFFFF"/>
+                                            </ResourceDictionary>
+                                            <ResourceDictionary x:Key="Light">
+                                                <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#15000000"/>
+                                                <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#0A000000"/>
+                                            </ResourceDictionary>
+                                        </ResourceDictionary.ThemeDictionaries>
+                                    </ResourceDictionary>
+                                </Button.Resources>
+                            </Button>
+                            <TextBlock x:Name="ButtonNameTextBlock" x:FieldModifier="Public" IsHitTestVisible="False" FontSize="12" Text="{x:Bind MusicData.ButtonName,Mode=OneWay}" Foreground="{ThemeResource SystemChromeDisabledLowColor}" TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+
+                    </Grid>
+                </Grid>
+
+                <FontIcon x:Name="MoveSymbol" Visibility="Collapsed" Glyph="&#xE700;" Grid.Column="2" Margin="8,0,12,0" Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
+                <StackPanel x:Name="RightToolBar" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" FlowDirection="LeftToRight" Margin="0,0,8,0">
+                    <StackPanel.Resources>
+                        <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                            <Setter Property="BorderBrush" Value="{ThemeResource CircleElevationBorderBrush}"/>
+                            <Setter Property="BorderThickness" Value="1"/>
+                            <Setter Property="Width" Value="38"/>
+                            <Setter Property="Height" Value="38"/>
+                            <Setter Property="CornerRadius" Value="18"/>
+                            <Setter Property="Padding" Value="0"/>
+                        </Style>
+                        <Style TargetType="FontIcon">
+                            <Setter Property="FontSize" Value="14"/>
+                        </Style>
+                    </StackPanel.Resources>
+                    <Button ToolTipService.ToolTip="播放" Click="Play_Click">
+                        <FontIcon x:Name="PlayingButtonIcon" Glyph="&#xE768;"/>
+                    </Button>
+                    <Button Margin="4,0,0,0" ToolTipService.ToolTip="更多选项" Click="Button_Click">
+                        <FontIcon Glyph="&#xE712;"/>
+                    </Button>
+                </StackPanel>
+
+            </Grid>
+        </Grid>
+    </Border>
+</Grid>

@@ -1,0 +1,366 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+		<RootNamespace>TewiMP</RootNamespace>
+		<AssemblyName>TewiMP</AssemblyName>
+		<Platforms>x86;x64;arm64</Platforms>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+		<UseWinUI>true</UseWinUI>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<NeutralLanguage>zh-CN</NeutralLanguage>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<PlatformTarget>x64</PlatformTarget>
+		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
+		<PublishTrimmed>False</PublishTrimmed>
+		<PublishAot>False</PublishAot>
+		<ApplicationIcon>Images\Icons\icon.ico</ApplicationIcon>
+		<ApplicationManifest>app.manifest</ApplicationManifest>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
+	  <DebugType>portable</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	  <DebugType>portable</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
+	  <DebugType>portable</DebugType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+	  <DebugType>portable</DebugType>
+	  <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+	  <DebugType>portable</DebugType>
+	  <Optimize>True</Optimize>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
+	  <DebugType>portable</DebugType>
+	  <Optimize>True</Optimize>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<None Remove="Background.zip" />
+		<None Remove="Controls\ArtistCard.xaml" />
+		<None Remove="Controls\AutoView.xaml" />
+		<None Remove="Controls\DownloadCard.xaml" />
+		<None Remove="Controls\ImageEx.xaml" />
+		<None Remove="Controls\ItemListViewArtist.xaml" />
+		<None Remove="Controls\ItemListViewPlayList.xaml" />
+		<None Remove="Controls\ItemListViewSearch.xaml" />
+		<None Remove="Controls\KeyControl.xaml" />
+		<None Remove="Controls\LoadingTip.xaml" />
+		<None Remove="Controls\LyricItem.xaml" />
+		<None Remove="Controls\MediaPlayStateViewer.xaml" />
+		<None Remove="Controls\MusicDataFlyout.xaml" />
+		<None Remove="Controls\MusicDataItem.xaml" />
+		<None Remove="Controls\NotifyItem.xaml" />
+		<None Remove="Controls\PlayListCard.xaml" />
+		<None Remove="Controls\ScrollFootButton.xaml" />
+		<None Remove="Controls\ScrollViewerSearchControl.xaml" />
+		<None Remove="Controls\SongHistoryCard.xaml" />
+		<None Remove="Controls\SongHistoryInfo.xaml" />
+		<None Remove="Controls\SongItem.xaml" />
+		<None Remove="Controls\ImageEx.xaml" />
+		<None Remove="DesktopLyricWindow.xaml" />
+		<None Remove="Pages\BrowsePage.xaml" />
+		<None Remove="Pages\DialogPages\AddPlayListPage.xaml" />
+		<None Remove="Pages\DialogPages\AudioInfoPage.xaml" />
+		<None Remove="Pages\DialogPages\EditPlayListPage.xaml" />
+		<None Remove="Pages\DialogPages\EqualizerPage.xaml" />
+		<None Remove="Pages\DialogPages\HotKeyEditor.xaml" />
+		<None Remove="Pages\DialogPages\HotKeyPage.xaml" />
+		<None Remove="Pages\DialogPages\InsertPlayListPage.xaml" />
+		<None Remove="Pages\DownloadPage.xaml" />
+		<None Remove="Pages\EmptyPage.xaml" />
+		<None Remove="Pages\HistoryPage.xaml" />
+		<None Remove="Pages\ListViewPages\ItemListViewAlbum.xaml" />
+		<None Remove="Pages\ListViewPages\PlayListPage.xaml" />
+		<None Remove="Pages\LocalAudioPage.xaml" />
+		<None Remove="Pages\MusicPage.xaml" />
+		<None Remove="Pages\PlayListPage.xaml" />
+		<None Remove="Pages\SearchPage.xaml" />
+		<None Remove="Pages\SettingEqPage.xaml" />
+		<None Remove="Pages\SettingHotKeyPage.xaml" />
+		<None Remove="Pages\SettingPage.xaml" />
+		<None Remove="Windows\ImageViewerWindow.xaml" />
+		<None Remove="Windows\MediaPlayerWindow.xaml" />
+		<None Remove="Windows\NotifyIconWindow.xaml" />
+		<None Remove="Windows\TaskBarInfoWindow.xaml" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Content Include="Images\Icons\icon.ico" />
+		<Content Include="Images\Icons\icon_nobackground.ico" />
+		<Content Include="IpaDic\char.bin" />
+		<Content Include="IpaDic\matrix.bin" />
+		<Content Include="IpaDic\sys.dic" />
+		<Content Include="IpaDic\unk.dic" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CoelWu.Music.SDK" Version="1.0.7" />
+		<PackageReference Include="CommunityToolkit.WinUI" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.0.240109" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.0.240109" />
+		<PackageReference Include="CommunityToolkit.WinUI.Notifications" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Animations" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Behaviors" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Core" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.DataGrid" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Input" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Layout" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Markdown" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Media" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Primitives" Version="7.1.2" />
+		<PackageReference Include="CommunityToolkit.WinUI.UI.Media" Version="7.1.2" />
+		<PackageReference Include="Downloader" Version="3.0.6" />
+		<PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
+		<PackageReference Include="Melanchall.DryWetMidi" Version="7.0.2" />
+		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.4" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.18-beta">
+			<PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240428000" />
+		<PackageReference Include="NAudio" Version="2.2.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="PInvoke.BCrypt" Version="0.7.124" />
+		<PackageReference Include="PInvoke.NCrypt" Version="0.7.124" />
+		<PackageReference Include="PInvoke.User32" Version="0.7.124" />
+		<PackageReference Include="PInvoke.Windows.Core" Version="0.7.124" />
+		<PackageReference Include="SoundTouch.Net.NAudioSupport" Version="2.3.2" />
+		<PackageReference Include="System.Runtime.InteropServices.WindowsRuntime" Version="4.3.0" />
+		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
+		<PackageReference Include="TagLibSharp" Version="2.3.0" />
+		<PackageReference Include="Vanara.PInvoke.User32" Version="4.0.0" />
+		<Manifest Include="$(ApplicationManifest)" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Controls\MusicDataItem.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Controls\MusicDataFlyout.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Controls\ImageEx.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Controls\ScrollFootButton.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Controls\ScrollViewerSearchControl.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<None Update="Images\Icons\icon.ico">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Images\Icons\icon_nobackground.ico">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Media\Decoder\Flac\NAudio.Flac\FlacFrame_GetBuffer.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>FlacFrame_GetBuffer.cs</LastGenOutput>
+		</None>
+		<None Update="Media\Decoder\Flac\NAudio.Flac\SubFrames\FlacSubFrameLPC_Calculation.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>FlacSubFrameLPC_Calculation.cs</LastGenOutput>
+		</None>
+		<Page Update="Pages\ListViewPages\PlayListPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Page Update="Controls\KeyControl.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\NotifyItem.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\LoadingTip.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\SongHistoryInfo.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Pages\DialogPages\InsertPlayListPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\DialogPages\EditPlayListPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\LyricItem.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\ItemListViewPlayList.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\ItemListViewArtist.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\MediaPlayStateViewer.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\DownloadCard.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\ArtistCard.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="DesktopLyricWindow.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\PlayListCard.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\SongItem.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Controls\ItemListViewSearch.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\BrowsePage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\DialogPages\HotKeyPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\DialogPages\AudioInfoPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\DialogPages\AddPlayListPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\DialogPages\EqualizerPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\SettingEqPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\SettingHotKeyPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\EmptyPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\ListViewPages\ItemListViewAlbum.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Pages\LocalAudioPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\MusicPages\MusicPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\SettingPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\HistoryPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\PlayListPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\DownloadPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\SearchPage.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Windows\ImageViewerWindow.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Windows\TaskBarInfoWindow.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Windows\NotifyIconWindow.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+		<Page Update="Windows\MediaPlayerWindow.xaml">
+			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		</Page>
+
+		<Page Update="Pages\DialogPages\HotKeyEditor.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Controls\AutoView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Controls\SongHistoryCard.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Media\Decoder\Flac\NAudio.Flac\FlacFrame_GetBuffer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>FlacFrame_GetBuffer.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Media\Decoder\Flac\NAudio.Flac\SubFrames\FlacSubFrameLPC_Calculation.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>FlacSubFrameLPC_Calculation.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Properties\Resources.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
+	</ItemGroup>
+
+	<Target Name="RemovingLanuageFolders" AfterTargets="Build">
+		<ItemGroup>
+			<RemovingFiles Include="$(OutDir)*\*.mui" Exclude="$(OutDir)zh-CN\*.mui" />
+			<RemovingFolders Include="@(RemovingFiles->'%(RootDir)%(Directory)')" />
+		</ItemGroup>
+		<RemoveDir Directories="@(RemovingFolders)" />
+	</Target>
+</Project>

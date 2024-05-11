@@ -1,0 +1,89 @@
+﻿<Page
+    x:Class="TewiMP.Pages.DownloadPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP"
+    xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:controls="using:TewiMP.Controls"
+    xmlns:dm="using:TewiMP.Background"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
+
+    <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None">
+
+        <ListView.Header>
+            <Grid x:Name="HeaderBaseGrid">
+                <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1"/>
+                <TextBlock x:Name="HeaderBaseTextBlock" Text="下载" Style="{ThemeResource TBHeader}"/>
+                <CommandBar HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,14,-6"
+                            DefaultLabelPosition="Right">
+                    <AppBarButton Click="PausePlayBtn_Click"
+                                  Label="暂停下载"
+                                  AccessKey="P"
+                                  x:Name="PausePlayBtn">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE769;" x:Name="PausePlayIcon"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarButton x:Name="ToSettingBtn"
+                                  Click="ToSettingBtn_Click"
+                                  Label="选项"
+                                  AccessKey="D">
+                        <AppBarButton.Icon>
+                            <AnimatedIcon>
+                                <AnimatedIcon.Source>
+                                    <m:AnimatedSettingsVisualSource/>
+                                </AnimatedIcon.Source>
+                            </AnimatedIcon>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                </CommandBar>
+            </Grid>
+        </ListView.Header>
+
+        <ListView.Footer>
+            <Grid>
+                <TextBlock Text="到底了~"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Bottom"
+                           Margin="12" x:Name="AtListBottomTb"
+                           Foreground="{ThemeResource TextFillColorSecondary}"/>
+                <Grid VerticalAlignment="Bottom"
+                      HorizontalAlignment="Center"
+                      Background="{ThemeResource AcrylicNormal}"
+                      BorderThickness="1" CornerRadius="4"
+                      BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                      Margin="12,12,12,54" x:Name="ListEmptyPopup" Visibility="Collapsed">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <Grid>
+                            <FontIcon Glyph="&#xE896;" FontSize="20" Margin="12"
+                                      Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
+                            <TextBlock Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
+                                       Text="+" FontSize="16"
+                                       VerticalAlignment="Top"
+                                       HorizontalAlignment="Right"
+                                       Margin="0,5,12,0"/>
+                        </Grid>
+                        <TextBlock Text="没有正在下载的歌曲，去添加歌曲吧！"
+                                   VerticalAlignment="Center" Grid.Column="1"
+                                   FontSize="16" TextWrapping="WrapWholeWords"
+                                   Margin="0,12,12,12"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </ListView.Footer>
+        
+        <ListView.ItemTemplate>
+            <DataTemplate x:DataType="dm:DownloadData">
+                <controls:DownloadCard Margin="0,0,4,2"/>
+            </DataTemplate>
+        </ListView.ItemTemplate>
+    </ListView>
+</Page>
