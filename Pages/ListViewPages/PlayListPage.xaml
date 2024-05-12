@@ -177,7 +177,7 @@
                                     </AppBarToggleButton>
                                     <AppBarToggleButton
                                         Click="AppBarToggleButton_Click"
-                                        Label="排序" Tag="move"
+                                        Label="排序" Tag="move" x:Name="moveButton"
                                         ToolTipService.ToolTip="拖动音乐控件以重新排序">
                                         <AppBarToggleButton.Icon>
                                             <FontIcon Glyph="&#xEA37;"/>
@@ -266,6 +266,13 @@
                                                             VerticalAlignment="Bottom"/>
                                             </Grid>
                                         </Viewbox>
+                                    </AppBarButton>
+                                    <AppBarButton
+                                        Click="AppBarButton_Click"
+                                        Label="取消更改" Tag="move_Cancel">
+                                        <AppBarButton.Icon>
+                                            <FontIcon Glyph="&#xE711;"/>
+                                        </AppBarButton.Icon>
                                     </AppBarButton>
                                 </CommandBar>
                             </Grid>

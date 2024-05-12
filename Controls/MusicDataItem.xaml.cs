@@ -17,6 +17,7 @@ namespace TewiMP.Controls
 {
     public sealed partial class MusicDataItem : UserControl
     {
+        static bool isMouseEventClosed = false;
         static bool isStaticInited = false;
         static List<MusicDataItem> staticMusicDataItem = [];
         ArrayList arrayList;
@@ -62,6 +63,16 @@ namespace TewiMP.Controls
                 {
                     item.SetHighlight();
                 }
+            }
+        }
+
+        public static void SetIsCloseMouseEvent(bool value)
+        {
+            isMouseEventClosed = value;
+            foreach (MusicDataItem item in staticMusicDataItem)
+            {
+                item.Info_Texts_ButtonNameButton.IsHitTestVisible = !value;
+                item.Info_MoveIcon.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
             }
         }
 
@@ -177,6 +188,7 @@ namespace TewiMP.Controls
                 out strokeVisualShowAnimation);
         }
 
+        bool last_IsMusicDataPlaying = false;
         void InitPlayingState()
         {
             if (isUnloaded) return;
@@ -187,15 +199,20 @@ namespace TewiMP.Controls
                 App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
                 App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
                 SetPlayingIcon(App.audioPlayer.PlaybackState);
-                UserControl_PointerEntered(null, null);
+                OnMouseIn();
                 Background_PlayingRectangle.Opacity = 1;
+                last_IsMusicDataPlaying = true;
             }
             else
             {
                 App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-                SetPlayingIcon(NAudio.Wave.PlaybackState.Paused);
-                UserControl_PointerExited(null, null);
-                Background_PlayingRectangle.Opacity = 0;
+                if (last_IsMusicDataPlaying) // 只有当上次调用此函数时 IsMusicDataPlaying 判断为 true 时才执行下面的恢复样式代码
+                {
+                    SetPlayingIcon(NAudio.Wave.PlaybackState.Paused);
+                    OnMouseLeave();
+                    Background_PlayingRectangle.Opacity = 0;
+                }
+                last_IsMusicDataPlaying = false;
             }
         }
 
@@ -225,6 +242,26 @@ namespace TewiMP.Controls
             {
                 Info_Buttons_MediaStateIcon.Glyph = "\xE768";
             }
+        }
+
+        void OnMouseIn()
+        {
+            if (songItemBind == null) return;
+            Info_Buttons_Root.Visibility = Visibility.Visible;
+            backgroundFillVisual.StartAnimation("Opacity", backgroundFillVisualShowAnimation);
+            rightButtonVisual.StartAnimation("Opacity", rightButtonVisualShowAnimation);
+        }
+        void OnMouseLeave()
+        {
+            if (songItemBind == null)
+            {
+                rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
+                return;
+            }
+            backgroundFillVisual.StartAnimation("Opacity", backgroundFillVisualHideAnimation);
+            rightButtonVisual.StartAnimation("Opacity", rightButtonVisualHideAnimation);
+            rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
+            rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += MusicDataItem_Completed;
         }
 
         private void MusicDataItem_Completed(object sender, CompositionBatchCompletedEventArgs args)
@@ -277,42 +314,36 @@ namespace TewiMP.Controls
         bool isPointEnter = false;
         private void UserControl_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            if (songItemBind == null) return;
             isPointEnter = true;
-            Info_Buttons_Root.Visibility = Visibility.Visible;
-            backgroundFillVisual.StartAnimation("Opacity", backgroundFillVisualShowAnimation);
-            rightButtonVisual.StartAnimation("Opacity", rightButtonVisualShowAnimation);
+            if (isMouseEventClosed) return;
+            OnMouseIn();
         }
 
         private void UserControl_PointerExited(object sender, PointerRoutedEventArgs e)
         {
             if (IsMusicDataPlaying) return;
+            if (isMouseEventClosed) return;
             if (!isPointEnter) return;
-            if (songItemBind == null)
-            {
-                rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
-                return;
-            }
             isPointEnter = false;
-            backgroundFillVisual.StartAnimation("Opacity", backgroundFillVisualHideAnimation);
-            rightButtonVisual.StartAnimation("Opacity", rightButtonVisualHideAnimation);
-            rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
-            rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += MusicDataItem_Completed;
+            OnMouseLeave();
         }
 
 
         private async void UserControl_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
+            if (isMouseEventClosed) return;
             await App.playingList.Play(songItemBind.MusicData, true);
         }
 
         private void UserControl_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-          musicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
+            if (isMouseEventClosed) return;
+            musicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
         }
 
         private void UserControl_Holding(object sender, HoldingRoutedEventArgs e)
         {
+            if (isMouseEventClosed) return;
             musicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
         }
 

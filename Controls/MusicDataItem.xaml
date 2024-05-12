@@ -131,6 +131,13 @@
                     </Grid>
                 </StackPanel>
             </Grid>
+            <FontIcon
+                x:Name="Info_MoveIcon"
+                Visibility="Collapsed"
+                Glyph="&#xE700;"
+                Grid.Column="1"
+                Margin="8,0,12,0"
+                Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
             <Grid
                 x:Name="Info_Buttons_Root"
                 Visibility="Collapsed"

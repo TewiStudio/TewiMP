@@ -1687,6 +1687,7 @@ namespace TewiMP
                 await Task.Delay(10);
                 await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
                 await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
+                SPlayingListBaseView.SelectedItem = App.audioPlayer.MusicData;
             }
             catch { }
         }
@@ -2242,8 +2243,10 @@ namespace TewiMP
             oc.Clear();
         }
 
+        public static bool AllowDragEvents = true;
         private void WindowGridBase_DragOver(object sender, DragEventArgs e)
         {
+            if (!AllowDragEvents) return;
             DropInfo_Root.Opacity = 1;
             e.AcceptedOperation = DataPackageOperation.Link;
             e.DragUIOverride.Caption = "打开";
@@ -2251,6 +2254,7 @@ namespace TewiMP
 
         private async void WindowGridBase_Drop(object sender, DragEventArgs e)
         {
+            if (!AllowDragEvents) return;
             DropInfo_Root.Opacity = 0;
             if (!e.DataView.Contains(StandardDataFormats.StorageItems))
             {

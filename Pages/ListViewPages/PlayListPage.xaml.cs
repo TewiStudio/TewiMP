@@ -14,11 +14,10 @@ using Microsoft.UI.Composition;
 using TewiMP.Media;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
-using Newtonsoft.Json.Linq;
 using TewiMP.Controls;
-using CommunityToolkit.WinUI.UI;
+using Newtonsoft.Json.Linq;
 using Windows.Storage.Pickers;
-using Windows.ApplicationModel.Search;
+using CommunityToolkit.WinUI.UI;
 
 namespace TewiMP.Pages.ListViewPages
 {
@@ -66,6 +65,7 @@ namespace TewiMP.Pages.ListViewPages
 
             foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
             {
+                if ((string)element.Tag == "move_") continue;
                 if ((string)element.Tag == "multiSelect") continue;
                 if (((string)element.Tag).Contains("multi"))
                     element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -74,9 +74,53 @@ namespace TewiMP.Pages.ListViewPages
                     element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
                 }
             }
-            UpdateCommandBarWidth();
-
             ItemsList.SelectionMode = isChecked ? ListViewSelectionMode.Multiple : ListViewSelectionMode.None;
+            UpdateCommandBarWidth();
+            MusicDataItem.SetIsCloseMouseEvent(isChecked ? true : false);
+        }
+        void MoveItemDo(bool isChecked)
+        {
+            if (isUnloaded) return;
+            if (musicListBind == null) return;
+
+            foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
+            {
+                if (((string)element.Tag).Contains("multi_")) continue;
+                if ((string)element.Tag == "move") continue;
+                if (((string)element.Tag).Contains("move"))
+                    element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
+                else
+                {
+                    element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
+                }
+            }
+            moveButton.Label = isChecked ? "完成排序" : "排序";
+            ItemsList.AllowDrop = isChecked;
+            ItemsList.CanDragItems = isChecked;
+            ItemsList.CanReorderItems = isChecked;
+            ItemsList.SelectionMode = isChecked ? ListViewSelectionMode.Multiple : ListViewSelectionMode.None;
+            UpdateCommandBarWidth();
+            MusicDataItem.SetIsCloseMouseEvent(isChecked ? true : false);
+            MainWindow.AllowDragEvents = !isChecked;
+        }
+        async void MoveItemSave()
+        {
+            ItemsList_Header_Info_CommandBar.IsEnabled = false;
+            var item = MainWindow.AddNotify("正在保存排序...", null, NotifySeverity.Loading, TimeSpan.MaxValue);
+            var data = await PlayListHelper.ReadData();
+            musicListData.Songs.Clear();
+            foreach (var i in musicListBind)
+            {
+                musicListData.Songs.Add(i.MusicData);
+            }
+            data[musicListData.ListName] = JObject.FromObject(musicListData);
+            await PlayListHelper.SaveData(data);
+            await App.playListReader.Refresh();
+            InitInfo();
+            InitBindings();
+            item.SetNotifyItemData("保存排序完成。", null, NotifySeverity.Complete);
+            MainWindow.NotifyCountDown(item);
+            ItemsList_Header_Info_CommandBar.IsEnabled = true;
         }
 
         void SelectedReverseDo()
@@ -266,6 +310,7 @@ namespace TewiMP.Pages.ListViewPages
         {
             if (isUnloaded) return;
             MultiSelectDo(false);
+            MoveItemDo(false);
 
             // 设置 header 为顶层
             var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ItemsList.Header);
@@ -682,6 +727,11 @@ namespace TewiMP.Pages.ListViewPages
                 case "search":
                     ItemList_Header_Search_Control.IsOpen = !ItemList_Header_Search_Control.IsOpen;
                     break;
+                case "move_Cancel":
+                    moveButton.IsChecked = !moveButton.IsChecked;
+                    MoveItemDo(false);
+                    InitBindings();
+                    break;
             }
         }
 
@@ -694,6 +744,11 @@ namespace TewiMP.Pages.ListViewPages
                     MultiSelectDo((bool)btn.IsChecked);
                     break;
                 case "move":
+                    MoveItemDo((bool)btn.IsChecked);
+                    if (btn.IsChecked == false)
+                    {
+                        MoveItemSave();
+                    }
                     break;
             }
         }
