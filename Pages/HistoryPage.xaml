@@ -56,7 +56,7 @@
                     </Grid>
                     <Grid x:Name="HeaderText" VerticalAlignment="Bottom" Opacity="1"
                           Grid.Row="1" CornerRadius="4" BorderThickness="1"
-                          Background="{ThemeResource ControlSolidFillColorDefaultBrush}" Margin="16,0,16,8"
+                          Background="{ThemeResource AcrylicNormal}" Margin="16,0,16,8"
                           BorderBrush="{ThemeResource ControlElevationBorderBrush}">
                         <Grid Margin="12,4,140,4">
                             <Grid.Resources>
