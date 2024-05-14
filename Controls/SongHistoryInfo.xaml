@@ -11,7 +11,7 @@
 
     <UserControl.Resources>
         <DataTemplate x:Key="MusicDataCard" x:DataType="helper:SongItemBindBase">
-            <local:SongItem/>
+            <local:MusicDataItem/>
         </DataTemplate>
         <DataTemplate x:Key="ArtistDataCard" x:DataType="data:Artist">
             <TextBlock Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"

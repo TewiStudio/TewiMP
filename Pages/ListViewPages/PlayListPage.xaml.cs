@@ -611,7 +611,6 @@ namespace TewiMP.Pages.ListViewPages
             ItemsList.ItemsSource = musicListBind;
             ItemList_Header_Search_Control.SongItemBinds = musicListBind;
             scrollViewer.ChangeView(null, pageData.VerticalOffset, null);
-            //arrayList = new ArrayList(100000000);
         }
 
         bool isUnloaded = false;

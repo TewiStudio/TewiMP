@@ -66,6 +66,8 @@ namespace TewiMP.Controls
         void InitVisual()
         {
             isInitedVisuals = true;
+            root_Background.Visibility = Visibility.Collapsed;
+
             rootVisual = ElementCompositionPreview.GetElementVisual(root);
             imageVisual = ElementCompositionPreview.GetElementVisual(Image_Control);
             gammaMassVisual = ElementCompositionPreview.GetElementVisual(Image_GammaMass);
@@ -74,7 +76,7 @@ namespace TewiMP.Controls
 
             // Õº∆¨‘¥«–ªª∂Øª≠
             AnimateHelper.AnimateScalar(
-                rootVisual, 1, 02,
+                rootVisual, 1, 02, 
                 0.2f, 1, 0.22f, 1f,
                 out animationOpacity_SourceChanged);
             //  Û±Í“∆»Î’⁄’÷∂Øª≠
@@ -164,6 +166,7 @@ namespace TewiMP.Controls
             gammaMassVisual.StartAnimation(nameof(gammaMassVisual.Opacity), animationMassOpacity_MouseIn);
             rootVisual.StartAnimation("Scale.X", animationSize_MouseIn);
             rootVisual.StartAnimation("Scale.Y", animationSize_MouseIn);
+            root_Background.Visibility = Visibility.Visible;
         }
 
         private void UserControl_PointerExited(object sender, PointerRoutedEventArgs e)
@@ -176,8 +179,9 @@ namespace TewiMP.Controls
             gammaMassVisual.StartAnimation(nameof(gammaMassVisual.Opacity), animationMassOpacity_MouseExited);
             rootVisual.StartAnimation("Scale.X", animationSize_MouseExited);
             rootVisual.StartAnimation("Scale.Y", animationSize_MouseExited);
+            rootVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= ImageEx_Completed;
+            rootVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += ImageEx_Completed;
         }
-
         bool IsMouse4Click = false;
         private void UserControl_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
@@ -205,6 +209,13 @@ namespace TewiMP.Controls
         {
             if (rootVisual == null) return;
             rootVisual.CenterPoint = new((float)ActualWidth / 2, (float)ActualHeight / 2, 1);
+        }
+
+        private void ImageEx_Completed(object sender, CompositionBatchCompletedEventArgs args)
+        {
+            rootVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= ImageEx_Completed;
+            if (isPointEnter) return;
+            root_Background.Visibility = Visibility.Collapsed;
         }
     }
 }

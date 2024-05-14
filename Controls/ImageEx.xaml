@@ -16,6 +16,11 @@
     SizeChanged="UserControl_SizeChanged"
     Background="Transparent">
     <Grid
+        x:Name="root_Background"
+        CornerRadius="{Binding ElementName=control,Path=CornerRadius}">
+        <Rectangle Fill="{ThemeResource AcrylicNormal}"/>
+    </Grid>
+    <Grid
         x:Name="root"
         CornerRadius="{Binding ElementName=control,Path=CornerRadius}">
         <Image

@@ -1695,8 +1695,10 @@ namespace TewiMP
         static Visual musicPageVisual;
         static Vector3KeyFrameAnimation musicPageVisualClosingAnimation;
         static Vector3KeyFrameAnimation musicPageVisualOpeningAnimation;
-        static void InitMusicPageVisuals()
+        static void InitMusicPageVisuals(bool onlyUpdateOffset = false)
         {
+            musicPageVisualClosingAnimation?.Dispose();
+            musicPageVisualOpeningAnimation?.Dispose();
             AnimateHelper.AnimateOffset(
                 SMusicPageBaseFrame,
                 0, (float)SMusicPageBaseGrid.ActualHeight, 0,
@@ -1711,8 +1713,9 @@ namespace TewiMP
                 0.16f, 1, 0.3f, 1,
                 out musicPageVisual, out Compositor compositor1, out musicPageVisualOpeningAnimation);
 
+            if (onlyUpdateOffset) return;
             musicPageVisual.Offset = new(0, (float)SMusicPageBaseGrid.ActualHeight, 0);
-            SMusicPageBaseFrame.Visibility = Visibility.Visible;
+            SMusicPageBaseFrame.Visibility = Visibility.Collapsed;
         }
         public static bool InOpenMusicPage { get; set; } = false;
         static bool isFirstInMusicPage = true;
@@ -1721,6 +1724,7 @@ namespace TewiMP
         {
             if (App.audioPlayer.MusicData == null) return;
             if (musicPageVisual == null) InitMusicPageVisuals();
+            else InitMusicPageVisuals(true);
 
             SMusicPageBaseFrame.Content = SMusicPage;
             if (InOpenMusicPage)
@@ -1777,6 +1781,7 @@ namespace TewiMP
                 InOpenMusicPage = true;
 
                 SMusicPageBaseFrame.Visibility = Visibility.Visible;
+                musicPageVisual.Offset = new(0, (float)SMusicPageBaseGrid.ActualHeight, 0);
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualOpeningAnimation);
                 musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
                 {
