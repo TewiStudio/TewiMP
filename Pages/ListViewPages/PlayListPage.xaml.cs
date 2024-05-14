@@ -359,7 +359,10 @@ namespace TewiMP.Pages.ListViewPages
             logoHeaderScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             imageVisual.StartAnimation("Scale.xy", logoHeaderScaleAnimation);
             if (ItemsList_Header_Root.ActualWidth != 0)
-                ItemsList_Header_Info_Root_SizeChanger.Width = ItemsList_Header_Root.ActualWidth - ItemsList_Header_Image_Root.ActualWidth * imageVisual.Scale.X - 32 - 16;
+            {
+                var width = ItemsList_Header_Root.ActualWidth - ItemsList_Header_Image_Root.ActualWidth * imageVisual.Scale.X - 32 - 16;
+                ItemsList_Header_Info_Root_SizeChanger.Width = width <= 0 ? 0 : width;
+            }
             if (imageSizeOnly) return;
 
             if (delay) await Task.Delay(10);

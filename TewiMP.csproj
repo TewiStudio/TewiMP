@@ -52,6 +52,7 @@
 		<None Remove="Controls\KeyControl.xaml" />
 		<None Remove="Controls\LoadingTip.xaml" />
 		<None Remove="Controls\LyricItem.xaml" />
+		<None Remove="Controls\ManageLocalMusicFolderControl.xaml" />
 		<None Remove="Controls\MediaPlayStateViewer.xaml" />
 		<None Remove="Controls\MusicDataFlyout.xaml" />
 		<None Remove="Controls\MusicDataItem.xaml" />
@@ -153,6 +154,9 @@
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>
 		<Page Update="Controls\ScrollViewerSearchControl.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
+		<Page Update="Controls\ManageLocalMusicFolderControl.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>
 		<None Update="Images\Icons\icon.ico">

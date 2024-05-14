@@ -213,7 +213,8 @@ namespace TewiMP.Controls
 
         private void ImageEx_Completed(object sender, CompositionBatchCompletedEventArgs args)
         {
-            rootVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= ImageEx_Completed;
+            if (rootVisual != null)
+                rootVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= ImageEx_Completed;
             if (isPointEnter) return;
             root_Background.Visibility = Visibility.Collapsed;
         }

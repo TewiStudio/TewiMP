@@ -27,6 +27,11 @@ namespace TewiMP.DataEditor
         public static string PlayListDataPath { get; } = Path.Combine(UserDataFolder, "PlayList");
         
         /// <summary>
+        /// 本地音乐数据文件路径
+        /// </summary>
+        public static string LocalMusicDataPath { get; } = Path.Combine(UserDataFolder, "LocalMusic");
+        
+        /// <summary>
         /// 设置数据文件路径
         /// </summary>
         public static string SettingDataPath { get; } = Path.Combine(UserDataFolder, "Setting");
@@ -189,6 +194,8 @@ namespace TewiMP.DataEditor
             TopNavigationStyle,
         }
 
+        public enum LocalMusicDataType { LocalMusicFolderPath, AnalyzedDatas }
+
         /// <summary>
         /// 初始化所有文件夹和文件
         /// </summary>
@@ -207,6 +214,17 @@ namespace TewiMP.DataEditor
                 File.Create(PlayListDataPath).Close();
                 File.WriteAllText(PlayListDataPath, "{}");
                 PlayListHelper.AddPlayList(PlayListDefault);
+            }
+            
+            if (!File.Exists(LocalMusicDataPath))
+            {
+                File.Create(LocalMusicDataPath).Close();
+                File.WriteAllText(LocalMusicDataPath,
+                    new JObject()
+                    {
+                        { LocalMusicDataType.LocalMusicFolderPath.ToString(), new JArray() { Environment.GetFolderPath(Environment.SpecialFolder.MyMusic) } },
+                        { LocalMusicDataType.AnalyzedDatas.ToString(), new JArray() }
+                    }.ToString());
             }
             
             if (!File.Exists(SettingDataPath))

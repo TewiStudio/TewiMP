@@ -32,6 +32,7 @@ namespace TewiMP
         public static LyricManager lyricManager { get; private set; } = null;
         public static DownloadManager downloadManager { get; private set; } = null;
         public static PlayListReader playListReader { get; private set; } = null;
+        public static LocalMusicManager localMusicManager { get; private set; } = null;
         public static HotKeyManager hotKeyManager { get; private set; } = null;
         public static App AppStatic { get; private set; } = null;
         public static string AppName { get; } = "TewiMP";
@@ -86,6 +87,7 @@ namespace TewiMP
             cacheManager = new();
             audioPlayer = new();
             playingList = new();
+            localMusicManager = new();
             lyricManager = new();
             downloadManager = new();
             playListReader = new();

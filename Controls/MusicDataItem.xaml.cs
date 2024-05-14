@@ -95,7 +95,7 @@ namespace TewiMP.Controls
         {
             if (isUnloaded) return;
             if (songItemBind == null) return;
-            Info_Texts_CountRun.Text = songItemBind.MusicData.Count == 0 ? null : $"{songItemBind.MusicData.Count}.";
+            Info_Texts_CountRun.Text = songItemBind.MusicData.Count == 0 ? null : $"{songItemBind.MusicData.Count}. ";
             Info_Texts_TitleRun.Text = songItemBind.MusicData.Title;
             Info_Texts_Title2Run.Text = songItemBind.MusicData.Title2;
             Info_Texts_ButtonNameTextBlock.Text = songItemBind.MusicData.ButtonName;

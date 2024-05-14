@@ -87,6 +87,7 @@ namespace TewiMP.DataEditor
         public string ID { get; set; }
         public string PicturePath { get; set; }
         public string Describee { get; set; }
+        public MusicFrom From { get; set; }
         public MusicListData HotSongs { get; set; }
         public int Count { get; set; }
 
@@ -117,6 +118,7 @@ namespace TewiMP.DataEditor
         public string Describee { get; set; }
         public string RelaseTime { get; set; }
         public int Count { get; set; }
+        public MusicFrom From { get; set; }
         public List<Artist> Artists { get; set; }
         public MusicListData Songs { get; set; }
         public Album(string title = null, string ID = null, string picturePath = null, string describee = null, MusicListData songs = null)

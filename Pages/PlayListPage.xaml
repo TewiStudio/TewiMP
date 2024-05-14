@@ -32,14 +32,14 @@
                             <FontIcon Glyph="&#xE8CB;"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
-                    <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
-                        <AppBarButton.Icon>
-                            <FontIcon Glyph="&#xE72C;"/>
-                        </AppBarButton.Icon>
-                    </AppBarButton>
                     <AppBarButton Label="添加/导入" AccessKey="A" Click="AppBarButton_Click_1">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xE710;"/>
+                        </AppBarButton.Icon>
+                    </AppBarButton>
+                    <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
+                        <AppBarButton.Icon>
+                            <FontIcon Glyph="&#xE72C;"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
                 </CommandBar>

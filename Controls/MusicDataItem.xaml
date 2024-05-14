@@ -75,13 +75,7 @@
                         Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"
                         FontSize="13"
                         TextTrimming="CharacterEllipsis">
-                        <Run x:Name="Info_Texts_CountRun"/>
-                        <Run
-                            x:Name="Info_Texts_TitleRun"
-                            Foreground="{ThemeResource ApplicationForegroundThemeBrush}"
-                            FontSize="14"/>
-                        <Run x:Name="Info_Texts_Title2Run"/>
-                    </TextBlock>
+<Run x:Name="Info_Texts_CountRun"/><Run x:Name="Info_Texts_TitleRun" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="14"/><Run x:Name="Info_Texts_Title2Run"/></TextBlock>
                     <Grid>
                         <TextBlock
                             x:Name="Info_Texts_ButtonNameTextBlock"
