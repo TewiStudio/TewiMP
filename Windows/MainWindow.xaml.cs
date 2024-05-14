@@ -25,14 +25,14 @@ using TewiMP.Windowed;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
-using CommunityToolkit.WinUI;
 using Windows.UI;
-using WinRT;
+using Windows.Storage;
 using Windows.Graphics;
+using Windows.ApplicationModel.DataTransfer;
+using WinRT;
 using NAudio.Wave;
 using Newtonsoft.Json.Linq;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Storage;
+using CommunityToolkit.WinUI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -1692,36 +1692,53 @@ namespace TewiMP
             catch { }
         }
 
+        static Visual musicPageVisual;
+        static Vector3KeyFrameAnimation musicPageVisualClosingAnimation;
+        static Vector3KeyFrameAnimation musicPageVisualOpeningAnimation;
+        static void InitMusicPageVisuals()
+        {
+            AnimateHelper.AnimateOffset(
+                SMusicPageBaseFrame,
+                0, (float)SMusicPageBaseGrid.ActualHeight, 0,
+                0.22,
+                0.5f, 0, 0.75f, 0,
+                out musicPageVisual, out Compositor compositor, out musicPageVisualClosingAnimation);
+
+            AnimateHelper.AnimateOffset(
+                SMusicPageBaseFrame,
+                0, 0, 0,
+                0.5,
+                0.16f, 1, 0.3f, 1,
+                out musicPageVisual, out Compositor compositor1, out musicPageVisualOpeningAnimation);
+
+            musicPageVisual.Offset = new(0, (float)SMusicPageBaseGrid.ActualHeight, 0);
+            SMusicPageBaseFrame.Visibility = Visibility.Visible;
+        }
         public static bool InOpenMusicPage { get; set; } = false;
         static bool isFirstInMusicPage = true;
         static bool isHiddenMusicPageAnimationNotCompleted = false;
         public static void OpenOrCloseMusicPage()
         {
             if (App.audioPlayer.MusicData == null) return;
+            if (musicPageVisual == null) InitMusicPageVisuals();
 
             SMusicPageBaseFrame.Content = SMusicPage;
             if (InOpenMusicPage)
             {
                 InOpenMusicPage = false;
-
                 isHiddenMusicPageAnimationNotCompleted = true;
-                AnimateHelper.AnimateOffset(
-                    SMusicPageBaseFrame,
-                    0, (float)SMusicPageBaseGrid.ActualHeight, 0,
-                    0.22,
-                    0.5f, 0, 0.75f, 0,
-                    out Visual contentGridVisual, out Compositor compositor, out Vector3KeyFrameAnimation animation);
-                contentGridVisual.StartAnimation(nameof(contentGridVisual.Offset), animation);
-                SetMainPageVisibility(true);
-                /*compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
+
+                Debug.WriteLine("[MainWindow]: 主界面被显示。");
+                SWindowGridBase.Visibility = Visibility.Visible;
+                musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualClosingAnimation);
+                musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
                 {
                     if (!InOpenMusicPage)
                     {
                         SMusicPageBaseFrame.Visibility = Visibility.Collapsed;
                         isHiddenMusicPageAnimationNotCompleted = false;
-                        Debug.WriteLine("音乐界面被隐藏。");
                     }
-                };*/
+                };
 
                 SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
                 MusicPageViewStateChanged?.Invoke(MusicPageViewState.Hidden);
@@ -1759,32 +1776,21 @@ namespace TewiMP
             {
                 InOpenMusicPage = true;
 
-                AnimateHelper.AnimateOffset(
-                    SMusicPageBaseFrame,
-                    0, 0, 0,
-                    0.5,
-                    0.16f, 1, 0.3f, 1,
-                    out Visual contentGridVisual, out Compositor compositor, out Vector3KeyFrameAnimation animation);
-                SetMainPageVisibility(false);
-                /*compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
+                SMusicPageBaseFrame.Visibility = Visibility.Visible;
+                musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualOpeningAnimation);
+                musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
                 {
                     if (InOpenMusicPage && !isHiddenMusicPageAnimationNotCompleted)
                     {
                         SWindowGridBase.Visibility = Visibility.Collapsed;
 #if DEBUG
-                        Debug.WriteLine("主界面被隐藏。");
+                        Debug.WriteLine("[MainWindow]: 主界面被隐藏。");
 #endif
                     }
-                };*/
-                contentGridVisual.StartAnimation(nameof(contentGridVisual.Offset), animation);
+                };
 
                 SMusicPage.MusicPageViewStateChange(MusicPageViewState.View);
                 MusicPageViewStateChanged?.Invoke(MusicPageViewState.View);
-                if (isFirstInMusicPage)
-                {
-                    isFirstInMusicPage = false;
-                    SWindowGridBase.Visibility = Visibility.Collapsed;
-                }
             }
         }
 
