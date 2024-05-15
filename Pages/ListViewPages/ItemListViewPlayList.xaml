@@ -92,7 +92,7 @@
                                                 </CommandBar.SecondaryCommands>
                                                 <AppBarButton Click="Button_Click"
                                                               AccessKey="Q"
-                                                              Label="播放全部（Alt+Q）"
+                                                              Label="全部播放（Alt+Q）"
                                                               Background="{ThemeResource AccentFillColorDefaultBrush}"
                                                               BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                                                               Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"

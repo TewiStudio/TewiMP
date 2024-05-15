@@ -1,22 +1,16 @@
 ﻿using System;
+using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
-using System.Collections;
-using System.Linq;
-using System.Collections.ObjectModel;
-using TewiMP.Helpers;
-using Microsoft.VisualBasic;
-using TinyPinyin;
-using System.Threading.Tasks;
-using CommunityToolkit.Common;
-using System.Collections.Generic;
-using TewiMP.DataEditor;
-using static System.Net.Mime.MediaTypeNames;
 using CommunityToolkit.WinUI.UI;
+using TinyPinyin;
 using TewiMP.Controls;
+using TewiMP.DataEditor;
 
 namespace TewiMP.Pages
 {
@@ -190,11 +184,24 @@ namespace TewiMP.Pages
             AppBarButton button = (AppBarButton)sender;
             switch (button.Tag as string)
             {
-                case "manageFolder":
-                    await MainWindow.ShowDialog("管理本地音乐文件夹", new Controls.ManageLocalMusicFolderControl(), "完成");
+                case "play":
+                    if (App.localMusicManager.LocalMusicItems.Count == 0) return;
+                    if (App.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
+                    {
+                        App.playingList.ClearAll();
+                    }
+                    foreach (var songItem in App.localMusicManager.LocalMusicItems)
+                    {
+                        App.playingList.Add(songItem.MusicData, false);
+                    }
+                    await App.playingList.Play(App.localMusicManager.LocalMusicItems.First().MusicData, true);
+                    App.playingList.SetRandomPlay(App.playingList.PlayBehavior);
                     break;
                 case "refresh":
                     await App.localMusicManager.Refresh();
+                    break;
+                case "manageFolder":
+                    await MainWindow.ShowDialog("管理本地音乐文件夹", new Controls.ManageLocalMusicFolderControl(), "完成");
                     break;
                 case "reAnalysis":
                     button.IsEnabled = false;
@@ -231,6 +238,11 @@ namespace TewiMP.Pages
 
 
         private void ItemsList_Header_Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void AppBarToggleButton_Click(object sender, RoutedEventArgs e)
         {
 
         }
