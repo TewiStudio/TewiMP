@@ -167,9 +167,9 @@
                 </MenuFlyoutItem.Icon>
             </MenuFlyoutItem>
             <MenuFlyoutItem
+                x:Name="DeleteFromPlaylistAndLocalFileItem"
                 Text="从列表中删除并删除其文件"
                 Click="MenuFlyoutItem_Click"
-                Visibility="{Binding ElementName=ExploreLocalFileItem,Path=Visibility}"
                 AccessKey="B"
                 Tag="deleteFile">
                 <MenuFlyoutItem.Icon>

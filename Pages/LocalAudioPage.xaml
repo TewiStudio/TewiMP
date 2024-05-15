@@ -131,7 +131,7 @@
                 <TextBlock x:Name="ItemsList_Header_Label" Text="本地音频" Style="{ThemeResource TBHeader}"/>
                 <CommandBar
                         x:Name="ItemsList_Header_CommandBar" VerticalAlignment="Center" Margin="0,0,10,0" Background="Transparent"
-                        OverflowButtonVisibility="Auto" DefaultLabelPosition="Right" Grid.Row="1">
+                        OverflowButtonVisibility="Auto" DefaultLabelPosition="Right" Grid.Row="1" AccessKey="Y">
                     <AppBarButton Label="管理音乐文件夹" Tag="manageFolder" AccessKey="A" Click="AppBarButton_Click">
                         <AppBarButton.Icon>
                             <FontIcon Glyph="&#xED25;"/>
@@ -142,6 +142,13 @@
                             <FontIcon Glyph="&#xE72C;"/>
                         </AppBarButton.Icon>
                     </AppBarButton>
+                    <CommandBar.SecondaryCommands>
+                        <AppBarButton Label="重新编制歌曲索引" Tag="reAnalysis" AccessKey="Y" Click="AppBarButton_Click">
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="&#xE8F7;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                    </CommandBar.SecondaryCommands>
                 </CommandBar>
                 <Grid Grid.Row="1">
                     <cc:Segmented
@@ -193,7 +200,6 @@
                     <ListView
                         x:Name="ItemsList"
                         ItemsSource="{Binding Source={StaticResource ItemsList_SongGroup}}"
-                        HorizontalContentAlignment="Center"
                         SelectionMode="None">
                         <ListView.Footer>
                             <TextBlock
@@ -209,11 +215,11 @@
                                     <DataTemplate>
                                         <Grid
                                             Margin="16,4,16,4" Padding="4"
-                                            HorizontalAlignment="Left"
+                                            HorizontalAlignment="Left" MinWidth="36"
                                             BorderThickness="1" CornerRadius="4"
                                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                                             Background="{ThemeResource ControlFillColorDefault}">
-                                            <TextBlock Text="{Binding Key}"/>
+                                            <TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Grid>
                                     </DataTemplate>
                                 </GroupStyle.HeaderTemplate>
@@ -236,9 +242,10 @@
         <Grid
             Grid.Row="1">
             <controls:ScrollFootButton
+                x:Name="ItemsView_BottomButtons"
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
-                Margin="0,0,16,4"/>
+                Margin="0,0,16,8"/>
         </Grid>
     </Grid>
 </Page>

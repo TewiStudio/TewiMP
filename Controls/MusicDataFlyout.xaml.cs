@@ -44,10 +44,15 @@ namespace TewiMP.Controls
             if (songItemBind.MusicListData?.ListDataType == DataType.歌单 || songItemBind.MusicListData?.ListDataType == DataType.本地歌单)
             {
                 DeleteFromPlaylistItem.Visibility = Visibility.Visible;
+                if (songItemBind.MusicData.From == MusicFrom.localMusic)
+                    DeleteFromPlaylistAndLocalFileItem.Visibility = Visibility.Visible;
+                else
+                    DeleteFromPlaylistAndLocalFileItem.Visibility = Visibility.Collapsed;
             }
             else
             {
                 DeleteFromPlaylistItem.Visibility = Visibility.Collapsed;
+                DeleteFromPlaylistAndLocalFileItem.Visibility = Visibility.Collapsed;
             }
 
             if (songItemBind.MusicData.From == MusicFrom.localMusic)

@@ -15,6 +15,8 @@ using CommunityToolkit.Common;
 using System.Collections.Generic;
 using TewiMP.DataEditor;
 using static System.Net.Mime.MediaTypeNames;
+using CommunityToolkit.WinUI.UI;
+using TewiMP.Controls;
 
 namespace TewiMP.Pages
 {
@@ -109,15 +111,27 @@ namespace TewiMP.Pages
         void InitEvents()
         {
             scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
+            scrollViewer.ViewChanging += ScrollViewer_ViewChanging;
             App.localMusicManager.DataChanging -= LocalMusicManager_DataChanging;
             App.localMusicManager.DataChanging += LocalMusicManager_DataChanging;
             App.localMusicManager.DataChanged -= LocalMusicManager_DataChanged;
             App.localMusicManager.DataChanged += LocalMusicManager_DataChanged;
+            ItemsView_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
+            ItemsView_BottomButtons.PositionToNowPlaying_Button.Click += Position_Button_Click;
+            ItemsView_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
+            ItemsView_BottomButtons.PositionToTop_Button.Click += Position_Button_Click;
+            ItemsView_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
+            ItemsView_BottomButtons.PositionToBottom_Button.Click += Position_Button_Click;
         }
+
         void RemoveEvents()
         {
+            scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
             App.localMusicManager.DataChanging -= LocalMusicManager_DataChanging;
             App.localMusicManager.DataChanged -= LocalMusicManager_DataChanged;
+            ItemsView_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
+            ItemsView_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
+            ItemsView_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
         }
         void CallEventsWhenDataLated()
         {
@@ -155,7 +169,7 @@ namespace TewiMP.Pages
                 array.Add(i.MusicData, a);
             }
 
-            var groupsResult = App.localMusicManager.LocalMusicItems.GroupBy(t => array[t.MusicData].ToUpper().First());
+            var groupsResult = App.localMusicManager.LocalMusicItems.GroupBy(t => array[t.MusicData].ToUpper().First()).OrderBy(t => t.Key);
 
             ItemsList_SongGroup.Source = groupsResult;
             ItemsList_HeaderGridView.ItemsSource = ItemsList_SongGroup.View.CollectionGroups;
@@ -180,11 +194,41 @@ namespace TewiMP.Pages
                     await MainWindow.ShowDialog("管理本地音乐文件夹", new Controls.ManageLocalMusicFolderControl(), "完成");
                     break;
                 case "refresh":
+                    await App.localMusicManager.Refresh();
+                    break;
+                case "reAnalysis":
+                    button.IsEnabled = false;
                     await LocalMusicHelper.ReAnalysisMusicDatas();
                     await App.localMusicManager.Refresh();
+                    button.IsEnabled = true;
                     break;
             }
         }
+
+        private async void Position_Button_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            switch ((ScrollFootButton.ButtonType)btn.Tag)
+            {
+                case ScrollFootButton.ButtonType.NowPlaying:
+                    foreach (var i in App.localMusicManager.LocalMusicItems)
+                    {
+                        if (i.MusicData != App.audioPlayer.MusicData) continue;
+                        await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
+                        await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
+                        MusicDataItem.TryHighlightPlayingItem();
+                        break;
+                    }
+                    break;
+                case ScrollFootButton.ButtonType.Top:
+                    scrollViewer.ChangeView(null, 0, null);
+                    break;
+                case ScrollFootButton.ButtonType.Bottom:
+                    scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
+                    break;
+            }
+        }
+
 
         private void ItemsList_Header_Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

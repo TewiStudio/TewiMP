@@ -637,6 +637,7 @@
                 </StackPanel>
             </Grid>
         </Popup>
+
         <Grid
             x:Name="DropInfo_Root"
             IsHitTestVisible="False"

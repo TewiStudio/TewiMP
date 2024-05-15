@@ -72,10 +72,10 @@ namespace TewiMP
         public static Frame SPlayContent;
         public static Flyout teachingTipVolume;
         public static Flyout teachingTipPlayingList;
-        public static ContentDialog AsyncDialog = null;
         public static StackPanel SNotifyStackPanel;
         public static ListView SNotifyListView;
         public static ScrollViewer SNotifyListViewScrollViewer;
+        public static ContentDialog AsyncDialog { get; set; } = null;
 
         public static void InvokeDpiEvent() => WindowDpiChanged?.Invoke();
         public delegate void WindowDpiChangedDelegate();
@@ -126,12 +126,7 @@ namespace TewiMP
             SPlayContent = PlayContent;
             SNotifyStackPanel = NotifyStackPanel;
             //SNotifyListView = NotifyListView;
-            AsyncDialog = new ContentDialog()
-            {
-                XamlRoot = SContent.XamlRoot,
-                CloseButtonCommand = null
-            };
-
+            InitDialog();
             equalizerPage = new Pages.DialogPages.EqualizerPage();
             //SubClassing();
 
@@ -707,6 +702,17 @@ namespace TewiMP
         #endregion
 
         #region Dialog
+        async void InitDialog()
+        {
+            AsyncDialog = new ContentDialog()
+            {
+                XamlRoot = SContent.XamlRoot,
+                CloseButtonCommand = null
+            };
+            //await ShowDialog("Loading Dialog", "");
+            HideDialog();
+        }
+
         static ScrollViewer dialogScrollViewer = new() { HorizontalScrollMode = ScrollMode.Disabled };
         static bool dialogShow = false;
         static List<object[]> dialogShowObjects = new();
@@ -751,7 +757,7 @@ namespace TewiMP
                 }
                 else
                 {
-                    dialogShowObjects.Add(new object[] { title, content, closeButtonText, primaryButtonText, secondaryButtonText, defaultButton, fullSizeDesired });
+                    dialogShowObjects.Add([title, content, closeButtonText, primaryButtonText, secondaryButtonText, defaultButton, fullSizeDesired]);
                 }
                 return result;
             }

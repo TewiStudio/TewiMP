@@ -228,9 +228,13 @@ namespace TewiMP.DataEditor
             return $"{Title} - {ButtonName}";
         }
 
-        public static async Task<MusicData[]> FromFile(string file)
+        public static async Task<MusicData[]> FromFile(string file, bool extensionCheck = false)
         {
             FileInfo localFile = new(file);
+            if (extensionCheck)
+            {
+                if (!App.SupportedMediaFormats.Contains(localFile.Extension)) return null;
+            }
             if (localFile.Extension == ".cue")
             {
                 return await Task.Run(() =>

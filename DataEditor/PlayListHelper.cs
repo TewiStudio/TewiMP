@@ -210,7 +210,8 @@ namespace TewiMP.DataEditor
                 var folder = new DirectoryInfo(folderPath);
                 foreach (var file in folder.GetFiles())
                 {
-                    var array = await MusicData.FromFile(file.FullName);
+                    var array = await MusicData.FromFile(file.FullName, true);
+                    if (array == null) continue;
                     foreach (var item in array)
                     {
                         musicDatas.Add(item);
