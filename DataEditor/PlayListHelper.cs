@@ -267,6 +267,7 @@ namespace TewiMP.DataEditor
             foreach (var path in list)
             {
                 var musicDatas = await AnalysisFolderMusic(path);
+                if (musicDatas == null) continue;
                 await AddAnalyzedMusic(await Task.Run(musicDatas.ToArray));
             }
         }
