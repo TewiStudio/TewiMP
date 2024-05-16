@@ -230,14 +230,14 @@ namespace TewiMP.DataEditor
 
         public static async Task<MusicData[]> FromFile(string file, bool extensionCheck = false)
         {
-            FileInfo localFile = new(file);
-            if (extensionCheck)
+            return await Task.Run(() =>
             {
-                if (!App.SupportedMediaFormats.Contains(localFile.Extension)) return null;
-            }
-            if (localFile.Extension == ".cue")
-            {
-                return await Task.Run(() =>
+                FileInfo localFile = new(file);
+                if (extensionCheck)
+                {
+                    if (!App.SupportedMediaFormats.Contains(localFile.Extension)) return null;
+                }
+                if (localFile.Extension == ".cue")
                 {
                     var encoding = CodeHelper.GetEncoding(localFile.FullName, System.Text.Encoding.Default);
                     CueSharp.CueSheet cueSheet = new CueSharp.CueSheet(localFile.FullName, encoding);
@@ -246,7 +246,7 @@ namespace TewiMP.DataEditor
 
                     var track = new ATL.Track(path);
                     duration = TimeSpan.FromMilliseconds(track.DurationMs);
-                    
+
                     List<MusicData> data = new List<MusicData>();
                     foreach (var t in cueSheet.Tracks)
                     {
@@ -297,26 +297,23 @@ namespace TewiMP.DataEditor
                     }
                     data.Reverse();
                     return data.ToArray();
-                });
-            }
-            else
-            {
-                MusicData localAudioData;
-                TagLib.File tagFile = null;
-                TagLib.Tag tag = null;
-                //Track track = null;
-                bool isError = false;
-
-                try
+                }
+                else
                 {
-                    /*
-                    await Task.Run(() =>
+                    MusicData localAudioData;
+                    TagLib.File tagFile = null;
+                    TagLib.Tag tag = null;
+                    //Track track = null;
+                    bool isError = false;
+
+                    try
                     {
-                        track = new(localFile.FullName);
-                    });*/
-                    if (localFile.Extension != ".mid")
-                    {
+                        /*
                         await Task.Run(() =>
+                        {
+                            track = new(localFile.FullName);
+                        });*/
+                        if (localFile.Extension != ".mid")
                         {
                             try
                             {
@@ -324,44 +321,47 @@ namespace TewiMP.DataEditor
                                 tag = tagFile.Tag;
                             }
                             catch { }
-                            if (tag == null) { isError = true; return; }
-                            if (tag.IsEmpty) isError = true;
-                            if (string.IsNullOrEmpty(tag.Title)) isError = true;
-                            if (tag.Performers == null) isError = true;
-                        });
+                            if (tag == null) isError = true;
+                            if (!isError)
+                            {
+                                if (tag.IsEmpty) isError = true;
+                                if (string.IsNullOrEmpty(tag.Title)) isError = true;
+                                if (tag.Performers == null) isError = true;
+                            }
+                        }
+                        else isError = true;
                     }
-                    else isError = true;
-                }
-                catch
-                {
-                    isError = true;
-                }
-
-                if (!isError)
-                {
-                    List<Artist> artists = new();
-                    foreach (var art in tag.Performers)
+                    catch
                     {
-                        artists.Add(new(art));
+                        isError = true;
                     }
 
-                    localAudioData = new MusicData(
-                    tag.Title, null, artists, new(tag.Album),
-                        inLocal: localFile.FullName, from: MusicFrom.localMusic
-                        )
-                    { Index = (int)tag.Track };
-                }
-                else
-                {
-                    localAudioData = new MusicData(
-                    localFile.Name, null, new(), new(null),
-                        inLocal: localFile.FullName, from: MusicFrom.localMusic
-                    );
-                }
+                    if (!isError)
+                    {
+                        List<Artist> artists = new();
+                        foreach (var art in tag.Performers)
+                        {
+                            artists.Add(new(art));
+                        }
 
-                localAudioData.RelaseTime = localFile.CreationTime.Ticks.ToString();
-                return new[] { localAudioData };
-            }
+                        localAudioData = new MusicData(
+                        tag.Title, null, artists, new(tag.Album),
+                            inLocal: localFile.FullName, from: MusicFrom.localMusic
+                            )
+                        { Index = (int)tag.Track };
+                    }
+                    else
+                    {
+                        localAudioData = new MusicData(
+                        localFile.Name, null, new(), new(null),
+                            inLocal: localFile.FullName, from: MusicFrom.localMusic
+                        );
+                    }
+
+                    localAudioData.RelaseTime = localFile.CreationTime.Ticks.ToString();
+                    return new[] { localAudioData };
+                }
+            });
         }
     }
 

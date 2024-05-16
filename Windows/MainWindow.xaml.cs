@@ -713,6 +713,7 @@ namespace TewiMP
             HideDialog();
         }
 
+        static bool isFirstDialogShow = true;
         static ScrollViewer dialogScrollViewer = new() { HorizontalScrollMode = ScrollMode.Disabled };
         static bool dialogShow = false;
         static List<object[]> dialogShowObjects = new();
@@ -1448,9 +1449,9 @@ namespace TewiMP
             else if (item == SNavView.MenuItems[5] as NavigationViewItem)
                 SetNavViewContent(typeof(PlayListPage));
             else if (item == SNavView.MenuItems[6] as NavigationViewItem)
-                SetNavViewContent(typeof(HistoryPage));
-            else if (item == SNavView.MenuItems[7] as NavigationViewItem)
                 SetNavViewContent(typeof(LocalAudioPage));
+            else if (item == SNavView.MenuItems[7] as NavigationViewItem)
+                SetNavViewContent(typeof(HistoryPage));
             else if (item == SNavView.FooterMenuItems[0] as NavigationViewItem)
                 SetNavViewContent(typeof(AboutPage));
             else
@@ -1490,9 +1491,9 @@ namespace TewiMP
                 SNavView.SelectedItem = SNavView.MenuItems[3];
             else if (type == typeof(PlayListPage))
                 SNavView.SelectedItem = SNavView.MenuItems[5];
-            else if (type == typeof(HistoryPage))
-                SNavView.SelectedItem = SNavView.MenuItems[6];
             else if (type == typeof(LocalAudioPage))
+                SNavView.SelectedItem = SNavView.MenuItems[6];
+            else if (type == typeof(HistoryPage))
                 SNavView.SelectedItem = SNavView.MenuItems[7];
             else if (type == typeof(AboutPage))
                 SNavView.SelectedItem = SNavView.FooterMenuItems[0];

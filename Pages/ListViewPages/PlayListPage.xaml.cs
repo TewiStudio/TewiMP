@@ -60,7 +60,7 @@ namespace TewiMP.Pages.ListViewPages
         }
         void MultiSelectDo(bool isChecked)
         {
-            if (isUnloaded) return;
+            if (!this.IsLoaded) return;
             if (musicListBind == null) return;
 
             foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
@@ -80,7 +80,7 @@ namespace TewiMP.Pages.ListViewPages
         }
         void MoveItemDo(bool isChecked)
         {
-            if (isUnloaded) return;
+            if (!this.IsLoaded) return;
             if (musicListBind == null) return;
 
             foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
@@ -100,7 +100,7 @@ namespace TewiMP.Pages.ListViewPages
             ItemsList.CanReorderItems = isChecked;
             ItemsList.SelectionMode = isChecked ? ListViewSelectionMode.Multiple : ListViewSelectionMode.None;
             UpdateCommandBarWidth();
-            MusicDataItem.SetIsCloseMouseEvent(isChecked ? true : false);
+            MusicDataItem.SetIsCloseMouseEvent(isChecked ? true : false, true);
             MainWindow.AllowDragEvents = !isChecked;
         }
         async void MoveItemSave()
@@ -308,7 +308,7 @@ namespace TewiMP.Pages.ListViewPages
         ScalarKeyFrameAnimation commandBarVisualOpacityAnimation;
         void InitVisuals()
         {
-            if (isUnloaded) return;
+            if (!this.IsLoaded) return;
             MultiSelectDo(false);
             MoveItemDo(false);
 
@@ -349,7 +349,7 @@ namespace TewiMP.Pages.ListViewPages
         {
             if (scrollViewer == null) return;
             if (compositor == null) return;
-            if (isUnloaded) return;
+            if (!IsLoaded) return;
             var anotherHeight = 154;
             double imageSizeEnd = 0.45;
             string progress = $"Clamp(-scroller.Translation.Y / {anotherHeight}, 0, 1.0)";
@@ -446,7 +446,7 @@ namespace TewiMP.Pages.ListViewPages
         List<PlaySort> listSortEnum = null;
         async void InitBindings()
         {
-            if (isUnloaded) return;
+            if (!IsLoaded) return;
             if (isInInitBindings) return;
             isInInitBindings = true;
             var scs = musicListData.PlaySort;
@@ -499,7 +499,7 @@ namespace TewiMP.Pages.ListViewPages
             });
 
             musicListBind.Clear();
-            if (isUnloaded || musicListData == null)
+            if (!IsLoaded || musicListData == null)
             {
                 array = null;
                 return;
@@ -519,7 +519,7 @@ namespace TewiMP.Pages.ListViewPages
 
         void InitInfo()
         {
-            if (isUnloaded) return;
+            if (!IsLoaded) return;
             foreach (var mld in App.playListReader.NowMusicListData)
             {
                 if (mld.MD5 == md5)
@@ -537,14 +537,14 @@ namespace TewiMP.Pages.ListViewPages
             MainWindow.WindowDpiChanged -= MainWindow_WindowDpiChanged;
             MainWindow.WindowDpiChanged += MainWindow_WindowDpiChanged;
             ItemsList_Header_Info_TitleTextBlock.Text = musicListData.ListShowName;
-            ItemsList_Header_Info_OtherTextBlock.Text = $"¹² {musicListData.Songs.Count} Ê×¸èÇú";
+            ItemsList_Header_Info_OtherTextBlock.Text = $"{musicListData.Songs.Count} Ê×¸èÇú";
         }
 
         static Thickness thickness0 = new(0);
         static Thickness thickness1 = new(1);
         async void InitImage()
         {
-            if (isUnloaded) return;
+            if (!IsLoaded) return;
             if (musicListData == null) return;
             ItemsList_Header_Image.BorderThickness = thickness0;
             ImageSource imageSource = null;
@@ -563,7 +563,7 @@ namespace TewiMP.Pages.ListViewPages
                 imageSource = await FileHelper.GetImageSource("");
             }
 
-            if (isUnloaded || musicListData == null) return;
+            if (!IsLoaded || musicListData == null) return;
             ItemsList_Header_Image.BorderThickness = thickness1;
             ItemsList_Header_Image.Source = imageSource;
             InitShyHeader();
@@ -616,10 +616,8 @@ namespace TewiMP.Pages.ListViewPages
             scrollViewer.ChangeView(null, pageData.VerticalOffset, null);
         }
 
-        bool isUnloaded = false;
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            isUnloaded = true;
             RemoveEvents();
             ItemList_Header_Search_Control.IsOpenChanged -= ItemList_Header_Search_Control_IsOpenChanged;
             MainWindow.WindowDpiChanged -= MainWindow_WindowDpiChanged;

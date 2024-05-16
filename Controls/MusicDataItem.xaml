@@ -12,7 +12,12 @@
     PointerEntered="UserControl_PointerEntered"
     PointerExited="UserControl_PointerExited"
     RightTapped="UserControl_RightTapped"
-    Holding="UserControl_Holding">
+    Holding="UserControl_Holding" MinHeight="74">
+    <UserControl.Transitions>
+        <TransitionCollection>
+            <PopupThemeTransition/>
+        </TransitionCollection>
+    </UserControl.Transitions>
     <Grid>
         <local:MusicDataFlyout x:Name="musicDataFlyout"/>
         <Rectangle
@@ -58,7 +63,7 @@
                     x:Name="Info_Image_Root"
                     Height="58"
                     Width="58"
-                    Margin="0,0,6,0">
+                    Margin="0,0,4,0">
                     <local:ImageEx
                         BorderThickness="1"
                         CornerRadius="4"
@@ -69,7 +74,7 @@
                 <StackPanel
                     x:Name="Info_Texts_StackPanel"
                     Grid.Column="1"
-                    Margin="6,0" UseLayoutRounding="False"
+                    Margin="4,0" UseLayoutRounding="True"
                     VerticalAlignment="Center">
                     <TextBlock
                         Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"
@@ -163,6 +168,21 @@
                     </Button>
                 </StackPanel>
             </Grid>
+        </Grid>
+        <Grid
+            x:Name="FileNotExists_Root"
+            Visibility="Collapsed"
+            VerticalAlignment="Center"
+            HorizontalAlignment="Center"
+            BorderThickness="1" CornerRadius="4" Padding="8" IsHitTestVisible="False"
+            Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <FontIcon Glyph="&#xE7BA;" FontSize="14"/>
+            <TextBlock Grid.Column="1" Text="文件不存在" Margin="4,0,0,0"/>
         </Grid>
     </Grid>
 </UserControl>

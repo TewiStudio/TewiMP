@@ -203,10 +203,10 @@ namespace TewiMP.DataEditor
 
         public static async Task<List<MusicData>> AnalysisFolderMusic(string folderPath)
         {
-            List<MusicData> musicDatas = [];
-            await Task.Run(async () =>
+            return await Task.Run(async () =>
             {
-                if (!Directory.Exists(folderPath)) return;
+                List<MusicData> musicDatas = [];
+                if (!Directory.Exists(folderPath)) return null;
                 var folder = new DirectoryInfo(folderPath);
                 foreach (var file in folder.GetFiles())
                 {
@@ -217,14 +217,14 @@ namespace TewiMP.DataEditor
                         musicDatas.Add(item);
                     }
                 }
+                return musicDatas;
             });
-            return musicDatas;
         }
 
         public static async Task RemoveAllAnalyzedMusic()
         {
             var data = await GetLocalMusicData();
-            data[DataFolderBase.LocalMusicDataType.AnalyzedDatas.ToString()] = new JArray();
+            await Task.Run(() => data[DataFolderBase.LocalMusicDataType.AnalyzedDatas.ToString()] = new JArray());
             await SaveLocalMusicData(data);
         }
 
@@ -232,15 +232,15 @@ namespace TewiMP.DataEditor
         {
             if (musicDatas == null) return;
             var data = await GetLocalMusicData();
-            var analyzedList = data[DataFolderBase.LocalMusicDataType.AnalyzedDatas.ToString()] as JArray;
             await Task.Run(() =>
             {
+                var analyzedList = data[DataFolderBase.LocalMusicDataType.AnalyzedDatas.ToString()] as JArray;
                 foreach (var item in musicDatas)
                 {
                     analyzedList.Add(JObject.FromObject(item));
                 }
+                data[DataFolderBase.LocalMusicDataType.AnalyzedDatas.ToString()] = analyzedList;
             });
-            data[DataFolderBase.LocalMusicDataType.AnalyzedDatas.ToString()] = analyzedList;
             await SaveLocalMusicData(data);
         }
 
@@ -262,12 +262,12 @@ namespace TewiMP.DataEditor
 
         public static async Task ReAnalysisMusicDatas()
         {
-            await RemoveAllAnalyzedMusic();
             var list = await GetAllMusicFolders();
+            await RemoveAllAnalyzedMusic();
             foreach (var path in list)
             {
                 var musicDatas = await AnalysisFolderMusic(path);
-                await AddAnalyzedMusic([.. musicDatas]);
+                await AddAnalyzedMusic(await Task.Run(musicDatas.ToArray));
             }
         }
     }

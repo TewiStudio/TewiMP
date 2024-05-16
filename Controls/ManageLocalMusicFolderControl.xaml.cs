@@ -17,7 +17,7 @@ namespace TewiMP.Controls
 
         async void Init()
         {
-            if (isUnloaded) return;
+            if (!this.IsLoaded) return;
             musicFolders.Clear();
             var folderPaths = await DataEditor.LocalMusicHelper.GetAllMusicFolders();
             foreach (string folder in folderPaths) musicFolders?.Add(folder);
@@ -29,10 +29,9 @@ namespace TewiMP.Controls
             ItemsList.ItemsSource = musicFolders;
         }
 
-        bool isUnloaded = false;
         private async void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
-            isUnloaded = true;
+            if (this.IsLoaded) return;
             if (musicFolders != null)
             {/*
                 foreach (string folder in deletedMusicFolders)

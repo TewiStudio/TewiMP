@@ -128,7 +128,18 @@
                     <RowDefinition Height="auto"/>
                     <RowDefinition Height="auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="ItemsList_Header_Label" Text="本地音频" Style="{ThemeResource TBHeader}"/>
+                <Grid x:Name="ItemsList_Header_Label_Root">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="auto"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock x:Name="ItemsList_Header_Label" Text="本地音频" Style="{ThemeResource TBHeader}"/>
+                    <TextBlock
+                        x:Name="ItemsList_Header_Label_Count"
+                        Grid.Column="1" Margin="12,0,0,12"
+                        VerticalAlignment="Bottom"
+                        Text=""/>
+                </Grid>
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -140,7 +151,15 @@
                         Margin="10,0,0,0" MinWidth="60"
                         Background="Transparent"
                         OverflowButtonVisibility="Auto" DefaultLabelPosition="Right" Grid.Row="1" AccessKey="Y">
-                        <AppBarButton Label="播放全部（Alt+Q）" Tag="play" AccessKey="Q" Click="AppBarButton_Click">
+                        <AppBarButton
+                            Background="{ThemeResource AccentFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                            BorderThickness="0,0,0,1"
+                            Label="播放全部（Alt+Q）"
+                            Tag="play"
+                            AccessKey="Q"
+                            Click="AppBarButton_Click">
                             <AppBarButton.Icon>
                                 <FontIcon Glyph="&#xEE4A;"/>
                             </AppBarButton.Icon>
@@ -150,7 +169,7 @@
                                 <FontIcon Glyph="&#xE72C;"/>
                             </AppBarButton.Icon>
                         </AppBarButton>
-                        <AppBarToggleButton Label="多选" AccessKey="S" Click="AppBarToggleButton_Click">
+                        <AppBarToggleButton Label="多选" Tag="multi" AccessKey="S" Click="AppBarToggleButton_Click">
                             <AppBarToggleButton.Icon>
                                 <FontIcon Glyph="&#xE762;"/>
                             </AppBarToggleButton.Icon>
@@ -159,6 +178,67 @@
                             <AppBarButton.Icon>
                                 <FontIcon Glyph="&#xED25;"/>
                             </AppBarButton.Icon>
+                        </AppBarButton>
+                        
+                        <AppBarButton
+                            Click="multiButton_Click"
+                            Tag="multi_selectAll"
+                            Label="选中全部"
+                            ToolTipService.ToolTip="选中全部">
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="&#xE8B3;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton
+                            Click="multiButton_Click"
+                            Tag="multi_selectReverse"
+                            Label="反选"
+                            ToolTipService.ToolTip="反选">
+                            <AppBarButton.Icon>
+                                <PathIcon Data="{StaticResource 反选}"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton
+                            Click="multiButton_Click"
+                            Tag="multi_deleteSelect"
+                            Label="删除选中歌曲"
+                            ToolTipService.ToolTip="删除选中歌曲">
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="&#xE74D;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton
+                            Click="multiButton_Click"
+                            Tag="multi_addSelectToPlayList"
+                            Label="添加选中歌曲到播放列表中"
+                            ToolTipService.ToolTip="添加选中歌曲到播放列表中">
+                            <AppBarButton.Flyout>
+                                <MenuFlyout Opening="multi_addSelectToPlayList_flyout_Opening" Closed="multi_addSelectToPlayList_flyout_Closed"/>
+                            </AppBarButton.Flyout>
+                            <Viewbox Width="9" Margin="2,0,0,0">
+                                <Grid>
+                                    <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
+                                                            VerticalAlignment="Top"/>
+                                    <FontIcon Glyph="&#xE90B;"
+                                                            VerticalAlignment="Bottom"/>
+                                </Grid>
+                            </Viewbox>
+                        </AppBarButton>
+                        <AppBarButton
+                            Click="multiButton_Click"
+                            Tag="multi_addSelectToPlaying"
+                            Label="添加选中歌曲到正在播放的列表中"
+                            ToolTipService.ToolTip="添加选中歌曲到正在播放的列表中">
+                            <Viewbox Width="9" Margin="2,0,0,0" VerticalAlignment="Center">
+                                <Grid>
+                                    <FontIcon 
+                                        Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
+                                        VerticalAlignment="Top"/>
+                                    <FontIcon
+                                        Glyph="&#xEE4A;"
+                                        VerticalAlignment="Bottom"/>
+                                </Grid>
+                            </Viewbox>
                         </AppBarButton>
                         <CommandBar.SecondaryCommands>
                             <AppBarButton Label="重新编制歌曲索引" Tag="reAnalysis" AccessKey="Y" Click="AppBarButton_Click">
@@ -227,7 +307,7 @@
                                 Text="到底了~"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Bottom"
-                                Margin="4,4,4,52" x:Name="AtListBottomTb"
+                                Margin="4,4,4,50" x:Name="AtListBottomTb"
                                 Foreground="{ThemeResource TextFillColorSecondary}"/>
                         </ListView.Footer>
                         <ListView.GroupStyle>
@@ -235,12 +315,15 @@
                                 <GroupStyle.HeaderTemplate>
                                     <DataTemplate>
                                         <Grid
-                                            Margin="16,4,16,4" Padding="4"
-                                            HorizontalAlignment="Left" MinWidth="36"
-                                            BorderThickness="1" CornerRadius="4"
-                                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                                            Background="{ThemeResource ControlFillColorDefault}">
-                                            <TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            Margin="16,4,16,4">
+                                            <Grid
+                                                Padding="4"
+                                                HorizontalAlignment="Left" MinWidth="36"
+                                                BorderThickness="1" CornerRadius="4"
+                                                BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                                                Background="{ThemeResource ControlFillColorDefault}">
+                                                <TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Grid>
                                         </Grid>
                                     </DataTemplate>
                                 </GroupStyle.HeaderTemplate>
@@ -267,6 +350,26 @@
                 HorizontalAlignment="Right"
                 VerticalAlignment="Bottom"
                 Margin="0,0,16,4"/>
+        </Grid>
+        <Grid
+            x:Name="ItemsList_Analyzing_Root"
+            Grid.Row="1" Margin="0,0,0,4"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Bottom"
+            Visibility="Collapsed"
+            Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+            CornerRadius="4" BorderThickness="1" Padding="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <ProgressRing Width="20" Height="20"/>
+            <TextBlock
+                Grid.Column="1" Margin="8,0,0,0"
+                Text="正在编制歌曲索引..."
+                VerticalAlignment="Center"
+                HorizontalAlignment="Left"/>
         </Grid>
     </Grid>
 </Page>

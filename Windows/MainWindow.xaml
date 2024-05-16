@@ -115,14 +115,14 @@
                         <NavigationViewItem.MenuItems>
                         </NavigationViewItem.MenuItems>
                     </NavigationViewItem>
-                    <NavigationViewItem Content="历史" AccessKey="MH">
-                        <NavigationViewItem.Icon>
-                            <FontIcon Glyph="&#xE81C;"/>
-                        </NavigationViewItem.Icon>
-                    </NavigationViewItem>
                     <NavigationViewItem Content="本地音频" AccessKey="MF">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE838;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                    <NavigationViewItem Content="历史" AccessKey="MH">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE81C;"/>
                         </NavigationViewItem.Icon>
                     </NavigationViewItem>
                 </NavigationView.MenuItems>

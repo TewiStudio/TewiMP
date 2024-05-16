@@ -66,13 +66,14 @@ namespace TewiMP.Controls
             }
         }
 
-        public static void SetIsCloseMouseEvent(bool value)
+        public static void SetIsCloseMouseEvent(bool value, bool showMoveIcon = false)
         {
             isMouseEventClosed = value;
             foreach (MusicDataItem item in staticMusicDataItem)
             {
                 item.Info_Texts_ButtonNameButton.IsHitTestVisible = !value;
-                item.Info_MoveIcon.Visibility = value ? Visibility.Visible : Visibility.Collapsed;
+                item.Info_MoveIcon.Visibility =
+                    value ? showMoveIcon ? Visibility.Visible : Visibility.Collapsed : Visibility.Collapsed;
             }
         }
 
@@ -81,7 +82,6 @@ namespace TewiMP.Controls
             get => songItemBind?.MusicData == App.audioPlayer.MusicData;
         }
 
-        bool isUnloaded = false;
         SongItemBindBase songItemBind;
         public MusicDataItem()
         {
@@ -93,11 +93,11 @@ namespace TewiMP.Controls
 
         void InitInfo()
         {
-            if (isUnloaded) return;
+            if (!IsLoaded) return;
             if (songItemBind == null) return;
             Info_Texts_CountRun.Text = songItemBind.MusicData.Count == 0 ? null : $"{songItemBind.MusicData.Count}. ";
             Info_Texts_TitleRun.Text = songItemBind.MusicData.Title;
-            Info_Texts_Title2Run.Text = songItemBind.MusicData.Title2;
+            Info_Texts_Title2Run.Text = $" {songItemBind.MusicData.Title2}";
             Info_Texts_ButtonNameTextBlock.Text = songItemBind.MusicData.ButtonName;
         }
 
@@ -107,14 +107,15 @@ namespace TewiMP.Controls
             if (Info_Image == null) return;
             Info_Image.Source = null;
             Info_Image_Root.Visibility = Visibility.Visible;
+            FileNotExists_Root.Visibility = Visibility.Collapsed;
             SetImageBorder(false);
-            if (isUnloaded) return;
+            if (!IsLoaded) return;
             if (songItemBind == null) return;
             initImageCallCount++;
             await Task.Delay(200);
             initImageCallCount--;
             if (initImageCallCount != 0) return;
-            if (isUnloaded) return;
+            if (!IsLoaded) return;
             if (songItemBind == null) return;
             if (songItemBind.MusicListData?.ListDataType == DataType.×¨¼­) return;
             if (songItemBind.MusicData.From == MusicFrom.localMusic)
@@ -128,12 +129,28 @@ namespace TewiMP.Controls
                 }
             }
 
+
+            bool isExists = true;
+            if (songItemBind.MusicData.From == MusicFrom.localMusic)
+            {
+                isExists = await Task.Run(() => File.Exists(songItemBind.MusicData.InLocal));
+            }
+
             MusicData musicData = songItemBind.MusicData;
             ImageSource result = null;
-            var bitmapTuple = await ImageManage.GetImageSource(musicData, (int)(56 * songItemBind.ImageScaleDPI), (int)(56 * songItemBind.ImageScaleDPI), true);
-            result = bitmapTuple.Item1;
 
-            if (isUnloaded) result = null;
+            if (isExists)
+            {
+                var bitmapTuple = await ImageManage.GetImageSource(musicData, (int)(56 * songItemBind.ImageScaleDPI), (int)(56 * songItemBind.ImageScaleDPI), true);
+                result = bitmapTuple.Item1;
+                FileNotExists_Root.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                FileNotExists_Root.Visibility = Visibility.Visible;
+            }
+
+            if (!IsLoaded) result = null;
             if (songItemBind == null) result = null;
 
             if (result != null)
@@ -191,7 +208,7 @@ namespace TewiMP.Controls
         bool last_IsMusicDataPlaying = false;
         void InitPlayingState()
         {
-            if (isUnloaded) return;
+            if (!IsLoaded) return;
             if (songItemBind == null) return;
 
             if (IsMusicDataPlaying)
@@ -290,7 +307,7 @@ namespace TewiMP.Controls
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             staticMusicDataItem.Add(this);
-            if (songItemBind == null) return;
+            UserControl_DataContextChanged(sender as FrameworkElement, null);
         }
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
@@ -301,7 +318,6 @@ namespace TewiMP.Controls
             }
             App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
             staticMusicDataItem.Remove(this);
-            isUnloaded = true;
             songItemBind = null;
             Info_Image.Source = null;
             rightButtonVisualShowAnimation.Dispose();

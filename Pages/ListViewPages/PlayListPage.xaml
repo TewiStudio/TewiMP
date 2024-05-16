@@ -296,7 +296,7 @@
                         Text="到底了~"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
-                        Margin="4,4,4,52" x:Name="AtListBottomTb"
+                        Margin="4,4,4,50" x:Name="AtListBottomTb"
                         Foreground="{ThemeResource TextFillColorSecondary}"/>
                 </Grid>
             </ListView.Footer>
