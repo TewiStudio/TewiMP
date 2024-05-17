@@ -351,10 +351,10 @@ namespace TewiMP.Pages
                     {
                         App.playingList.ClearAll();
                     }
-                    foreach (var songItem in )
+                    foreach (var songItem in App.localMusicManager.LocalMusicItems)
                     {
-                        System.Diagnostics.Debug.WriteLine(songItem.Key);
-                        //App.playingList.Add(, false);
+                        //System.Diagnostics.Debug.WriteLine(songItem.Key);
+                        App.playingList.Add(songItem.MusicData, false);
                     }
                     await App.playingList.Play(App.localMusicManager.LocalMusicItems.First().MusicData, true);
                     App.playingList.SetRandomPlay(App.playingList.PlayBehavior);
