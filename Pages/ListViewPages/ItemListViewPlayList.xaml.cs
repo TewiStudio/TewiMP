@@ -269,10 +269,10 @@ namespace TewiMP.Pages
                             array = NavToObj.Songs.OrderByDescending(m => m.Album.Title).ToArray();
                             break;
                         case PlaySort.时间升序:
-                            array = NavToObj.Songs.OrderBy(m => m.RelaseTime).ToArray();
+                            array = NavToObj.Songs.OrderBy(m => m.ReleaseTime).ToArray();
                             break;
                         case PlaySort.时间降序:
-                            array = NavToObj.Songs.OrderByDescending(m => m.RelaseTime).ToArray();
+                            array = NavToObj.Songs.OrderByDescending(m => m.ReleaseTime).ToArray();
                             break;
                         case PlaySort.索引升序:
                             array = NavToObj.Songs.OrderBy(m => m.Index).ToArray();

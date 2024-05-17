@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using TewiMP.DataEditor;
+using Kawazu;
 
 namespace TewiMP.Helpers.MetingService
 {
@@ -234,7 +235,7 @@ namespace TewiMP.Helpers.MetingService
                     (string)md["name"],
                     (string)md["id"],
                     artists, album,
-                    md.ContainsKey("publishTime") ? (string)md["publishTime"] : null,
+                    md.ContainsKey("publishTime") ? new DateTime(long.Parse((string)md["publishTime"])) : null,
                     MusicFrom.neteaseMusic);
 
                 if (md.ContainsKey("tns"))

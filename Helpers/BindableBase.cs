@@ -35,6 +35,20 @@ namespace TewiMP.Helpers
             }
         }
 
+        IIsListPage _isListPage;
+        public IIsListPage OtherData
+        {
+            get => _isListPage;
+            set
+            {
+                if (_isListPage != value)
+                {
+                    _isListPage = value;
+                    OnPropertyChanged(nameof(OtherData));
+                }
+            }
+        }
+
         double _imageScaleDPI = 1.0;
         public double ImageScaleDPI
         {

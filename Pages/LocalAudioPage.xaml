@@ -20,6 +20,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="ms-appx:///CommunityToolkit.WinUI.Controls.Segmented/Segmented/Segmented.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <x:Double x:Key="GroupItemWidth">60</x:Double>
+            <x:Double x:Key="VariableSizedWrapGridMaxWidth">500</x:Double>
             <Style TargetType="ListViewItem">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -240,12 +242,20 @@
                                 </Grid>
                             </Viewbox>
                         </AppBarButton>
+                        
                         <CommandBar.SecondaryCommands>
                             <AppBarButton Label="重新编制歌曲索引" Tag="reAnalysis" AccessKey="Y" Click="AppBarButton_Click">
                                 <AppBarButton.Icon>
                                     <FontIcon Glyph="&#xE8F7;"/>
                                 </AppBarButton.Icon>
                             </AppBarButton>
+                            <AppBarSeparator/>
+                            <AppBarElementContainer AllowFocusOnInteraction="True">
+                                <ComboBox
+                                    x:Name="CommandBar_SortComboBox"
+                                    Header="分组依据" Margin="12,4"
+                                    SelectionChanged="CommandBar_SortComboBox_SelectionChanged"/>
+                            </AppBarElementContainer>
                         </CommandBar.SecondaryCommands>
                     </CommandBar>
                     <Grid Grid.Column="1">
@@ -268,20 +278,16 @@
             <SemanticZoom
                 Margin="0,0,0,0"
                 ScrollViewer.ZoomMode="Enabled">
-                <SemanticZoom.Style>
-                    <Style TargetType="SemanticZoom">
-                        
-                    </Style>
-                </SemanticZoom.Style>
                 <SemanticZoom.ZoomedOutView>
                     <GridView
                         x:Name="ItemsList_HeaderGridView">
                         <GridView.ItemTemplate>
                             <DataTemplate x:DataType="helper:SongItemBindBase">
-                                <Grid VerticalAlignment="Center" Width="60" Height="60">
+                                <Grid VerticalAlignment="Center" MinWidth="{ThemeResource GroupItemWidth}" Height="60">
                                     <TextBlock
                                         Text="{Binding Group.Key}"
                                         VerticalAlignment="Center" HorizontalAlignment="Center"
+                                        TextTrimming="WordEllipsis"
                                         FontSize="18" FontWeight="Medium"/>
                                 </Grid>
                             </DataTemplate>
@@ -291,7 +297,7 @@
                                 <VariableSizedWrapGrid
                                     VerticalAlignment="Center"
                                     Orientation="Horizontal"
-                                    MaxWidth="500"/>
+                                    MaxWidth="{ThemeResource VariableSizedWrapGridMaxWidth}"/>
                             </ItemsPanelTemplate>
                         </GridView.ItemsPanel>
                     </GridView>
@@ -322,7 +328,7 @@
                                                 BorderThickness="1" CornerRadius="4"
                                                 BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                                                 Background="{ThemeResource ControlFillColorDefault}">
-                                                <TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                <TextBlock Text="{Binding Key}" HorizontalAlignment="Center" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                             </Grid>
                                         </Grid>
                                     </DataTemplate>
@@ -360,6 +366,11 @@
             Background="{ThemeResource SystemFillColorCautionBackgroundBrush}"
             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
             CornerRadius="4" BorderThickness="1" Padding="12">
+            <Grid.Transitions>
+                <TransitionCollection>
+                    <EntranceThemeTransition/>
+                </TransitionCollection>
+            </Grid.Transitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
                 <ColumnDefinition/>

@@ -140,7 +140,7 @@
                                                 SelectionChanged="SortComboBox_SelectionChanged"
                                                 Header="排序方式"
                                                 AccessKey="X"
-                                                Margin="12, 4">
+                                                Margin="12,4">
                                             </ComboBox>
                                         </AppBarElementContainer>
                                     </CommandBar.SecondaryCommands>

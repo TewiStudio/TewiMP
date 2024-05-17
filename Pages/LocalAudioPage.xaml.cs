@@ -111,12 +111,15 @@ namespace TewiMP.Pages
             }
         }
 
+        bool inInit = false;
         async void Init()
         {
+            inInit = true;
             InitVisual();
             InitShyHeader();
             InitEvents();
             CallEventsWhenDataLated();
+            inInit = false;
 
             if (isFirstLoadedPage)
             {
@@ -136,6 +139,9 @@ namespace TewiMP.Pages
         {
             if (!IsLoaded) return;
             MultiSelectDo(false);
+
+            CommandBar_SortComboBox.ItemsSource = new string[] { "标题", "艺术家", "专辑", "发行日期", "文件创建日期" };
+            CommandBar_SortComboBox.SelectedIndex = 0;
 
             scrollViewer = (VisualTreeHelper.GetChild(ItemsList, 0) as Border).Child as ScrollViewer;
             scrollViewer.CanContentRenderOutsideBounds = true;
@@ -242,6 +248,7 @@ namespace TewiMP.Pages
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
+            CommandBar_SortComboBox.ItemsSource = null;
             ItemsList_SongGroup.Source = null;
             RemoveEvents();
         }
@@ -269,21 +276,57 @@ namespace TewiMP.Pages
 
         private async void LocalMusicManager_DataChanged()
         {
-            var groupsResult = await Task.Run(async () =>
-            {
-                using Kawazu.KawazuConverter converter = new();
-                Dictionary<MusicData, string> array = [];
-                foreach (var i in App.localMusicManager.LocalMusicItems)
-                {
-                    if (array.ContainsKey(i.MusicData)) continue;
-                    string a = i.MusicData.Title;
-                    a = PinyinHelper.GetPinyin(a).ToUpper().First().ToString();
-                    a = (await converter.Convert(a, Kawazu.To.Romaji, Kawazu.Mode.Spaced, Kawazu.RomajiSystem.Nippon)).ToUpper().First().ToString();
-                    array.Add(i.MusicData, a);
-                }
+            dynamic groupsResult = null;
 
-                return App.localMusicManager.LocalMusicItems.GroupBy(t => array[t.MusicData].ToUpper().First()).OrderBy(t => t.Key);
-            });
+            switch (CommandBar_SortComboBox.SelectedItem)
+            {
+                case "标题":
+                    Resources["GroupItemWidth"] = 60;
+                    groupsResult = await Task.Run(async () =>
+                    {
+                        using Kawazu.KawazuConverter converter = new();
+                        Dictionary<MusicData, string> array = [];
+                        foreach (var i in App.localMusicManager.LocalMusicItems)
+                        {
+                            if (array.ContainsKey(i.MusicData)) continue;
+                            string a = i.MusicData.Title;
+                            a = PinyinHelper.GetPinyin(a).ToUpper().First().ToString();
+                            a = (await converter.Convert(a, Kawazu.To.Romaji, Kawazu.Mode.Spaced, Kawazu.RomajiSystem.Nippon)).ToUpper().First().ToString();
+                            array.Add(i.MusicData, a);
+                        }
+
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => array[t.MusicData].ToUpper().First()).OrderBy(t => t.Key);
+                    });
+                    break;
+                case "艺术家":
+                    Resources["GroupItemWidth"] = 500;
+                    groupsResult = await Task.Run(() =>
+                    {
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ArtistName).OrderBy(t => t.Key);
+                    });
+                    break;
+                case "专辑":
+                    Resources["GroupItemWidth"] = 500;
+                    groupsResult = await Task.Run(() =>
+                    {
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.Album.Title).OrderBy(t => t.Key);
+                    });
+                    break;
+                case "发行日期":
+                    Resources["GroupItemWidth"] = 500;
+                    groupsResult = await Task.Run(() =>
+                    {
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ReleaseTime).OrderBy(t => t.Key);
+                    });
+                    break;
+                case "文件创建日期":
+                    Resources["GroupItemWidth"] = 500;
+                    groupsResult = await Task.Run(() =>
+                    {
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.FileCreateTime).OrderBy(t => t.Key);
+                    });
+                    break;
+            }
 
             vOffset = scrollViewer.VerticalOffset;
             ItemsList_SongGroup.Source = groupsResult;
@@ -432,6 +475,12 @@ namespace TewiMP.Pages
                 item.Click -= Item_Click;
             }
             (sender as MenuFlyout).Items.Clear();
+        }
+
+        private async void CommandBar_SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (inInit) return;
+            await App.localMusicManager.Refresh();
         }
     }
 }

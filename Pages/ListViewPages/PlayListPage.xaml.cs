@@ -65,7 +65,11 @@ namespace TewiMP.Pages.ListViewPages
 
             foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
             {
-                if ((string)element.Tag == "move_") continue;
+                if (((string)element.Tag).Contains("move_"))
+                {
+                    element.Visibility = Visibility.Collapsed;
+                    continue;
+                }
                 if ((string)element.Tag == "multiSelect") continue;
                 if (((string)element.Tag).Contains("multi"))
                     element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
@@ -484,10 +488,10 @@ namespace TewiMP.Pages.ListViewPages
                         array = [.. musicListData.Songs.OrderByDescending(m => m.Album.Title)];
                         break;
                     case PlaySort.时间升序:
-                        array = [.. musicListData.Songs.OrderBy(m => m.RelaseTime)];
+                        array = [.. musicListData.Songs.OrderBy(m => m.ReleaseTime ?? DateTime.MinValue)];
                         break;
                     case PlaySort.时间降序:
-                        array = [.. musicListData.Songs.OrderByDescending(m => m.RelaseTime)];
+                        array = [.. musicListData.Songs.OrderByDescending(m => m.ReleaseTime ?? DateTime.MinValue)];
                         break;
                     case PlaySort.索引升序:
                         array = [.. musicListData.Songs.OrderBy(m => m.Index)];

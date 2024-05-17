@@ -113,7 +113,7 @@ namespace TewiMP.Helpers
                         else
                         {
                             var album = await App.metingServices.NeteaseServices.GetAlbum(musicData.Album.ID);
-                            addressResult = album.PicturePath;
+                            addressResult = album?.PicturePath;
                         }
                         break;
                     case MusicFrom.kgMusic:
@@ -150,7 +150,6 @@ namespace TewiMP.Helpers
                         break;
                     case MusicFrom.kgMusic:
                         return await App.metingServices.KgServices.GetUrl(musicData.ID, 320);
-                        break;
                     case MusicFrom.neteaseMusic:
                         return await App.metingServices.NeteaseServices.GetUrl(musicData.ID, 960);
                     case MusicFrom.qqMusic:

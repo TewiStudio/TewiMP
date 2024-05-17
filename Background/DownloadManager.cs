@@ -303,6 +303,7 @@ namespace TewiMP.Background
                 tag.Pictures = pictures.ToArray();
                 tag.Title = dm.MusicData.Title;
                 tag.Album = dm.MusicData.Album.Title;
+                tag.DateTagged = dm.MusicData.ReleaseTime;
                 tag.Comment = $"Download with {App.AppName}";
                 tag.Description = tag.Comment;
 

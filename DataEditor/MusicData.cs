@@ -153,7 +153,8 @@ namespace TewiMP.DataEditor
         public string ID { get; set; }
         public List<Artist> Artists { get; set; }
         public Album Album { get; set; }
-        public string RelaseTime { get; set; }
+        public DateTime? ReleaseTime { get; set; }
+        public DateTime? FileCreateTime { get; set; }
         public MusicFrom From { get; set; }
         public string InLocal { get; set; }
         public CUETrackData CUETrackData { get; set; } = null;
@@ -193,7 +194,7 @@ namespace TewiMP.DataEditor
                          string ID = "",
                          List<Artist> artists = null,
                          Album album = null,
-                         string relaseTime = null,
+                         DateTime? releaseTime = null,
                          MusicFrom from = MusicFrom.kwMusic,
                          string inLocal = null)
         {
@@ -201,7 +202,7 @@ namespace TewiMP.DataEditor
             this.ID = ID;
             this.Artists = artists;
             this.Album = album;
-            this.RelaseTime = relaseTime;
+            this.ReleaseTime = DateTime.MinValue;
             this.From = from;
             this.InLocal = inLocal;
 
@@ -349,6 +350,7 @@ namespace TewiMP.DataEditor
                             inLocal: localFile.FullName, from: MusicFrom.localMusic
                             )
                         { Index = (int)tag.Track };
+                        localAudioData.ReleaseTime = tag.DateTagged ?? new DateTime(localFile.CreationTime.Ticks);
                     }
                     else
                     {
@@ -357,9 +359,8 @@ namespace TewiMP.DataEditor
                             inLocal: localFile.FullName, from: MusicFrom.localMusic
                         );
                     }
-
-                    localAudioData.RelaseTime = localFile.CreationTime.Ticks.ToString();
-                    return new[] { localAudioData };
+                    tagFile?.Dispose();
+                    return [localAudioData];
                 }
             });
         }
