@@ -228,14 +228,18 @@ namespace TewiMP.Helpers.MetingService
                 {
                     pic = null;
                 }
+
                 Album album = new(
                     (string)md["al"]["name"], (string)md["al"]["id"], pic);
+
+                bool dateTickComplete = long.TryParse((string)md["publishTime"], out var dateTick);
+                DateTime? dateTime =
+                    md.ContainsKey("publishTime") ? dateTickComplete ? new DateTime(dateTick) : null : null;
 
                 MusicData data = new(
                     (string)md["name"],
                     (string)md["id"],
-                    artists, album,
-                    md.ContainsKey("publishTime") ? new DateTime(long.Parse((string)md["publishTime"])) : null,
+                    artists, album, dateTime,
                     MusicFrom.neteaseMusic);
 
                 if (md.ContainsKey("tns"))

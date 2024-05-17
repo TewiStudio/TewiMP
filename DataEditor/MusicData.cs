@@ -202,7 +202,7 @@ namespace TewiMP.DataEditor
             this.ID = ID;
             this.Artists = artists;
             this.Album = album;
-            this.ReleaseTime = DateTime.MinValue;
+            this.ReleaseTime = releaseTime;
             this.From = from;
             this.InLocal = inLocal;
 

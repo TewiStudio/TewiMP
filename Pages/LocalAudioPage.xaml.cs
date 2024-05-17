@@ -316,14 +316,14 @@ namespace TewiMP.Pages
                     Resources["GroupItemWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ReleaseTime).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ReleaseTime ?? DateTime.MinValue).OrderBy(t => t.Key);
                     });
                     break;
                 case "文件创建日期":
                     Resources["GroupItemWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.FileCreateTime).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.FileCreateTime ?? DateTime.MinValue).OrderBy(t => t.Key);
                     });
                     break;
             }
@@ -351,9 +351,10 @@ namespace TewiMP.Pages
                     {
                         App.playingList.ClearAll();
                     }
-                    foreach (var songItem in App.localMusicManager.LocalMusicItems)
+                    foreach (var songItem in )
                     {
-                        App.playingList.Add(songItem.MusicData, false);
+                        System.Diagnostics.Debug.WriteLine(songItem.Key);
+                        //App.playingList.Add(, false);
                     }
                     await App.playingList.Play(App.localMusicManager.LocalMusicItems.First().MusicData, true);
                     App.playingList.SetRandomPlay(App.playingList.PlayBehavior);
