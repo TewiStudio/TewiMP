@@ -336,7 +336,7 @@ namespace TewiMP.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ReleaseTime == null ? "..." : t.MusicData.ReleaseTime.Value.Year.ToString()).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.ReleaseTime).GroupBy(t => t.MusicData.ReleaseTime == null ? "..." : t.MusicData.ReleaseTime.Value.Year.ToString());
                     });
                     break;
                 case 4:
@@ -344,7 +344,7 @@ namespace TewiMP.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.FileTime == null ? "..." : t.MusicData.FileTime.Value.Year.ToString()).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.FileTime).GroupBy(t => t.MusicData.FileTime == null ? "..." : t.MusicData.FileTime.Value.Year.ToString());
                     });
                     break;
             }
@@ -354,6 +354,12 @@ namespace TewiMP.Pages
             ItemsList_HeaderGridView.ItemsSource = ItemsList_SongGroup.View.CollectionGroups;
             ItemsList_Header_Label_Count.Text = $"{App.localMusicManager.LocalMusicItems.Count} 首歌曲";
             scrollViewer.ChangeView(null, vOffset, null, true);
+            int count = 0;
+            foreach (SongItemBindBase songItem in ItemsList_SongGroup.View)
+            {
+                count++;
+                songItem.MusicData.Count = count;
+            }
             isRefresh = false;
         }
 
@@ -410,6 +416,9 @@ namespace TewiMP.Pages
                         if (i.MusicData != App.audioPlayer.MusicData) continue;
                         await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                         await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
+                        await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
+                        MusicDataItem.TryHighlightPlayingItem();
+                        await Task.Delay(200);
                         MusicDataItem.TryHighlightPlayingItem();
                         break;
                     }
@@ -537,7 +546,9 @@ namespace TewiMP.Pages
             var scrollPlacement = ScrollItemPlacement.Top;
             await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, additionalVerticalOffset: -44);
             await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: -44);
-            await Task.Delay(50);
+            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: -44);
+            MusicDataItem.TryHighlight(songItemBind);
+            await Task.Delay(200);
             MusicDataItem.TryHighlight(songItemBind);
         }
 
