@@ -15,11 +15,14 @@ using Newtonsoft.Json.Linq;
 using TewiMP.Helpers;
 using System.IO;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
 
 namespace TewiMP.Pages
 {
     public partial class LocalAudioPage : Page
     {
+        public static int ItemSortBy = 0;
+
         static bool isFirstLoadedPage = true;
         public ArrayList arrayList { get; set; }
         public LocalAudioPage()
@@ -140,8 +143,8 @@ namespace TewiMP.Pages
             if (!IsLoaded) return;
             MultiSelectDo(false);
 
-            CommandBar_SortComboBox.ItemsSource = new string[] { "标题", "艺术家", "专辑", "发行日期", "文件创建日期" };
-            CommandBar_SortComboBox.SelectedIndex = 0;
+            CommandBar_SortComboBox.ItemsSource = new string[] { "标题", "艺术家", "专辑", "发行年份", "文件修改年份" };
+            CommandBar_SortComboBox.SelectedIndex = ItemSortBy;
 
             scrollViewer = (VisualTreeHelper.GetChild(ItemsList, 0) as Border).Child as ScrollViewer;
             scrollViewer.CanContentRenderOutsideBounds = true;
@@ -207,6 +210,8 @@ namespace TewiMP.Pages
 
         void InitEvents()
         {
+            MainWindow.InKeyDownEvent -= MainWindow_InKeyDownEvent;
+            MainWindow.InKeyDownEvent += MainWindow_InKeyDownEvent;
             scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
             scrollViewer.ViewChanging += ScrollViewer_ViewChanging;
             App.localMusicManager.DataAnalyzing -= LocalMusicManager_DataAnalyzing;
@@ -217,24 +222,31 @@ namespace TewiMP.Pages
             App.localMusicManager.DataChanging += LocalMusicManager_DataChanging;
             App.localMusicManager.DataChanged -= LocalMusicManager_DataChanged;
             App.localMusicManager.DataChanged += LocalMusicManager_DataChanged;
-            ItemsView_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
-            ItemsView_BottomButtons.PositionToNowPlaying_Button.Click += Position_Button_Click;
-            ItemsView_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
-            ItemsView_BottomButtons.PositionToTop_Button.Click += Position_Button_Click;
-            ItemsView_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
-            ItemsView_BottomButtons.PositionToBottom_Button.Click += Position_Button_Click;
+            ItemsList_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
+            ItemsList_BottomButtons.PositionToNowPlaying_Button.Click += Position_Button_Click;
+            ItemsList_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
+            ItemsList_BottomButtons.PositionToTop_Button.Click += Position_Button_Click;
+            ItemsList_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
+            ItemsList_BottomButtons.PositionToBottom_Button.Click += Position_Button_Click;
+            ItemsList_SearchControl.SearchingAItem -= ItemsList_SearchControl_SearchingAItem;
+            ItemsList_SearchControl.SearchingAItem += ItemsList_SearchControl_SearchingAItem;
+            ItemsList_SearchControl.IsOpenChanged -= ItemsList_SearchControl_IsOpenChanged;
+            ItemsList_SearchControl.IsOpenChanged += ItemsList_SearchControl_IsOpenChanged;
         }
 
         void RemoveEvents()
         {
+            MainWindow.InKeyDownEvent -= MainWindow_InKeyDownEvent;
             scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
             App.localMusicManager.DataAnalyzing -= LocalMusicManager_DataAnalyzing;
             App.localMusicManager.DataAnalyzed -= LocalMusicManager_DataAnalyzed;
             App.localMusicManager.DataChanging -= LocalMusicManager_DataChanging;
             App.localMusicManager.DataChanged -= LocalMusicManager_DataChanged;
-            ItemsView_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
-            ItemsView_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
-            ItemsView_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
+            ItemsList_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
+            ItemsList_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
+            ItemsList_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
+            ItemsList_SearchControl.SearchingAItem -= ItemsList_SearchControl_SearchingAItem;
+            ItemsList_SearchControl.IsOpenChanged -= ItemsList_SearchControl_IsOpenChanged;
         }
         void CallEventsWhenDataLated()
         {
@@ -248,6 +260,7 @@ namespace TewiMP.Pages
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
+            ItemSortBy = CommandBar_SortComboBox.SelectedIndex;
             CommandBar_SortComboBox.ItemsSource = null;
             ItemsList_SongGroup.Source = null;
             RemoveEvents();
@@ -260,28 +273,32 @@ namespace TewiMP.Pages
 
         private void LocalMusicManager_DataAnalyzing()
         {
+            CommandBar_SortComboBox.IsEnabled = false;
             ItemsList_Analyzing_Root.Visibility = Visibility.Visible;
         }
 
         private void LocalMusicManager_DataAnalyzed()
         {
             ItemsList_Analyzing_Root.Visibility = Visibility.Collapsed;
+            CommandBar_SortComboBox.IsEnabled = true;
+        }
+
+        bool isRefresh = false;
+        private void LocalMusicManager_DataChanging()
+        {
+            isRefresh = true;
         }
 
         double vOffset = 0;
-        private void LocalMusicManager_DataChanging()
-        {
-
-        }
-
         private async void LocalMusicManager_DataChanged()
         {
             dynamic groupsResult = null;
 
-            switch (CommandBar_SortComboBox.SelectedItem)
+            switch (CommandBar_SortComboBox.SelectedIndex)
             {
-                case "标题":
+                case 0:
                     Resources["GroupItemWidth"] = 60;
+                    Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(async () =>
                     {
                         using Kawazu.KawazuConverter converter = new();
@@ -298,32 +315,36 @@ namespace TewiMP.Pages
                         return App.localMusicManager.LocalMusicItems.GroupBy(t => array[t.MusicData].ToUpper().First()).OrderBy(t => t.Key);
                     });
                     break;
-                case "艺术家":
-                    Resources["GroupItemWidth"] = 500;
+                case 1:
+                    Resources["GroupItemWidth"] = 270;
+                    Resources["GroupHeaderPanelMaxWidth"] = 9000;
                     groupsResult = await Task.Run(() =>
                     {
                         return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ArtistName).OrderBy(t => t.Key);
                     });
                     break;
-                case "专辑":
-                    Resources["GroupItemWidth"] = 500;
+                case 2:
+                    Resources["GroupItemWidth"] = 270;
+                    Resources["GroupHeaderPanelMaxWidth"] = 9000;
                     groupsResult = await Task.Run(() =>
                     {
                         return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.Album.Title).OrderBy(t => t.Key);
                     });
                     break;
-                case "发行日期":
-                    Resources["GroupItemWidth"] = 500;
+                case 3:
+                    Resources["GroupItemWidth"] = 90;
+                    Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ReleaseTime ?? DateTime.MinValue).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ReleaseTime == null ? "..." : t.MusicData.ReleaseTime.Value.Year.ToString()).OrderBy(t => t.Key);
                     });
                     break;
-                case "文件创建日期":
-                    Resources["GroupItemWidth"] = 500;
+                case 4:
+                    Resources["GroupItemWidth"] = 90;
+                    Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.FileCreateTime ?? DateTime.MinValue).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.FileTime == null ? "..." : t.MusicData.FileTime.Value.Year.ToString()).OrderBy(t => t.Key);
                     });
                     break;
             }
@@ -333,11 +354,13 @@ namespace TewiMP.Pages
             ItemsList_HeaderGridView.ItemsSource = ItemsList_SongGroup.View.CollectionGroups;
             ItemsList_Header_Label_Count.Text = $"{App.localMusicManager.LocalMusicItems.Count} 首歌曲";
             scrollViewer.ChangeView(null, vOffset, null, true);
+            isRefresh = false;
         }
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             //UpdateShyHeader();
+            ItemsList_SemanticZoom_Clip.Rect = new(0, 0, ItemsList_SemanticZoom_Control.ActualWidth, ActualHeight);
         }
 
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
@@ -346,24 +369,26 @@ namespace TewiMP.Pages
             switch (button.Tag as string)
             {
                 case "play":
-                    if (App.localMusicManager.LocalMusicItems.Count == 0) return;
+                    if (ItemsList_SongGroup.View.Count == 0) return;
                     if (App.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
                     {
                         App.playingList.ClearAll();
                     }
-                    foreach (var songItem in App.localMusicManager.LocalMusicItems)
+                    foreach (SongItemBindBase songItem in ItemsList_SongGroup.View)
                     {
-                        //System.Diagnostics.Debug.WriteLine(songItem.Key);
                         App.playingList.Add(songItem.MusicData, false);
                     }
-                    await App.playingList.Play(App.localMusicManager.LocalMusicItems.First().MusicData, true);
+                    await App.playingList.Play((ItemsList_SongGroup.View.First() as SongItemBindBase).MusicData, true);
                     App.playingList.SetRandomPlay(App.playingList.PlayBehavior);
                     break;
                 case "refresh":
                     await App.localMusicManager.Refresh();
                     break;
                 case "manageFolder":
-                    await MainWindow.ShowDialog("管理本地音乐文件夹", new Controls.ManageLocalMusicFolderControl(), "完成");
+                    await MainWindow.ShowDialog("管理本地音乐文件夹", new ManageLocalMusicFolderControl(), "完成");
+                    break;
+                case "search":
+                    ItemsList_SearchControl.IsOpen = !ItemsList_SearchControl.IsOpen;
                     break;
                 case "reAnalysis":
                     button.IsEnabled = false;
@@ -481,7 +506,50 @@ namespace TewiMP.Pages
         private async void CommandBar_SortComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (inInit) return;
+            if (isRefresh) return;
+            if (!IsLoaded) return;
+            ItemSortBy = CommandBar_SortComboBox.SelectedIndex;
             await App.localMusicManager.Refresh();
+        }
+
+        private void ItemsList_SearchControl_IsOpenChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            if (ItemsList_SearchControl.IsOpen)
+            {
+                ItemsList_SearchControl.Margin = new(16, 0, 16, 4);
+                ItemsList_BottomButtons.Margin = new(0, 0, 16, ItemsList_SearchControl.ActualHeight + 8);
+                AtListBottomTb.Margin = new(4, 4, 4, ItemsList_BottomButtons.ActualHeight + ItemsList_SearchControl.ActualHeight + 12);
+                ObservableCollection<SongItemBindBase> songs = [];
+                foreach (SongItemBindBase i in ItemsList_SongGroup.View) { songs.Add(i); }
+                ItemsList_SearchControl.SongItemBinds = songs;
+            }
+            else
+            {
+                ItemsList_SearchControl.Margin = new(16, 0, 16, -ItemsList_SearchControl.ActualHeight - 4);
+                ItemsList_BottomButtons.Margin = new(0, 0, 16, 4);
+                AtListBottomTb.Margin = new(4, 4, 4, ItemsList_BottomButtons.ActualHeight + 8);
+                ItemsList_SearchControl.SongItemBinds = null;
+            }
+        }
+
+        private async void ItemsList_SearchControl_SearchingAItem(SongItemBindBase songItemBind)
+        {
+            var scrollPlacement = ScrollItemPlacement.Top;
+            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, additionalVerticalOffset: -44);
+            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: -44);
+            await Task.Delay(50);
+            MusicDataItem.TryHighlight(songItemBind);
+        }
+
+        private void MainWindow_InKeyDownEvent(Windows.System.VirtualKey key)
+        {
+            if (!MainWindow.isControlDown) return;
+            if (key != Windows.System.VirtualKey.F) return;
+            ItemsList_SearchControl.IsOpen = !ItemsList_SearchControl.IsOpen;
+            if (ItemsList_SearchControl.IsOpen)
+                ItemsList_SearchControl.FocusToSearchBox();
+            else
+                ItemsList_Header_CommandBar.Focus(FocusState.Keyboard);
         }
     }
 }

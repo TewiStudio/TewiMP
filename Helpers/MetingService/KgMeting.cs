@@ -39,7 +39,7 @@ namespace TewiMP.Helpers.MetingService
                                     ld.Songs.Add(new(
                                         (string)item["songname"],
                                         (string)item["hash"],
-                                        new() { new((string)item["singername"]) },
+                                        new() { new((string)item["singername"]) { From = MusicFrom.kgMusic } },
                                         new((string)item["album_name"], (string)item["album_id"]),
                                         from: MusicFrom.kgMusic
                                         )
@@ -141,7 +141,7 @@ namespace TewiMP.Helpers.MetingService
                         Title = data.song_name.ToString(),
                         ID = id,
                         Artists = artists,
-                        Album = new Album(data.album_name.ToString(), data.album_id.ToString(), data.img.ToString()),
+                        Album = new Album(data.album_name.ToString(), data.album_id.ToString(), data.img.ToString()) { From = MusicFrom.kgMusic },
                         From = MusicFrom.kgMusic
                     };
 

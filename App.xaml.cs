@@ -15,6 +15,7 @@ using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Popups;
 using Newtonsoft.Json.Linq;
+using TewiMP.Pages;
 
 namespace TewiMP
 {
@@ -268,6 +269,7 @@ namespace TewiMP
                 audioPlayer.WasapiOnly = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.WasapiOnly);
                 audioPlayer.Latency = SettingEditHelper.GetSetting<int>(b, DataFolderBase.SettingParams.AudioLatency);
                 MainWindow.SMusicPage.ShowLrcPage = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.MusicPageShowLyricPage);
+
                 string nmc = "NeteaseMusicCookie";
                 if (b.ContainsKey(nmc))
                 {
@@ -281,18 +283,15 @@ namespace TewiMP
                 downloadManager.IDv3WriteArtistImage = (bool)SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.DownloadOptions)[1];
                 downloadManager.IDv3WriteLyric = (bool)SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.DownloadOptions)[2];
                 downloadManager.SaveLyricToLrcFile = (bool)SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.DownloadOptions)[3];
-
                 playingList.PlayBehavior = (PlayBehavior)SettingEditHelper.GetSetting<int>(b, DataFolderBase.SettingParams.PlayBehavior);
                 playingList.PauseWhenPreviousPause = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.PlayPauseWhenPreviousPause);
                 playingList.NextWhenPlayError = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.PlayNextWhenPlayError);
-
                 MainWindow.SWindowGridBaseTop.RequestedTheme = (ElementTheme)SettingEditHelper.GetSetting<int>(b, DataFolderBase.SettingParams.ThemeColorMode);
                 MainWindow.SMusicPage.RequestedTheme = (ElementTheme)SettingEditHelper.GetSetting<int>(b, DataFolderBase.SettingParams.ThemeMusicPageColorMode);
                 MainWindow.m_currentBackdrop = (MainWindow.BackdropType)SettingEditHelper.GetSetting<int>(b, DataFolderBase.SettingParams.ThemeBackdropEffect);
                 MainWindow.ImagePath = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.ThemeBackdropImagePath);
                 MainWindow.SBackgroundMass.Opacity = SettingEditHelper.GetSetting<double>(b, DataFolderBase.SettingParams.ThemeBackdropImageMassOpacity);
                 //Accent Color
-                
                 DesktopLyricWindow.PauseButtonVisible = (bool)SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.DesktopLyricOptions)[0];
                 DesktopLyricWindow.ProgressUIVisible = (bool)SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.DesktopLyricOptions)[1];
                 DesktopLyricWindow.ProgressUIPercentageVisible = (bool)SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.DesktopLyricOptions)[2];
@@ -302,13 +301,12 @@ namespace TewiMP
                 DesktopLyricWindow.LyricTranslateTextBehavior = (LyricTranslateTextBehavior)(int)SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.DesktopLyricTranslateText)[0];
                 DesktopLyricWindow.LyricTranslateTextPosition = (LyricTranslateTextPosition)(int)SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.DesktopLyricTranslateText)[1];
                 DesktopLyricWindow.LyricOpacity = SettingEditHelper.GetSetting<double>(b, DataFolderBase.SettingParams.DesktopLyricOpacity);
-
                 NotifyIconWindow.IsVisible = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.TaskbarShowIcon);
                 MainWindow.RunInBackground = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.BackgroundRun);
                 Controls.ImageEx.ImageDarkMass = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.ImageDarkMass);
                 LoadLastExitPlayingSongAndSongList = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.LoadLastExitPlayingSongAndSongList);
                 MainWindow.SNavView.PaneDisplayMode = SettingEditHelper.GetSetting<bool>(b, DataFolderBase.SettingParams.TopNavigationStyle) ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;
-
+                LocalAudioPage.ItemSortBy = SettingEditHelper.GetSetting<int>(b, DataFolderBase.SettingParams.LocalMusicPageItemSortBy);
                 JArray hkd = SettingEditHelper.GetSetting<JArray>(b, DataFolderBase.SettingParams.HotKeySettings);
                 HotKeyManager.WillRegisterHotKeysList = hkd.ToObject<List<HotKey>>();
 
@@ -378,13 +376,13 @@ namespace TewiMP
                 DesktopLyricWindow.LyricTranslateTextPosition
             });
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.DesktopLyricOpacity, DesktopLyricWindow.LyricOpacity);
-
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.TaskbarShowIcon, NotifyIconWindow.IsVisible);
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.BackgroundRun, MainWindow.RunInBackground);
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.ImageDarkMass, Controls.ImageEx.ImageDarkMass);
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.LoadLastExitPlayingSongAndSongList, LoadLastExitPlayingSongAndSongList);
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.HotKeySettings, JArray.FromObject(App.hotKeyManager.RegistedHotKeys));
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.TopNavigationStyle, MainWindow.SNavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top);
+            SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.LocalMusicPageItemSortBy, LocalAudioPage.ItemSortBy);
 
             List<float> c = new();
             foreach (var d in AudioEqualizerBands.CustomBands)

@@ -801,5 +801,11 @@ namespace TewiMP.Pages.MusicPages
                 }
             }
         }
+
+        private void BackgroundFillBase_RightTapped(object sender, RightTappedRoutedEventArgs e)
+        {
+            MusicDataFlyout.SongItemBind = new() { MusicData = MusicData };
+            MusicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
+        }
     }
 }

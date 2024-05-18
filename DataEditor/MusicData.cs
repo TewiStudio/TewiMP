@@ -154,12 +154,33 @@ namespace TewiMP.DataEditor
         public List<Artist> Artists { get; set; }
         public Album Album { get; set; }
         public DateTime? ReleaseTime { get; set; }
-        public DateTime? FileCreateTime { get; set; }
-        public MusicFrom From { get; set; }
+        public DateTime? FileTime { get; set; }
         public string InLocal { get; set; }
         public CUETrackData CUETrackData { get; set; } = null;
         public int Index { get; set; } = 0;
         public int Count { get; set; }
+
+        MusicFrom _from = MusicFrom.localMusic;
+        public MusicFrom From
+        {
+            get => _from;
+            set
+            {
+                if (_from == value) return;
+                _from = value;
+                if (Album != null)
+                {
+                    Album.From = value;
+                }
+                if (Artists.Count > 0)
+                {
+                    foreach (var artist in Artists)
+                    {
+                        artist.From = value;
+                    }
+                }
+            }
+        }
 
         string _artistName = null;
         [JsonIgnore]
@@ -195,7 +216,7 @@ namespace TewiMP.DataEditor
                          List<Artist> artists = null,
                          Album album = null,
                          DateTime? releaseTime = null,
-                         MusicFrom from = MusicFrom.kwMusic,
+                         MusicFrom from = MusicFrom.localMusic,
                          string inLocal = null)
         {
             this.Title = title;

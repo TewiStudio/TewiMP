@@ -21,7 +21,7 @@
                 <ResourceDictionary Source="ms-appx:///CommunityToolkit.WinUI.Controls.Segmented/Segmented/Segmented.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <x:Double x:Key="GroupItemWidth">60</x:Double>
-            <x:Double x:Key="VariableSizedWrapGridMaxWidth">500</x:Double>
+            <x:Double x:Key="GroupHeaderPanelMaxWidth">500</x:Double>
             <Style TargetType="ListViewItem">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -111,6 +111,172 @@
                     </Setter.Value>
                 </Setter>
             </Style>
+            <Style TargetType="SemanticZoom">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderThickness" Value="0" />
+                <Setter Property="IsTabStop" Value="False" />
+                <Setter Property="TabNavigation" Value="Once" />
+                <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
+                <Setter Property="ScrollViewer.IsHorizontalRailEnabled" Value="False" />
+                <Setter Property="ScrollViewer.VerticalScrollMode" Value="Disabled" />
+                <Setter Property="ScrollViewer.IsVerticalRailEnabled" Value="False" />
+                <Setter Property="IsZoomOutButtonEnabled" Value="False" />
+                <Setter Property="ScrollViewer.ZoomMode" Value="Disabled" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="SemanticZoom">
+                            <Grid>
+
+                                <VisualStateManager.VisualStateGroups>
+                                    <VisualStateGroup x:Name="SemanticZoomStates">
+                                        <VisualState x:Name="ZoomInView">
+
+                                            <Storyboard>
+                                                <FadeOutThemeAnimation TargetName="ZoomedOutPresenter" />
+                                                <FadeInThemeAnimation TargetName="ZoomedInPresenter" />
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="ZoomOutView">
+
+                                            <Storyboard>
+                                                <FadeOutThemeAnimation TargetName="ZoomedInPresenter" />
+                                                <FadeInThemeAnimation TargetName="ZoomedOutPresenter" />
+                                            </Storyboard>
+                                        </VisualState>
+
+                                    </VisualStateGroup>
+                                    <VisualStateGroup x:Name="ZoomOutButtonStates">
+
+                                        <VisualStateGroup.Transitions>
+                                            <VisualTransition From="ZoomOutButtonVisible" To="ZoomOutButtonHidden">
+                                                <Storyboard BeginTime="0:0:3">
+                                                    <FadeOutThemeAnimation TargetName="ZoomOutButton" />
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsHitTestVisible"
+                                                        Storyboard.TargetName="ZoomOutButton">
+                                                        <DiscreteObjectKeyFrame KeyTime="0">
+                                                            <DiscreteObjectKeyFrame.Value>
+                                                                <x:Boolean>False</x:Boolean>
+                                                            </DiscreteObjectKeyFrame.Value>
+                                                        </DiscreteObjectKeyFrame>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </VisualTransition>
+                                        </VisualStateGroup.Transitions>
+                                        <VisualState x:Name="ZoomOutButtonVisible">
+
+                                            <Storyboard>
+                                                <FadeInThemeAnimation TargetName="ZoomOutButton" />
+                                            </Storyboard>
+                                        </VisualState>
+                                        <VisualState x:Name="ZoomOutButtonHidden">
+
+                                            <Storyboard>
+                                                <FadeOutThemeAnimation TargetName="ZoomOutButton" />
+                                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="IsHitTestVisible"
+                                                    Storyboard.TargetName="ZoomOutButton">
+                                                    <DiscreteObjectKeyFrame KeyTime="0">
+                                                        <DiscreteObjectKeyFrame.Value>
+                                                            <x:Boolean>False</x:Boolean>
+                                                        </DiscreteObjectKeyFrame.Value>
+                                                    </DiscreteObjectKeyFrame>
+                                                </ObjectAnimationUsingKeyFrames>
+                                            </Storyboard>
+                                        </VisualState>
+
+                                    </VisualStateGroup>
+
+                                </VisualStateManager.VisualStateGroups>
+                                <ScrollViewer x:Name="ScrollViewer"
+                                    CanContentRenderOutsideBounds="True"
+                                    HorizontalScrollMode="{TemplateBinding ScrollViewer.HorizontalScrollMode}"
+                                    HorizontalScrollBarVisibility="Hidden"
+                                    VerticalScrollMode="{TemplateBinding ScrollViewer.VerticalScrollMode}"
+                                    VerticalScrollBarVisibility="Hidden"
+                                    IsHorizontalRailEnabled="{TemplateBinding ScrollViewer.IsHorizontalRailEnabled}"
+                                    IsVerticalRailEnabled="{TemplateBinding ScrollViewer.IsVerticalRailEnabled}"
+                                    ZoomMode="{TemplateBinding ScrollViewer.ZoomMode}"
+                                    IsZoomChainingEnabled="True"
+                                    IsZoomInertiaEnabled="False"
+                                    IsScrollInertiaEnabled="True"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    MinZoomFactor="0.5"
+                                    MaxZoomFactor="1.0"
+                                    AutomationProperties.AccessibilityView="Raw">
+                                    <ScrollViewer.Template>
+                                        <ControlTemplate TargetType="ScrollViewer">
+                                            <ScrollContentPresenter
+                                                x:Name="ScrollContentPresenter"
+                                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                Margin="{TemplateBinding Padding}" />
+                                        </ControlTemplate>
+                                    </ScrollViewer.Template>
+                                    <Grid Padding="{TemplateBinding Padding}"
+                                        RenderTransformOrigin="0, 0"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}">
+                                        <Grid.RenderTransform>
+                                            <CompositeTransform x:Name="ManipulatedElementTransform" />
+                                        </Grid.RenderTransform>
+                                        <ContentPresenter x:Name="ZoomedInPresenter"
+                                            RenderTransformOrigin="0.5, 0.5"
+                                            Visibility="Collapsed"
+                                            IsHitTestVisible="False"
+                                            Content="{TemplateBinding ZoomedInView}">
+                                            <ContentPresenter.RenderTransform>
+                                                <CompositeTransform x:Name="ZoomedInTransform" />
+                                            </ContentPresenter.RenderTransform>
+                                        </ContentPresenter>
+                                        <ContentPresenter x:Name="ZoomedOutPresenter"
+                                            RenderTransformOrigin="0.5, 0.5"
+                                            Content="{TemplateBinding ZoomedOutView}"
+                                            IsHitTestVisible="False"
+                                            Visibility="Collapsed">
+                                            <ContentPresenter.RenderTransform>
+                                                <CompositeTransform x:Name="ZoomedOutTransform" />
+                                            </ContentPresenter.RenderTransform>
+                                        </ContentPresenter>
+                                    </Grid>
+                                </ScrollViewer>
+                                <Button x:Name="ZoomOutButton"
+                                    IsTabStop="False"
+                                    Margin="0,0,19,19"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    UseSystemFocusVisuals="{StaticResource UseSystemFocusVisuals}"
+                                    FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                    FontSize="4"
+                                    Content="&#xE0B8;"
+                                    Width="12"
+                                    Height="12"
+                                    Padding="0" />
+
+                            </Grid>
+
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <ItemsPanelTemplate x:Key="GridViewItemsPanelTemplate" >
+                <VariableSizedWrapGrid
+                    x:Name="variableSizedWrapGrid"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Orientation="Horizontal"
+                    MaxWidth="{ThemeResource GroupHeaderPanelMaxWidth}"/>
+            </ItemsPanelTemplate>
+            <DataTemplate x:Key="GridViewItemsTemplate" x:DataType="helper:SongItemBindBase">
+                <Grid VerticalAlignment="Center" Width="{ThemeResource GroupItemWidth}" Height="60">
+                    <TextBlock
+                        Text="{Binding Group.Key}"
+                        VerticalAlignment="Center" HorizontalAlignment="Center"
+                        TextTrimming="WordEllipsis"
+                        FontSize="22" FontWeight="Medium"/>
+                </Grid>
+            </DataTemplate>
+
             <CollectionViewSource x:Key="ItemsList_SongGroup" x:Name="ItemsList_SongGroup" IsSourceGrouped="True" />
         </ResourceDictionary>
     </Page.Resources>
@@ -176,6 +342,11 @@
                                 <FontIcon Glyph="&#xE762;"/>
                             </AppBarToggleButton.Icon>
                         </AppBarToggleButton>
+                        <AppBarButton Label="搜索歌曲" Tag="search" AccessKey="F" Click="AppBarButton_Click">
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="&#xE721;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
                         <AppBarButton Label="管理音乐文件夹" Tag="manageFolder" AccessKey="A" Click="AppBarButton_Click">
                             <AppBarButton.Icon>
                                 <FontIcon Glyph="&#xED25;"/>
@@ -258,7 +429,7 @@
                             </AppBarElementContainer>
                         </CommandBar.SecondaryCommands>
                     </CommandBar>
-                    <Grid Grid.Column="1">
+                    <Grid Grid.Column="1" Visibility="Collapsed">
                         <cc:Segmented
                             x:Name="ItemsList_Header_Segmented"
                             HorizontalAlignment="Right"
@@ -273,33 +444,20 @@
                 </Grid>
             </Grid>
         </Grid>
-        <Grid
+        <Grid x:Name="ItemsList_SemanticZoom_Root"
             Grid.Row="1">
+            <Grid.Clip>
+                <RectangleGeometry x:Name="ItemsList_SemanticZoom_Clip"/>
+            </Grid.Clip>
             <SemanticZoom
+                x:Name="ItemsList_SemanticZoom_Control"
                 Margin="0,0,0,0"
                 ScrollViewer.ZoomMode="Enabled">
                 <SemanticZoom.ZoomedOutView>
                     <GridView
-                        x:Name="ItemsList_HeaderGridView">
-                        <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="helper:SongItemBindBase">
-                                <Grid VerticalAlignment="Center" MinWidth="{ThemeResource GroupItemWidth}" Height="60">
-                                    <TextBlock
-                                        Text="{Binding Group.Key}"
-                                        VerticalAlignment="Center" HorizontalAlignment="Center"
-                                        TextTrimming="WordEllipsis"
-                                        FontSize="18" FontWeight="Medium"/>
-                                </Grid>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                        <GridView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VariableSizedWrapGrid
-                                    VerticalAlignment="Center"
-                                    Orientation="Horizontal"
-                                    MaxWidth="{ThemeResource VariableSizedWrapGridMaxWidth}"/>
-                            </ItemsPanelTemplate>
-                        </GridView.ItemsPanel>
+                        x:Name="ItemsList_HeaderGridView"
+                        ItemsPanel="{StaticResource GridViewItemsPanelTemplate}"
+                        ItemTemplate="{StaticResource GridViewItemsTemplate}">
                     </GridView>
                 </SemanticZoom.ZoomedOutView>
                 <SemanticZoom.ZoomedInView>
@@ -349,16 +507,23 @@
                 </SemanticZoom.ZoomedInView>
             </SemanticZoom>
         </Grid>
-        <Grid
-            Grid.Row="1">
-            <controls:ScrollFootButton
-                x:Name="ItemsView_BottomButtons"
-                HorizontalAlignment="Right"
+        <Grid x:Name="ItemsList_BottomTool_Root"
+            Grid.Row="1"
+            VerticalAlignment="Bottom">
+            <controls:ScrollViewerSearchControl
+                x:Name="ItemsList_SearchControl"
+                Margin="16,4" MaxWidth="9999"
                 VerticalAlignment="Bottom"
-                Margin="0,0,16,4"/>
+                IsOpen="False">
+            </controls:ScrollViewerSearchControl>
+            <controls:ScrollFootButton
+                x:Name="ItemsList_BottomButtons"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Right"
+                Margin="0,0,16,4">
+            </controls:ScrollFootButton>
         </Grid>
-        <Grid
-            x:Name="ItemsList_Analyzing_Root"
+        <Grid x:Name="ItemsList_Analyzing_Root"
             Grid.Row="1" Margin="0,0,0,4"
             HorizontalAlignment="Center"
             VerticalAlignment="Bottom"

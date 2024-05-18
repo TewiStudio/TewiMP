@@ -297,6 +297,7 @@ namespace TewiMP.Controls
             if (sender == null) return;
             if (sender.DataContext == null) return;
             if (sender.DataContext is not SongItemBindBase) return;
+            strokeVisual.Opacity = 0;
             songItemBind = sender.DataContext as SongItemBindBase;
             musicDataFlyout.SongItemBind = songItemBind;
             InitInfo();

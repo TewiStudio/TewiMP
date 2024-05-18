@@ -214,7 +214,7 @@ namespace TewiMP.DataEditor
                     if (array == null) continue;
                     foreach (var item in array)
                     {
-                        item.FileCreateTime = file.CreationTime;
+                        item.FileTime = file.LastWriteTime;
                         musicDatas.Add(item);
                     }
                 }

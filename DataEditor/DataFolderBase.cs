@@ -127,8 +127,9 @@ namespace TewiMP.DataEditor
             { SettingParams.BackgroundRun.ToString(), false },
             { SettingParams.ImageDarkMass.ToString(), false },
             { SettingParams.LoadLastExitPlayingSongAndSongList.ToString(), true },
-            { SettingParams.HotKeySettings.ToString(), JArray.FromObject(HotKeyManager.DefaultRegisterHotKeysList) },
             { SettingParams.TopNavigationStyle.ToString(), false },
+            { SettingParams.LocalMusicPageItemSortBy.ToString(), 0 },
+            { SettingParams.HotKeySettings.ToString(), JArray.FromObject(HotKeyManager.DefaultRegisterHotKeysList) },
         };
         
         /// <summary>
@@ -190,8 +191,9 @@ namespace TewiMP.DataEditor
             BackgroundRun,
             ImageDarkMass,
             LoadLastExitPlayingSongAndSongList,
-            HotKeySettings,
             TopNavigationStyle,
+            LocalMusicPageItemSortBy,
+            HotKeySettings,
         }
 
         public enum LocalMusicDataType { LocalMusicFolderPath, AnalyzedDatas }

@@ -54,11 +54,13 @@
     </Page.Resources>
 
     <Grid>
+        <controls:MusicDataFlyout x:Name="MusicDataFlyout"/>
         <controls:ImageEx x:Name="BackgroundBaseImage" IsHitTestVisible="False"
                           VerticalAlignment="Center" HorizontalAlignment="Center"
                           Stretch="UniformToFill" Loaded="BackgroundBaseImage_Loaded"/>
         <TextBlock x:Name="BridgeTb" TextAlignment="Left" HorizontalAlignment="Left"/>
-        <Grid Name="BackgroundFillBase" Opacity="1">
+        <Grid Name="BackgroundFillBase" Opacity="1" Background="Transparent"
+              RightTapped="BackgroundFillBase_RightTapped">
             <Grid.OpacityTransition>
                 <ScalarTransition/>
             </Grid.OpacityTransition>
@@ -116,7 +118,8 @@
                                   SelectionChanged="LrcBaseListView_SelectionChanged"
                                   SizeChanged="LrcBaseListView_SizeChanged"
                                   IsFocusEngagementEnabled="True"
-                                  PointerWheelChanged="LrcSecondListView_PointerWheelChanged"/>
+                                  PointerWheelChanged="LrcSecondListView_PointerWheelChanged"
+                                  Background="{x:Null}"/>
                     </Grid>
                     <StackPanel x:Name="InfoBaseTitle" Grid.Row="2" Loaded="InfoBaseTitle_Loaded"
                                 Spacing="4" Margin="0,12,0,0">
@@ -230,7 +233,7 @@
                         </Grid.Transitions>
                         <ListView x:Name="LrcBaseListView"
                                   Loaded="LrcBaseListView_Loaded"
-                                  Background="Transparent"
+                                  Background="{x:Null}"
                                   SelectionChanged="LrcBaseListView_SelectionChanged"
                                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                                   IsFocusEngagementEnabled="True"
@@ -311,7 +314,7 @@
                             </Grid.Transitions>
                             <ScrollViewer  VerticalScrollMode="Disabled" VerticalScrollBarVisibility="Disabled"
                                            HorizontalScrollMode="Enabled" HorizontalScrollBarVisibility="Hidden"
-                                           HorizontalAlignment="Stretch">
+                                           HorizontalAlignment="Stretch" Background="{x:Null}">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <StackPanel.Resources>
                                         <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">

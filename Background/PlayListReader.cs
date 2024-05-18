@@ -58,6 +58,7 @@ namespace TewiMP.Background
 
         public async Task Refresh()
         {
+            if (isAnalyzingData) return;
             DataChanging?.Invoke();
 
             int count = 0;

@@ -230,11 +230,17 @@ namespace TewiMP.Helpers.MetingService
                 }
 
                 Album album = new(
-                    (string)md["al"]["name"], (string)md["al"]["id"], pic);
+                    (string)md["al"]["name"], (string)md["al"]["id"], pic)
+                { From = MusicFrom.neteaseMusic };
 
+                DateTime? dateTime = null;
                 bool dateTickComplete = long.TryParse((string)md["publishTime"], out var dateTick);
-                DateTime? dateTime =
-                    md.ContainsKey("publishTime") ? dateTickComplete ? new DateTime(dateTick) : null : null;
+                if (dateTick != 0)
+                {
+                    DateTime? resultDateTime = dateTickComplete ? CodeHelper.UnixGetTime(dateTick, true) : null;
+                    dateTime =
+                        md.ContainsKey("publishTime") ? resultDateTime : null;
+                }
 
                 MusicData data = new(
                     (string)md["name"],
@@ -384,7 +390,8 @@ namespace TewiMP.Helpers.MetingService
                                 ID = id,
                                 PicturePath = (string)album["picUrl"],
                                 Describee = (string)album["description"],
-                                RelaseTime = (string)album["publishTime"]
+                                RelaseTime = (string)album["publishTime"],
+                                From = MusicFrom.neteaseMusic
                             };
                             Album.Artists = new()
                             {
@@ -394,6 +401,7 @@ namespace TewiMP.Helpers.MetingService
                                     Name2 = (string)artist["trans"],
                                     ID = (string)artist["id"],
                                     PicturePath = (string)artist["picUrl"],
+                                    From = MusicFrom.neteaseMusic
                                 }
                             };
                             Album.Songs = new()

@@ -325,6 +325,25 @@ namespace TewiMP.Helpers
         }
         #endregion
 
+        #region 时间戳转DateTime
+        /// <summary>
+        /// 指定时间戳转为时间。
+        /// </summary>
+        /// <param name="timeStamp">需要被反转的时间戳</param>
+        /// <param name="accurateToMilliseconds">是否精确到毫秒</param>
+        /// <returns>返回时间戳对应的DateTime</returns>
+        public static DateTime UnixGetTime(long timeStamp, bool accurateToMilliseconds = false)
+        {
+            if (accurateToMilliseconds)
+            {
+                return DateTimeOffset.FromUnixTimeMilliseconds(timeStamp).LocalDateTime;
+            }
+            else
+            {
+                return DateTimeOffset.FromUnixTimeSeconds(timeStamp).LocalDateTime;
+            }
+        }
+        #endregion
 
         public async static Task<BitmapImage> ImageFromBytes(byte[] bytes, int width = 0, int height = 0)
         {
