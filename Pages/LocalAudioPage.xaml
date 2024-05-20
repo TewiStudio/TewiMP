@@ -451,7 +451,7 @@
             </Grid.Clip>
             <SemanticZoom
                 x:Name="ItemsList_SemanticZoom_Control"
-                Margin="0,0,0,0"
+                Margin="0,0,0,0" ViewChangeStarted="ItemsList_SemanticZoom_Control_ViewChangeStarted"
                 ScrollViewer.ZoomMode="Enabled">
                 <SemanticZoom.ZoomedOutView>
                     <GridView
@@ -510,9 +510,12 @@
         <Grid x:Name="ItemsList_BottomTool_Root"
             Grid.Row="1"
             VerticalAlignment="Bottom">
+            <Grid.OpacityTransition>
+                <ScalarTransition/>
+            </Grid.OpacityTransition>
             <controls:ScrollViewerSearchControl
                 x:Name="ItemsList_SearchControl"
-                Margin="16,4" MaxWidth="9999"
+                Margin="16,8" MaxWidth="9999"
                 VerticalAlignment="Bottom"
                 IsOpen="False">
             </controls:ScrollViewerSearchControl>
@@ -520,7 +523,7 @@
                 x:Name="ItemsList_BottomButtons"
                 VerticalAlignment="Bottom"
                 HorizontalAlignment="Right"
-                Margin="0,0,16,4">
+                Margin="0,0,16,8">
             </controls:ScrollFootButton>
         </Grid>
         <Grid x:Name="ItemsList_Analyzing_Root"

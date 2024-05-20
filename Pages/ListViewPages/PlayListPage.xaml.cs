@@ -401,11 +401,11 @@ namespace TewiMP.Pages.ListViewPages
                 $"Lerp(" +
                     $"Vector3(" +
                         $"-16," +
-                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 4," +
+                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
                         $"0)," +
                     $"Vector3(" +
                         $"-16," +
-                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 4," +
+                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
                         $"0)," +
                     $"{progress})");
             headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);

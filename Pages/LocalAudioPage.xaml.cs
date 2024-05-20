@@ -525,18 +525,16 @@ namespace TewiMP.Pages
         {
             if (ItemsList_SearchControl.IsOpen)
             {
-                ItemsList_SearchControl.Margin = new(16, 0, 16, 4);
-                ItemsList_BottomButtons.Margin = new(0, 0, 16, ItemsList_SearchControl.ActualHeight + 8);
-                AtListBottomTb.Margin = new(4, 4, 4, ItemsList_BottomButtons.ActualHeight + ItemsList_SearchControl.ActualHeight + 12);
+                ItemsList_BottomButtons.Margin = new(0, 0, 16, ItemsList_SearchControl.ActualHeight + 16);
+                AtListBottomTb.Margin = new(4, 4, 4, ItemsList_BottomButtons.ActualHeight + ItemsList_SearchControl.ActualHeight + 20);
                 ObservableCollection<SongItemBindBase> songs = [];
                 foreach (SongItemBindBase i in ItemsList_SongGroup.View) { songs.Add(i); }
                 ItemsList_SearchControl.SongItemBinds = songs;
             }
             else
             {
-                ItemsList_SearchControl.Margin = new(16, 0, 16, -ItemsList_SearchControl.ActualHeight - 4);
-                ItemsList_BottomButtons.Margin = new(0, 0, 16, 4);
-                AtListBottomTb.Margin = new(4, 4, 4, ItemsList_BottomButtons.ActualHeight + 8);
+                ItemsList_BottomButtons.Margin = new(0, 0, 16, 8);
+                AtListBottomTb.Margin = new(4, 4, 4, ItemsList_BottomButtons.ActualHeight + 12);
                 ItemsList_SearchControl.SongItemBinds = null;
             }
         }
@@ -561,6 +559,11 @@ namespace TewiMP.Pages
                 ItemsList_SearchControl.FocusToSearchBox();
             else
                 ItemsList_Header_CommandBar.Focus(FocusState.Keyboard);
+        }
+
+        private void ItemsList_SemanticZoom_Control_ViewChangeStarted(object sender, SemanticZoomViewChangedEventArgs e)
+        {
+            ItemsList_BottomTool_Root.Opacity = ItemsList_SemanticZoom_Control.IsZoomedInViewActive ? 1 : 0;
         }
     }
 }
