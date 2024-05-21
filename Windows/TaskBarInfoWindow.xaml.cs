@@ -179,6 +179,7 @@ namespace TewiMP.Windowed
                 filePath = Path.Combine(localPath, "icon.png");
             }
             if (IconPathUsing == filePath) return;
+            if (!await Task.Run(() => File.Exists(filePath))) return;
             bool canBreak = false;
             using var bmp = await Task.Run(() => Bitmap.FromFile(filePath));
             int size = 160;

@@ -85,7 +85,7 @@ namespace TewiMP.Helpers
             return await Client.GetStringAsync(address);
         }
 
-        static List<MusicData> loadingImages = new();
+        static List<MusicData> loadingImages = [];
         public static async Task<string> GetPicturePathAsync(MusicData musicData)
         {
             while (loadingImages.Count > 1)

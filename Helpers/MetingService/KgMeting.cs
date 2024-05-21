@@ -212,11 +212,19 @@ namespace TewiMP.Helpers.MetingService
 
         public override async Task<string> GetPicFromMusicData(MusicData musicData)
         {
-            return await Task.Run(() =>
+            return await Task.Run(async () =>
             {
-                var getPicAction = string () =>
+                var getPicAction = async Task<string> () =>
                 {
-                    return GetMusicData(musicData.ID).GetAwaiter().GetResult().Album.PicturePath;
+                    return null;
+                    try
+                    {
+                        return (await GetMusicData(musicData.ID)).Album?.PicturePath;
+                    }
+                    catch
+                    {
+                        return null;
+                    }
                 };
 
                 for (int i = 0; i <= App.metingServices.RetryCount; i++)
@@ -224,7 +232,7 @@ namespace TewiMP.Helpers.MetingService
                     string a = null;
                     try
                     {
-                        a = getPicAction();
+                        a = await getPicAction();
                     }
                     catch (Exception err) { a = null; }
 

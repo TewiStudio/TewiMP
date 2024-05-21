@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -13,9 +12,9 @@ namespace TewiMP.Pages
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            var navtostring = e.Parameter as string;
-            if (string.IsNullOrEmpty(navtostring)) return;
-            SearchTextBox.Text = navtostring;
+            var navToString = e.Parameter as string;
+            if (string.IsNullOrEmpty(navToString)) return;
+            SearchTextBox.Text = navToString;
         }
 
         public SearchPage()
