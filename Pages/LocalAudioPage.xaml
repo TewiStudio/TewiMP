@@ -260,7 +260,7 @@
             </Style>
 
             <ItemsPanelTemplate x:Key="GridViewItemsPanelTemplate" >
-                <VariableSizedWrapGrid
+                <ItemsWrapGrid
                     x:Name="variableSizedWrapGrid"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Center"
