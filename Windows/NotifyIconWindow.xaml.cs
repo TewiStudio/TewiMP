@@ -49,7 +49,7 @@ namespace TewiMP.Windowed
 
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Text = App.AppName;
-            notifyIcon.Icon = new(Path.Combine(Directory.GetCurrentDirectory(), "Images", "Icons", "icon_nobackground.ico"));
+            notifyIcon.Icon = new(Path.Combine(Directory.GetCurrentDirectory(), "Images", "Icons", "icon.ico"));
             notifyIcon.Visible = isVisible;
 
             #region others

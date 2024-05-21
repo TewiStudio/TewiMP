@@ -93,7 +93,6 @@
 	
 	<ItemGroup>
 		<Content Include="Images\Icons\icon.ico" />
-		<Content Include="Images\Icons\icon_nobackground.ico" />
 		<Content Include="IpaDic\char.bin" />
 		<Content Include="IpaDic\matrix.bin" />
 		<Content Include="IpaDic\sys.dic" />
@@ -160,9 +159,6 @@
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>
 		<None Update="Images\Icons\icon.ico">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="Images\Icons\icon_nobackground.ico">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="Media\Decoder\Flac\NAudio.Flac\FlacFrame_GetBuffer.tt">

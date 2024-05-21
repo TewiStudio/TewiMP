@@ -126,7 +126,7 @@ namespace TewiMP.Pages
 
         private async void Hyperlink_Click_2(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
-            await Launcher.LaunchUriAsync(new Uri($"https://www.pixiv.net/artworks/100402784"));
+            await Launcher.LaunchUriAsync(new Uri($"https://www.pixiv.net/artworks/117179092"));
         }
     }
 }

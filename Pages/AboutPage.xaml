@@ -156,7 +156,7 @@
                     </cc:SettingsExpander.Items>
                 </cc:SettingsExpander>
                 <TextBlock>
-                    图标中的图片来自 <Hyperlink Click="Hyperlink_Click_2">裁 - 嫌</Hyperlink>
+                    图标中的图片来自 <Hyperlink Click="Hyperlink_Click_2">なま</Hyperlink>
                 </TextBlock>
             </StackPanel>
         </ScrollView>
