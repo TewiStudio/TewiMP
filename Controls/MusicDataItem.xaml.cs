@@ -141,7 +141,7 @@ namespace TewiMP.Controls
 
             if (isExists)
             {
-                var bitmapTuple = await ImageManage.GetImageSource(musicData, (int)(56 * songItemBind.ImageScaleDPI), (int)(56 * songItemBind.ImageScaleDPI), true);
+                var bitmapTuple = await ImageManage.GetImageSource(musicData, (int)(56 * MainWindow.NowDPI), (int)(56 * MainWindow.NowDPI), true);
                 result = bitmapTuple.Item1;
                 FileNotExists_Root.Visibility = Visibility.Collapsed;
             }

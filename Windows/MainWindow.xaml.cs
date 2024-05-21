@@ -77,8 +77,13 @@ namespace TewiMP
         public static ScrollViewer SNotifyListViewScrollViewer;
         public static ContentDialog AsyncDialog { get; set; } = null;
 
-        public static void InvokeDpiEvent() => WindowDpiChanged?.Invoke();
-        public delegate void WindowDpiChangedDelegate();
+        public static double NowDPI { get; set; } = 1.0;
+        public static void InvokeDpiEvent()
+        {
+            NowDPI = CodeHelper.GetScaleAdjustment(App.WindowLocal);
+            WindowDpiChanged?.Invoke(NowDPI);
+        }
+        public delegate void WindowDpiChangedDelegate(double newDPI);
         public static event WindowDpiChangedDelegate WindowDpiChanged;
         
         public delegate void WindowViewStateChangedDelegate(bool isView);

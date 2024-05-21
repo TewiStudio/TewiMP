@@ -50,6 +50,7 @@ namespace TewiMP.Helpers
         }
 
         double _imageScaleDPI = 1.0;
+        [Obsolete]
         public double ImageScaleDPI
         {
             get => _imageScaleDPI;

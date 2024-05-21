@@ -369,7 +369,7 @@ namespace TewiMP.Background.HotKeys
                 }
                 return (Windows.Win32.Foundation.LRESULT)IntPtr.Zero;
             }
-            else if (uMsg == 0x02E0)
+            else if (uMsg == 0x02E0) // window dpi 改变消息
             {
                 MainWindow.InvokeDpiEvent();
             }

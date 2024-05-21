@@ -292,6 +292,7 @@ namespace TewiMP.Pages
         double vOffset = 0;
         private async void LocalMusicManager_DataChanged()
         {
+            //IOrderedEnumerable<IGrouping<string, SongItemBindBase>> groupsResult = null;
             dynamic groupsResult = null;
 
             switch (CommandBar_SortComboBox.SelectedIndex)
@@ -312,7 +313,7 @@ namespace TewiMP.Pages
                             array.Add(i.MusicData, a);
                         }
 
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => array[t.MusicData].ToUpper().First()).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.GroupBy(t => array[t.MusicData].ToUpper().First().ToString()).OrderBy(t => t.Key);
                     });
                     break;
                 case 1:

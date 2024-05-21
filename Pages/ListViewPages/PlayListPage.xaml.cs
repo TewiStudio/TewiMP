@@ -509,11 +509,10 @@ namespace TewiMP.Pages.ListViewPages
                 return;
             }
             int count = 1;
-            var dpi = CodeHelper.GetScaleAdjustment(App.WindowLocal);
             foreach (var item in array)
             {
                 item.Count = count;
-                musicListBind.Add(new() { MusicData = item, MusicListData = musicListData, ImageScaleDPI = dpi });
+                musicListBind.Add(new() { MusicData = item, MusicListData = musicListData });
                 count++;
             }
 
@@ -676,7 +675,7 @@ namespace TewiMP.Pages.ListViewPages
             InitShyHeader();
         }
 
-        private void MainWindow_WindowDpiChanged()
+        private void MainWindow_WindowDpiChanged(double nowDpi)
         {
             InitShyHeader();
         }

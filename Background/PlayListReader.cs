@@ -61,13 +61,10 @@ namespace TewiMP.Background
             if (isAnalyzingData) return;
             DataChanging?.Invoke();
 
-            int count = 0;
             var resultData = await DataEditor.LocalMusicHelper.GetAllAnalyzedMusicData();
             LocalMusicItems.Clear();
             foreach (var i in resultData)
             {
-                //count++;
-                //i.Count = count;
                 LocalMusicItems.Add(new() { MusicData = i });
             }
 

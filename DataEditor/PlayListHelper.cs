@@ -256,8 +256,8 @@ namespace TewiMP.DataEditor
                 {
                     musicDatas.Add(JsonConvert.DeserializeObject<MusicData>(item.ToString()));
                 }
+                musicDatas = [.. musicDatas.OrderBy(m => m.Title)];
             });
-            musicDatas = [.. musicDatas.OrderBy(m => m.Title)];
             return musicDatas;
         }
 
