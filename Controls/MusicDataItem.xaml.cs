@@ -332,6 +332,7 @@ namespace TewiMP.Controls
         private void UserControl_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             isPointEnter = true;
+            if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Touch) return;
             if (isMouseEventClosed) return;
             OnMouseIn();
         }
@@ -420,6 +421,20 @@ namespace TewiMP.Controls
         private void Info_Texts_FlyoutMenu_Artist_Item_Unloaded(object sender, RoutedEventArgs e)
         {
             Info_Texts_FlyoutMenu_Artist_Item.Items.Clear();
+        }
+
+        private void UserControl_GotFocus(object sender, RoutedEventArgs e)
+        {
+            //if (isMouseEventClosed) return;
+            //OnMouseIn();
+            //Info_Buttons_StackPanel.Focus(FocusState.Keyboard);
+            System.Diagnostics.Debug.WriteLine("Focus");
+        }
+
+        private void UserControl_LostFocus(object sender, RoutedEventArgs e)
+        {
+            OnMouseLeave();
+            System.Diagnostics.Debug.WriteLine("Lost Focus");
         }
     }
 }

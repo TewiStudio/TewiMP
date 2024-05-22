@@ -143,7 +143,7 @@ namespace TewiMP.Pages
             if (!IsLoaded) return;
             MultiSelectDo(false);
 
-            CommandBar_SortComboBox.ItemsSource = new string[] { "标题", "艺术家", "专辑", "发行年份", "文件修改年份" };
+            CommandBar_SortComboBox.ItemsSource = new string[] { "标题", "艺术家", "专辑", "发行年份", "文件修改日期" };
             CommandBar_SortComboBox.SelectedIndex = ItemSortBy;
 
             scrollViewer = (VisualTreeHelper.GetChild(ItemsList, 0) as Border).Child as ScrollViewer;
@@ -292,8 +292,8 @@ namespace TewiMP.Pages
         double vOffset = 0;
         private async void LocalMusicManager_DataChanged()
         {
-            //IOrderedEnumerable<IGrouping<string, SongItemBindBase>> groupsResult = null;
-            dynamic groupsResult = null;
+            IEnumerable<IGrouping<string, SongItemBindBase>> groupsResult = null;
+            //dynamic groupsResult = null;
 
             switch (CommandBar_SortComboBox.SelectedIndex)
             {
@@ -313,23 +313,23 @@ namespace TewiMP.Pages
                             array.Add(i.MusicData, a);
                         }
 
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => array[t.MusicData].ToUpper().First().ToString()).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).GroupBy(t => array[t.MusicData].ToUpper().First().ToString());
                     });
                     break;
                 case 1:
                     Resources["GroupItemWidth"] = 270;
-                    Resources["GroupHeaderPanelMaxWidth"] = 9000;
+                    Resources["GroupHeaderPanelMaxWidth"] = 90000;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.ArtistName).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).OrderBy(t => t.MusicData.Album.Title).GroupBy(t => t.MusicData.ArtistName).OrderBy(t => t.Key);
                     });
                     break;
                 case 2:
                     Resources["GroupItemWidth"] = 270;
-                    Resources["GroupHeaderPanelMaxWidth"] = 9000;
+                    Resources["GroupHeaderPanelMaxWidth"] = 90000;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.GroupBy(t => t.MusicData.Album.Title).OrderBy(t => t.Key);
+                        return App.localMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).OrderBy(t => t.MusicData.Index).GroupBy(t => t.MusicData.Album.Title);
                     });
                     break;
                 case 3:

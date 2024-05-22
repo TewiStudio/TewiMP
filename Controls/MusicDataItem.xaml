@@ -9,6 +9,8 @@
     DataContextChanged="UserControl_DataContextChanged"
     Loaded="UserControl_Loaded"
     Unloaded="UserControl_Unloaded"
+    GotFocus="UserControl_GotFocus"
+    LostFocus="UserControl_LostFocus"
     PointerEntered="UserControl_PointerEntered"
     PointerExited="UserControl_PointerExited"
     RightTapped="UserControl_RightTapped"
@@ -19,6 +21,10 @@
         </TransitionCollection>
     </UserControl.Transitions>
     <Grid>
+        <Button
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch"
+            Opacity="0"/>
         <local:MusicDataFlyout x:Name="musicDataFlyout"/>
         <Rectangle
             x:Name="Background_FillRectangle"
@@ -94,7 +100,8 @@
                             Background="Transparent"
                             BorderThickness="0"
                             CornerRadius="4"
-                            Click="Button_Click_2">
+                            Click="Button_Click_2"
+                            IsTabStop="False">
                             <Button.Resources>
                                 <ResourceDictionary>
                                     <ResourceDictionary.ThemeDictionaries>
@@ -145,6 +152,7 @@
                 MinHeight="38">
                 <StackPanel 
                     x:Name="Info_Buttons_StackPanel"
+                    XYFocusKeyboardNavigation="Enabled"
                     Orientation="Horizontal"
                     Spacing="2"
                     VerticalAlignment="Center"

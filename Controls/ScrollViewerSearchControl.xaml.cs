@@ -37,11 +37,13 @@ namespace TewiMP.Controls
             {
                 Opacity = 1;
                 IsHitTestVisible = true;
+                SearchBox.IsEnabled = true;
             }
             else
             {
                 Opacity = 0;
                 IsHitTestVisible = false;
+                SearchBox.IsEnabled = false;
             }
         }
 
@@ -86,6 +88,7 @@ namespace TewiMP.Controls
 
         private void SearchBox_Loaded(object sender, RoutedEventArgs e)
         {
+            SetIsOpen(IsOpen);
             SearchBox.ItemsSource = searchResult;
         }
 

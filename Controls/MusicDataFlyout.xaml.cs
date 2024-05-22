@@ -69,21 +69,29 @@ namespace TewiMP.Controls
 
         public void ShowAt(FrameworkElement element)
         {
+            if (songItemBind == null) return;
+            if (songItemBind.MusicData == null) return;
             root.ShowAt(element);
         }
         
         public void ShowAt(UIElement element, Point point)
         {
+            if (songItemBind == null) return;
+            if (songItemBind.MusicData == null) return;
             root.ShowAt(element, point);
         }
         
         public void ShowAt(DependencyObject element, FlyoutShowOptions flyoutShowOptions)
         {
+            if (songItemBind == null) return;
+            if (songItemBind.MusicData == null) return;
             root.ShowAt(element, flyoutShowOptions);
         }
 
         private void root_Opened(object sender, object e)
         {
+            if (songItemBind == null) return;
+            if (songItemBind.MusicData == null) return;
             Init();
             InitFlyout();
         }

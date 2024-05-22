@@ -68,6 +68,7 @@
                 CornerRadius="4,0,0,4" BorderThickness="1,1,0,1"
                 Click="Button_Click"
                 Tag="0"
+                IsEnabled="{Binding ElementName=SearchBox, Path=IsEnabled}"
                 ToolTipService.ToolTip="上一个">
                 <AnimatedIcon>
                     <AnimatedIcon.Source>
@@ -82,6 +83,7 @@
                 CornerRadius="0,4,4,0" BorderThickness="1,1,1,1"
                 Click="Button_Click"
                 Tag="1"
+                IsEnabled="{Binding ElementName=SearchBox, Path=IsEnabled}"
                 ToolTipService.ToolTip="下一个">
                 <AnimatedIcon
                     ui:VisualExtensions.RotationAngle="3.14"
@@ -103,6 +105,7 @@
                 CornerRadius="4,0,0,4"
                 BorderThickness="1,1,0,1"
                 Padding="7"
+                IsEnabled="{Binding ElementName=SearchBox, Path=IsEnabled}"
                 ToolTipService.ToolTip="搜索选项">
                 <Button.Flyout>
                     <Flyout ShouldConstrainToRootBounds="False">
@@ -131,6 +134,7 @@
                 CornerRadius="0,4,4,0"
                 BorderThickness="0,1,1,1" Tag="2"
                 Padding="0" Click="Button_Click"
+                IsEnabled="{Binding ElementName=SearchBox, Path=IsEnabled}"
                 ToolTipService.ToolTip="关闭搜索栏">
                 <FontIcon Glyph="&#xE711;" FontSize="16"/>
             </Button>
