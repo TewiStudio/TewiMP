@@ -1486,7 +1486,7 @@ namespace TewiMP
         }
 
         static bool IsJustUpdate = false;
-        public static async void UpdateNavViewSelectedItem(bool justUpdate = false)
+        public static void UpdateNavViewSelectedItem(bool justUpdate = false)
         {
             if (justUpdate) IsJustUpdate = true;
             Type type = (SContentFrame.Content as Page).GetType();
@@ -1509,7 +1509,7 @@ namespace TewiMP
             else if (type == typeof(ItemListViewPlayList))
             {
                 //TODO:优化写法
-                foreach (NavigationViewItem item in (SNavView.MenuItems[5] as NavigationViewItem).MenuItems)
+                foreach (NavigationViewItem item in (SNavView.MenuItems[6] as NavigationViewItem).MenuItems)
                 {
                     if ((SContentFrame.Content as ItemListViewPlayList).NavToObj == item.Tag as MusicListData)
                     {
@@ -1520,7 +1520,7 @@ namespace TewiMP
             }
             else if (type == typeof(Pages.ListViewPages.PlayListPage))
             {
-                foreach (NavigationViewItem item in (SNavView.MenuItems[5] as NavigationViewItem).MenuItems)
+                foreach (NavigationViewItem item in (SNavView.MenuItems[6] as NavigationViewItem).MenuItems)
                 {
                     if ((SContentFrame.Content as Pages.ListViewPages.PlayListPage).md5 == (item.Tag as MusicListData).MD5)
                     {

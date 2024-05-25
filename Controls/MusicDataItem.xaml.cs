@@ -332,7 +332,12 @@ namespace TewiMP.Controls
         private void UserControl_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
             isPointEnter = true;
-            if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Touch) return;
+            if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Touch)
+            {
+                Info_Texts_ButtonNameButton.Visibility = Visibility.Collapsed;
+                return;
+            }
+            else Info_Texts_ButtonNameButton.Visibility = Visibility.Visible;
             if (isMouseEventClosed) return;
             OnMouseIn();
         }
@@ -433,7 +438,7 @@ namespace TewiMP.Controls
 
         private void UserControl_LostFocus(object sender, RoutedEventArgs e)
         {
-            OnMouseLeave();
+            //OnMouseLeave();
             System.Diagnostics.Debug.WriteLine("Lost Focus");
         }
     }
