@@ -106,6 +106,9 @@
         <cc:SettingsExpander Header="下载"
                                    Description="下载路径、质量、文件命名方式"
                                    x:Name="DownloadEpd">
+            <cc:SettingsExpander.TranslationTransition>
+                <Vector3Transition/>
+            </cc:SettingsExpander.TranslationTransition>
             <cc:SettingsExpander.HeaderIcon>
                 <FontIcon Glyph="&#xE896;"/>
             </cc:SettingsExpander.HeaderIcon>

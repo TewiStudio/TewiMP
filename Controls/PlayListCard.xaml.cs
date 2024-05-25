@@ -15,7 +15,7 @@ using TewiMP.Pages.ListViewPages;
 
 namespace TewiMP.Controls
 {
-    public partial class PlayListCard : Grid, IDisposable
+    public partial class PlayListCard : Grid
     {
         private MusicListData MusicListData { get; set; }
         public double ImageScaleDPI { get; set; } = 1.0;
@@ -30,12 +30,7 @@ namespace TewiMP.Controls
             ConnectAnimationElement1 = TextBaseTb;
             DataContextChanged += PlayListCard_DataContextChanged;
         }
-/*
-        ~PlayListCard()
-        {
-            Dispose();
-        }
-*/
+
         private void PlayListCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (DataContext is not null)
@@ -126,11 +121,10 @@ namespace TewiMP.Controls
             {
                PlayListImage.Source = null;
             }
-            PlayListImage.Source = null;
             MusicListData = null;
             DataContext = null;
             //PlayListImage = null;
-            System.Diagnostics.Debug.WriteLine("[PlayListCard]: Disposed.");
+            //System.Diagnostics.Debug.WriteLine("[PlayListCard]: Disposed.");
         }
 
         private void Grid_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)

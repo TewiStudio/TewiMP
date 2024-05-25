@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:ccc="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:control="using:TewiMP.Controls"
@@ -15,7 +16,7 @@
             <StackPanel HorizontalAlignment="Stretch"
                         Orientation="Vertical"
                         Margin="16" Spacing="12">
-                <StackPanel Orientation="Horizontal">
+                <ccc:WrapPanel VerticalSpacing="12" HorizontalSpacing="12">
                     <Border CornerRadius="6"
                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                             BorderThickness="1"
@@ -23,12 +24,21 @@
                             HorizontalAlignment="Center">
                         <control:ImageEx x:Name="abcd"
                                          Source="/Images/icon.png"
-                                         MaxWidth="150" MaxHeight="150" CornerRadius="5"
+                                         MaxWidth="250" MaxHeight="250" CornerRadius="5"
                                          Opacity="1" Loaded="Image_Loaded"/>
                     </Border>
                     <Grid VerticalAlignment="Stretch"
-                          Margin="12,0,0,0" Background="Transparent">
-                        <StackPanel Orientation="Horizontal" Spacing="4"
+                          Background="Transparent">
+                        <Grid.Transitions>
+                            <TransitionCollection>
+                                <RepositionThemeTransition/>
+                            </TransitionCollection>
+                        </Grid.Transitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <ccc:WrapPanel Orientation="Horizontal" HorizontalSpacing="4"
                                     VerticalAlignment="Top">
                             <TextBlock Text="TewiMP"
                                        Style="{ThemeResource SubTBHeader}"/>
@@ -37,18 +47,24 @@
                                        VerticalAlignment="Bottom"
                                        FontSize="12" Margin="0,0,0,3"
                                        Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                        </StackPanel>
-                        <StackPanel VerticalAlignment="Bottom">
-                            <TextBlock>
+                        </ccc:WrapPanel>
+                        <StackPanel VerticalAlignment="Bottom"
+                                    Grid.Row="1">
+                            <TextBlock TextWrapping="Wrap">
                                 Powered by <Hyperlink Click="Hyperlink_Click">.NET 8.0.0</Hyperlink> &#x0026; <Hyperlink Click="Hyperlink_Click_1">Windows App SDK 1.5</Hyperlink>
                             </TextBlock>
-                            <TextBlock Text="© 2018-2024 zilongww. All Rights Reserved." Margin="0,4,0,0"/>
+                            <TextBlock TextWrapping="Wrap" Text="© 2020-2024 zilongww. All Rights Reserved." Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
-                </StackPanel>
+                </ccc:WrapPanel>
                 <cc:SettingsExpander Header="使用的开放源代码库"
                                      HorizontalAlignment="Stretch"
                                      Margin="0,0,0,0">
+                    <cc:SettingsExpander.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </cc:SettingsExpander.Transitions>
                     <cc:SettingsExpander.Items>
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
@@ -156,6 +172,11 @@
                     </cc:SettingsExpander.Items>
                 </cc:SettingsExpander>
                 <TextBlock>
+                    <TextBlock.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </TextBlock.Transitions>
                     图标中的图片来自 <Hyperlink Click="Hyperlink_Click_2">なま</Hyperlink>
                 </TextBlock>
             </StackPanel>

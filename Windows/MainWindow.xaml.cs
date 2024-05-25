@@ -17,6 +17,10 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
+using Windows.UI;
+using Windows.Storage;
+using Windows.Graphics;
+using Windows.ApplicationModel.DataTransfer;
 using TewiMP.Pages;
 using TewiMP.Pages.MusicPages;
 using TewiMP.Helpers;
@@ -25,10 +29,6 @@ using TewiMP.Windowed;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
-using Windows.UI;
-using Windows.Storage;
-using Windows.Graphics;
-using Windows.ApplicationModel.DataTransfer;
 using WinRT;
 using NAudio.Wave;
 using Newtonsoft.Json.Linq;
@@ -107,6 +107,7 @@ namespace TewiMP
             AppWindowLocal = AppWindow;
             //FullScreenPresenter = FullScreenPresenter.Create();
 
+            NowDPI = CodeHelper.GetScaleAdjustment(this);
             WindowGridBase.DataContext = this;
             SContent = Content;
             SBackgroundColor = BackgroundColor;
@@ -305,9 +306,10 @@ namespace TewiMP
             var screenHeight = displayArea.WorkArea.Height;
             // 设置参数
             if (screenWidth <= windowWidth ||
-                 screenHeight<= windowHeight)
+                screenHeight<= windowHeight)
             {
-                OverlappedPresenter.Maximize();
+                if (isPreparedActivate)
+                    OverlappedPresenter.Maximize();
             }
             else
             {
@@ -1452,9 +1454,9 @@ namespace TewiMP
             else if (item == SNavView.MenuItems[3] as NavigationViewItem)
                 SetNavViewContent(typeof(DownloadPage));
             else if (item == SNavView.MenuItems[5] as NavigationViewItem)
-                SetNavViewContent(typeof(PlayListPage));
-            else if (item == SNavView.MenuItems[6] as NavigationViewItem)
                 SetNavViewContent(typeof(LocalAudioPage));
+            else if (item == SNavView.MenuItems[6] as NavigationViewItem)
+                SetNavViewContent(typeof(PlayListPage));
             else if (item == SNavView.MenuItems[7] as NavigationViewItem)
                 SetNavViewContent(typeof(HistoryPage));
             else if (item == SNavView.FooterMenuItems[0] as NavigationViewItem)
@@ -1494,9 +1496,9 @@ namespace TewiMP
                 SNavView.SelectedItem = SNavView.MenuItems[2];
             else if (type == typeof(DownloadPage))
                 SNavView.SelectedItem = SNavView.MenuItems[3];
-            else if (type == typeof(PlayListPage))
-                SNavView.SelectedItem = SNavView.MenuItems[5];
             else if (type == typeof(LocalAudioPage))
+                SNavView.SelectedItem = SNavView.MenuItems[5];
+            else if (type == typeof(PlayListPage))
                 SNavView.SelectedItem = SNavView.MenuItems[6];
             else if (type == typeof(HistoryPage))
                 SNavView.SelectedItem = SNavView.MenuItems[7];

@@ -12,12 +12,6 @@
     PointerPressed="Grid_PointerPressed" PointerReleased="Grid_PointerReleased"
     RightTapped="Grid_RightTapped" Holding="Grid_Holding" AccessKeyInvoked="Grid_AccessKeyInvoked">
 
-    <Grid.Transitions>
-        <TransitionCollection>
-            <RepositionThemeTransition/>
-        </TransitionCollection>
-    </Grid.Transitions>
-
     <Grid.Resources>
         <MenuFlyout x:Name="FlyoutMenu">
             <MenuFlyoutItem x:Name="EditPlayListButton" Icon="edit" Text="编辑" Click="EditPlayListButton_Click"/>
@@ -31,26 +25,33 @@
     </Grid.Resources>
 
     <Rectangle x:Name="ShadowBaseRectangle"/>
-    <Border CornerRadius="8"
-            BorderThickness="1"
-            BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+    <Border>
         <Grid CornerRadius="7">
-            <local:ImageEx x:Name="PlayListImage" Stretch="UniformToFill" PointInBehavior="OnlyLightUp"
-                               HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="8"/>
-            <Grid IsHitTestVisible="False"
-                      VerticalAlignment="Bottom">
-                <Grid Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
-                          BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                          BorderThickness="1" CornerRadius="8"
-                          Padding="8" Margin="4"
-                      HorizontalAlignment="Left">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+            <local:ImageEx
+                x:Name="PlayListImage" Stretch="UniformToFill" PointInBehavior="OnlyLightUp"
+                HorizontalAlignment="Center" VerticalAlignment="Stretch" CornerRadius="8"
+                BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1"/>
+            <Grid
+                IsHitTestVisible="false"
+                VerticalAlignment="Bottom">
+                <Grid
+                    Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                    BorderThickness="1" CornerRadius="8"
+                    Padding="8" Margin="4"
+                    HorizontalAlignment="Left">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <local:AutoScrollViewer>
-                        <TextBlock x:Name="TextBaseTb"
-                                   Text="{Binding ListShowName}"/>
+                        <TextBlock
+                            x:Name="TextBaseTb"
+                            Text="{Binding ListShowName}"/>
                     </local:AutoScrollViewer>
                     <local:AutoScrollViewer Grid.Row="1">
                         <TextBlock FontSize="12">

@@ -108,17 +108,17 @@
                         </NavigationViewItem.InfoBadge>
                     </NavigationViewItem>
                     <NavigationViewItemHeader x:Name="NavView_LocalTextItem" Content="本地"/>
+                    <NavigationViewItem Content="本地音频" AccessKey="MF">
+                        <NavigationViewItem.Icon>
+                            <FontIcon Glyph="&#xE838;"/>
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
                     <NavigationViewItem Content="播放列表" AccessKey="ML" x:Name="MusicPlayListButton">
                         <NavigationViewItem.Icon>
                             <FontIcon Glyph="&#xE90B;"/>
                         </NavigationViewItem.Icon>
                         <NavigationViewItem.MenuItems>
                         </NavigationViewItem.MenuItems>
-                    </NavigationViewItem>
-                    <NavigationViewItem Content="本地音频" AccessKey="MF">
-                        <NavigationViewItem.Icon>
-                            <FontIcon Glyph="&#xE838;"/>
-                        </NavigationViewItem.Icon>
                     </NavigationViewItem>
                     <NavigationViewItem Content="历史" AccessKey="MH">
                         <NavigationViewItem.Icon>
