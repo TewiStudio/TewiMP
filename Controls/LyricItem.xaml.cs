@@ -57,13 +57,21 @@ namespace TewiMP.Controls
             {
                 RomajiTextBlock.Text = null;
                 RomajiTextBlock.Height = 0;
-            }/*
+            }
+            /*
             RomajiTextBlock.Text = lyricData.LyricTimeSpan.ToString();
             RomajiTextBlock.Height = double.NaN;*/
+#if DEBUG
+            DebugTimeDisplayer_TextBlock.Text = lyricData.LyricTimeSpan.ToString();
+#endif
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
+#if DEBUG
+            DebugTimeDisplayer.XamlRoot = this.XamlRoot;
+            DebugTimeDisplayer.IsOpen = true;
+#endif
         }
 
         private void Grid_Unloaded(object sender, RoutedEventArgs e)

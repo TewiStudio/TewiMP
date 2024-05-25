@@ -572,8 +572,8 @@ namespace TewiMP.Helpers
                 if (lyricDictionary.Any())
                 {
                     //lastLyric
-                    lyricDictionary.Add(lyricDictionary.Last().Key + TimeSpan.FromSeconds(1),
-                        new(null, null, lyricDictionary.Last().Key + TimeSpan.FromSeconds(1)));
+                    lyricDictionary.Add(TimeSpan.MaxValue,
+                        new(null, null, TimeSpan.MaxValue));
                 }
                 sorter = from pair in lyricDictionary orderby pair.Key ascending select pair;
             });
@@ -626,7 +626,7 @@ namespace TewiMP.Helpers
                     case 1: timeMillsStr += "00"; break;
                     case 2: timeMillsStr += "0"; break;
                     case 3: break;
-                    default: System.Diagnostics.Debug.WriteLine("Warning：歌词精度可能会降低。"); break;
+                    default: Debug.WriteLine("Warning：歌词精度可能会降低。"); break;
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
                 return timesb + timeMills;
@@ -634,23 +634,22 @@ namespace TewiMP.Helpers
             else
             {
                 var times = timeString.Split(':');
-                if (times.Length != 3)
-                {
-                    System.Diagnostics.Debug.WriteLine("[LyricToLrcData] 无法转换不支持的时间格式");
-                    return null;
-                }
-
                 var timesa = TimeSpan.TryParse($"00:{times[0]}:{times[1]}", null, out TimeSpan timesb);
-                var timeMillsStr = times[2];
-                var parse = int.TryParse(timeMillsStr, out int iparse);
-                if (!parse) return null;
 
-                switch (timeMillsStr.Length)
+                var timeMillsStr = "0";
+                if (times.Length == 3)
                 {
-                    case 1: timeMillsStr += "00"; break;
-                    case 2: timeMillsStr += "0"; break;
-                    case 3: break;
-                    default: System.Diagnostics.Debug.WriteLine("Warning：歌词精度可能会降低。"); break;
+                    timeMillsStr = times[2];
+                    var parse = int.TryParse(timeMillsStr, out int iparse);
+                    if (!parse) return null;
+
+                    switch (timeMillsStr.Length)
+                    {
+                        case 1: timeMillsStr += "00"; break;
+                        case 2: timeMillsStr += "0"; break;
+                        case 3: break;
+                        default: Debug.WriteLine("Warning：歌词精度可能会降低。"); break;
+                    }
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
                 return timesb + timeMills;

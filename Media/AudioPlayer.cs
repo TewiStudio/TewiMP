@@ -64,6 +64,17 @@ namespace TewiMP.Media
             return result;
         }
 
+        public static OutDevice GetDirectSoundOutDefaultDevice()
+        {
+            foreach (var dev in DirectSoundOut.Devices)
+            {
+                string name = dev.Description;
+                OutDevice outDevice = new OutDevice(OutApi.DirectSound, dev, name) { IsDefaultDevice = name == "主声音驱动程序" };
+                if (outDevice.IsDefaultDevice) return outDevice;
+            }
+            return null;
+        }
+
         public static string defaultName = "默认输出设备";
         /// <summary>
         /// 获取可以播放的音频输出设备列表
@@ -79,7 +90,7 @@ namespace TewiMP.Media
                 {
                     var wocb = WaveOut.GetCapabilities(n);
                     string name = wocb.ProductName;
-                    OutDevice outDevice = new OutDevice(OutApi.WaveOut, n, name) { IsDefaultDevice = name == "Microsoft 声音映射器" || name == "Microsoft Sound Mapper" ? true : false };
+                    OutDevice outDevice = new OutDevice(OutApi.WaveOut, n, name) { IsDefaultDevice = name == "Microsoft 声音映射器" || name == "Microsoft Sound Mapper" };
                     outDevices.Add(outDevice);
                 }
                 if (outDevices.Count < 2) outDevices.Clear();
@@ -88,7 +99,7 @@ namespace TewiMP.Media
                 foreach (var dev in DirectSoundOut.Devices)
                 {
                     string name = dev.Description;
-                    OutDevice outDevice = new OutDevice(OutApi.DirectSound, dev, name) { IsDefaultDevice = name == "主声音驱动程序" ? true : false };
+                    OutDevice outDevice = new OutDevice(OutApi.DirectSound, dev, name) { IsDefaultDevice = name == "主声音驱动程序" };
 
                     if (dev != null)
                         foreach (var device in outDevices)
@@ -179,8 +190,16 @@ namespace TewiMP.Media
         public delegate void OnOnPropertyValueChangedDelegate(string deviceId, PropertyKey propertyKey);
         public event OnOnPropertyValueChangedDelegate OnPropertyValueChangedEvent;
 
-        public void OnDefaultDeviceChanged(DataFlow dataFlow, Role deviceRole, string defaultDeviceId)
+        int defaultDeviceChangedCounter = 0;
+        public async void OnDefaultDeviceChanged(DataFlow dataFlow, Role deviceRole, string defaultDeviceId)
         {
+            if (deviceRole != Role.Multimedia) return;
+
+            defaultDeviceChangedCounter++;
+            await Task.Delay(100);
+            defaultDeviceChangedCounter--;
+            if (defaultDeviceChangedCounter != 0) return;
+
             Debug.WriteLine("[DeviceManage]: Default Device Changed.");
             OnDefaultDeviceChangedEvent?.Invoke(dataFlow, deviceRole, defaultDeviceId);
         }
@@ -199,7 +218,7 @@ namespace TewiMP.Media
 
         public void OnDeviceStateChanged(string deviceId, DeviceState newState)
         {
-            Debug.WriteLine($"[DeviceManage]: Device State changed. deviceId:{deviceId}/newState:{newState}.");
+            Debug.WriteLine($"[DeviceManage]: Device State changed. deviceId:{deviceId} / newState:{newState}.");
             OnDeviceStateChangedEvent?.Invoke(deviceId, newState);
         }
 
@@ -527,6 +546,7 @@ namespace TewiMP.Media
             App.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
             App.cacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
             ClientDeviceEvents.notificationClient.OnDefaultDeviceChangedEvent += NotificationClient_OnDefaultDeviceChangedEvent;
+            ClientDeviceEvents.notificationClient.OnDeviceStateChangedEvent += NotificationClient_OnDeviceStateChangedEvent;
             ClientDeviceEvents.notificationClient.OnDeviceRemovedEvent += NotificationClient_OnDeviceRemovedEvent;
         }
 
@@ -547,12 +567,16 @@ namespace TewiMP.Media
             if (musicData != pointMusicData) return;
             CacheLoadingChanged?.Invoke(this, value);
         }
-
+        
+        int loadCounter = 0;
         bool isInErrorDialog = false;
-        bool isInReloadDefaultDeviceChanged = false;
         private async void NotificationClient_OnDefaultDeviceChangedEvent(DataFlow dataFlow, Role deviceRole, string defaultDeviceId)
         {
-            await Task.Delay(100); // 不加会导致 集合被修改 的错误，DirectSound 导致的 >:(
+            //loadCounter++;
+            //await Task.Delay(100); // 不加会导致 集合被修改 的错误，DirectSound 导致的 >:(
+            //loadCounter--;
+            //if (loadCounter != 0) return;
+
             var devices = await OutDevice.GetOutDevicesAsync();
             if (NowOutObj == null)
             {
@@ -561,32 +585,44 @@ namespace TewiMP.Media
             }
             if (devices.First().DeviceType == OutApi.None)
             {
-                if (isInErrorDialog) return;
-                isInErrorDialog = true;
                 MainWindow.Invoke(() =>
                 {
                     MainWindow.AddNotify("无音频输出设备", "似乎所有音频输出设备都已被拔出，程序找不到音频输出设备。\n" +
                         "请检查音频驱动是否正常工作，或检查音频输出设备的接口是否松动或拔出。\n" +
                         "如果检查完毕后仍然无法正常播放，请到 GitHub 里向项目提出 Issues。",
-                        NotifySeverity.Error);
-                    isInErrorDialog = false;
+                        NotifySeverity.Error, TimeSpan.FromSeconds(10));
                 });
                 return;
             }
-            MainWindow.Invoke(() => SetPlay());
-            if (isInReloadDefaultDeviceChanged) return;
+            if (!devices.Contains(NowOutDevice))
+            {
+                if (NowOutDevice.DeviceType == OutApi.DirectSound) NowOutDevice = OutDevice.GetDirectSoundOutDefaultDevice();
+                else if (NowOutDevice.DeviceType == OutApi.Wasapi) NowOutDevice = OutDevice.GetWasapiDefaultDevice();
+                else NowOutDevice = devices.First();
+            }
+
+            MainWindow.Invoke(() =>
+            {
+                if (isPlaying) SetPlay();
+                else SetPause();
+            });
             if (NowOutObj.GetType() != typeof(DirectSoundOut) && NowOutObj.GetType() != typeof(WasapiOut)) return;
             if (!NowOutDevice.IsDefaultDevice) return;
 
-            isInReloadDefaultDeviceChanged = true;
             if (NowOutObj.GetType() == typeof(WasapiOut)) NowOutDevice = OutDevice.GetWasapiDefaultDevice();
+            else if (NowOutObj.GetType() == typeof(DirectSoundOut)) NowOutDevice = OutDevice.GetDirectSoundOutDefaultDevice();
             MainWindow.Invoke(() =>
             {
-                SetReloadAsync(true);
+                SetReloadAsync(isPlaying);
             });
-            await Task.Delay(1);
-            isInReloadDefaultDeviceChanged = false;
         }
+
+        private void NotificationClient_OnDeviceStateChangedEvent(string deviceId, DeviceState newState)
+        {
+            if (newState == DeviceState.Disabled)
+                NotificationClient_OnDefaultDeviceChangedEvent(DataFlow.All, Role.Multimedia, deviceId);
+        }
+
 
         private void NotificationClient_OnDeviceRemovedEvent(string deviceId)
         {
@@ -762,6 +798,7 @@ namespace TewiMP.Media
                 switch (NowOutDevice.DeviceType)
                 {
                     case OutApi.WaveOut:
+                        Debug.WriteLine($"[AudioPlayer]: Using WaveOut.");
                         await Task.Run(() => NowOutObj = new WaveOutEvent());
                         (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device == null ? -1 : (int)NowOutDevice.Device;
                         (NowOutObj as WaveOutEvent).NumberOfBuffers = Latency;
@@ -769,6 +806,7 @@ namespace TewiMP.Media
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                     case OutApi.DirectSound:
+                        Debug.WriteLine($"[AudioPlayer]: Using DirectSound.");
                         if (NowOutDevice.Device == null)
                         {
                             await Task.Run(() => NowOutObj = new DirectSoundOut(Latency));
@@ -781,7 +819,7 @@ namespace TewiMP.Media
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                     case OutApi.Wasapi:
-
+                        Debug.WriteLine($"[AudioPlayer]: Using Wasapi.");
                         MMDevice device = null;
                         await Task.Run(() =>
                         {
@@ -806,6 +844,7 @@ namespace TewiMP.Media
                         device.Dispose();
                         break;
                     case OutApi.Asio:
+                        Debug.WriteLine($"[AudioPlayer]: Using Asio.");
                         await Task.Run(() => NowOutObj = new AsioOut(NowOutDevice.Device.ToString()));
                         //if (notDefaultLatency) (NowOutObj as AsioOut).PlaybackLatency = Latency;
                         NowOutObj.Init(FileProvider);
@@ -913,32 +952,50 @@ namespace TewiMP.Media
             });
         }
 
-        public bool SetPlay()
+        bool isPlaying = false;
+        public async void SetPlay()
         {
-            if (localFileIniting) return false;
-            NowOutObj?.Play();
+            if (localFileIniting) return;
+
+            try
+            {
+                NowOutObj?.Play();
+            }
+            catch
+            {
+                await Reload();
+                NowOutObj?.Play();
+            }
             MidiPlayback?.Start();
+            isPlaying = true;
             PlayStateChanged?.Invoke(this);
             ReCallTiming();
-            return true;
         }
         
-        public bool SetPause()
+        public async void SetPause()
         {
-            if (localFileIniting) return false;
-            NowOutObj?.Pause();
+            if (localFileIniting) return;
+            try
+            {
+                NowOutObj?.Pause();
+            }
+            catch
+            {
+                await Reload();
+                NowOutObj?.Pause();
+            }
             MidiPlayback?.Stop();
+            isPlaying = false;
             PlayStateChanged?.Invoke(this);
-            return true;
         }
         
-        public bool SetStop()
+        public void SetStop()
         {
-            if (localFileIniting) return false;
+            if (localFileIniting) return;
             NowOutObj?.Stop();
             MidiPlayback?.Stop();
+            isPlaying = false;
             PlayStateChanged?.Invoke(this);
-            return true;
         }
 
         public void ReCallTiming()

@@ -32,4 +32,11 @@
             </ui:Effects.Shadow>
         </TextBlock>
     </Grid>
+
+    <Popup
+        x:Name="DebugTimeDisplayer"
+        VerticalOffset="-12"
+        ShouldConstrainToRootBounds="True">
+        <TextBlock x:Name="DebugTimeDisplayer_TextBlock" Text="time" IsHitTestVisible="False"/>
+    </Popup>
 </Grid>

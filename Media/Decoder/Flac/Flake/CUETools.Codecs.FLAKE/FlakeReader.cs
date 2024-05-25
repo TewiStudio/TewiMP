@@ -593,7 +593,10 @@ namespace CUETools.Codecs.FLAKE
 				ushort crc_1 = DoCRC ? crc16.ComputeChecksum(framereader.Buffer + pos, framereader.Position - pos) : (ushort)0;
 				ushort crc_2 = (ushort)framereader.Readbits(16);
 				if (DoCRC && crc_1 != crc_2)
+				{
+					SetPositionFailedReload();
 					throw new Exception("frame crc mismatch");
+				}
 				Restore_samples(frame);
 				_samplesInBuffer = frame.blocksize;
 				return framereader.Position - pos;

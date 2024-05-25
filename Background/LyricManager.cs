@@ -213,15 +213,10 @@ namespace TewiMP.Background
         LyricData lastLyricData = null;
         public void ReCallUpdate()
         {
-            //System.Diagnostics.Debug.WriteLine($"Lyric Lasted Count {PlayingLyricSelectedChange?.GetInvocationList().Length}");
             timer.Start();
             if (PlayingLyricSelectedChange == null) StopTimer();
             if (!NowPlayingLyrics.Any()) StopTimer();
             if (NowPlayingLyrics.Count <= 3) StopTimer();
-
-            //System.Diagnostics.Debug.WriteLine($"Lyric Timing Changed: {App.audioPlayer.FileReader?.Position}.");
-            //System.Diagnostics.Debug.WriteLine($"Lyric Timing Changed: {App.audioPlayer.FileReader?.WaveFormat.AverageBytesPerSecond}.");
-            //System.Diagnostics.Debug.WriteLine($"Lyric Timing Changed: {(decimal)App.audioPlayer.FileReader?.Position / (decimal)App.audioPlayer.FileReader?.WaveFormat.AverageBytesPerSecond}.");
 
             foreach (var data in NowPlayingLyrics)
             {
@@ -235,20 +230,6 @@ namespace TewiMP.Background
                     break;
                 }
             }
-            /*
-            for (int i = 0; i < NowPlayingLyrics.Count; i++)
-            {
-                var npl = NowPlayingLyrics[i];
-                if (npl.LyricTimeSpan < App.audioPlayer.CurrentTime)
-                {
-                    lastLyricData = npl;
-                }
-                else
-                {
-                    NowLyricsData = lastLyricData;
-                    break;
-                }
-            }*/
         }
         
 
