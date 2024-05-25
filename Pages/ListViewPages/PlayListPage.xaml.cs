@@ -49,6 +49,7 @@ namespace TewiMP.Pages.ListViewPages
         public PlayListPage()
         {
             InitializeComponent();
+            //arrayList = new ArrayList(100000000);
         }
 
         // Items 更新时 CommandBar 宽度不会更新 >:(

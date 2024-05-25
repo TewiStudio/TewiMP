@@ -33,7 +33,7 @@
             </Grid.RowDefinitions>
             <local:ImageEx
                 x:Name="PlayListImage" Stretch="UniformToFill" PointInBehavior="OnlyLightUp"
-                HorizontalAlignment="Center" VerticalAlignment="Stretch" CornerRadius="8"
+                HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="8"
                 BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1"/>
             <Grid
                 IsHitTestVisible="false"

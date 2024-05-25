@@ -11,11 +11,11 @@
     xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
     xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:cc="using:TewiMP.Controls"
+    Loaded="Page_Loaded" Unloaded="Page_Unloaded"
     mc:Ignorable="d" SizeChanged="Page_SizeChanged">
 
     <GridView x:Name="BaseGridView"
               SelectionMode="None"
-              Loaded="BaseGridView_Loaded"
               animations:Connected.ListItemKey="listItem"
               animations:Connected.ListItemElementName="ItemThumbnail"
               animations:ItemsReorderAnimation.Duration="00:00:00.2000000">
@@ -25,6 +25,13 @@
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="0,0,0,1"/>
                 <TextBlock x:Name="BaseGridView_HeaderTextBlock" Text="播放列表" Style="{ThemeResource TBHeader}"/>
+                <Grid x:Name="BaseGridView_HeaderGrid_Foot_Root">
+                    <cc:ScrollFootButton
+                        x:Name="BaseGridView_HeaderGrid_Foot_Buttons"
+                        IsPositionToNowPlayingButtonShow="False"
+                        VerticalAlignment="Bottom"
+                        HorizontalAlignment="Right"/>
+                </Grid>
                 <CommandBar VerticalAlignment="Bottom" Margin="0,0,10,-6" Background="Transparent"
                             OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
                     <AppBarButton Label="排序" AccessKey="L" Click="AppBarButton_Click_2">
@@ -45,7 +52,7 @@
                 </CommandBar>
             </Grid>
         </GridView.Header>
-        <ItemsView x:Name="ItemsViewer" SelectionMode="None" Margin="16,12,12,0"
+        <ItemsView x:Name="ItemsViewer" SelectionMode="None" Margin="16,12,12,44"
                    HorizontalAlignment="Center" VerticalAlignment="Center">
             <ItemsView.Resources>
                 <SolidColorBrush x:Key="ItemContainerPointerOverBackground" Color="Transparent"/>
