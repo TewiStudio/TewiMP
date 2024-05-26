@@ -25,7 +25,9 @@
     </Grid.Resources>
 
     <Rectangle x:Name="ShadowBaseRectangle"/>
-    <Border>
+    <Border
+        CornerRadius="8" BorderThickness="1"
+        BorderBrush="{ThemeResource ControlElevationBorderBrush}">
         <Grid CornerRadius="7">
             <Grid.RowDefinitions>
                 <RowDefinition/>
@@ -33,8 +35,7 @@
             </Grid.RowDefinitions>
             <local:ImageEx
                 x:Name="PlayListImage" Stretch="UniformToFill" PointInBehavior="OnlyLightUp"
-                HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="8"
-                BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1"/>
+                HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="8"/>
             <Grid
                 IsHitTestVisible="false"
                 VerticalAlignment="Bottom">

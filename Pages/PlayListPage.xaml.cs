@@ -51,13 +51,13 @@ namespace TewiMP.Pages
         }
 
         private void MainWindow_MainViewStateChanged(bool isView)
-        {
+        {/*
             if (isView)
                 ItemsViewer.ItemsSource = playListCards;
             else
             {
                 ItemsViewer.ItemsSource = null;
-            }
+            }*/
         }
 
         bool isInUpdate = false;
