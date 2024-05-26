@@ -758,7 +758,7 @@ namespace TewiMP.Media
                 fileProvider.Tempo = Tempo;
                 fileProvider.Rate = Rate;
             });
-            await Task.Run(() => DisposeAll());
+            await Task.Run(DisposeAll);
             FileReader = fileReader;
             FileProvider = fileProvider;
             Debug.WriteLine($"[AudioPlayer]: FileReader filePath \"{fileReader.FileName}\".");
@@ -833,12 +833,12 @@ namespace TewiMP.Media
                         {
                             NowOutObj.Init(FileProvider);
                         }
-                        catch (COMException)
+                        catch (COMException err)
                         {
                             if (WasapiOnly)
                                 throw new Exception("当前输出设备似乎不支持独占模式。\n" +
-                                    "请尝试到音频输出设备的 属性 页面的 高级 选项卡打开 允许应用程序独占控制该设备。");
-                            throw new Exception("无法初始化音频输出，可能是其它应用程序独占了此音频输出设备，请尝试重新播放。");
+                                    $"请尝试到音频输出设备的 属性 页面的 高级 选项卡打开 允许应用程序独占控制该设备。\n错误信息：{err.Message}");
+                            throw new Exception($"无法初始化音频输出，可能是其它应用程序独占了此音频输出设备，请尝试重新播放。\n错误信息：{err.Message}");
                         }
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         device.Dispose();
@@ -865,23 +865,23 @@ namespace TewiMP.Media
 
         public async Task Reload(TimeSpan? reloadedStreamPosition = null)
         {
+            //if (IsInPlaybackStopped) return;
+            if (FileReader == null) return;
+            if (FileReader.isMidi) return;
+
+            TimeSpan nowPosition = reloadedStreamPosition == null ? FileReader.CurrentTime : (TimeSpan)reloadedStreamPosition;
+            var nowPlayState = NowOutObj?.PlaybackState;
+            string filePath = FileReader.FileName;
+
+            await Task.Run(() => DisposeAll());
+            await SetSource(filePath);
+
             if (FileReader != null)
             {
-                if (FileReader.isMidi) return;
-                TimeSpan nowPosition = reloadedStreamPosition == null ? FileReader.CurrentTime : (TimeSpan)reloadedStreamPosition;
-                var nowPlayState = NowOutObj?.PlaybackState;
-                string filePath = FileReader.FileName;
-
-                await Task.Run(() => DisposeAll());
-                await SetSource(filePath);
-
-                if (FileReader != null)
-                {
-                    FileReader.CurrentTime = nowPosition;
-                }
-                if (nowPlayState == PlaybackState.Playing) SetPlay();
-                else SetPause();
+                FileReader.CurrentTime = nowPosition;
             }
+            if (nowPlayState == PlaybackState.Playing) SetPlay();
+            else SetPause();
         }
 
         public async void SetReloadAsync(bool autoPlay = false)
@@ -953,7 +953,7 @@ namespace TewiMP.Media
         }
 
         bool isPlaying = false;
-        public async void SetPlay()
+        public async void SetPlay(bool ifErrorReload = true)
         {
             if (localFileIniting) return;
 
@@ -962,9 +962,12 @@ namespace TewiMP.Media
                 NowOutObj?.Play();
             }
             catch
-            {
-                await Reload();
-                NowOutObj?.Play();
+            {/*
+                if (ifErrorReload)
+                {
+                    await Reload();
+                    NowOutObj?.Play();
+                }*/
             }
             MidiPlayback?.Start();
             isPlaying = true;

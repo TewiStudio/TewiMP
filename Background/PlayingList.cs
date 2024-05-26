@@ -97,8 +97,10 @@ namespace TewiMP.Background
                     await Play(NowPlayingList.First());*/
         }
 
+        bool isPlayEndCallPlay = false;
         private async void AudioPlayer_PlayEnd(Media.AudioPlayer audioPlayer)
         {
+            isPlayEndCallPlay = true;
             AddHistory(audioPlayer.MusicData);
             switch (PlayBehavior)
             {
@@ -118,6 +120,7 @@ namespace TewiMP.Background
                     App.audioPlayer.SetStop();
                     break;
             }
+            isPlayEndCallPlay = true;
         }
 
         MusicData lastMusicData = null;
@@ -226,7 +229,7 @@ namespace TewiMP.Background
             {
                 await App.audioPlayer.SetSource(musicData);
                 if (playState == NAudio.Wave.PlaybackState.Playing)
-                    App.audioPlayer.SetPlay();
+                    App.audioPlayer.SetPlay(false);
                 Debug.WriteLine($"[PlayingList]: 设置播放完成：\"{musicData.Title}\"");
             }
             catch (DivideByZeroException)

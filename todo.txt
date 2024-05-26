@@ -15,3 +15,7 @@ songitem图片dpi缩放不正确；X
 添加自定义Mica、Acrylic主题；X
 对更多平台的支持；
 缓存歌曲进度可视化；
+
+恶性BUG：Wasapi 和 DirectSound 在正常播放完成歌曲后会调用两次 SetSource，第一次是正确的下一首歌曲的调用，第二次是错误的当前歌曲的调用，
+会导致切换下一首歌曲却还播放上一首歌曲的音频或播放失败无音频输出
+播放失败的原因是连续两次调用 SetSource 导致 FileReader 等被 Dispose 并设置为 null 导致无法获取到正确的 FileReader。
