@@ -1015,10 +1015,7 @@ namespace TewiMP
         static bool isDeleteImage = true;
         private static void PlayingList_NowPlayingImageLoading(ImageSource imageSource, string _)
         {
-            if (SPlayContent.Content is not ImageEx)
-            {
-                SPlayContent.Content = new ImageEx() { MinWidth = 0, CornerRadius = new(3) };
-            }
+
         }
 
         public static void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
@@ -1036,7 +1033,6 @@ namespace TewiMP
                 im.Source = imageSource;
                 im.SaveName = $"{App.audioPlayer.MusicData.Title} · {App.audioPlayer.MusicData.Album.Title}";
                 im.BorderThickness = new(1);
-                im.BorderBrush = App.Current.Resources["ControlElevationBorderBrush"] as Brush;
             }
 
         }
@@ -2268,11 +2264,25 @@ namespace TewiMP
             oc.Clear();
         }
 
+        void ShowDropInfo_Root()
+        {
+            DropInfo_Root.Visibility = Visibility.Visible;
+            DropInfo_Root.Opacity = 1;
+        }
+
+        async void HideDropInfo_Root()
+        {
+            DropInfo_Root.Opacity = 0;
+            await Task.Delay(300);
+            if (DropInfo_Root.Opacity == 0)
+                DropInfo_Root.Visibility = Visibility.Collapsed;
+        }
+
         public static bool AllowDragEvents = true;
         private void WindowGridBase_DragOver(object sender, DragEventArgs e)
         {
             if (!AllowDragEvents) return;
-            DropInfo_Root.Opacity = 1;
+            ShowDropInfo_Root();
             e.AcceptedOperation = DataPackageOperation.Link;
             e.DragUIOverride.Caption = "打开";
         }
@@ -2280,7 +2290,7 @@ namespace TewiMP
         private async void WindowGridBase_Drop(object sender, DragEventArgs e)
         {
             if (!AllowDragEvents) return;
-            DropInfo_Root.Opacity = 0;
+            HideDropInfo_Root();
             if (!e.DataView.Contains(StandardDataFormats.StorageItems))
             {
                 AddNotify("无法打开此文件类型", "仅允许打开文件。", NotifySeverity.Error);
@@ -2299,7 +2309,7 @@ namespace TewiMP
 
         private void WindowGridBase_DragLeave(object sender, DragEventArgs e)
         {
-            DropInfo_Root.Opacity = 0;
+            HideDropInfo_Root();
         }
 
         private void Button_RightTapped(object sender, RightTappedRoutedEventArgs e)

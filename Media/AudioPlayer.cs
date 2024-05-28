@@ -684,7 +684,6 @@ namespace TewiMP.Media
                 {
                     CacheLoadingChanged?.Invoke(this, null);
                     await SetSource(resultPath, musicData.CUETrackData != null);
-                    CacheLoadedChanged?.Invoke(this);
                 }
                 catch (Exception err)
                 {
@@ -695,6 +694,7 @@ namespace TewiMP.Media
                 finally
                 {
                     localFileIniting = false;
+                    CacheLoadedChanged?.Invoke(this);
                     PlayStateChanged?.Invoke(this);
                     TimingChanged?.Invoke(this);
                 }
@@ -886,7 +886,7 @@ namespace TewiMP.Media
             var nowPlayState = NowOutObj?.PlaybackState;
             string filePath = FileReader.FileName;
 
-            await Task.Run(() => DisposeAll());
+            await Task.Run(DisposeAll);
             await SetSource(filePath);
 
             if (FileReader != null)

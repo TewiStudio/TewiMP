@@ -197,6 +197,9 @@
                                                 <ContentThemeTransition/>
                                             </TransitionCollection>
                                         </Frame.ContentTransitions>
+                                        <controls:ImageEx
+                                            CornerRadius="4"
+                                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"/>
                                     </Frame>
                                 </Border>
                                 <StackPanel VerticalAlignment="Center"
@@ -638,11 +641,11 @@
             </Grid>
         </Popup>
 
-        <Grid
-            x:Name="DropInfo_Root"
-            IsHitTestVisible="False"
-            Opacity="0"
-            Margin="0">
+        <Grid x:Name="DropInfo_Root"
+              IsHitTestVisible="False"
+              Visibility="Collapsed"
+              Opacity="0"
+              Margin="0">
             <Grid.OpacityTransition>
                 <ScalarTransition/>
             </Grid.OpacityTransition>

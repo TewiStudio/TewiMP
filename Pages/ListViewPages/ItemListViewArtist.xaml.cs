@@ -274,6 +274,8 @@ namespace TewiMP.Pages
                 Children.AllowDrop = false;
                 Children.CanReorderItems = false;
             }
+            MusicDataItem.SetIsCloseMouseEvent(SelectItemButton.IsChecked == true);
+            MainWindow.AllowDragEvents = SelectItemButton.IsChecked == false;
             UpdateCommandToolBarWidth();
         }
 
