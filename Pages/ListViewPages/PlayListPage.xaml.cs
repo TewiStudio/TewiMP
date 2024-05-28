@@ -594,7 +594,6 @@ namespace TewiMP.Pages.ListViewPages
         {
             MainWindow.InKeyDownEvent -= MainWindow_InKeyDownEvent;
             ItemList_Header_Search_Control.SearchingAItem -= ItemList_Header_Search_Control_SearchingAItem;
-            ItemList_Header_Search_Control.SearchingAItem -= ItemList_Header_Search_Control_SearchingAItem;
             ItemList_Header_Search_Control.IsOpenChanged -= ItemList_Header_Search_Control_IsOpenChanged;
             ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToNowPlaying_Button_Click;
             ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToNowPlaying_Button_Click;
@@ -859,12 +858,24 @@ namespace TewiMP.Pages.ListViewPages
             (sender as MenuFlyout).Items.Clear();
         }
 
+        SongItemBindBase searchPointSongItemBindBase = null;
         private async void ItemList_Header_Search_Control_SearchingAItem(SongItemBindBase songItemBind)
         {
-            var scrollPlacement = ActualHeight <= 450 ? ScrollItemPlacement.Bottom : ScrollItemPlacement.Center;
-            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement);
-            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true);
-            MusicDataItem.TryHighlight(songItemBind);
+            searchPointSongItemBindBase = songItemBind;
+            var scrollPlacement = ScrollItemPlacement.Top;
+            int additionalVerticalOffset = -214;
+            bool tryHighlight = MusicDataItem.TryHighlight(songItemBind);
+            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, additionalVerticalOffset: additionalVerticalOffset);
+            while (!tryHighlight)
+            {
+                if (!IsLoaded) break;
+                if (searchPointSongItemBindBase != songItemBind) break;
+                await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
+                await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
+                tryHighlight = MusicDataItem.TryHighlight(songItemBind);
+                await Task.Delay(80);
+            }
+            searchPointSongItemBindBase = null;
         }
 
         private void MainWindow_InKeyDownEvent(Windows.System.VirtualKey key)

@@ -634,6 +634,7 @@ namespace TewiMP.Helpers
             else
             {
                 var times = timeString.Split(':');
+                if (times.Length == 0 || times.Length == 1) return null;
                 var timesa = TimeSpan.TryParse($"00:{times[0]}:{times[1]}", null, out TimeSpan timesb);
 
                 var timeMillsStr = "0";

@@ -227,7 +227,7 @@ namespace TewiMP.Background
             //System.Diagnostics.Debug.WriteLine(musicData.Title);
             try
             {
-                await App.audioPlayer.SetSource(musicData);
+                await App.audioPlayer.SetSourceAsync(musicData);
                 if (playState == NAudio.Wave.PlaybackState.Playing)
                     App.audioPlayer.SetPlay(false);
                 Debug.WriteLine($"[PlayingList]: 设置播放完成：\"{musicData.Title}\"");

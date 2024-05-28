@@ -629,9 +629,17 @@ namespace TewiMP.Media
             Debug.WriteLine("[DeviceManage]: Device Removed.");
         }
 
+        bool isInSetSource = false;
+        public async Task SetSourceAsync(MusicData musicData)
+        {
+            isInSetSource = true;
+            await SetSource(musicData);
+            isInSetSource = false;
+        }
+
         public MusicData pointMusicData = null;
         int freezeSetSourceCount = 0;
-        public async Task SetSource(MusicData musicData)
+        private async Task SetSource(MusicData musicData)
         {
             pointMusicData = musicData;
             freezeSetSourceCount++;
@@ -699,15 +707,18 @@ namespace TewiMP.Media
         }
 
         List<IWavePlayer> WavePlayers { get; set; } = new();
+        int setSourceCallCounter = 0;
         string _filePath = null;
         public string FileType = null;
         public int FileSize = 0;
         public string AudioBitrate = null;
         public bool localFileIniting = false;
         public ATL.Track tfile = null;
-        public async Task SetSource(string filePath, bool cueFile = false)
+        private async Task SetSource(string filePath, bool cueFile = false)
         {
-            MusicData musicData = MusicData;
+            //if (MusicData != pointMusicData) return;
+            MusicData musicData = pointMusicData;
+            Debug.WriteLine($"\n\ncall {musicData.Title}");
             if (localFileIniting) return;
             if (filePath != _filePath) return;
             if (FileReader != null)
@@ -735,9 +746,9 @@ namespace TewiMP.Media
                 NowOutDevice = devices.First();
             }
 
+            localFileIniting = true;
             AudioFileReader fileReader = null;
             AudioEffects.SoundTouchWaveProvider fileProvider = null;
-            localFileIniting = true;
 
             await Task.Run(() =>
             {
@@ -857,6 +868,7 @@ namespace TewiMP.Media
 
             SourceChanged?.Invoke(this);
             localFileIniting = false;
+            Debug.WriteLine($"called {musicData.Title}\n\n");
         }
 
         private void AudioPlayer_TimingChanged(AudioPlayer audioPlayer)
@@ -866,6 +878,7 @@ namespace TewiMP.Media
         public async Task Reload(TimeSpan? reloadedStreamPosition = null)
         {
             //if (IsInPlaybackStopped) return;
+            if (isInSetSource) return;
             if (FileReader == null) return;
             if (FileReader.isMidi) return;
 
@@ -962,12 +975,12 @@ namespace TewiMP.Media
                 NowOutObj?.Play();
             }
             catch
-            {/*
+            {
                 if (ifErrorReload)
                 {
                     await Reload();
                     NowOutObj?.Play();
-                }*/
+                }
             }
             MidiPlayback?.Start();
             isPlaying = true;

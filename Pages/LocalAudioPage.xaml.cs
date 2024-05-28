@@ -540,15 +540,24 @@ namespace TewiMP.Pages
             }
         }
 
+        SongItemBindBase searchPointSongItemBindBase = null;
         private async void ItemsList_SearchControl_SearchingAItem(SongItemBindBase songItemBind)
         {
+            searchPointSongItemBindBase = songItemBind;
             var scrollPlacement = ScrollItemPlacement.Top;
-            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, additionalVerticalOffset: -44);
-            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: -44);
-            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: -44);
-            MusicDataItem.TryHighlight(songItemBind);
-            await Task.Delay(200);
-            MusicDataItem.TryHighlight(songItemBind);
+            int additionalVerticalOffset = -44;
+            bool tryHighlight = MusicDataItem.TryHighlight(songItemBind);
+            await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, additionalVerticalOffset: additionalVerticalOffset);
+            while (!tryHighlight)
+            {
+                if (!IsLoaded) break;
+                if (searchPointSongItemBindBase != songItemBind) break;
+                await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
+                await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
+                tryHighlight = MusicDataItem.TryHighlight(songItemBind);
+                await Task.Delay(80);
+            }
+            searchPointSongItemBindBase = null;
         }
 
         private void MainWindow_InKeyDownEvent(Windows.System.VirtualKey key)

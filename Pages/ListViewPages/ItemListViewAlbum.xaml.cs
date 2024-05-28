@@ -32,7 +32,6 @@ namespace TewiMP.Pages
         {
             InitializeComponent();
             DataContext = this;
-            SearchBox.ItemsSource = searchMusicDatas;
             MainWindow.InKeyDownEvent += MainWindow_InKeyDownEvent;
         }
 
@@ -57,25 +56,24 @@ namespace TewiMP.Pages
         private async void LeavingPageDo()
         {
             IsNavigatedOutFromPage = true;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
+            SearchBox.SearchingAItem -= SearchBox_SearchingAItem;
+            SearchBox.IsOpenChanged -= SearchBox_IsOpenChanged;
             await Task.Delay(500);
             MainWindow.InKeyDownEvent -= MainWindow_InKeyDownEvent;
             MainWindow.MainViewStateChanged -= MainWindow_MainViewStateChanged;
 
             MusicDataList?.Clear();
-            searchMusicDatas?.Clear();
 
             if (Children != null)
             {
                 Children.ItemsSource = null;
             }
-            if (SearchBox != null)
-            {
-                SearchBox.ItemsSource = null;
-            }
 
             musicListData = null;
             MusicDataList = null;
-            searchMusicDatas = null;
 
             if (Album_Image != null) Album_Image.Source = null;
             if (AlbumLogo != null) AlbumLogo.Source = null;
@@ -207,6 +205,7 @@ namespace TewiMP.Pages
         Visual commandbarVisual;
         Visual describeeRootVisual;
         Visual searchBaseVisual;
+        Visual headerFootRootVisual;
         public void UpdateShyHeader()
         {
             if (scrollViewer == null) return;
@@ -231,6 +230,7 @@ namespace TewiMP.Pages
                 commandbarVisual = ElementCompositionPreview.GetElementVisual(ToolsCommandBar);
                 describeeRootVisual = ElementCompositionPreview.GetElementVisual(DescribeeTextRoot);
                 searchBaseVisual = ElementCompositionPreview.GetElementVisual(SearchBase);
+                headerFootRootVisual = ElementCompositionPreview.GetElementVisual(ItemsList_Header_Foot_Root);
                 CrateShadow();
             }
 
@@ -281,6 +281,20 @@ namespace TewiMP.Pages
             var searchBaseVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(16,{headerVisual.Size.Y + 12},0), Vector3(16,{anotherHeight + 132 + 12},0), {progress})");
             searchBaseVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             searchBaseVisual.StartAnimation(nameof(searchBaseVisual.Offset), searchBaseVisualOffsetAnimation);
+
+            var headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
+                $"Lerp(" +
+                    $"Vector3(" +
+                        $"-16," +
+                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                        $"0)," +
+                    $"Vector3(" +
+                        $"-16," +
+                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                        $"0)," +
+                    $"{progress})");
+            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
         }
 
         private async void UpdateCommandToolBarWidth()
@@ -308,6 +322,17 @@ namespace TewiMP.Pages
             UpdateCommandToolBarWidth();
             Result_BaseGrid_SizeChanged(null, null);
             CrateShadow();
+            SearchBox.SongItemBinds = MusicDataList;
+            SearchBox.IsOpenChanged -= SearchBox_IsOpenChanged;
+            SearchBox.IsOpenChanged += SearchBox_IsOpenChanged;
+            SearchBox.SearchingAItem -= SearchBox_SearchingAItem;
+            SearchBox.SearchingAItem += SearchBox_SearchingAItem;
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click += PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click += PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click += PositionToButton_Click;
         }
 
         private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
@@ -512,204 +537,45 @@ namespace TewiMP.Pages
 
         private void AddToPlayListFlyout_Closed(object sender, object e)
         {
-            //AddToPlayListFlyout.Items.Clear();
-        }
-        private async void Button_Click_6(object sender, RoutedEventArgs e)
-        {
-            switch ((sender as Button).Tag)
-            {
-                case "0":
-                    scrollViewer.ChangeView(null, 0, null);
-                    break;
-                case "1":
-                    scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
-                    break;
-                case "2":
-                    foreach (var i in MusicDataList)
-                    {
-                        if (i.MusicData == App.audioPlayer.MusicData)
-                        {
-                            await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
-                            await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, true);
-                            foreach (var j in SongItem.StaticSongItems)
-                            {
-                                if (j != null)
-                                    if (j.MusicData == App.audioPlayer.MusicData)
-                                        j.AnimateStroke();
-                            }
-                        }
-                    }
-                    break;
-            }
+
         }
 
-
-        ObservableCollection<SongItemBindBase> searchMusicDatas = new();
-        private async void ChangeViewToSearchItem(SongItemBindBase item)
+        private void SearchBox_IsOpenChanged(object sender, DependencyPropertyChangedEventArgs e)
         {
-            if (searchMusicDatas.Any())
+            if ((bool)e.NewValue)
             {
-                searchNum = searchMusicDatas.IndexOf(item) - 1;
-                SearchResultTextBlock.Text = $"{searchNum + 1} of {searchMusicDatas.Count}";
-                await Children.SmoothScrollIntoViewWithItemAsync(item, ScrollItemPlacement.Center);
-                await Children.SmoothScrollIntoViewWithItemAsync(item, ScrollItemPlacement.Center, true);
-                foreach (var s in SongItem.StaticSongItems)
-                {
-                    if (s.MusicData == item.MusicData) s.AnimateStroke();
-                }
-            }
-        }
-
-        private async void ChangeViewToSearchItem(bool add = true)
-        {
-            if (searchMusicDatas.Any())
-            {
-                if (add) searchNum++;
-                else searchNum--;
-
-                if (searchNum > searchMusicDatas.Count - 1) searchNum = 0;
-                if (searchNum <= -1) searchNum = searchMusicDatas.Count - 1;
-
-                var item = searchMusicDatas[searchNum];
-                SearchResultTextBlock.Text = $"{searchNum + 1} of {searchMusicDatas.Count}";
-                await Children.SmoothScrollIntoViewWithItemAsync(item, ScrollItemPlacement.Center);
-                await Children.SmoothScrollIntoViewWithItemAsync(item, ScrollItemPlacement.Center, true);
-
-                foreach (var s in SongItem.StaticSongItems)
-                {
-                    if (s.MusicData == item.MusicData) s.AnimateStroke();
-                }
+                SearchBox.FocusToSearchBox();
+                menu_border.Margin = new(0, 0, 0, searchBaseVisual.Size.Y + 12 + 12);
             }
             else
             {
-                SearchResultTextBlock.Text = "0 of 0";
+                menu_border.Margin = new(0, 0, 0, 12);
             }
         }
 
-        bool isQuery = false;
-        int searchNum = -1;
-        private async void AutoSuggestBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        SongItemBindBase searchPointSongItemBindBase = null;
+        private async void SearchBox_SearchingAItem(SongItemBindBase songItemBind)
         {
-            ChangeViewToSearchItem();
-            AutoSuggestBox_TextChanged(null, new() { Reason = AutoSuggestionBoxTextChangeReason.UserInput });
-        }
-
-        private void SearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
-        {
-            if (SearchModeComboBox.SelectedIndex == 0)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Title;
-            else if (SearchModeComboBox.SelectedIndex == 1)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Title;
-            else if (SearchModeComboBox.SelectedIndex == 2)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.ArtistName;
-            else if (SearchModeComboBox.SelectedIndex == 3)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Album.Title;
-
-            searchNum = searchMusicDatas.IndexOf(args.SelectedItem as SongItemBindBase) - 1;
-            SearchResultTextBlock.Text = $"{searchNum + 2} of {searchMusicDatas.Count}";
-            //ChangeViewToSearchItem(args.SelectedItem as SongItemBindBase);
-        }
-
-        private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
-        {
-            if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) // 有 bug
+            searchPointSongItemBindBase = songItemBind;
+            var scrollPlacement = ScrollItemPlacement.Top;
+            int additionalVerticalOffset = -210;
+            bool tryHighlight = MusicDataItem.TryHighlight(songItemBind);
+            await Children.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, additionalVerticalOffset: additionalVerticalOffset);
+            while (!tryHighlight)
             {
-                if (string.IsNullOrEmpty(SearchBox.Text)) return;
-                searchMusicDatas.Clear();
-                string text = CompareString(SearchBox.Text);
-
-                switch (SearchModeComboBox.SelectedIndex)
-                {
-                    case 0:
-                        foreach (var i in MusicDataList)
-                        {
-                            if (CompareString(i.MusicData.Title).Contains(text))
-                                if (!searchMusicDatas.Contains(i))
-                                    searchMusicDatas.Add(i);
-                            if (i.MusicData.Title2 is not null)
-                            {
-                                if (CompareString(i.MusicData.Title2).Contains(text))
-                                    if (!searchMusicDatas.Contains(i))
-                                        searchMusicDatas.Add(i);
-                            }
-                            if (i.MusicData.ArtistName is not null)
-                            {
-                                if (CompareString(i.MusicData.ArtistName).Contains(text))
-                                    if (!searchMusicDatas.Contains(i))
-                                        searchMusicDatas.Add(i);
-                            }
-                            if (CompareString(i.MusicData.Album.Title).Contains(text))
-                                if (!searchMusicDatas.Contains(i))
-                                    searchMusicDatas.Add(i);
-                        }
-                        break;
-                    case 1:
-                        foreach (var i in MusicDataList)
-                        {
-                            if (CompareString(i.MusicData.Title).Contains(text))
-                                searchMusicDatas.Add(i);
-                            else if (i.MusicData.Title2 is not null)
-                            {
-                                if (CompareString(i.MusicData.Title2).Contains(text))
-                                    searchMusicDatas.Add(i);
-                            }
-                        }
-                        break;
-                    case 2:
-                        foreach (var i in MusicDataList)
-                        {
-                            if (i.MusicData.ArtistName is not null)
-                            {
-                                if (CompareString(i.MusicData.ArtistName).Contains(text))
-                                    searchMusicDatas.Add(i);
-                            }
-                        }
-                        break;
-                    case 3:
-                        foreach (var i in MusicDataList)
-                        {
-                            if (CompareString(i.MusicData.Album.Title).Contains(text))
-                                searchMusicDatas.Add(i);
-                        }
-                        break;
-                }
-                searchNum = 0;
-                SearchResultTextBlock.Text = $"All of {searchMusicDatas.Count}";
+                if (!IsLoaded) break;
+                if (searchPointSongItemBindBase != songItemBind) break;
+                await Children.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
+                await Children.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
+                tryHighlight = MusicDataItem.TryHighlight(songItemBind);
+                await Task.Delay(80);
             }
+            searchPointSongItemBindBase = null;
         }
 
         private void SearchButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SearchBase.IsHitTestVisible)
-            {
-                SearchBase.Opacity = 0;
-                menu_border.Margin = new(0, 0, 0, 12);
-            }
-            else
-            {
-                SearchBase.Opacity = 1;
-                menu_border.Margin = new(0, 0, 0, searchBaseVisual.Size.Y + 12 + 12);
-                SearchBox.Focus(FocusState.Keyboard);
-            }
-            SearchBase.IsHitTestVisible = !SearchBase.IsHitTestVisible;
-        }
-
-        private void Button_Click_7(object sender, RoutedEventArgs e)
-        {
-            var btn = sender as Button;
-            if (btn.Tag as string == "0")
-            {
-                ChangeViewToSearchItem(false);
-            }
-            else
-            {
-                ChangeViewToSearchItem();
-            }
-        }
-
-        private string CompareString(string str)
-        {
-            return (bool)LowerCheckBox.IsChecked ? str : str?.ToLower();
+            SearchBox.IsOpen = !SearchBox.IsOpen;
         }
 
         private void MainWindow_InKeyDownEvent(Windows.System.VirtualKey key)
@@ -718,10 +584,33 @@ namespace TewiMP.Pages
             {
                 if (key == Windows.System.VirtualKey.F)
                 {
-                    SearchButton_Click(null, null);
-                    if (!SearchBase.IsHitTestVisible)
+                    SearchBox.IsOpen = !SearchBox.IsOpen;
+                    if (!SearchBox.IsOpen)
                         ToolsCommandBar.Focus(FocusState.Programmatic);
                 }
+            }
+        }
+
+        private async void PositionToButton_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            switch ((ScrollFootButton.ButtonType)btn.Tag)
+            {
+                case ScrollFootButton.ButtonType.NowPlaying:
+                    foreach (var i in MusicDataList)
+                    {
+                        if (i.MusicData != App.audioPlayer.MusicData) continue;
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
+                        MusicDataItem.TryHighlightPlayingItem();
+                    }
+                    break;
+                case ScrollFootButton.ButtonType.Top:
+                    scrollViewer.ChangeView(null, 0, null);
+                    break;
+                case ScrollFootButton.ButtonType.Bottom:
+                    scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
+                    break;
             }
         }
     }

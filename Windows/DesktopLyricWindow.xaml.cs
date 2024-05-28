@@ -453,7 +453,7 @@ namespace TewiMP.Windowed
                         num++;
                         nextData = App.lyricManager.NowPlayingLyrics[num];
                     }
-                    while (nextData.Lyric.FirstOrDefault() == LyricHelper.NoneLyricString);
+                    while (nextData?.Lyric?.FirstOrDefault() == LyricHelper.NoneLyricString);
                 }
                 catch { }
 

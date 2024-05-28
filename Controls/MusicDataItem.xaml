@@ -14,7 +14,7 @@
     PointerEntered="UserControl_PointerEntered"
     PointerExited="UserControl_PointerExited"
     RightTapped="UserControl_RightTapped"
-    Holding="UserControl_Holding" MinHeight="74">
+    Holding="UserControl_Holding" MinHeight="64">
     <UserControl.Transitions>
         <TransitionCollection>
             <PopupThemeTransition/>
@@ -44,7 +44,7 @@
             HorizontalAlignment="Left"
             Width="3"
             Fill="{ThemeResource SystemColorControlAccentBrush}"
-            Margin="3,16"
+            Margin="3,20"
             RadiusX="1.5" RadiusY="1.5"
             Opacity="0">
             <Rectangle.OpacityTransition>

@@ -17,6 +17,7 @@ namespace TewiMP.Controls
 {
     public sealed partial class MusicDataItem : UserControl
     {
+        #region Static Methods
         static bool isMouseEventClosed = false;
         static bool isStaticInited = false;
         static List<MusicDataItem> staticMusicDataItem = [];
@@ -34,36 +35,37 @@ namespace TewiMP.Controls
             };
         }
 
-        public static void TryHighlightPlayingItem()
+        public static bool TryHighlightPlayingItem()
         {
+            bool result = false;
             foreach (MusicDataItem item in staticMusicDataItem)
             {
-                if (!item.IsMusicDataPlaying) continue;
-                item.SetHighlight();
+                item.SetHighlight(item.IsMusicDataPlaying);
+                if (item.IsMusicDataPlaying) result = true;
             }
+            return result;
         }
 
-        public static void TryHighlight(SongItemBindBase songItemBind)
+        public static bool TryHighlight(SongItemBindBase songItemBind)
         {
+            bool result = false;
             foreach (MusicDataItem item in staticMusicDataItem)
             {
-                if (item.songItemBind == songItemBind)
-                {
-                    item.SetHighlight();
-                    break;
-                }
+                item.SetHighlight(item.songItemBind == songItemBind);
+                if (item.songItemBind == songItemBind) result = true;
             }
+            return result;
         }
 
-        public static void TryHighlight(MusicData musicData)
+        public static bool TryHighlight(MusicData musicData)
         {
+            bool result = false;
             foreach (MusicDataItem item in staticMusicDataItem)
             {
-                if (item.songItemBind.MusicData == musicData)
-                {
-                    item.SetHighlight();
-                }
+                item.SetHighlight(item.songItemBind.MusicData == musicData);
+                if (item.songItemBind.MusicData == musicData) result = true;
             }
+            return result;
         }
 
         public static void SetIsCloseMouseEvent(bool value, bool showMoveIcon = false)
@@ -75,6 +77,14 @@ namespace TewiMP.Controls
                 item.Info_MoveIcon.Visibility =
                     value ? showMoveIcon ? Visibility.Visible : Visibility.Collapsed : Visibility.Collapsed;
             }
+        }
+        #endregion
+
+        bool _isImageShow = true;
+        public bool IsImageShow
+        {
+            get => _isImageShow;
+            set => _isImageShow = value;
         }
 
         public bool IsMusicDataPlaying
@@ -106,10 +116,11 @@ namespace TewiMP.Controls
         {
             if (Info_Image == null) return;
             Info_Image.Source = null;
-            Info_Image_Root.Visibility = Visibility.Visible;
+            Info_Image_Root.Visibility = IsImageShow ? Visibility.Visible : Visibility.Collapsed;
             FileNotExists_Root.Visibility = Visibility.Collapsed;
             SetImageBorder(false);
             if (!IsLoaded) return;
+            if (!IsImageShow) return;
             if (songItemBind == null) return;
             initImageCallCount++;
             await Task.Delay(200);
@@ -177,6 +188,7 @@ namespace TewiMP.Controls
         ScalarKeyFrameAnimation backgroundFillVisualShowAnimation;
         ScalarKeyFrameAnimation backgroundFillVisualHideAnimation;
         ScalarKeyFrameAnimation strokeVisualShowAnimation;
+        ScalarKeyFrameAnimation strokeVisualHideAnimation;
         void InitVisuals()
         {
             backgroundFillVisual = ElementCompositionPreview.GetElementVisual(Background_FillRectangle);
@@ -203,6 +215,8 @@ namespace TewiMP.Controls
                 out backgroundFillVisualHideAnimation);
             AnimateHelper.AnimateScalar(strokeVisual, 0, 3, 0, 0, 0, 0,
                 out strokeVisualShowAnimation);
+            AnimateHelper.AnimateScalar(strokeVisual, 0, 0.2, 0, 0, 0, 0,
+                out strokeVisualHideAnimation);
         }
 
         bool last_IsMusicDataPlaying = false;
@@ -233,10 +247,17 @@ namespace TewiMP.Controls
             }
         }
 
-        void SetHighlight()
+        void SetHighlight(bool value)
         {
-            strokeVisual.Opacity = 1;
-            strokeVisual.StartAnimation("Opacity", strokeVisualShowAnimation);
+            if (value)
+            {
+                strokeVisual.Opacity = 1;
+                strokeVisual.StartAnimation("Opacity", strokeVisualShowAnimation);
+            }
+            else
+            {
+                strokeVisual.StartAnimation("Opacity", strokeVisualHideAnimation);
+            }
         }
 
         void SetImageBorder(bool isShow)
@@ -326,6 +347,7 @@ namespace TewiMP.Controls
             backgroundFillVisualShowAnimation.Dispose();
             backgroundFillVisualHideAnimation.Dispose();
             strokeVisualShowAnimation.Dispose();
+            strokeVisualHideAnimation.Dispose();
         }
 
         bool isPointEnter = false;
