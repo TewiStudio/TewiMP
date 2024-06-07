@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-		<TargetPlatformMinVersion>10.0.19041.0</TargetPlatformMinVersion>
+		<WindowsSdkPackageVersion>10.0.22621.35-preview</WindowsSdkPackageVersion>
+		<TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
 		<RootNamespace>TewiMP</RootNamespace>
 		<AssemblyName>TewiMP</AssemblyName>
 		<Platforms>x86;x64;arm64</Platforms>
@@ -39,7 +40,7 @@
 	  <DebugType>portable</DebugType>
 	  <Optimize>True</Optimize>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<None Remove="Background.zip" />
 		<None Remove="Controls\ArtistCard.xaml" />
@@ -124,7 +125,7 @@
 		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.18-beta">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240428000" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240531000-experimental1" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="PInvoke.BCrypt" Version="0.7.124" />

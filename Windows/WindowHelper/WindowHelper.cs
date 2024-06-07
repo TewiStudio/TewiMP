@@ -10,7 +10,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using WinRT.Interop;
-using Windows.UI;
 using WinRT;
 
 namespace TewiMP.WindowHelperzn

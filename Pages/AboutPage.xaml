@@ -51,7 +51,7 @@
                         <StackPanel VerticalAlignment="Bottom"
                                     Grid.Row="1">
                             <TextBlock TextWrapping="Wrap">
-                                Powered by <Hyperlink Click="Hyperlink_Click">.NET 8</Hyperlink> &#x0026; <Hyperlink Click="Hyperlink_Click_1">Windows App SDK 1.5</Hyperlink>
+                                Powered by <Hyperlink Click="Hyperlink_Click">.NET 8</Hyperlink> &#x0026; <Hyperlink Click="Hyperlink_Click_1">Windows App SDK 1.6</Hyperlink>
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" Text="© 2020-2024 zilongww. All Rights Reserved." Margin="0,4,0,0"/>
                         </StackPanel>
