@@ -6,6 +6,8 @@ using Microsoft.UI.Xaml.Controls;
 using TewiMP.Media;
 using TewiMP.Helpers;
 using CueSharp;
+using NAudio.Wave.Asio;
+using NAudio.Wave;
 
 namespace TewiMP.Pages.DialogPages
 {
@@ -141,37 +143,62 @@ namespace TewiMP.Pages.DialogPages
                 }
 
                 string outInfo = $"未知";
-                if (App.audioPlayer.WasapiOnly && App.audioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi)
+                if ((App.audioPlayer.WasapiOnly && App.audioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi) || App.audioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Asio)
+                {
                     outInfo = $"{App.audioPlayer.NowOutDevice.DeviceType} -> {App.audioPlayer.NowOutDevice.DeviceName}";
+                }
                 else
+                {
                     outInfo = $"{App.audioPlayer.NowOutDevice.DeviceType} -> SRC -> {App.audioPlayer.NowOutDevice.DeviceName}";
+                }
 
                 string sampleRateText = "未知";
-                var getd = await OutDevice.GetWasapiDeviceFromOtherAPI(App.audioPlayer.NowOutDevice);
-                if (App.audioPlayer.WasapiOnly && App.audioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi)
+                string channelsText = "未知";
+
+                if (App.audioPlayer.NowOutDevice.DeviceType != AudioPlayer.OutApi.Asio)
                 {
-                    if (App.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate != App.audioPlayer.FileReader.WaveFormat.SampleRate)
-                        sampleRateText = $"{App.audioPlayer.FileReader.WaveFormat.SampleRate} Hz -> {App.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（重采样）";
+                    var getd = await OutDevice.GetWasapiDeviceFromOtherAPI(App.audioPlayer.NowOutDevice);
+                    if (App.audioPlayer.WasapiOnly && App.audioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi)
+                    {
+                        if (App.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate != App.audioPlayer.FileReader.WaveFormat.SampleRate)
+                            sampleRateText = $"{App.audioPlayer.FileReader.WaveFormat.SampleRate} Hz -> {App.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（重采样）";
+                        else
+                            sampleRateText = $"{App.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz";
+                    }
                     else
-                        sampleRateText = $"{App.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz";
+                    {
+                        if (getd.SampleRate != App.audioPlayer.FileReader.WaveFormat.SampleRate)
+                            sampleRateText = $"{App.audioPlayer.FileReader.WaveFormat.SampleRate} Hz -> SRC -> {getd.SampleRate} Hz";
+                        else
+                            sampleRateText = $"{App.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（SRC）";
+
+                    }
+
+                    if (App.audioPlayer.FileReader.WaveFormat.Channels != getd.Channels)
+                    {
+                        channelsText = $"{App.audioPlayer.FileReader.WaveFormat.Channels} 声道 -> {getd.Channels} 声道";
+                    }
+                    else
+                    {
+                        channelsText = $"{App.audioPlayer.FileReader.WaveFormat.Channels} 声道";
+                    }
                 }
                 else
                 {
-                    if (getd.SampleRate != App.audioPlayer.FileReader.WaveFormat.SampleRate)
-                        sampleRateText = $"{App.audioPlayer.FileReader.WaveFormat.SampleRate} Hz -> SRC -> {getd.SampleRate} Hz";
+                    var asioOut = App.audioPlayer.NowOutObj as AsioOut;
+                    if (asioOut.OutputWaveFormat.SampleRate != App.audioPlayer.FileReader.WaveFormat.SampleRate)
+                        sampleRateText = $"{App.audioPlayer.FileReader.WaveFormat.SampleRate} Hz -> {asioOut.OutputWaveFormat.SampleRate} Hz（重采样）";
                     else
-                        sampleRateText = $"{App.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（SRC）";
+                        sampleRateText = $"{asioOut.OutputWaveFormat.SampleRate} Hz";
 
-                }
-
-                string channelsText = null;
-                if (App.audioPlayer.FileReader.WaveFormat.Channels != getd.Channels)
-                {
-                    channelsText = $"{App.audioPlayer.FileReader.WaveFormat.Channels} 声道 -> {getd.Channels} 声道";
-                }
-                else
-                {
-                    channelsText = $"{App.audioPlayer.FileReader.WaveFormat.Channels} 声道";
+                    if (App.audioPlayer.FileReader.WaveFormat.Channels != asioOut.OutputWaveFormat.Channels)
+                    {
+                        channelsText = $"{App.audioPlayer.FileReader.WaveFormat.Channels} 声道 -> {asioOut.OutputWaveFormat.Channels} 声道";
+                    }
+                    else
+                    {
+                        channelsText = $"{asioOut.OutputWaveFormat.Channels} 声道";
+                    }
                 }
 
                 ((TextBlock)OutInfoSp.Children[2]).Text = outInfo;

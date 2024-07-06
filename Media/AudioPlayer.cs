@@ -134,9 +134,10 @@ namespace TewiMP.Media
                     enumerator.Dispose();
 
                     // Asio
-                    foreach (var asio in AsioOut.GetDriverNames())
+                    var asioNames = AsioOut.GetDriverNames().ToList();
+                    foreach (var asio in asioNames)
                     {
-                        OutDevice outDevice = new OutDevice(OutApi.Asio, asio, asio);
+                        OutDevice outDevice = new OutDevice(OutApi.Asio, asioNames.IndexOf(asio), asio);
                         outDevices.Add(outDevice);
                     }
 
@@ -856,9 +857,11 @@ namespace TewiMP.Media
                         break;
                     case OutApi.Asio:
                         Debug.WriteLine($"[AudioPlayer]: Using Asio.");
-                        await Task.Run(() => NowOutObj = new AsioOut(NowOutDevice.Device.ToString()));
-                        //if (notDefaultLatency) (NowOutObj as AsioOut).PlaybackLatency = Latency;
+                        var asioOut = new AsioOut((int)NowOutDevice.Device);
+                        asioOut.AutoStop = false;
+                        NowOutObj = asioOut;
                         NowOutObj.Init(FileProvider);
+                        TimingChanged += AudioPlayer_TimingChanged;
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                 }
@@ -873,6 +876,13 @@ namespace TewiMP.Media
 
         private void AudioPlayer_TimingChanged(AudioPlayer audioPlayer)
         {
+            if (NowOutDevice.DeviceType == OutApi.Asio)
+            {
+                if ((NowOutObj as AsioOut).HasReachedEnd)
+                {
+                    AudioPlayer_PlaybackStopped(null, null);
+                }
+            }
         }
 
         public async Task Reload(TimeSpan? reloadedStreamPosition = null)
