@@ -19,21 +19,18 @@
                     <ControlTemplate TargetType="ListViewItem">
                         <ListViewItemPresenter
                             Padding="0"
-                            Margin="16,0">
-                            <ListViewItemPresenter.Transitions>
-                                <TransitionCollection>
-                                    <RepositionThemeTransition/>
-                                </TransitionCollection>
-                            </ListViewItemPresenter.Transitions>
-                        </ListViewItemPresenter>
+                            Margin="16,0"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
     </Page.Resources>
     
-    <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None"
-              Padding="0,0,0,14">
+    <ListView
+        x:Name="ListViewBase"
+        HorizontalContentAlignment="Center"
+        SelectionMode="None"
+        Padding="0,0,0,14">
 
         <ListView.Header>
             <Grid x:Name="HeaderBaseGrid">

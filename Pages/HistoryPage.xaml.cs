@@ -17,7 +17,7 @@ namespace TewiMP.Pages
     public partial class HistoryPage : Page
     {
         bool isLeavedPage = false;
-        protected override async void OnNavigatedFrom(NavigationEventArgs e)
+        protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
             isLeavedPage = true;

@@ -881,6 +881,7 @@ namespace TewiMP.Media
                 if ((NowOutObj as AsioOut).HasReachedEnd)
                 {
                     AudioPlayer_PlaybackStopped(null, null);
+                    TimingChanged -= AudioPlayer_TimingChanged;
                 }
             }
         }

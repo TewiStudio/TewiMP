@@ -1045,7 +1045,7 @@ namespace TewiMP
             pointConnectAnimationMusicData = audioPlayer.MusicData;
             PlayTitle.Text = audioPlayer.MusicData.Title;
             PlayArtist.Text = audioPlayer.MusicData.ButtonName;
-            PlayingListBaseView.SelectedItem = audioPlayer.MusicData;
+            //PlayingListBaseView.SelectedItem = audioPlayer.MusicData;
 
             foreach (var i in SongItem.StaticSongItems)
             {
@@ -1663,7 +1663,7 @@ namespace TewiMP
         public static void OpenOrCloseVolume(
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment verticalAlignment = VerticalAlignment.Bottom,
-            Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode flyoutPlacementMode = Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.LeftEdgeAlignedBottom,
+            FlyoutPlacementMode flyoutPlacementMode = FlyoutPlacementMode.LeftEdgeAlignedBottom,
             Thickness placementMargin = default)
         {
             if (teachingTipVolume.IsOpen)
@@ -1682,7 +1682,7 @@ namespace TewiMP
         public static async void OpenOrClosePlayingList(
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment verticalAlignment = VerticalAlignment.Bottom,
-            Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode flyoutPlacementMode = Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.LeftEdgeAlignedBottom,
+            FlyoutPlacementMode flyoutPlacementMode = FlyoutPlacementMode.LeftEdgeAlignedBottom,
             Thickness placementMargin = default)
         {
             UpdatePlayListFlyoutHeight();
@@ -1694,7 +1694,10 @@ namespace TewiMP
             teachingTipPlayingList.ShowAt(STopControlsBaseGrid);
             try
             {
-                await Task.Delay(10);
+                await Task.Delay(300);
+                await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
+                await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
+                await Task.Delay(300);
                 await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
                 await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
                 SPlayingListBaseView.SelectedItem = App.audioPlayer.MusicData;
@@ -1998,17 +2001,12 @@ namespace TewiMP
                 App.audioPlayer.Volume = NoVolumeValue;
             }
         }
-
-        private void Button_Click_7(object sender, RoutedEventArgs e)
-        {
-            App.playingList.NowPlayingList.Remove((sender as Button).DataContext as MusicData);
-        }
         #endregion
 
         #region PlayingListView Events
         bool inSelectionChange = false;
         private async void PlayingListBaseView_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
+        {/*
             inSelectionChange = true;
             if (PlayingListBaseView.SelectedItem != null)
             {
@@ -2016,7 +2014,7 @@ namespace TewiMP
                 if (App.audioPlayer.MusicData != data)
                     await App.playingList.Play(data);
             }
-            inSelectionChange = false;
+            inSelectionChange = false;*/
         }
 
         private async void Button_Click_5(object sender, RoutedEventArgs e)

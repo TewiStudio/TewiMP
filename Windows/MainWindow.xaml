@@ -10,41 +10,75 @@
     xmlns:data="using:TewiMP.DataEditor"
     xmlns:media="using:Microsoft.UI.Xaml.Media"
     xmlns:controls="using:TewiMP.Controls"
+    xmlns:primitives="using:Microsoft.UI.Xaml.Controls.Primitives"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
 
-    <Grid x:Name="WindowGridBase" SizeChanged="Grid_SizeChanged"
-          KeyDown="Grid_KeyDown" KeyUp="Grid_KeyUp" Opacity="0"
-          PointerPressed="Grid_PointerPressed" PointerReleased="Grid_PointerReleased"
-          Tapped="Grid_Tapped" Loaded="WindowGridBase_Loaded"  RequestedTheme="Default"
-          AllowDrop="True"
-          DragOver="WindowGridBase_DragOver" Drop="WindowGridBase_Drop" DragLeave="WindowGridBase_DragLeave">
+    <Grid
+        x:Name="WindowGridBase"
+        SizeChanged="Grid_SizeChanged"
+        KeyDown="Grid_KeyDown"
+        KeyUp="Grid_KeyUp"
+        Opacity="0"
+        PointerPressed="Grid_PointerPressed"
+        PointerReleased="Grid_PointerReleased"
+        Tapped="Grid_Tapped"
+        Loaded="WindowGridBase_Loaded"
+        RequestedTheme="Default"
+        AllowDrop="True"
+        DragOver="WindowGridBase_DragOver"
+        Drop="WindowGridBase_Drop"
+        DragLeave="WindowGridBase_DragLeave">
         <Grid.OpacityTransition>
             <ScalarTransition/>
         </Grid.OpacityTransition>
 
-        <Rectangle VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Fill="#01000000"/>
-        <Rectangle x:Name="BackgroundColor" Fill="{ThemeResource ApplicationPageBackgroundThemeBrush}" Visibility="Collapsed"/>
-        
-        <Grid x:Name="BackgroundImageRoot" Visibility="Collapsed">
-            <Image x:Name="BackgroundImage" x:FieldModifier="Public" Stretch="UniformToFill"
-               VerticalAlignment="Center" HorizontalAlignment="Center"/>
-            <Rectangle x:Name="BackgroundMass" Fill="{ThemeResource ApplicationPageBackgroundThemeBrush}" Opacity="0.6"/>
+        <!--  背景  -->
+        <Rectangle
+            VerticalAlignment="Stretch"
+            HorizontalAlignment="Stretch"
+            Fill="#00000000"/>
+        <Rectangle
+            x:Name="BackgroundColor"
+            Fill="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+            Visibility="Collapsed"/>
+
+        <!--  背景图片  -->
+        <Grid
+            x:Name="BackgroundImageRoot"
+            Visibility="Collapsed">
+            <Image
+                x:Name="BackgroundImage"
+                x:FieldModifier="Public"
+                Stretch="UniformToFill"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center"/>
+            <Rectangle
+                x:Name="BackgroundMass"
+                Fill="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+                Opacity="0.6"/>
         </Grid>
 
+        <!--  Content  -->
         <Grid x:Name="GridBase">
-            <Rectangle VerticalAlignment="Top"
-                       HorizontalAlignment="Stretch"
-                       Height="48"
-                       Fill="{ThemeResource LayerFillColorDefault}"
-                       x:Name="NavigationViewMinSizeTopColorRectangle"
-                       Visibility="Collapsed"/>
-            <Grid x:Name="AppTitleBar"
-                  VerticalAlignment="Top"
-                  Height="48"
-                  Margin="0,0,0,0">
+            
+            <!--  标题栏背景  -->
+            <Rectangle
+                VerticalAlignment="Top"
+                HorizontalAlignment="Stretch"
+                Height="48"
+                Fill="{ThemeResource LayerFillColorDefault}"
+                x:Name="NavigationViewMinSizeTopColorRectangle"
+                Visibility="Collapsed"/>
+            
+            <!--  标题栏  -->
+            <Grid
+                x:Name="AppTitleBar"
+                VerticalAlignment="Top"
+                Height="48"
+                Margin="0,0,0,0">
                 <Grid.OpacityTransition>
                     <ScalarTransition/>
                 </Grid.OpacityTransition>
@@ -53,32 +87,41 @@
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock x:Name="AppTitleTextBlock"
-                               Text="TewiMP"
-                               TextWrapping="NoWrap"
-                               Style="{StaticResource CaptionTextBlockStyle}"
-                               VerticalAlignment="Center"/>
-                    <TextBlock x:Name="LyricTextBlock"
-                               TextWrapping="NoWrap"
-                               Style="{StaticResource CaptionTextBlockStyle}"
-                               Grid.Column="1"
-                               VerticalAlignment="Center"
-                               Margin="0,0,138,0">
+
+                    <!--  窗口名  -->
+                    <TextBlock
+                        x:Name="AppTitleTextBlock"
+                        Text="TewiMP"
+                        TextWrapping="NoWrap"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        VerticalAlignment="Center"/>
+
+                    <!--  歌词  -->
+                    <TextBlock
+                        x:Name="LyricTextBlock"
+                        TextWrapping="NoWrap"
+                        Style="{StaticResource CaptionTextBlockStyle}"
+                        VerticalAlignment="Center"
+                        Grid.Column="1"
+                        Margin="0,0,138,0">
                     </TextBlock>
                 </Grid>
             </Grid>
-            <NavigationView x:Name="NavView"
-                            Margin="0,0,0,0"
-                            IsBackButtonVisible="Visible"
-                            Background="Transparent"
-                            IsTitleBarAutoPaddingEnabled="False"
-                            SelectionChanged="NavView_SelectionChanged"
-                            BackRequested="NavView_BackRequested"
-                            DisplayModeChanged="NavView_DisplayModeChanged"
-                            PaneOpened="NavView_PaneOpened"
-                            Loaded="NavView_Loaded"
-                            AccessKey="MO">
 
+            <!--  侧边栏  -->
+            <NavigationView
+                x:Name="NavView"
+                Margin="0,0,0,0"
+                IsBackButtonVisible="Visible"
+                Background="Transparent"
+                IsTitleBarAutoPaddingEnabled="False"
+                SelectionChanged="NavView_SelectionChanged"
+                BackRequested="NavView_BackRequested"
+                DisplayModeChanged="NavView_DisplayModeChanged"
+                PaneOpened="NavView_PaneOpened"
+                Loaded="NavView_Loaded"
+                ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                AccessKey="MO">
                 <NavigationView.MenuItems>
                     <NavigationViewItemHeader Content="网络"/>
                     <NavigationViewItem Content="搜索" AccessKey="MS">
@@ -135,31 +178,38 @@
                     </NavigationViewItem>
                 </NavigationView.FooterMenuItems>
 
-                <Grid x:Name="NavViewContentBase" SizeChanged="NavViewContentBase_SizeChanged">
+                <!--  侧边栏内容  -->
+                <Grid
+                    x:Name="NavViewContentBase"
+                    SizeChanged="NavViewContentBase_SizeChanged">
                     <Grid.Clip>
                         <RectangleGeometry x:Name="NavViewContentBase_RGClip" Rect="0,0,400,400"/>
                     </Grid.Clip>
                     <!--<Rectangle Fill="{ThemeResource BottomBackground}" VerticalAlignment="Bottom" Height="86"/>-->
-                    <Frame x:Name="ContentFrame"
-                           Loaded="ContentFrame_Loaded"
-                           IsTabStop="True" CornerRadius="0"
-                           Padding="0,0,0,86"/>
-                    <Grid VerticalAlignment="Bottom"
-                          Height="86"
-                          Background="{ThemeResource AcrylicNormal}"
-                          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                          BorderThickness="0,1,0,0"
-                          x:Name="BottomPlayGrid">
-                        <Button Background="Transparent"
-                                CornerRadius="0"
-                                VerticalAlignment="Stretch"
-                                HorizontalAlignment="Stretch"
-                                BorderThickness="0"
-                                Margin="0"
-                                Click="Button_Click_1"
-                                RightTapped="Button_RightTapped"
-                                Holding="Button_Holding"
-                                AccessKey="BM">
+                    <Frame
+                        x:Name="ContentFrame"
+                        Loaded="ContentFrame_Loaded"
+                        IsTabStop="True"
+                        CornerRadius="0"
+                        Padding="0,0,0,86"/>
+                    <Grid
+                        VerticalAlignment="Bottom"
+                        Height="86"
+                        Background="{ThemeResource AcrylicNormal}"
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,1,0,0"
+                        x:Name="BottomPlayGrid">
+                        <Button
+                            Background="Transparent"
+                            CornerRadius="0"
+                            VerticalAlignment="Stretch"
+                            HorizontalAlignment="Stretch"
+                            BorderThickness="0"
+                            Margin="0"
+                            Click="Button_Click_1"
+                            RightTapped="Button_RightTapped"
+                            Holding="Button_Holding"
+                            AccessKey="BM">
                             <Button.Resources>
                                 <ResourceDictionary>
                                     <ResourceDictionary.ThemeDictionaries>
@@ -181,17 +231,22 @@
                                 <ColumnDefinition Width="auto"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Grid Margin="10,0,0,0"
-                                  IsHitTestVisible="True">
+                            <Grid
+                                Margin="10,0,0,0"
+                                IsHitTestVisible="True">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <Border Height="66"
-                                        Margin="0,0,10,0">
-                                    <Frame x:Name="PlayContent"
-                                           IsTabStop="True" MinWidth="0" CornerRadius="4"
-                                           CommonNavigationTransitionInfo.IsStaggerElement="True">
+                                <Border
+                                    Height="66"
+                                    Margin="0,0,10,0">
+                                    <Frame
+                                        x:Name="PlayContent"
+                                        IsTabStop="True"
+                                        MinWidth="0"
+                                        CornerRadius="4"
+                                        CommonNavigationTransitionInfo.IsStaggerElement="True">
                                         <Frame.ContentTransitions>
                                             <TransitionCollection>
                                                 <ContentThemeTransition/>
@@ -202,43 +257,50 @@
                                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"/>
                                     </Frame>
                                 </Border>
-                                <StackPanel VerticalAlignment="Center"
-                                            Margin="0,0,0,0"
-                                            Grid.Column="1"
-                                            IsHitTestVisible="False" Background="{x:Null}">
+                                <StackPanel
+                                    VerticalAlignment="Center"
+                                    Margin="0,0,0,0"
+                                    Grid.Column="1"
+                                    IsHitTestVisible="False"
+                                    Background="{x:Null}">
                                     <StackPanel.Transitions>
                                         <TransitionCollection>
                                             <RepositionThemeTransition/>
                                         </TransitionCollection>
                                     </StackPanel.Transitions>
-                                    <TextBlock x:Name="PlayTitle"
-                                               Text="TewiMP"
-                                               FontSize="20"
-                                               HorizontalAlignment="Left"
-                                               RasterizationScale="1.89"
-                                               TextTrimming="CharacterEllipsis">
+                                    <TextBlock
+                                        x:Name="PlayTitle"
+                                        Text="TewiMP"
+                                        FontSize="20"
+                                        HorizontalAlignment="Left"
+                                        RasterizationScale="1.89"
+                                        TextTrimming="CharacterEllipsis">
                                     </TextBlock>
-                                    <TextBlock x:Name="PlayArtist"
-                                               Text="No media playing"
-                                               FontSize="14"
-                                               HorizontalAlignment="Left"
-                                               RasterizationScale="1.96"
-                                               TextTrimming="CharacterEllipsis">
+                                    <TextBlock
+                                        x:Name="PlayArtist"
+                                        Text="No media playing"
+                                        FontSize="14"
+                                        HorizontalAlignment="Left"
+                                        RasterizationScale="1.96"
+                                        TextTrimming="CharacterEllipsis">
                                     </TextBlock>
                                 </StackPanel>
                             </Grid>
 
-                            <StackPanel Orientation="Horizontal"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Center"
-                                        Grid.Column="1"
-                                        Background="Transparent">
-                                <Button x:Name="PlayBeforeButton"
-                                        Height="44"
-                                        Width="44"
-                                        BorderThickness="0" Padding="14"
-                                        Click="PlayBeforeButton_Click"
-                                        Background="Transparent">
+                            <StackPanel
+                                Orientation="Horizontal"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Grid.Column="1"
+                                Background="Transparent">
+                                <Button
+                                    x:Name="PlayBeforeButton"
+                                    Height="44"
+                                    Width="44"
+                                    Padding="14"
+                                    BorderThickness="0"
+                                    Click="PlayBeforeButton_Click"
+                                    Background="Transparent">
                                     <Button.Resources>
                                         <ResourceDictionary>
                                             <ResourceDictionary.ThemeDictionaries>
@@ -252,45 +314,63 @@
                                             </ResourceDictionary.ThemeDictionaries>
                                         </ResourceDictionary>
                                     </Button.Resources>
-                                    <Path Stretch="Uniform"
-                                          Fill="{ThemeResource ButtonForegroundThemeBrush}"
-                                          Data="{StaticResource 上一首}"/>
+                                    <Path
+                                        Stretch="Uniform"
+                                        Fill="{ThemeResource ButtonForegroundThemeBrush}"
+                                        Data="{StaticResource 上一首}"/>
                                 </Button>
                                 <Grid>
-                                    <Button x:Name="PlayButton"
-                                            Height="60"
-                                            Width="60"
-                                            CornerRadius="30" 
-                                            Background="Transparent"
-                                            BorderThickness="0" Padding="15"
-                                            Margin="8,0,8,0"
-                                            Click="PlayButton_Click"
-                                            IsHoldingEnabled="True" Holding="PlayButton_Holding"
-                                            IsRightTapEnabled="True" RightTapped="PlayButton_RightTapped">
+                                    <Button
+                                        x:Name="PlayButton"
+                                        Height="60"
+                                        Width="60"
+                                        Padding="15"
+                                        Margin="8,0,8,0"
+                                        CornerRadius="30" 
+                                        BorderThickness="0"
+                                        Background="Transparent"
+                                        Click="PlayButton_Click"
+                                        IsHoldingEnabled="True"
+                                        Holding="PlayButton_Holding"
+                                        IsRightTapEnabled="True"
+                                        RightTapped="PlayButton_RightTapped">
                                         <Button.Resources>
-                                            <TeachingTip x:Name="PlayTimeSliderBasePopup"
-                                                         Target="{x:Bind PlayButton}">
+                                            <TeachingTip
+                                                x:Name="PlayTimeSliderBasePopup"
+                                                Target="{x:Bind PlayButton}">
                                                 <StackPanel Orientation="Vertical">
                                                     <TextBlock x:Name="PlayTimeTextBlock" Text="00:00/00:00" TextAlignment="Center"/>
                                                     <Slider x:Name="PlayTimeSlider" Width="180" IsThumbToolTipEnabled="False"/>
                                                 </StackPanel>
                                             </TeachingTip>
                                         </Button.Resources>
-                                        <controls:MediaPlayStateViewer x:Name="MediaPlayStateViewer" PlaybackState="Paused" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="4"/>
+                                        <controls:MediaPlayStateViewer
+                                            x:Name="MediaPlayStateViewer"
+                                            PlaybackState="Paused"
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            Margin="4"/>
                                     </Button>
-                                    <Ellipse Width="60" Height="60"
-                                             IsHitTestVisible="False"
-                                             Fill="Transparent"
-                                             Stroke="{ThemeResource ControlStrokeColorSecondaryBrush}"
-                                             StrokeThickness="5"/>
-                                    <ProgressRing x:Name="PlayRing" Width="62" Height="62" IsIndeterminate="False"/>
+                                    <Ellipse
+                                        Width="60" Height="60"
+                                        IsHitTestVisible="False"
+                                        Fill="Transparent"
+                                        Stroke="{ThemeResource ControlStrokeColorSecondaryBrush}"
+                                        StrokeThickness="5"/>
+                                    <ProgressRing
+                                        x:Name="PlayRing"
+                                        Width="62"
+                                        Height="62"
+                                        IsIndeterminate="False"/>
                                 </Grid>
-                                <Button x:Name="PlayNextButton"
-                                        Height="44"
-                                        Width="44"
-                                        BorderThickness="0" Padding="14"
-                                        Click="PlayNextButton_Click"
-                                        Background="Transparent">
+                                <Button
+                                    x:Name="PlayNextButton"
+                                    Height="44"
+                                    Width="44"
+                                    BorderThickness="0"
+                                    Padding="14"
+                                    Click="PlayNextButton_Click"
+                                    Background="Transparent">
                                     <Button.Resources>
                                         <ResourceDictionary>
                                             <ResourceDictionary.ThemeDictionaries>
@@ -304,31 +384,36 @@
                                             </ResourceDictionary.ThemeDictionaries>
                                         </ResourceDictionary>
                                     </Button.Resources>
-                                    <Path Stretch="Uniform"
-                                          Fill="{ThemeResource ButtonForegroundThemeBrush}"
-                                          Data="{StaticResource 下一首}"/>
+                                    <Path
+                                        Stretch="Uniform"
+                                        Fill="{ThemeResource ButtonForegroundThemeBrush}"
+                                        Data="{StaticResource 下一首}"/>
                                 </Button>
                             </StackPanel>
 
-                            <CommandBar Background="{x:Null}"
-                                        VerticalAlignment="Center"
-                                        HorizontalAlignment="Right"
-                                        DefaultLabelPosition="Right"
-                                        Grid.Column="2"
-                                        SizeChanged="CommandBar_SizeChanged"
-                                        AccessKey="BT">
-                                <AppBarButton Background="Transparent"
-                                              Label="桌面歌词" IsCompact="False"
-                                              Click="Button_Click_6"
-                                              AccessKey="BY">
+                            <CommandBar
+                                Background="{x:Null}"
+                                VerticalAlignment="Center"
+                                HorizontalAlignment="Right"
+                                DefaultLabelPosition="Right"
+                                Grid.Column="2"
+                                SizeChanged="CommandBar_SizeChanged"
+                                AccessKey="BT">
+                                <AppBarButton
+                                    Background="Transparent"
+                                    Label="桌面歌词" IsCompact="False"
+                                    Click="Button_Click_6"
+                                    AccessKey="BY">
                                     <AppBarButton.Icon>
                                         <FontIcon Glyph="&#xED1E;"/>
                                     </AppBarButton.Icon>
                                 </AppBarButton>
-                                <AppBarButton x:Name="VolumeAppButton"
-                                              Click="Button_Click"
-                                              Label="音量"
-                                              AccessKey="BV" PointerWheelChanged="VolumeAppButton_PointerWheelChanged">
+                                <AppBarButton
+                                    x:Name="VolumeAppButton"
+                                    Click="Button_Click"
+                                    Label="音量"
+                                    AccessKey="BV"
+                                    PointerWheelChanged="VolumeAppButton_PointerWheelChanged">
                                     <AppBarButton.Resources>
                                         <Flyout x:Name="VolumePopup">
                                             <Flyout.SystemBackdrop>
@@ -351,9 +436,10 @@
                                         <FontIcon Glyph="{Binding ElementName=VolumeIconBase,Path=Glyph}"/>
                                     </Grid>
                                 </AppBarButton>
-                                <AppBarButton Click="Button_Click_4"
-                                              Label="播放列表"
-                                              AccessKey="BL">
+                                <AppBarButton
+                                    Click="Button_Click_4"
+                                    Label="播放列表"
+                                    AccessKey="BL">
                                     <AppBarButton.Icon>
                                         <FontIcon Glyph="&#xE90B;"/>
                                     </AppBarButton.Icon>
@@ -365,18 +451,22 @@
             </NavigationView>
         </Grid>
 
+        <!--  音乐界面  -->
         <Grid x:Name="MusicPageBaseGrid">
             <Frame x:Name="MusicPageBaseFrame"/>
         </Grid>
 
-        <Grid x:Name="TopControlsBaseGrid"
-              IsHitTestVisible="True"
-              Background="{x:Null}"
-              SizeChanged="Grid_SizeChanged">
+        <!--  音量、播放列表浮出控件  -->
+        <Grid
+            x:Name="TopControlsBaseGrid"
+            IsHitTestVisible="True"
+            Background="{x:Null}"
+            SizeChanged="Grid_SizeChanged">
             <Grid.Resources>
                 
-                <Flyout x:Name="PlayingListBasePopup"
-                        ShouldConstrainToRootBounds="True">
+                <Flyout
+                    x:Name="PlayingListBasePopup"
+                    ShouldConstrainToRootBounds="True">
                     <Flyout.FlyoutPresenterStyle>
                         <Style TargetType="FlyoutPresenter">
                             <Setter Property="Background" Value="{ThemeResource AcrylicNormal}"/>
@@ -390,49 +480,63 @@
                             <Setter Property="CanDrag" Value="True"/>
                         </Style>
                     </Flyout.FlyoutPresenterStyle>
-                    <Grid x:Name="PlayingListBaseGrid"
-                          Margin="-12"
-                          MaxWidth="400"
-                          MaxHeight="800"
-                          VerticalAlignment="Stretch"
-                          HorizontalAlignment="Stretch">
+                    <Grid
+                        x:Name="PlayingListBaseGrid"
+                        Margin="-12"
+                        MaxWidth="400"
+                        MaxHeight="800"
+                        VerticalAlignment="Stretch"
+                        HorizontalAlignment="Stretch">
                         <Grid>
-                            <ListView x:Name="PlayingListBaseView"
-                                      SelectionChanged="PlayingListBaseView_SelectionChanged"
-                                      Background="Transparent"
-                                      AllowDrop="True"
-                                      CanReorderItems="True">
+                            <ListView
+                                x:Name="PlayingListBaseView"
+                                SelectionChanged="PlayingListBaseView_SelectionChanged"
+                                SelectionMode="None"
+                                Background="Transparent"
+                                AllowDrop="True"
+                                CanReorderItems="True">
                                 <interactivity:Interaction.Behaviors>
                                     <behaviors:StickyHeaderBehavior/>
                                 </interactivity:Interaction.Behaviors>
                                 <ListView.Header>
-                                    <Grid Background="{ThemeResource AcrylicNormal}" x:Name="PlayingListHeader"
-                                          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="0,0,0,1">
+                                    <Grid
+                                        x:Name="PlayingListHeader"
+                                        Background="{ThemeResource AcrylicNormal}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="0,0,0,1">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
                                             <ColumnDefinition Width="auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="当前播放列表"
-                                                   Style="{ThemeResource SubTBHeader}"
-                                                   Margin="12"/>
-                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right"
-                                                    Orientation="Horizontal"
-                                                    Grid.Column="1" Spacing="4"
-                                                    Margin="0,0,16,0">
-                                            <Button Content="定位" ToolTipService.ToolTip="定位到当前播放的歌曲"
-                                                    AccessKey="V"
-                                                    Click="Button_Click_5"/>
-                                            <Button Width="52"
-                                                    Height="32"
-                                                    Padding="0"
-                                                    Click="Button_Click_5"
-                                                    AccessKey="C"
-                                                    ToolTipService.ToolTip="清除所有"
-                                                    Visibility="Visible">
+                                        <TextBlock
+                                            Text="当前播放列表"
+                                            Style="{ThemeResource SubTBHeader}"
+                                            Margin="12"/>
+                                        <StackPanel
+                                            VerticalAlignment="Center"
+                                            HorizontalAlignment="Right"
+                                            Orientation="Horizontal"
+                                            Grid.Column="1"
+                                            Spacing="4"
+                                            Margin="0,0,16,0">
+                                            <Button
+                                                Content="定位"
+                                                ToolTipService.ToolTip="定位到当前播放的歌曲"
+                                                AccessKey="V"
+                                                Click="Button_Click_5"/>
+                                            <Button
+                                                Width="52"
+                                                Height="32"
+                                                Padding="0"
+                                                Click="Button_Click_5"
+                                                AccessKey="C"
+                                                ToolTipService.ToolTip="清除所有"
+                                                Visibility="Visible">
                                                 <StackPanel Orientation="Horizontal">
-                                                    <TextBlock Text="{Binding ElementName=PlayingListBaseView,Path=ItemsSource.Count}"
-                                                               FontSize="12" Margin="0,0,4,0"
-                                                               VerticalAlignment="Center"/>
+                                                    <TextBlock
+                                                        Text="{Binding ElementName=PlayingListBaseView,Path=ItemsSource.Count}"
+                                                        FontSize="12" Margin="0,0,4,0"
+                                                        VerticalAlignment="Center"/>
                                                     <FontIcon Glyph="&#xE711;" FontSize="14" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </Button>
@@ -440,32 +544,30 @@
                                     </Grid>
                                 </ListView.Header>
                                 <ListView.Footer>
-                                    <TextBlock Text="到底了~"
-                                               HorizontalAlignment="Center"
-                                               VerticalAlignment="Bottom"
-                                               Margin="12" x:Name="AtListBottomTb"
-                                               Foreground="{ThemeResource TextFillColorSecondary}"/>
+                                    <TextBlock
+                                        x:Name="AtListBottomTb"
+                                        Text="到底了~"
+                                        HorizontalAlignment="Center"
+                                        VerticalAlignment="Bottom"
+                                        Margin="12"
+                                        Foreground="{ThemeResource TextFillColorSecondary}"/>
                                 </ListView.Footer>
                                 <ListView.ItemTemplate>
                                     <DataTemplate x:DataType="data:MusicData">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition/>
-                                                <ColumnDefinition Width="auto"/>
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Padding="0,8,0,8" Tag="{x:Bind MD5}">
-                                                <TextBlock TextTrimming="CharacterEllipsis">
-                                                    <Run Text="{Binding Title}"/>
-                                                </TextBlock>
-                                                <TextBlock Text="{x:Bind ButtonName}" TextTrimming="CharacterEllipsis" Foreground="{ThemeResource SystemChromeDisabledLowColor}" FontSize="12"/>
-                                            </StackPanel>
-                                            <Button Grid.Column="1" Background="Transparent" BorderThickness="0"
-                                                    Click="Button_Click_7" Height="36" Margin="0,0,4,0">
-                                                <FontIcon Glyph="&#xE711;" FontSize="14" VerticalAlignment="Center"/>
-                                            </Button>
-                                        </Grid>
+                                        <controls:MainMusicDataItem Margin="4,1,16,1"/>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
+                                <ListView.Resources>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListViewItem">
+                                                    <ListViewItemPresenter/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListView.Resources>
                             </ListView>
                         </Grid>
                     </Grid>
@@ -534,10 +636,13 @@
                 
             </Grid.Resources>
         </Grid>
-        
-        <Grid x:Name="NotifyArea"
-              Opacity="1" IsHitTestVisible="False"
-              Loaded="NotifyArea_Loaded">
+
+        <!--  通知  -->
+        <Grid
+            x:Name="NotifyArea"
+            Opacity="1"
+            IsHitTestVisible="False"
+            Loaded="NotifyArea_Loaded">
             <!--
             <ListView x:Name="NotifyListView"
                       HorizontalAlignment="Stretch"
@@ -575,12 +680,14 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>-->
-            <StackPanel x:Name="NotifyStackPanel"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Bottom"
-                        Background="Transparent"
-                        IsHitTestVisible="False"
-                        Margin="0,0,0,96" Spacing="4">
+            <StackPanel
+                x:Name="NotifyStackPanel"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom"
+                Background="Transparent"
+                IsHitTestVisible="False"
+                Margin="0,0,0,96"
+                Spacing="4">
                 <StackPanel.Transitions>
                     <TransitionCollection>
                         <RepositionThemeTransition/>
@@ -594,21 +701,25 @@
             </StackPanel>
         </Grid>
 
-        <Popup ShouldConstrainToRootBounds="False"
-               x:Name="DebugViewPopup"
-               HorizontalOffset="0"
-               VerticalOffset="-42"
-               Loaded="DebugViewPopup_Loaded"
-               Unloaded="DebugViewPopup_Unloaded"
-               SizeChanged="DebugViewPopup_SizeChanged">
+        <!--  Debug  -->
+        <Popup
+            x:Name="DebugViewPopup"
+            ShouldConstrainToRootBounds="False"
+            HorizontalOffset="0"
+            VerticalOffset="-42"
+            Loaded="DebugViewPopup_Loaded"
+            Unloaded="DebugViewPopup_Unloaded"
+            SizeChanged="DebugViewPopup_SizeChanged">
             <Popup.SystemBackdrop>
                 <DesktopAcrylicBackdrop/>
             </Popup.SystemBackdrop>
-            <Grid x:Name="DebugViewBase"
-                  BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                  BorderThickness="1" CornerRadius="8"
-                  Padding="12"
-                  Margin="0">
+            <Grid
+                x:Name="DebugViewBase"
+                BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="12"
+                Margin="0">
                 <StackPanel Spacing="4">
                     <TextBlock Text="TewiMP Debug Panel" FontWeight="Medium"/>
                     <cc:WrapPanel HorizontalSpacing="4">
@@ -641,11 +752,13 @@
             </Grid>
         </Popup>
 
-        <Grid x:Name="DropInfo_Root"
-              IsHitTestVisible="False"
-              Visibility="Collapsed"
-              Opacity="0"
-              Margin="0">
+        <!--  拖入文件处理  -->
+        <Grid
+            x:Name="DropInfo_Root"
+            IsHitTestVisible="False"
+            Visibility="Collapsed"
+            Opacity="0"
+            Margin="0">
             <Grid.OpacityTransition>
                 <ScalarTransition/>
             </Grid.OpacityTransition>
