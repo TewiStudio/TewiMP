@@ -141,29 +141,29 @@ namespace TewiMP.Background
             switch (DownloadNamedMethod)
             {
                 case DataFolderBase.DownloadNamedMethod.t_ar_al:
-                    downloadPath1 =
-                        $"{DataFolderBase.DownloadFolder}\\" +
-                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)} - {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.ButtonName)}";
+                    downloadPath1 = Path.Combine(
+                        $"{DataFolderBase.DownloadFolder}",
+                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)} - {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.ButtonName)}");
                     break;
                 case DataFolderBase.DownloadNamedMethod.t_ar:
-                    downloadPath1 =
-                        $"{DataFolderBase.DownloadFolder}\\" +
-                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)} - {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.ArtistName)}";
+                    downloadPath1 = Path.Combine(
+                        $"{DataFolderBase.DownloadFolder}",
+                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)} - {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.ArtistName)}");
                     break;
                 case DataFolderBase.DownloadNamedMethod.t_al_ar:
-                    downloadPath1 =
-                        $"{DataFolderBase.DownloadFolder}\\" +
-                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)} - {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Album.Title)} · {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.ArtistName)}";
+                    downloadPath1 = Path.Combine(
+                        $"{DataFolderBase.DownloadFolder}",
+                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)} - {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Album.Title)} · {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.ArtistName)}");
                     break;
                 case DataFolderBase.DownloadNamedMethod.t_al:
-                    downloadPath1 =
-                        $"{DataFolderBase.DownloadFolder}\\" +
-                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)} - {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Album.Title)}";
+                    downloadPath1 = Path.Combine(
+                        $"{DataFolderBase.DownloadFolder}",
+                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)} - {CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Album.Title)}");
                     break;
                 case DataFolderBase.DownloadNamedMethod.t:
-                    downloadPath1 =
-                        $"{DataFolderBase.DownloadFolder}\\" +
-                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)}";
+                    downloadPath1 = Path.Combine(
+                        $"{DataFolderBase.DownloadFolder}",
+                        $"{CodeHelper.ReplaceBadCharOfFileName(dm.MusicData.Title)}");
                     break;
             }
                 

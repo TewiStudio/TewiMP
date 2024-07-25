@@ -16,7 +16,7 @@ namespace TewiMP.DataEditor
                     ShowDialog(title, message);
                 }
                 var last = File.ReadAllText(DataFolderBase.LogDataPath, Encoding.UTF8);
-                string log = $"{last}[{DateTime.Now} | {title}] {message}\n\n\n";
+                string log = $"{last}[{DateTime.Now} | {title}]\n{message}\n\n\n";
                 File.WriteAllText(DataFolderBase.LogDataPath, log);
             }
         }

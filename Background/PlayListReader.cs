@@ -5,6 +5,9 @@ using TewiMP.Helpers;
 
 namespace TewiMP.Background
 {
+    /// <summary>
+    /// 用于读取播放列表
+    /// </summary>
     public class PlayListReader
     {
         public delegate void PlayListChanged();
@@ -33,6 +36,9 @@ namespace TewiMP.Background
         }
     }
 
+    /// <summary>
+    /// 本地音乐解析
+    /// </summary>
     public class LocalMusicManager
     {
         public delegate void LocalMusicDelegate();
@@ -43,7 +49,7 @@ namespace TewiMP.Background
 
         public ObservableCollection<SongItemBindBase> LocalMusicItems { get; set; } = [];
 
-        public LocalMusicManager() { Refresh(); }
+        public LocalMusicManager() => Refresh();
 
         bool isAnalyzingData = false;
         public async Task ReAnalysisMusicDatas()

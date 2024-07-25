@@ -253,10 +253,10 @@ namespace TewiMP.Background.HotKeys
         /// </summary>
         /// <param name="willRegisterHotKeysList"></param>
         /// <returns></returns>
-        public void UnregisterHotKeys(List<HotKey> willunregisterHotKeysList)
+        public void UnregisterHotKeys(List<HotKey> willUnregisterHotKeysList)
         {
             // 循环列表注册热键
-            foreach (HotKey key in willunregisterHotKeysList)
+            foreach (HotKey key in willUnregisterHotKeysList)
             {
                 bool IsRegister = UnregisterHotKey(key.HotKeyID);
             }
@@ -369,7 +369,7 @@ namespace TewiMP.Background.HotKeys
                 }
                 return (Windows.Win32.Foundation.LRESULT)IntPtr.Zero;
             }
-            else if (uMsg == 0x02E0) // window dpi 改变消息
+            else if (uMsg == 0x02E0) // window dpi 改变消息，懒得再在MainWindow里再写一个 windows 信息处理了
             {
                 MainWindow.InvokeDpiEvent();
             }

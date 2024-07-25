@@ -48,7 +48,6 @@ namespace TewiMP.Background
                 return musicPathResult; // 当检测到已缓存时返回
             }
 
-
             if (!WebHelper.IsNetworkConnected)
             {
                 InCachingMusicData.Remove(data);

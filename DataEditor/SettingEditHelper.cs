@@ -32,11 +32,11 @@ namespace TewiMP.DataEditor
             {
                 return eData[settingParams.ToString()].Value<T>();
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentNullException)
             {
-                var jdata = DataFolderBase.JSettingData;
-                jdata.Add(settingParams.ToString(), DataFolderBase.SettingDefault[settingParams.ToString()]);
-                DataFolderBase.JSettingData = jdata;
+                var jData = DataFolderBase.JSettingData;
+                jData.Add(settingParams.ToString(), DataFolderBase.SettingDefault[settingParams.ToString()]);
+                DataFolderBase.JSettingData = jData;
                 return DataFolderBase.SettingDefault[settingParams.ToString()].Value<T>();
             }
         }
