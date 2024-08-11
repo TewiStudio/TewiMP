@@ -44,16 +44,16 @@
                             BorderThickness="0,0,0,0" Visibility="Collapsed"/>
                     <Grid x:Name="HeaderBaseTextBlock_Base">
                         <TextBlock x:Name="HeaderBaseTextBlock" Text="历史" Style="{ThemeResource TBHeader}"/>
-                        <cc:Segmented x:Name="HeaderSelectBase"
-                                      SelectedIndex="0" SelectionChanged="Segmented_SelectionChanged"
+                        <SelectorBar x:Name="HeaderSelectBase"
+                                      SelectionChanged="HeaderSelectBase_SelectionChanged"
                                       Loaded="HeaderSelectBase_Loaded">
-                            <cc:SegmentedItem Content="播放历史"/>
-                            <cc:SegmentedItem Content="统计"/>
-                        </cc:Segmented>
+                            <SelectorBarItem Text="播放历史"/>
+                            <SelectorBarItem Text="统计"/>
+                        </SelectorBar>
                     </Grid>
                     <Grid x:Name="HeaderText" VerticalAlignment="Bottom" Opacity="1"
                           Grid.Row="1" CornerRadius="4" BorderThickness="1"
-                          Background="{ThemeResource AcrylicNormal}" Margin="16,0,16,8"
+                          Background="{ThemeResource CardBackgroundFillColorDefault}" Margin="16,0,16,8"
                           BorderBrush="{ThemeResource ControlElevationBorderBrush}">
                         <Grid Margin="12,4,140,4">
                             <Grid.Resources>

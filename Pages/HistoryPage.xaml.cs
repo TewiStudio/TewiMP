@@ -43,7 +43,7 @@ namespace TewiMP.Pages
 
         private void HistoryHelper_HistoryDataChanged()
         {
-            if (HeaderSelectBase.SelectedIndex == 0)
+            if (HeaderSelectBase.SelectedItem == HeaderSelectBase.Items[0])
                 Init();
         }
 
@@ -121,7 +121,7 @@ namespace TewiMP.Pages
             selectVisualOffsetXAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             headerSelectVisual.StartAnimation("Offset.X", selectVisualOffsetXAnimation);*/
 
-            var selectVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(34, 34, {progress})");
+            var selectVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(24, 24, {progress})");
             selectVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             headerSelectVisual.StartAnimation("Offset.Y", selectVisualOffsetYAnimation);
 
@@ -166,11 +166,20 @@ namespace TewiMP.Pages
 
         private void Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (!isLoaded) return;
-            if (HeaderSelectBase.SelectedIndex == 0)
+        }
+
+        private void HeaderSelectBase_Loaded(object sender, RoutedEventArgs e)
+        {
+            ListViewBase.ItemTemplate = this.Resources["HistoryDataTemplate"] as DataTemplate;
+            Init();
+        }
+
+        private void HeaderSelectBase_SelectionChanged(SelectorBar sender, SelectorBarSelectionChangedEventArgs args)
+        {
+            if (!IsLoaded) return;
+            if (HeaderSelectBase.SelectedItem == HeaderSelectBase.Items[0])
             {
                 HeaderText.Visibility = Visibility.Visible;
-                ListViewBase.Items.Clear();
                 ListViewBase.ItemsSource = songHistories;
                 ListViewBase.ItemTemplate = this.Resources["HistoryDataTemplate"] as DataTemplate;
                 Init();
@@ -183,14 +192,6 @@ namespace TewiMP.Pages
                 ListViewBase.ItemTemplate = null;
                 ListViewBase.Items.Add(new SongHistoryInfo() { Margin = new(0, 12, 0, 0) });
             }
-        }
-
-        bool isLoaded = false;
-        private void HeaderSelectBase_Loaded(object sender, RoutedEventArgs e)
-        {
-            ListViewBase.ItemTemplate = this.Resources["HistoryDataTemplate"] as DataTemplate;
-            Init();
-            isLoaded = true;
         }
     }
 }

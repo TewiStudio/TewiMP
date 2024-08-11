@@ -119,11 +119,11 @@
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Media" Version="7.1.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Controls.Primitives" Version="7.1.2" />
 		<PackageReference Include="CommunityToolkit.WinUI.UI.Media" Version="7.1.2" />
-		<PackageReference Include="Downloader" Version="3.0.6" />
+		<PackageReference Include="Downloader" Version="3.1.2" />
 		<PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
-		<PackageReference Include="Melanchall.DryWetMidi" Version="7.0.2" />
+		<PackageReference Include="Melanchall.DryWetMidi" Version="7.1.0" />
 		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.0.4" />
-		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.18-beta">
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.240701003-experimental2" />
@@ -137,7 +137,7 @@
 		<PackageReference Include="System.Runtime.InteropServices.WindowsRuntime" Version="4.3.0" />
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="8.0.0" />
 		<PackageReference Include="TagLibSharp" Version="2.3.0" />
-		<PackageReference Include="Vanara.PInvoke.User32" Version="4.0.0" />
+		<PackageReference Include="Vanara.PInvoke.User32" Version="4.0.3" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 
