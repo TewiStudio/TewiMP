@@ -227,7 +227,7 @@ namespace TewiMP
                 List<string> openFiles = new List<string>();
                 foreach (var str in App.LaunchArgs)
                 {
-                    if (str.Contains(":\\"))
+                    if (str.Contains(@":\"))
                     {
                         openFiles.Add(str);
                     }
@@ -296,7 +296,7 @@ namespace TewiMP
                         unknowArg.Add(arg);
                     }
                 }
-                if (unknowArg.Any())
+                if (unknowArg.Count != 0)
                 {
                     AddNotify("未知的启动参数：", string.Join('、', unknowArg), NotifySeverity.Warning, TimeSpan.FromSeconds(10));
                 }
@@ -578,7 +578,7 @@ namespace TewiMP
                 default:
                     m_configurationSource.Theme = SystemBackdropTheme.Default; break;
             }
-            m_micaController.SetSystemBackdropConfiguration(m_configurationSource);
+            m_micaController?.SetSystemBackdropConfiguration(m_configurationSource);
             //m_micaController.Kind = MicaKind.BaseAlt;
         }
 
@@ -646,7 +646,7 @@ namespace TewiMP
         {
             if (AppWindowTitleBar.IsCustomizationSupported())
             {
-                InitializeTitleBara(AppWindowLocal.TitleBar, theme);
+                InitializeTitleBar(AppWindowLocal.TitleBar, theme);
             }
             else
             {
@@ -670,7 +670,7 @@ namespace TewiMP
             }
         }
 
-        public static void InitializeTitleBara(AppWindowTitleBar bar, ElementTheme theme)
+        public static void InitializeTitleBar(AppWindowTitleBar bar, ElementTheme theme)
         {
             bar.ExtendsContentIntoTitleBar = true;
 
@@ -682,6 +682,7 @@ namespace TewiMP
                 defaultLightTheme = App.Current.RequestedTheme == ApplicationTheme.Light;
                 defaultDarkTheme = App.Current.RequestedTheme == ApplicationTheme.Dark;
             }
+            bar.PreferredHeightOption = TitleBarHeightOption.Standard;
 
             if (theme == ElementTheme.Light || defaultLightTheme)
             {
