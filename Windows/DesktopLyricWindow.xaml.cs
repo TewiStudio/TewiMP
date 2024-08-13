@@ -614,7 +614,7 @@ namespace TewiMP.Windowed
                 overlappedPresenter.IsResizable = false;
                 overlappedPresenter.SetBorderAndTitleBar(false, false);
                 DisposeAcrylicBackdrop();
-                TryTransparentWindow();
+                TryTransparentWindow(); // winui1.6 preview 1 透明后会显示经典窗口边框
                 root.Padding = new(8,0,8,8); // 透明窗口后会导致窗口左右下往外增大 8 像素
                 ToolButtonsBase.Visibility = Visibility.Collapsed;
 

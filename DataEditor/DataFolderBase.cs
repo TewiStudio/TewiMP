@@ -107,7 +107,7 @@ namespace TewiMP.DataEditor
             { SettingParams.ThemeBackdropImageMassOpacity.ToString(), 0.5 },
             { SettingParams.DesktopLyricOptions.ToString(),
                 new JArray() {
-                    true, true, false, true
+                    true, false, false, true
                 }
             },
             { SettingParams.DesktopLyricText.ToString(),

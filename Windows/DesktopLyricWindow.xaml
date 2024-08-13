@@ -95,13 +95,13 @@
         </Grid>
         <Grid x:Name="ToolButtonsBase"
               VerticalAlignment="Top"
-              HorizontalAlignment="Left">
+              HorizontalAlignment="Left"
+              RequestedTheme="Dark">
             <StackPanel Margin="0,0,0,0"
                         x:Name="ToolButtonsStackPanel"
                         VerticalAlignment="Top"
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
-                        RequestedTheme="Dark"
                         Opacity="0.3">
                 <StackPanel.Resources>
                     <Style TargetType="FontIcon">

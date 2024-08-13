@@ -179,6 +179,51 @@
                     </TextBlock.Transitions>
                     图标中的图片来自 <Hyperlink Click="Hyperlink_Click_2">なま</Hyperlink>
                 </TextBlock>
+                <Button Background="Pink">
+                    <Button.Resources>
+                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="LightPink"/>
+                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="PaleVioletRed"/>
+                    </Button.Resources>
+                    <Button.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </Button.Transitions>
+                    <Button.Flyout>
+                        <Flyout>
+                            <StackPanel
+                                Orientation="Horizontal"
+                                Spacing="12">
+                                <StackPanel.Resources>
+                                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                        <Setter Property="Padding" Value="12"/>
+                                    </Style>
+                                </StackPanel.Resources>
+                                <Button>
+                                    <TextBlock
+                                        Text="一杯咖啡"/>
+                                </Button>
+                                <Button>
+                                    <TextBlock
+                                        Text="一瓶可乐"/>
+                                </Button>
+                                <Button>
+                                    <TextBlock
+                                        Text="一杯奶茶"/>
+                                </Button>
+                            </StackPanel>
+                        </Flyout>
+                    </Button.Flyout>
+                    <StackPanel
+                        Orientation="Horizontal"
+                        Spacing="4">
+                        <FontIcon
+                            Glyph="&#xEB51;"
+                            FontSize="14"/>
+                        <TextBlock
+                            Text="捐赠"/>
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </ScrollView>
     </Grid>
