@@ -774,9 +774,7 @@ namespace TewiMP.Pages
 
         private void Button_Click_8(object sender, RoutedEventArgs e)
         {
-            App.Current.Exit();
-            App.Current.Exit();
-            App.Current.Exit();
+            App.ExitApp();
         }
 
         private void ToggleSwitch_Loaded_1(object sender, RoutedEventArgs e)

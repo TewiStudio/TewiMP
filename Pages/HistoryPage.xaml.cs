@@ -190,6 +190,7 @@ namespace TewiMP.Pages
                 songHistories.Clear();
                 ListViewBase.ItemsSource = null;
                 ListViewBase.ItemTemplate = null;
+                ListViewBase.Items.Clear();
                 ListViewBase.Items.Add(new SongHistoryInfo() { Margin = new(0, 12, 0, 0) });
             }
         }
