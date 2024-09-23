@@ -29,7 +29,7 @@ namespace TewiMP.Controls
                 foreach (var songdata in datas)
                 {
                     var data = songdata.MusicData;
-                    if (data == null) continue;
+                    if (data is null) continue;
                     // 计算歌曲出现次数
                     if (!listenSongMost.ContainsKey(data))
                     {

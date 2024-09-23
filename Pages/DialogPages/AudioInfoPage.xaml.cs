@@ -56,7 +56,7 @@ namespace TewiMP.Pages.DialogPages
             }
 
             ATL.Track tfile = null;
-            if (App.audioPlayer.tfile == null)
+            if (App.audioPlayer.tfile is null)
             {
                 await Task.Run(() =>
                 {
@@ -79,7 +79,7 @@ namespace TewiMP.Pages.DialogPages
                 }
 
                 ((TextBlock)AudioInfoSp.Children[1]).Text = $"{App.audioPlayer.FileType}" +
-                    $"{(ConvertCodecFamilyIntToString(tfile.CodecFamily) == null ? "" : $"  {ConvertCodecFamilyIntToString(tfile.CodecFamily)}")}" +
+                    $"{(ConvertCodecFamilyIntToString(tfile.CodecFamily) is null ? "" : $"  {ConvertCodecFamilyIntToString(tfile.CodecFamily)}")}" +
                     $"  {tfile.SampleRate} Hz  {tfile.Bitrate} kbps" +
                     $"  {tfile.ChannelsArrangement.NbChannels} 声道  {App.audioPlayer.FileReader.TotalTime.ToString("hh\\:mm\\:ss\\.ff")}({tfile.Duration}s)";
 
@@ -211,8 +211,8 @@ namespace TewiMP.Pages.DialogPages
 
         private async void SetCUEInfoText()
         {
-            if (App.audioPlayer.MusicData == null) return;
-            if (App.audioPlayer.MusicData.CUETrackData == null)
+            if (App.audioPlayer.MusicData is null) return;
+            if (App.audioPlayer.MusicData.CUETrackData is null)
             {
                 CUEInfoGrid.Visibility = Visibility.Collapsed;
                 return;
@@ -222,7 +222,7 @@ namespace TewiMP.Pages.DialogPages
             {
                 return new CueSheet(App.audioPlayer.MusicData.CUETrackData.Path);
             });
-            if (cueSheet == null)
+            if (cueSheet is null)
             {
                 CUEInfoGrid.Visibility = Visibility.Collapsed;
                 return;

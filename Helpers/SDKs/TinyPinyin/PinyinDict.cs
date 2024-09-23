@@ -10,7 +10,7 @@ namespace TinyPinyin
         public string[] ToPinyin(string word)
         {
             var mappingResult = Mapping();
-            if (mappingResult == null)
+            if (mappingResult is null)
             {
                 return null;
             }

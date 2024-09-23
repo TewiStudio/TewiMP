@@ -279,7 +279,7 @@ namespace NVorbis
         /// <returns><see langword="true"/> if a new stream was found, otherwise <see langword="false"/>.</returns>
         public bool FindNextStream()
         {
-            if (_containerReader == null) return false;
+            if (_containerReader is null) return false;
             return _containerReader.FindNextStream();
         }
 

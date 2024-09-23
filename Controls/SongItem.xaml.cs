@@ -187,10 +187,10 @@ namespace TewiMP.Controls
 
         private void SongItem_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (DataContext == null) return;
+            if (DataContext is null) return;
             var d = DataContext as SongItemBindBase;
-            if (d == null) return;
-            if (d.MusicData == null) return;
+            if (d is null) return;
+            if (d.MusicData is null) return;
             if (musicItemBindBase?.MusicData == d.MusicData) return;
             musicItemBindBase = d;
             Init(musicItemBindBase);
@@ -327,7 +327,7 @@ namespace TewiMP.Controls
         {
             var element = d as SongItem;
             var md = e.NewValue as MusicData;
-            if (element == null || md == null) return;
+            if (element is null || md is null) return;
             
             element.mfi.Text = $"专辑：{md.Album}";
             element.rmfi.Text = $"专辑：{md.Album}";
@@ -808,7 +808,7 @@ namespace TewiMP.Controls
                 err = ex;
                 itema.SetNotifyItemData("删除失败。", null, NotifySeverity.Error);
             }
-            if (err == null)
+            if (err is null)
             {
                 itema.SetNotifyItemData("删除成功。", null, NotifySeverity.Complete);
             }

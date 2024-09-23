@@ -92,7 +92,7 @@ namespace TewiMP.Pages
             SelectAllButton.Visibility = Visibility.Collapsed;
             LoadingTipControl.ShowLoading();
             var obj = await App.metingServices.NeteaseServices.GetArtist(NavToObj.ID);
-            if (obj == null)
+            if (obj is null)
             {
                 MainWindow.AddNotify("加载艺术家信息时出现错误", "无法加载艺术家信息，请重试。", NotifySeverity.Error);
                 return;
@@ -149,12 +149,12 @@ namespace TewiMP.Pages
         Visual ImageScrollVisual;
         public void UpdateShyHeader()
         {
-            if (scrollViewer == null) return;
+            if (scrollViewer is null) return;
 
             double anotherHeight = menu_border.ActualHeight - LittleBarGrid.ActualHeight;
             String progress = $"Clamp(-scroller.Translation.Y / {anotherHeight}, 0, 1.0)";
 
-            if (scrollerPropertySet == null)
+            if (scrollerPropertySet is null)
             {
                 scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
                 compositor = scrollerPropertySet.Compositor;
@@ -187,7 +187,7 @@ namespace TewiMP.Pages
         Vector3 ATBOffset = default;
         private async void menu_border_Loaded(object sender, RoutedEventArgs e)
         {
-            if (scrollViewer == null)
+            if (scrollViewer is null)
             {
                 scrollViewer = (VisualTreeHelper.GetChild(Children, 0) as Border).Child as ScrollViewer;
                 scrollViewer.CanContentRenderOutsideBounds = true;

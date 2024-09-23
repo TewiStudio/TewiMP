@@ -63,7 +63,7 @@ namespace FlakeNAudioAdapter
         /// <exception cref="ArgumentNullException"><paramref name="buffer"/> is <see langword="null" />.</exception>
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+            if (buffer is null) throw new ArgumentNullException(nameof(buffer));
             int bytesRead = 0;
             int br = 0;
             lock (_repositionLock)

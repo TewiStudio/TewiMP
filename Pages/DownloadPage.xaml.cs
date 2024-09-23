@@ -103,7 +103,7 @@ namespace TewiMP.Pages
             var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
             Canvas.SetZIndex(headerContainer, 1);
 
-            if (scrollViewer == null)
+            if (scrollViewer is null)
             {
                 headerVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseGrid);
                 scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;

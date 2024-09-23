@@ -104,7 +104,7 @@ namespace NAudio.Flac
         public FlacReader(Stream stream, FlacPreScanMode scanFlag,
             Action<FlacPreScanFinishedEventArgs> onscanFinished)
         {
-            if (stream == null)
+            if (stream is null)
                 throw new ArgumentNullException();
             if (!stream.CanRead)
                 throw new ArgumentException("Stream is not readable.", "stream");
@@ -134,7 +134,7 @@ namespace NAudio.Flac
 
                 var streamInfo =
                     metadata.First(x => x.MetaDataType == FlacMetaDataType.StreamInfo) as FlacMetadataStreamInfo;
-                if (streamInfo == null)
+                if (streamInfo is null)
                     throw new FlacException("No StreamInfo-Metadata found.", FlacLayer.Metadata);
 
                 _streamInfo = streamInfo;
@@ -192,7 +192,7 @@ namespace NAudio.Flac
                 while (read < count)
                 {
                     FlacFrame frame = Frame;
-                    if (frame == null)
+                    if (frame is null)
                         return read;
 
                     while (!frame.NextFrame())

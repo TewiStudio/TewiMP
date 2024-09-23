@@ -240,7 +240,7 @@ namespace CUETools.Codecs
         {
             get
             {
-                if (samples == null || samples.GetLength(0) < Length)
+                if (samples is null || samples.GetLength(0) < Length)
                     samples = new int[Size, PCM.ChannelCount];
                 if (!dataInSamples && dataInBytes && Length != 0)
                     BytesToFLACSamples(bytes, 0, samples, 0, Length, PCM.ChannelCount, PCM.BitsPerSample);
@@ -253,7 +253,7 @@ namespace CUETools.Codecs
         {
             get
             {
-                if (fsamples == null || fsamples.GetLength(0) < Length)
+                if (fsamples is null || fsamples.GetLength(0) < Length)
                     fsamples = new float[Size, PCM.ChannelCount];
                 if (!dataInFloat && dataInBytes && Length != 0)
                 {
@@ -275,7 +275,7 @@ namespace CUETools.Codecs
         {
             get
             {
-                if (bytes == null || bytes.Length < Length * PCM.BlockAlign)
+                if (bytes is null || bytes.Length < Length * PCM.BlockAlign)
                     bytes = new byte[Size * PCM.BlockAlign];
                 if (!dataInBytes && Length != 0)
                 {

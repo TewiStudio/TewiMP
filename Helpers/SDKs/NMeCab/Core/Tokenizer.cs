@@ -165,7 +165,7 @@ namespace NMeCab.Core
                 begin3 += 1;
             }
 
-            if (resultNode == null) this.AddUnknown(ref resultNode, cInfo, begin, begin2, begin3, nodeAllocator);
+            if (resultNode is null) this.AddUnknown(ref resultNode, cInfo, begin, begin2, begin3, nodeAllocator);
 
             return resultNode;
         }

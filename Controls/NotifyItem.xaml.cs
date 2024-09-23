@@ -22,7 +22,7 @@ namespace TewiMP.Controls
         public void SetNotifyItemData(NotifyItemData notifyItemData)
         {
             this.notifyItemData = notifyItemData;
-            if (notifyItemData == null) return;
+            if (notifyItemData is null) return;
             if (string.IsNullOrEmpty(notifyItemData.Message))
                 MessageTextBlock.Visibility = Visibility.Collapsed;
             else MessageTextBlock.Visibility = Visibility.Visible;

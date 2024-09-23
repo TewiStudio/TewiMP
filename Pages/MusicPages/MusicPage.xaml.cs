@@ -314,7 +314,7 @@ namespace TewiMP.Pages.MusicPages
 
         public async void SelectedChangedDo(bool disableAnimation = false)
         {
-            if (App.lyricManager.NowLyricsData == null) return;
+            if (App.lyricManager.NowLyricsData is null) return;
 
             isCodeChangedLrcItem = true;
             LrcBaseListView.SelectedItem = App.lyricManager.NowLyricsData;
@@ -327,7 +327,7 @@ namespace TewiMP.Pages.MusicPages
                 var c = isMiniPage ?
                     LrcSecondListView.ContainerFromIndex(LrcBaseListView.SelectedIndex) as UIElement :
                     LrcBaseListView.ContainerFromIndex(LrcBaseListView.SelectedIndex) as UIElement;
-                if (c == null)
+                if (c is null)
                 {
                     if (!isMiniPage)
                     {
@@ -416,7 +416,7 @@ namespace TewiMP.Pages.MusicPages
         MusicData MusicData;
         private void AudioPlayer_SourceChanged(Media.AudioPlayer audioPlayer)
         {
-            if (audioPlayer.MusicData == null) return;
+            if (audioPlayer.MusicData is null) return;
             TitleRunText.Text = audioPlayer.MusicData.Title;
             Title2RunText.Text = audioPlayer.MusicData.Title2;
             ArtistRunText.Text = audioPlayer.MusicData.ArtistName;
@@ -582,7 +582,7 @@ namespace TewiMP.Pages.MusicPages
             var lrcItem = (sender as ListView).SelectedItem as LyricData;
             if (lrcItem != null )
             {
-                if (lrcItem.Lyric == null) return;
+                if (lrcItem.Lyric is null) return;
                 // 加1ms，否则会短时间判定到上一句歌词
                 App.audioPlayer.CurrentTime = lrcItem.LyricTimeSpan + TimeSpan.FromMilliseconds(App.audioPlayer.Latency + 1);
 #if DEBUG

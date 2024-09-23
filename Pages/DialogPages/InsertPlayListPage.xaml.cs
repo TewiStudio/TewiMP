@@ -63,8 +63,8 @@ namespace TewiMP.Pages.DialogPages
         {
             var ml = sender.DataContext as MusicListData;
             ImageEx image = (sender as Grid).Children[0] as ImageEx;
-            if (ml == null) return;
-            if (image == null) return;
+            if (ml is null) return;
+            if (image is null) return;
 
             int size = 0;
             if (ml.ListDataType == DataType.本地歌单)

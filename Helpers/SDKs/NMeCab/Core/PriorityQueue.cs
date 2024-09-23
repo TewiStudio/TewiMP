@@ -92,8 +92,8 @@ namespace NMeCab.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private HeapNode MergeNodes(HeapNode l, HeapNode r)
         {
-            if (l == null) return r;
-            if (r == null) return l;
+            if (l is null) return r;
+            if (r is null) return l;
 
             if (l.Value.CompareTo(r.Value) > 0)
             {

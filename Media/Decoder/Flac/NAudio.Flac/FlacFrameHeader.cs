@@ -136,7 +136,7 @@ namespace NAudio.Flac
         /// <param name="doCrc">A value which indicates whether the crc8 checksum of the <see cref="FlacFrameHeader"/> should be calculated.</param>
         public FlacFrameHeader(Stream stream, FlacMetadataStreamInfo streamInfo, bool doCrc)
         {
-            if (stream == null) throw new ArgumentNullException("stream");
+            if (stream is null) throw new ArgumentNullException("stream");
             if (stream.CanRead == false) throw new ArgumentException("stream is not readable");
             //streamInfo can be null
 
@@ -247,7 +247,7 @@ namespace NAudio.Flac
                         sampleRate = streamInfo.SampleRate;
                     else
                     {
-                        Error("Missing Samplerate. Samplerate Index = 0 && streamInfoMetaData == null.", loggerLocation);
+                        Error("Missing Samplerate. Samplerate Index = 0 && streamInfoMetaData is null.", loggerLocation);
                         return false;
                     }
                 }
@@ -297,7 +297,7 @@ namespace NAudio.Flac
                         bitsPerSample = streamInfo.BitsPerSample;
                     else
                     {
-                        Error("Missing BitsPerSample. Index = 0 && streamInfoMetaData == null.", loggerLocation);
+                        Error("Missing BitsPerSample. Index = 0 && streamInfoMetaData is null.", loggerLocation);
                         return false;
                     }
                 }

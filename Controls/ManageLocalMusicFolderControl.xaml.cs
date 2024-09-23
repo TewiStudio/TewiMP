@@ -64,7 +64,7 @@ namespace TewiMP.Controls
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            if (musicFolders == null) return;
+            if (musicFolders is null) return;
             var result = await FileHelper.UserSelectFolder(Windows.Storage.Pickers.PickerLocationId.MusicLibrary);
             if (musicFolders.Contains(result.Path)) return;
             musicFolders.Add(result.Path);

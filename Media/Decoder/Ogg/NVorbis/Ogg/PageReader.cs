@@ -220,7 +220,7 @@ namespace NVorbis.Ogg
         {
             if (!CheckLock()) throw new InvalidOperationException("Must be locked!");
 
-            if (_packets == null)
+            if (_packets is null)
             {
                 var pageBuf = new byte[_pageSize];
                 SeekStream(PageOffset);

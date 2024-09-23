@@ -57,7 +57,7 @@ namespace TewiMP.Background
 
             InCachingMusicData.Add(data);
             string musicWebAddress = await WebHelper.GetAudioAddressAsync(data);
-            if (musicWebAddress == null)
+            if (musicWebAddress is null)
             {
                 InCachingMusicData.Remove(data);
                 CachedMusicData?.Invoke(data, "无法获取歌曲链接。");
@@ -72,7 +72,7 @@ namespace TewiMP.Background
                 WebClient TheDownloader = new WebClient();
                 TheDownloader.DownloadProgressChanged += (s, e) =>
                 {
-                    if (e == null) return;
+                    if (e is null) return;
                     CachingStateChangeMusicData?.Invoke(data, e.ProgressPercentage);
                 };
                 TheDownloader.DownloadFileCompleted += (s, e) =>

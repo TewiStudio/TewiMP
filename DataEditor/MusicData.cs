@@ -22,7 +22,7 @@ namespace TewiMP.DataEditor
         {
             get
             {
-                if (md5 == null)
+                if (md5 is null)
                     md5 = GetMD5();
                 return md5;
             }
@@ -190,7 +190,7 @@ namespace TewiMP.DataEditor
             {
                 if (Artists.Any())
                 {
-                    if (_artistName == null)
+                    if (_artistName is null)
                         SetABName();
                 }
                 return string.IsNullOrEmpty(_artistName) ? "未知" : _artistName;
@@ -203,7 +203,7 @@ namespace TewiMP.DataEditor
         {
             get
             {
-                if (_buttonName == null)
+                if (_buttonName is null)
                 {
                     SetABName();
                 }
@@ -237,7 +237,7 @@ namespace TewiMP.DataEditor
                 _artistName += $"{Artists[i].ToString()}{(i < (Artists.Count - 1) ? (i < Artists.Count - 2 ? ", " : " & ") : "")}";
             }
 
-            _buttonName = $"{(ArtistName == null ? "未知" : ArtistName)} · {Album}";
+            _buttonName = $"{(ArtistName is null ? "未知" : ArtistName)} · {Album}";
         }
 
         public override string GetMD5()
@@ -343,12 +343,12 @@ namespace TewiMP.DataEditor
                                 tag = tagFile.Tag;
                             }
                             catch { }
-                            if (tag == null) isError = true;
+                            if (tag is null) isError = true;
                             if (!isError)
                             {
                                 if (tag.IsEmpty) isError = true;
                                 if (string.IsNullOrEmpty(tag.Title)) isError = true;
-                                if (tag.Performers == null) isError = true;
+                                if (tag.Performers is null) isError = true;
                             }
                         }
                         else isError = true;
@@ -407,7 +407,7 @@ namespace TewiMP.DataEditor
             this.ListFrom = listFrom;
             this.ListDataType = listDataType;
             this.ID = ID;
-            this.Songs = songs == null ? new() : songs;
+            this.Songs = songs is null ? new() : songs;
             ListDataType = listDataType;
         }
 
@@ -427,7 +427,7 @@ namespace TewiMP.DataEditor
         {
             get
             {
-                if (lyricAllString == null && Lyric != null)
+                if (lyricAllString is null && Lyric != null)
                 {
                     lyricAllString = string.Join("\n", Lyric);
                 }
@@ -442,7 +442,7 @@ namespace TewiMP.DataEditor
 
         public override string GetMD5()
         {
-            if (Lyric == null) return null;
+            if (Lyric is null) return null;
             return $"{string.Join(' ', Lyric)}{Lyric.Count}{LyricTimeSpan.Ticks}";
         }
     }

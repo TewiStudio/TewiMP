@@ -28,7 +28,7 @@ namespace TinyPinyin
             }
 
 
-            if (trie == null)
+            if (trie is null)
             {
                 // 没有提供字典或选择器，按单字符转换输出
                 var builder1 = new StringBuilder();

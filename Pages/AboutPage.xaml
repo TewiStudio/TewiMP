@@ -201,11 +201,11 @@
                                 </StackPanel.Resources>
                                 <Button>
                                     <TextBlock
-                                        Text="一杯咖啡"/>
+                                        Text="一瓶可乐"/>
                                 </Button>
                                 <Button>
                                     <TextBlock
-                                        Text="一瓶可乐"/>
+                                        Text="一杯咖啡"/>
                                 </Button>
                                 <Button>
                                     <TextBlock
@@ -216,7 +216,8 @@
                     </Button.Flyout>
                     <StackPanel
                         Orientation="Horizontal"
-                        Spacing="4">
+                        Spacing="4"
+                        RequestedTheme="Light">
                         <FontIcon
                             Glyph="&#xEB51;"
                             FontSize="14"/>

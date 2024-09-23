@@ -392,7 +392,7 @@ namespace Meting4Net.Core
         public virtual string Search(string keyword, Options options = null)
         {
             #region 当未提供 options 时则为 null,此时对其进行 new ，使其不为 null,但其中的初始化属性仍为null，这样因为默认 options 不为null,所以下方判断时不再需要判断 options!=null
-            if (options == null)
+            if (options is null)
             {
                 options = new Options();
             }
@@ -1804,7 +1804,7 @@ namespace Meting4Net.Core
                 }
                 index++;
             }
-            if (url == null || url.url == null)
+            if (url is null || url.url is null)
             {
                 url = new Music_url
                 {
@@ -1901,7 +1901,7 @@ namespace Meting4Net.Core
                     };
                 }
             } // end foreach
-            if (rtn == null || string.IsNullOrEmpty(rtn.url))
+            if (rtn is null || string.IsNullOrEmpty(rtn.url))
             {
                 rtn = new Music_url
                 {
@@ -1936,7 +1936,7 @@ namespace Meting4Net.Core
                     };
                 }
             }
-            if (rtn == null)
+            if (rtn is null)
             {
                 // 若找不到满足的,则无
                 rtn = new Music_url

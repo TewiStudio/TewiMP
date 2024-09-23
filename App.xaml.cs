@@ -16,6 +16,7 @@ using Windows.Storage.Streams;
 using Windows.UI.Popups;
 using Newtonsoft.Json.Linq;
 using TewiMP.Pages;
+using Microsoft.UI.Windowing;
 
 namespace TewiMP
 {
@@ -37,7 +38,7 @@ namespace TewiMP
         public static HotKeyManager hotKeyManager { get; private set; } = null;
         public static App AppStatic { get; private set; } = null;
         public static string AppName { get; } = "TewiMP";
-        public static string AppVersion { get; } = "0.4.3 Preview";
+        public static string AppVersion { get; } = "0.4.4 Preview";
 
         public static Window WindowLocal;
         public static NotifyIconWindow NotifyIconWindow;
@@ -115,7 +116,7 @@ namespace TewiMP
             };
             audioPlayer.CacheLoadedChanged += (_) =>
             {
-                if (_.MusicData == null)
+                if (_.MusicData is null)
                 {
                     SMTC.DisplayUpdater.MusicProperties.Title = _.FileReader?.FileName;
                     MainWindow.AppWindowLocal.Title = AppName;
@@ -198,7 +199,7 @@ namespace TewiMP
                 return;
             }
 
-            m_window.Closed += M_window_Closed;
+            //m_window.Closed += M_window_Closed;
             //AppWindowLocal.SetPresenter(AppWindowLocalPresenter);
             DelayOpenWindows();
         }
@@ -217,28 +218,28 @@ namespace TewiMP
             taskBarInfoWindow = new();
         }
 
-        private void M_window_Closed(object sender, WindowEventArgs args)
+        public static void ExitApp()
         {
-            if (MainWindow.DesktopLyricWindow != null)
-            {
-                MainWindow.DesktopLyricWindow.Close();
-            }
-
-            NotifyIconWindow.HideIcon();
+            SaveSettings();
+            MainWindow.SetBackdrop(MainWindow.BackdropType.DefaultColor); // 在App.Exit前将MainWindow的Backdrop释放，否则会报错
             MainWindow.SaveNowPlaying();
-            WindowLocal.Close();
+            MainWindow.DesktopLyricWindow?.Close();
+            NotifyIconWindow.HideIcon();
+            NotifyIconWindow.Close();
+            taskBarInfoWindow.Close();
+            MainWindow.SWindow.Close();
             SMTC.DisplayUpdater.ClearAll();
             SMTC.DisplayUpdater.Update();
             audioPlayer.DisposeAll();
-            SaveSettings();
-            Exit();
+            hotKeyManager.UnregisterHotKeys([.. hotKeyManager.RegistedHotKeys]);
+            App.Current.Exit();
         }
 
         public static async void ShowErrorDialog()
         {
             MessageDialog messageDialog = new("设置文件出现了一些错误，且程序尝试 5 次后也无法恢复默认配置。\n" +
-                "请尝试删除 文档->TewiMP->UserData 里的 Setting 文件。\n" +
-                "如果仍然出现问题，请到 GitHub 里向项目提出 Issues。", "TewiMP - 程序无法启动");
+                $"请尝试删除 文档->{AppName}->UserData 里的 Setting 文件。\n" +
+                "如果仍然出现问题，请到 GitHub 里向项目提出 Issues。", $"{AppName} - 程序无法启动");
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(WindowLocal);
             WinRT.Interop.InitializeWithWindow.Initialize(messageDialog, hwnd);
             await messageDialog.ShowAsync();

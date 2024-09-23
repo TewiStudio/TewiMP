@@ -103,7 +103,7 @@ namespace NAudio.Vorbis
         {
             // look for the next unplayed decoder after our current decoder
             LinkedListNode<IStreamDecoder> node;
-            if (_streamDecoder == null)
+            if (_streamDecoder is null)
             {
                 // first stream...
                 node = _streamDecoders.First;
@@ -125,7 +125,7 @@ namespace NAudio.Vorbis
             }
 
             // finally, if we still don't have a valid decoder, try to find a new stream in the container
-            if (node == null && FindNextStream())
+            if (node is null && FindNextStream())
             {
                 node = _streamDecoders.Last;
             }
@@ -161,14 +161,14 @@ namespace NAudio.Vorbis
 
         private T FindStreamNode<T>(int index, NodeFoundAction<T> action)
         {
-            if (_containerReader == null) throw new InvalidOperationException("Cannot operate on more than the current stream if not loaded from stream!");
+            if (_containerReader is null) throw new InvalidOperationException("Cannot operate on more than the current stream if not loaded from stream!");
             if (index < 0) throw new ArgumentOutOfRangeException(nameof(index));
 
             var node = _streamDecoders.First;
             var count = -1;
             while (++count < index)
             {
-                if (node.Next == null && !FindNextStream())
+                if (node.Next is null && !FindNextStream())
                 {
                     throw new ArgumentOutOfRangeException(nameof(index));
                 }
@@ -208,7 +208,7 @@ namespace NAudio.Vorbis
 
         internal int? GetNextStreamIndex()
         {
-            if (_containerReader == null) return null;
+            if (_containerReader is null) return null;
 
             var cnt = -1;
             var node = _streamDecoders.First;
@@ -356,7 +356,7 @@ namespace NAudio.Vorbis
         {
             if (!CanSeek)
             {
-                if (_containerReader == null) throw new InvalidOperationException("No container loaded!");
+                if (_containerReader is null) throw new InvalidOperationException("No container loaded!");
                 throw new InvalidOperationException("Cannot seek container!  Will discover streams as they are encountered.");
             }
 

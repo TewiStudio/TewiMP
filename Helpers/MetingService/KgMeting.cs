@@ -127,8 +127,8 @@ namespace TewiMP.Helpers.MetingService
 
                     dynamic obj = JsonConvert.DeserializeObject<dynamic>(result);
                     dynamic data = obj?.data;
-                    if (data == null) return null;
-                    if (data.song_name == null) return null;
+                    if (data is null) return null;
+                    if (data.song_name is null) return null;
 
                     List<Artist> artists = new List<Artist>();
                     foreach (var artist in data.authors)

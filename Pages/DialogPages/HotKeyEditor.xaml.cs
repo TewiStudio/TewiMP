@@ -90,7 +90,7 @@ namespace TewiMP.Pages.DialogPages
         bool isGettingHotKey = false;
         public async void ShowDialog(HotKey hotKey)
         {
-            if (hotKey == null) return;
+            if (hotKey is null) return;
             changedHotKey = hotKey;
 
             NowHotKeyText.Text = $"µ±Ç°ÈÈ¼ü£º{HotKey.GetHotKeyIDString(hotKey.HotKeyID)}";
@@ -101,7 +101,7 @@ namespace TewiMP.Pages.DialogPages
 
         private async void ShowDialog1()
         {
-            if (changedHotKey == null) return;
+            if (changedHotKey is null) return;
             MainWindow.AsyncDialog.PreviewKeyDown += HotKeyEditor_KeyDown;
             MainWindow.AsyncDialog.PreviewKeyUp += AsyncDialog_PreviewKeyUp;
             MainWindow.AsyncDialog.IsPrimaryButtonEnabled = false;

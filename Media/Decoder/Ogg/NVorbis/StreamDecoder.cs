@@ -322,7 +322,7 @@ namespace NVorbis
             if (buffer == null) throw new ArgumentNullException(nameof(buffer));
             if (offset < 0 || offset + count > buffer.Length) throw new ArgumentOutOfRangeException(nameof(offset));
             if (count % _channels != 0) throw new ArgumentOutOfRangeException(nameof(count), "Must be a multiple of Channels!");
-            if (_packetProvider == null) throw new ObjectDisposedException(nameof(StreamDecoder));
+            if (_packetProvider is null) throw new ObjectDisposedException(nameof(StreamDecoder));
 
             // if the caller didn't ask for any data, bail early
             if (count == 0)
@@ -419,7 +419,7 @@ namespace NVorbis
             // decode the next packet now so we can start overlapping with it
             var curPacket = DecodeNextPacket(out var startIndex, out var validLen, out var totalLen, out var isEndOfStream, out samplePosition, out var bitsRead, out var bitsRemaining, out var containerOverheadBits);
             _eosFound |= isEndOfStream;
-            if (curPacket == null)
+            if (curPacket is null)
             {
                 _stats.AddPacket(0, bitsRead, bitsRemaining, containerOverheadBits);
                 return false;
@@ -443,7 +443,7 @@ namespace NVorbis
                 OverlapBuffers(_prevPacketBuf, curPacket, _prevPacketStart, _prevPacketStop, startIndex, _channels);
                 _prevPacketStart = startIndex;
             }
-            else if (_prevPacketBuf == null)
+            else if (_prevPacketBuf is null)
             {
                 // first packet, so it doesn't have any good data before the valid length
                 _prevPacketStart = validLen;
@@ -467,7 +467,7 @@ namespace NVorbis
             IPacket packet = null;
             try
             {
-                if ((packet = _packetProvider.GetNextPacket()) == null)
+                if ((packet = _packetProvider.GetNextPacket()) is null)
                 {
                     // no packet? we're at the end of the stream
                     isEndOfStream = true;
@@ -495,7 +495,7 @@ namespace NVorbis
                     {
                         // if we get here, we should have a good packet; decode it and add it to the buffer
                         var mode = _modes[(int)packet.ReadBits(_modeFieldBits)];
-                        if (_nextPacketBuf == null)
+                        if (_nextPacketBuf is null)
                         {
                             _nextPacketBuf = new float[_channels][];
                             for (var i = 0; i < _channels; i++)
@@ -561,7 +561,7 @@ namespace NVorbis
         /// <param name="seekOrigin">The reference point used to obtain the new position.</param>
         public void SeekTo(long samplePosition, SeekOrigin seekOrigin = SeekOrigin.Begin)
         {
-            if (_packetProvider == null) throw new ObjectDisposedException(nameof(StreamDecoder));
+            if (_packetProvider is null) throw new ObjectDisposedException(nameof(StreamDecoder));
             if (!_packetProvider.CanSeek) throw new InvalidOperationException("Seek is not supported by the Contracts.IPacketProvider instance.");
 
             switch (seekOrigin)
@@ -730,7 +730,7 @@ namespace NVorbis
         /// <summary>
         /// Gets whether the decoder has reached the end of the stream.
         /// </summary>
-        public bool IsEndOfStream => _eosFound && _prevPacketBuf == null;
+        public bool IsEndOfStream => _eosFound && _prevPacketBuf is null;
 
         /// <summary>
         /// Gets the <see cref="IStreamStats"/> instance for this stream.

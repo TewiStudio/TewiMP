@@ -167,7 +167,7 @@ namespace NMeCab
         {
             get
             {
-                if (this.feature == null && this.Encoding != null && this.PFeature != null)
+                if (this.feature is null && this.Encoding != null && this.PFeature != null)
                     this.feature = StrUtils.GetString(this.PFeature, this.Encoding);
 
                 return this.feature;
@@ -185,10 +185,10 @@ namespace NMeCab
         /// <returns>素性情報の要素</returns>
         public string GetFeatureAt(int index)
         {
-            if (this.features == null)
+            if (this.features is null)
             {
                 var featureCsv = this.Feature;
-                if (featureCsv == null)
+                if (featureCsv is null)
                     this.features = new string[0];
                 else
                     this.features = StrUtils.SplitCsvRow(featureCsv, 32, 16);

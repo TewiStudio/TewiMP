@@ -62,7 +62,7 @@ namespace TewiMP.Pages.ListViewPages
         void MultiSelectDo(bool isChecked)
         {
             if (!this.IsLoaded) return;
-            if (musicListBind == null) return;
+            if (musicListBind is null) return;
 
             foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
             {
@@ -86,7 +86,7 @@ namespace TewiMP.Pages.ListViewPages
         void MoveItemDo(bool isChecked)
         {
             if (!this.IsLoaded) return;
-            if (musicListBind == null) return;
+            if (musicListBind is null) return;
 
             foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
             {
@@ -352,8 +352,8 @@ namespace TewiMP.Pages.ListViewPages
         ExpressionAnimation searchRootVisualOffsetAnimation;
         async void InitShyHeader(bool imageSizeOnly = false, bool delay = false)
         {
-            if (scrollViewer == null) return;
-            if (compositor == null) return;
+            if (scrollViewer is null) return;
+            if (compositor is null) return;
             if (!IsLoaded) return;
             var anotherHeight = 154;
             double imageSizeEnd = 0.45;
@@ -504,7 +504,7 @@ namespace TewiMP.Pages.ListViewPages
             });
 
             musicListBind.Clear();
-            if (!IsLoaded || musicListData == null)
+            if (!IsLoaded || musicListData is null)
             {
                 array = null;
                 return;
@@ -533,7 +533,7 @@ namespace TewiMP.Pages.ListViewPages
                 }
             }
 
-            if (musicListData == null) return;
+            if (musicListData is null) return;
             listSortEnum = Enum.GetValues(typeof(PlaySort)).Cast<PlaySort>().ToList();
             SortComboBox.ItemsSource = listSortEnum;
             SortComboBox.SelectedIndex = (int)musicListData.PlaySort;
@@ -549,7 +549,7 @@ namespace TewiMP.Pages.ListViewPages
         async void InitImage()
         {
             if (!IsLoaded) return;
-            if (musicListData == null) return;
+            if (musicListData is null) return;
             ItemsList_Header_Image.BorderThickness = thickness0;
             ImageSource imageSource = null;
             if (musicListData.ListDataType == DataType.±¾µØ¸èµ¥)
@@ -562,12 +562,12 @@ namespace TewiMP.Pages.ListViewPages
             {
                 imageSource = (await ImageManage.GetImageSource(musicListData)).Item1;
             }
-            if (imageSource == null)
+            if (imageSource is null)
             {
                 imageSource = await FileHelper.GetImageSource("");
             }
 
-            if (!IsLoaded || musicListData == null) return;
+            if (!IsLoaded || musicListData is null) return;
             ItemsList_Header_Image.BorderThickness = thickness1;
             ItemsList_Header_Image.Source = imageSource;
             InitShyHeader();
@@ -642,7 +642,7 @@ namespace TewiMP.Pages.ListViewPages
         bool isDelayInitShyHeaderWhenScroll = false;
         private async void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
-            if (scrollViewer == null) return;
+            if (scrollViewer is null) return;
             //scrollViewer.ScrollToVerticalOffset(Math.Round(scrollViewer.VerticalOffset, 0));
             headerVisual.IsPixelSnappingEnabled = true;
             if (scrollViewer.VerticalOffset < 300)
@@ -784,8 +784,8 @@ namespace TewiMP.Pages.ListViewPages
         {
             if (isInSave) return;
             if (isInInitBindings) return;
-            if (musicListData == null) return;
-            if (SortComboBox == null) return;
+            if (musicListData is null) return;
+            if (SortComboBox is null) return;
             if (SortComboBox.SelectedIndex == -1) return;
             if (SortComboBox.SelectedIndex == (int)musicListData.PlaySort) return;
             isInSave = true;

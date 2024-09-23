@@ -140,11 +140,11 @@ namespace Ude.Core
                         }
 
                         // start multibyte and singlebyte charset prober
-                        if (charsetProbers[0] == null)
+                        if (charsetProbers[0] is null)
                             charsetProbers[0] = new MBCSGroupProber();
-                        if (charsetProbers[1] == null)
+                        if (charsetProbers[1] is null)
                             charsetProbers[1] = new SBCSGroupProber();
-                        if (charsetProbers[2] == null)
+                        if (charsetProbers[2] is null)
                             charsetProbers[2] = new Latin1Prober(); 
                     }
                 } else { 
@@ -161,7 +161,7 @@ namespace Ude.Core
             
             switch (inputState) {
                 case InputState.EscASCII:
-                    if (escCharsetProber == null) {
+                    if (escCharsetProber is null) {
                         escCharsetProber = new EscCharsetProber();
                     }
                     st = escCharsetProber.HandleData(buf, offset, len);

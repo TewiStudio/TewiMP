@@ -125,7 +125,7 @@ namespace TewiMP.Pages
             LoadingTipControl.ShowLoading();
             var obj = await App.metingServices.NeteaseServices.GetAlbum(NavToObj.ID);
             if (IsNavigatedOutFromPage) return;
-            if (obj == null)
+            if (obj is null)
             {
                 MainWindow.AddNotify("加载专辑信息时出现错误", "无法加载专辑信息，请重试。",
                     NotifySeverity.Error);
@@ -208,7 +208,7 @@ namespace TewiMP.Pages
         Visual headerFootRootVisual;
         public void UpdateShyHeader()
         {
-            if (scrollViewer == null) return;
+            if (scrollViewer is null) return;
 
             double anotherHeight = 168;
             String progress = $"Clamp(-scroller.Translation.Y / {anotherHeight}, 0, 1.0)";
@@ -216,7 +216,7 @@ namespace TewiMP.Pages
             String blurProgress = $"Clamp((-scroller.Translation.Y - 20) / {anotherHeight}, 0, 1.0)";
             String massProgress = $"Clamp((-scroller.Translation.Y - 150) / {anotherHeight}, 0, 1.0)";
 
-            if (scrollerPropertySet == null)
+            if (scrollerPropertySet is null)
             {
                 scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
                 compositor = scrollerPropertySet.Compositor;
@@ -307,7 +307,7 @@ namespace TewiMP.Pages
         Vector3 ATBOffset = default;
         private void menu_border_Loaded(object sender, RoutedEventArgs e)
         {
-            if (scrollViewer == null)
+            if (scrollViewer is null)
             {
                 scrollViewer = (VisualTreeHelper.GetChild(Children, 0) as Border).Child as ScrollViewer;
                 scrollViewer.CanContentRenderOutsideBounds = true;

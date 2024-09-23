@@ -8,7 +8,7 @@ namespace TewiMP.DataEditor
     {
         public static void EditSetting(JObject eData, DataFolderBase.SettingParams settingParams, object data)
         {
-            if (data == null)
+            if (data is null)
             {
                 eData[settingParams.ToString()] = null;
             }

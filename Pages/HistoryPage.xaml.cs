@@ -69,7 +69,7 @@ namespace TewiMP.Pages
         Visual headerSelectVisual;
         public void UpdateShyHeader()
         {
-            if (scrollViewer == null) return;
+            if (scrollViewer is null) return;
             CompositionPropertySet scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
             Compositor compositor = scrollerPropertySet.Compositor;
 

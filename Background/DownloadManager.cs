@@ -201,7 +201,7 @@ namespace TewiMP.Background
             System.Net.WebClient TheDownloader = new System.Net.WebClient();
             TheDownloader.DownloadProgressChanged += (s, e) =>
             {
-                if (e == null) return;
+                if (e is null) return;
                 dm.DownloadPercent = e.ProgressPercentage;
                 dm.FileSize = e.TotalBytesToReceive;
                 dm.DownloadedSize = e.BytesReceived;
@@ -249,7 +249,7 @@ namespace TewiMP.Background
                         foreach (var a in dm.MusicData.Artists)
                         {
                             string result = a.PicturePath;
-                            if (a.PicturePath == null)
+                            if (a.PicturePath is null)
                             {
                                 result =
                                     (await App.metingServices.NeteaseServices.GetArtist(a.ID)).PicturePath;

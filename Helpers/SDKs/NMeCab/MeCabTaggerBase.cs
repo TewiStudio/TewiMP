@@ -63,7 +63,7 @@ namespace NMeCab
 
             string[] GetTirmedUserDics()
             {
-                if (userDics == null)
+                if (userDics is null)
                     return Array.Empty<string>();
                 else if (userDics is string[] ary)
                     return ary;
@@ -149,7 +149,7 @@ namespace NMeCab
         public unsafe TNode[] ParseSoftWakachi(string sentence,
                                                float theta = MeCabParam.DefaltTheta)
         {
-            if (sentence == null) throw new ArgumentNullException(nameof(sentence));
+            if (sentence is null) throw new ArgumentNullException(nameof(sentence));
 
             fixed (char* pStr = sentence)
                 return this.ParseSoftWakachi(pStr, sentence.Length, theta);
@@ -186,7 +186,7 @@ namespace NMeCab
         /// <returns>ラティス</returns>
         public unsafe MeCabLattice<TNode> ParseToLattice(string sentence, MeCabParam param)
         {
-            if (sentence == null) throw new ArgumentNullException(nameof(sentence));
+            if (sentence is null) throw new ArgumentNullException(nameof(sentence));
 
             fixed (char* pStr = sentence)
                 return this.ParseToLattice(pStr, sentence.Length, param);

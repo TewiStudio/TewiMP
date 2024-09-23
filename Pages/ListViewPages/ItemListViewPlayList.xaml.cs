@@ -159,15 +159,15 @@ namespace TewiMP.Pages
         private void MainWindow_MainViewStateChanged(bool isView)
         {
             if (IsNavigatedOutFromPage) return;
-            if (NavToObj == null) return;
+            if (NavToObj is null) return;
             AutoScrollViewerControl.Pause = !isView;
         }
 
         private void CrateShadow()
         {
             if (IsNavigatedOutFromPage) return;
-            if (NavToObj == null) return;
-            if (logoVisual == null) return;
+            if (NavToObj is null) return;
+            if (logoVisual is null) return;
             compositor = logoVisual.Compositor;
 
             var basicRectVisual = compositor.CreateSpriteVisual();
@@ -285,7 +285,7 @@ namespace TewiMP.Pages
                 int count = 0;
                 foreach (var i in array)
                 {
-                    if (i == null) continue;
+                    if (i is null) continue;
                     count++;
                     i.Count = count;
                     MusicDataList.Add(new() { MusicData = i, MusicListData = NavToObj, ImageScaleDPI = dpi });
@@ -301,7 +301,7 @@ namespace TewiMP.Pages
 
         private void PlayListReader_Updated()
         {
-            if (IsNavigatedOutFromPage || NavToObj == null)
+            if (IsNavigatedOutFromPage || NavToObj is null)
             {
                 App.playListReader.Updated -= PlayListReader_Updated;
                 return;
@@ -324,7 +324,7 @@ namespace TewiMP.Pages
 
         private async void LoadImage()
         {
-            if (NavToObj == null || IsNavigatedOutFromPage) return;
+            if (NavToObj is null || IsNavigatedOutFromPage) return;
             PlayList_Image.BorderThickness = new(0);
             if (NavToObj.ListDataType == DataType.本地歌单)
             {
@@ -336,8 +336,8 @@ namespace TewiMP.Pages
             {
                 PlayList_Image.Source = (await ImageManage.GetImageSource(NavToObj)).Item1;
             }
-            if (NavToObj == null) return;
-            if (PlayList_Image.Source == null)
+            if (NavToObj is null) return;
+            if (PlayList_Image.Source is null)
             {
                 PlayList_Image.Source = await FileHelper.GetImageSource("");
             }
@@ -375,9 +375,9 @@ namespace TewiMP.Pages
         int logoSizeCount = 0;
         public void UpdateShyHeader(bool xOnly = false)
         {
-            if (NavToObj == null) return;
+            if (NavToObj is null) return;
             if (IsNavigatedOutFromPage) return;
-            if (scrollViewer == null) return;
+            if (scrollViewer is null) return;
 
             int logoHeight = 280;
             double anotherHeight = 154;
@@ -399,7 +399,7 @@ namespace TewiMP.Pages
 
             String progress = $"Clamp(-scroller.Translation.Y / {anotherHeight}, 0, 1.0)";
 
-            if (scrollerPropertySet == null)
+            if (scrollerPropertySet is null)
             {
                 scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
                 compositor = scrollerPropertySet.Compositor;
@@ -506,9 +506,9 @@ namespace TewiMP.Pages
 
         private void UpdateInfoWidth()
         {
-            if (NavToObj == null) return;
+            if (NavToObj is null) return;
             if (IsNavigatedOutFromPage) return;
-            if (logoVisual == null) return;
+            if (logoVisual is null) return;
             var width = HeaderBaseGrid.ActualWidth - 50 - (PlayList_ImageBaseBorder.ActualWidth * logoVisual.Scale.X);
             if (width > 0)
             {
@@ -518,10 +518,10 @@ namespace TewiMP.Pages
 
         private async void menu_border_Loaded(object sender, RoutedEventArgs e)
         {
-            if (NavToObj == null) return;
+            if (NavToObj is null) return;
             if (IsNavigatedOutFromPage) return;
-            if (Children == null) return;
-            if (scrollViewer == null)
+            if (Children is null) return;
+            if (scrollViewer is null)
             {
                 scrollViewer = (VisualTreeHelper.GetChild(Children, 0) as Border).Child as ScrollViewer;
                 scrollViewer.CanContentRenderOutsideBounds = true;
@@ -550,7 +550,7 @@ namespace TewiMP.Pages
         private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
         {
             if (!isFirstScroll) { isFirstScroll = false; return; }
-            if (scrollViewer == null) return;
+            if (scrollViewer is null) return;
             UpdateShyHeader(true);
             UpdateInfoWidth();
             if (logoSizeCount == 1)

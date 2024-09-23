@@ -51,7 +51,7 @@ namespace NVorbis.Ogg
                 // if the page's granule position is 0 or less it doesn't have any sample
                 if (_reader.GranulePosition != -1)
                 {
-                    if (_firstDataPageIndex == null && _reader.GranulePosition > 0)
+                    if (_firstDataPageIndex is null && _reader.GranulePosition > 0)
                     {
                         _firstDataPageIndex = _pageOffsets.Count;
                     }

@@ -113,7 +113,7 @@ namespace TewiMP.Controls
 
         private void SetImageSource(ImageSource imageSource)
         {
-            if (imageVisual == null) return;
+            if (imageVisual is null) return;
             if (isInitedVisuals) imageVisual.Opacity = 0;
             imageVisual.StartAnimation("Opacity", animationOpacity_SourceChanged);
             Image_Control.Source = imageSource;
@@ -158,8 +158,8 @@ namespace TewiMP.Controls
         bool isPointEnter = false;
         private void UserControl_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
-            if (rootVisual == null) return;
-            if (gammaMassVisual == null) return;
+            if (rootVisual is null) return;
+            if (gammaMassVisual is null) return;
             if (PointInBehavior == PointInBehaviors.None) return;
             isPointEnter = true;
 
@@ -171,8 +171,8 @@ namespace TewiMP.Controls
 
         private void UserControl_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            if (rootVisual == null) return;
-            if (gammaMassVisual == null) return;
+            if (rootVisual is null) return;
+            if (gammaMassVisual is null) return;
             if (PointInBehavior == PointInBehaviors.None) return;
             isPointEnter = false;
 
@@ -192,7 +192,7 @@ namespace TewiMP.Controls
             }
 
             if (PointInBehavior == PointInBehaviors.None) return;
-            if (rootVisual == null) return;
+            if (rootVisual is null) return;
             rootVisual.StartAnimation("Scale.X", animationSize_MousePressed);
             rootVisual.StartAnimation("Scale.Y", animationSize_MousePressed);
         }
@@ -200,14 +200,14 @@ namespace TewiMP.Controls
         private void UserControl_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             if (PointInBehavior == PointInBehaviors.None) return;
-            if (rootVisual == null) return;
+            if (rootVisual is null) return;
             rootVisual.StartAnimation("Scale.X", animationSize_MouseReleased);
             rootVisual.StartAnimation("Scale.Y", animationSize_MouseReleased);
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (rootVisual == null) return;
+            if (rootVisual is null) return;
             rootVisual.CenterPoint = new((float)ActualWidth / 2, (float)ActualHeight / 2, 1);
         }
 

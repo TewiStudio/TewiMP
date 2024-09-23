@@ -72,7 +72,7 @@ namespace CUETools.Codecs
         {
             if (Position > 0)
                 throw new Exception("data already written, no chunks allowed");
-            if (_chunks == null)
+            if (_chunks is null)
             {
                 _chunks = new List<byte[]>();
                 _chunkFCCs = new List<uint>();

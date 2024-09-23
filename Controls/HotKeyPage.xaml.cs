@@ -20,7 +20,7 @@ namespace TewiMP.Controls
         {
             HotKeyRoot.ItemsSource = App.hotKeyManager.RegistedHotKeys;
             await Task.Delay(100);
-            if (HotKeyRoot.ItemsSource == null)
+            if (HotKeyRoot.ItemsSource is null)
                 HotKeyRoot.ItemsSource = App.hotKeyManager.RegistedHotKeys;
         }
 

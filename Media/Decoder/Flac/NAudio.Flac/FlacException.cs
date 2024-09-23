@@ -47,7 +47,7 @@ namespace NAudio.Flac
         /// </param>
         protected FlacException(SerializationInfo info, StreamingContext context)
         {
-            if (info == null)
+            if (info is null)
                 throw new ArgumentNullException("info");
 
             Layer = (FlacLayer)info.GetValue("Layer", typeof(FlacLayer));

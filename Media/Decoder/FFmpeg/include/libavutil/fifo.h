@@ -235,7 +235,7 @@ void av_fifo_reset2(AVFifo *f);
 
 /**
  * Free an AVFifo and reset pointer to NULL.
- * @param f Pointer to an AVFifo to free. *f == NULL is allowed.
+ * @param f Pointer to an AVFifo to free. *f is null is allowed.
  */
 void av_fifo_freep2(AVFifo **f);
 
@@ -321,7 +321,7 @@ int av_fifo_space(const AVFifoBuffer *f);
  *
  * @return a non-negative number on success, a negative error code on failure
  *
- * @deprecated use the new AVFifo-API with av_fifo_peek() when func == NULL,
+ * @deprecated use the new AVFifo-API with av_fifo_peek() when func is null,
  *             av_fifo_peek_to_cb() otherwise
  */
 attribute_deprecated
@@ -337,7 +337,7 @@ int av_fifo_generic_peek_at(AVFifoBuffer *f, void *dest, int offset, int buf_siz
  *
  * @return a non-negative number on success, a negative error code on failure
  *
- * @deprecated use the new AVFifo-API with av_fifo_peek() when func == NULL,
+ * @deprecated use the new AVFifo-API with av_fifo_peek() when func is null,
  *             av_fifo_peek_to_cb() otherwise
  */
 attribute_deprecated
@@ -352,7 +352,7 @@ int av_fifo_generic_peek(AVFifoBuffer *f, void *dest, int buf_size, void (*func)
  *
  * @return a non-negative number on success, a negative error code on failure
  *
- * @deprecated use the new AVFifo-API with av_fifo_read() when func == NULL,
+ * @deprecated use the new AVFifo-API with av_fifo_read() when func is null,
  *             av_fifo_read_to_cb() otherwise
  */
 attribute_deprecated
@@ -371,7 +371,7 @@ int av_fifo_generic_read(AVFifoBuffer *f, void *dest, int buf_size, void (*func)
  * If func is NULL, src is interpreted as a simple byte array for source data.
  * @return the number of bytes written to the FIFO or a negative error code on failure
  *
- * @deprecated use the new AVFifo-API with av_fifo_write() when func == NULL,
+ * @deprecated use the new AVFifo-API with av_fifo_write() when func is null,
  *             av_fifo_write_from_cb() otherwise
  */
 attribute_deprecated

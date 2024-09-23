@@ -18,7 +18,7 @@ namespace TewiMP.Controls
 
         private void Button_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (DataContext == null) return;
+            if (DataContext is null) return;
             if (DataContext.GetType() != typeof(HotKey)) return;
             HotKey = (HotKey)DataContext;
             UpdateInterface();
@@ -27,7 +27,7 @@ namespace TewiMP.Controls
         HotKey lastHotkey = null;
         private void UpdateInterface()
         {
-            if (HotKey == null) return;
+            if (HotKey is null) return;
             if (lastHotkey == HotKey) return;
             lastHotkey = HotKey;
             Children.Clear();

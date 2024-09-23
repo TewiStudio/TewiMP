@@ -119,11 +119,11 @@ namespace TewiMP.Helpers
         static string AesEncrypt(string plainText, string Key, string IV)
         {
             // Check arguments.
-            if (plainText == null || plainText.Length <= 0)
+            if (plainText is null || plainText.Length <= 0)
                 throw new ArgumentNullException("plainText");
-            if (Key == null || Key.Length <= 0)
+            if (Key is null || Key.Length <= 0)
                 throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
+            if (IV is null || IV.Length <= 0)
                 throw new ArgumentNullException("IV");
             byte[] encrypted;
 

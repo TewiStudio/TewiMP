@@ -142,7 +142,7 @@ namespace CueSharp
         /// <param name="lineDelims">Line delimeters; set to "(char[])null" for default delimeters.</param>
         public CueSheet(string cueString, char[] lineDelims)
         {
-            if (lineDelims == null)
+            if (lineDelims is null)
             {
                 lineDelims = new char[] { '\n' };
             }

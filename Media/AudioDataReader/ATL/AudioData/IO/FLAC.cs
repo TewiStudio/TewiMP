@@ -157,7 +157,7 @@ namespace ATL.AudioData.IO
         // Check for right FLAC file data
         private bool isValid()
         {
-            if (header == null) return false;
+            if (header is null) return false;
             return header.IsValid() &&
                     (channelsArrangement.NbChannels > 0) &&
                     (sampleRate > 0) &&

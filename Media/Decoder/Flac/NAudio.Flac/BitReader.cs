@@ -18,7 +18,7 @@ namespace NAudio.Flac
 
         public BitReader(byte[] buffer, int offset)
         {
-            if (buffer == null || buffer.Length <= 0)
+            if (buffer is null || buffer.Length <= 0)
                 throw new ArgumentException("buffer is null or has no elements", "buffer");
             if (offset < 0)
                 throw new ArgumentOutOfRangeException("offset");

@@ -33,7 +33,7 @@ namespace TewiMP.Windowed
             App.playingList.NowPlayingImageLoaded += (_, __) => IconPath = __;
             App.audioPlayer.SourceChanged += (_) =>
             {
-                if (_.MusicData == null)
+                if (_.MusicData is null)
                     Title = App.AppName;
                 else
                 {
@@ -41,7 +41,7 @@ namespace TewiMP.Windowed
                 }
                 Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetThumbnailTooltip(Handle, $"正在播放：{_.MusicData.Title} - {_.MusicData.ArtistName}");
             };
-            if (App.audioPlayer.MusicData == null)
+            if (App.audioPlayer.MusicData is null)
                 Title = App.AppName;
             else
             {

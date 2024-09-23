@@ -102,7 +102,7 @@ namespace TewiMP.Helpers
                 switch (musicData.From)
                 {
                     case MusicFrom.neteaseMusic:
-                        if (musicData.Album.ID == null)
+                        if (musicData.Album.ID is null)
                         {
                             addressResult = await App.metingServices.NeteaseServices.GetPicFromMusicData(musicData);
                             //System.Diagnostics.Debug.WriteLine(addressResult);

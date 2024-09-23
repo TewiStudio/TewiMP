@@ -45,7 +45,7 @@ namespace TewiMP.Pages
         Visual headerVisual;
         public void UpdateShyHeader()
         {
-            if (scrollViewer == null)
+            if (scrollViewer is null)
             {
                 headerVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseGrid);
                 scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;

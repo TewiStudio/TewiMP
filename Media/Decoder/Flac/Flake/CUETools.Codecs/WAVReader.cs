@@ -196,7 +196,7 @@ namespace CUETools.Codecs
                 pos = ckEnd;
             } while (true);
 
-            if ((foundFormat & foundData) == false || PCM == null)
+            if ((foundFormat & foundData) == false || PCM is null)
                 throw new Exception("Format or data chunk not found.");
             if (PCM.ChannelCount <= 0)
                 throw new Exception("Channel count is invalid.");

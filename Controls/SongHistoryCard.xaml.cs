@@ -23,7 +23,7 @@ namespace TewiMP.Controls
         SongHistoryData songHistoryData = null;
         private void SongHistoryCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (DataContext == null) return;
+            if (DataContext is null) return;
             songHistoryData = DataContext as SongHistoryData;
             if (songHistoryData.Count % 2 == 0)
             {

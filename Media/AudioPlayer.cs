@@ -331,7 +331,7 @@ namespace TewiMP.Media
             set
             {
                 _wasapiOnly = value;
-                if (NowOutObj == null) return;
+                if (NowOutObj is null) return;
                 if (NowOutObj.GetType() == typeof(WasapiOut))
                 {
                     SetReloadAsync();
@@ -360,7 +360,7 @@ namespace TewiMP.Media
                 {
                     if (FileReader.isMidi)
                     {
-                        if (MidiPlayback == null) return TimeSpan.Zero;
+                        if (MidiPlayback is null) return TimeSpan.Zero;
                         return TimeSpan.FromMilliseconds((MidiPlayback.GetCurrentTime(TimeSpanType.Metric) as MetricTimeSpan).TotalMilliseconds);
                     }
                     else
@@ -414,7 +414,7 @@ namespace TewiMP.Media
                 {
                     if (FileReader.isMidi)
                     {
-                        if (MidiPlayback == null) return TimeSpan.Zero;
+                        if (MidiPlayback is null) return TimeSpan.Zero;
                         return TimeSpan.FromMilliseconds((MidiPlayback.GetDuration(TimeSpanType.Metric) as MetricTimeSpan).TotalMilliseconds);
                     }
                     else
@@ -441,7 +441,7 @@ namespace TewiMP.Media
                 {
                     if (FileReader.isMidi)
                     {
-                        if (MidiPlayback == null) return PlaybackState.Stopped;
+                        if (MidiPlayback is null) return PlaybackState.Stopped;
                         if (MidiPlayback.IsRunning)
                             return PlaybackState.Playing;
                         else return PlaybackState.Paused;
@@ -579,7 +579,7 @@ namespace TewiMP.Media
             //if (loadCounter != 0) return;
 
             var devices = await OutDevice.GetOutDevicesAsync();
-            if (NowOutObj == null)
+            if (NowOutObj is null)
             {
                 NowOutDevice = devices.First();
                 return;
@@ -812,14 +812,14 @@ namespace TewiMP.Media
                     case OutApi.WaveOut:
                         Debug.WriteLine($"[AudioPlayer]: Using WaveOut.");
                         await Task.Run(() => NowOutObj = new WaveOutEvent());
-                        (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device == null ? -1 : (int)NowOutDevice.Device;
+                        (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
                         (NowOutObj as WaveOutEvent).NumberOfBuffers = Latency;
                         NowOutObj.Init(FileProvider);
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                     case OutApi.DirectSound:
                         Debug.WriteLine($"[AudioPlayer]: Using DirectSound.");
-                        if (NowOutDevice.Device == null)
+                        if (NowOutDevice.Device is null)
                         {
                             await Task.Run(() => NowOutObj = new DirectSoundOut(Latency));
                         }
@@ -890,10 +890,10 @@ namespace TewiMP.Media
         {
             //if (IsInPlaybackStopped) return;
             if (isInSetSource) return;
-            if (FileReader == null) return;
+            if (FileReader is null) return;
             if (FileReader.isMidi) return;
 
-            TimeSpan nowPosition = reloadedStreamPosition == null ? FileReader.CurrentTime : (TimeSpan)reloadedStreamPosition;
+            TimeSpan nowPosition = reloadedStreamPosition is null ? FileReader.CurrentTime : (TimeSpan)reloadedStreamPosition;
             var nowPlayState = NowOutObj?.PlaybackState;
             string filePath = FileReader.FileName;
 
@@ -1030,7 +1030,7 @@ namespace TewiMP.Media
             //.WriteLine($"ReCall Audio Player Timing Count {TimingChanged?.GetInvocationList()?.Length}.");
             timer.Start();
             if (PlaybackState != PlaybackState.Playing) timer.Stop();
-            if (TimingChanged == null) timer.Stop();
+            if (TimingChanged is null) timer.Stop();
             if (!timer.IsEnabled) return;
 
             TimingChanged?.Invoke(this);

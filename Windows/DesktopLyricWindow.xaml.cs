@@ -253,7 +253,7 @@ namespace TewiMP.Windowed
             LyricRomajiPopup_tb.Text = null;
 
             // nice coding
-            if (nowLyricsData == null)
+            if (nowLyricsData is null)
             {
                 if (App.audioPlayer.MusicData != null)
                 {
@@ -282,7 +282,7 @@ namespace TewiMP.Windowed
                 animationTextVisual(2);
                 return;
             }
-            if (nowLyricsData.Lyric == null)
+            if (nowLyricsData.Lyric is null)
             {
                 T1.Text = App.audioPlayer.MusicData.Title;
                 T2.Text = App.audioPlayer.MusicData.ButtonName;
@@ -792,7 +792,7 @@ namespace TewiMP.Windowed
 
         private void AudioPlayer_SourceChanged1(AudioPlayer audioPlayer)
         {
-            if (audioPlayer.MusicData == null) return;
+            if (audioPlayer.MusicData is null) return;
             MusicControl_TitleTb.Text = audioPlayer.MusicData.Title;
             MusicControl_ButtonNameTb.Text = audioPlayer.MusicData.ButtonName;
         }

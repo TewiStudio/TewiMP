@@ -24,7 +24,7 @@ namespace NAudio.Flac
 
         public FlacPreScan(Stream stream)
         {
-            if (stream == null) throw new ArgumentNullException("stream");
+            if (stream is null) throw new ArgumentNullException("stream");
             if (!stream.CanRead) throw new ArgumentException("stream is not readable");
 
             _stream = stream;

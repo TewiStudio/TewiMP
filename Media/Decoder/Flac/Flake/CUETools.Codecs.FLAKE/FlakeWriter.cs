@@ -136,7 +136,7 @@ namespace CUETools.Codecs.FLAKE
 			}
 			set
 			{
-				if (value as FlakeWriterSettings == null)
+				if (value as FlakeWriterSettings is null)
 					throw new Exception("Unsupported options " + value);
 				_settings = value as FlakeWriterSettings;
 			}
@@ -1441,7 +1441,7 @@ namespace CUETools.Codecs.FLAKE
 		{
 			if (!inited)
 			{
-				if (_IO == null)
+				if (_IO is null)
 					_IO = new FileStream(Path, FileMode.Create, FileAccess.Write, FileShare.Read);
 				int header_size = Flake_encode_init();
 				_IO.Write(header, 0, header_size);
@@ -1689,7 +1689,7 @@ namespace CUETools.Codecs.FLAKE
 			}
 
 			// output header bytes
-			header = new byte[eparams.padding_size + 1024 + (seek_table == null ? 0 : seek_table.Length * 18)];
+			header = new byte[eparams.padding_size + 1024 + (seek_table is null ? 0 : seek_table.Length * 18)];
 			header_len = Write_headers();
 
             // initialize CRC & MD5

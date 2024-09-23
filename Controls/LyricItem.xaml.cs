@@ -13,7 +13,7 @@ namespace TewiMP.Controls
         {
             foreach (var item in Items)
             {
-                if (item == null) continue;
+                if (item is null) continue;
                 item.SetTextAlignment(textAlignment);
             }
         }
@@ -26,7 +26,7 @@ namespace TewiMP.Controls
         static TextAlignment alignment = TextAlignment.Left;
         public void SetTextAlignment(TextAlignment textAlignment)
         {
-            if (LyricTextBlock == null) return;
+            if (LyricTextBlock is null) return;
             alignment = textAlignment;
             LyricTextBlock.TextAlignment = textAlignment;
             RomajiTextBlock.TextAlignment = textAlignment;
@@ -34,7 +34,7 @@ namespace TewiMP.Controls
 
         private void Grid_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (DataContext == null)
+            if (DataContext is null)
             {
                 Items.Remove(this);
                 return;

@@ -128,7 +128,7 @@ namespace TewiMP.Background
         {
             //System.Diagnostics.Debug.WriteLine(NowPlayingImageLoaded.GetInvocationList().Length);
             if (audioPlayer.FileReader.isMidi ||
-                audioPlayer.MusicData == null)
+                audioPlayer.MusicData is null)
             {
                 lastMusicData = null;
                 NowPlayingImage = null;
@@ -158,7 +158,7 @@ namespace TewiMP.Background
             a = _.Item1;
             path = _.Item2;
 
-            if (a == null) { lastMusicData = null; }
+            if (a is null) { lastMusicData = null; }
             NowPlayingImage = a;
             NowPlayingImagePath = path;
             NowPlayingImageLoaded?.Invoke(NowPlayingImage, path);

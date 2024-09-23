@@ -159,7 +159,7 @@ namespace TewiMP.Media.Decoder.FFmpeg
             convert = ffmpeg.swr_alloc();
             //设置重采样转换器参数
             convert = ffmpeg.swr_alloc_set_opts(convert, occ, osf, osr, icc, isf, isr, 0, null);
-            if (convert == null)
+            if (convert is null)
                 return false;
             //初始化重采样转换器
             ffmpeg.swr_init(convert);
@@ -284,7 +284,7 @@ namespace TewiMP.Media.Decoder.FFmpeg
         /// <param name="seekTime">更改到的位置（秒）</param>
         public void SeekProgress(int seekTime)
         {
-            if (format == null || audioStreamIndex == null)
+            if (format is null || audioStreamIndex is null)
                 return;
             lock (SyncLock)
             {

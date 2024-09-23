@@ -273,7 +273,7 @@ namespace TewiMP.DataEditor
         /// <returns>JSON字符串</returns>
         public static string ToJSON(this object o)
         {
-            if (o == null)
+            if (o is null)
             {
                 return null;
             }

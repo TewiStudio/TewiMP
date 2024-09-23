@@ -49,7 +49,7 @@ namespace TewiMP.DataEditor
 
         public static MusicListData AddMusicDataToPlayList(MusicData musicData, MusicListData musicListData)
         {
-            if (musicListData.Songs == null)
+            if (musicListData.Songs is null)
             {
                 musicListData.Songs = new();
             }
@@ -211,7 +211,7 @@ namespace TewiMP.DataEditor
                 foreach (var file in folder.GetFiles())
                 {
                     var array = await MusicData.FromFile(file.FullName, true);
-                    if (array == null) continue;
+                    if (array is null) continue;
                     foreach (var item in array)
                     {
                         item.FileTime = file.LastWriteTime;
@@ -231,7 +231,7 @@ namespace TewiMP.DataEditor
 
         public static async Task AddAnalyzedMusic(MusicData[] musicDatas)
         {
-            if (musicDatas == null) return;
+            if (musicDatas is null) return;
             var data = await GetLocalMusicData();
             await Task.Run(() =>
             {
@@ -268,7 +268,7 @@ namespace TewiMP.DataEditor
             foreach (var path in list)
             {
                 var musicDatas = await AnalysisFolderMusic(path);
-                if (musicDatas == null) continue;
+                if (musicDatas is null) continue;
                 await AddAnalyzedMusic(await Task.Run(musicDatas.ToArray));
             }
         }

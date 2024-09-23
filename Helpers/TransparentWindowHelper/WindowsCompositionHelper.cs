@@ -17,11 +17,11 @@ namespace TewiMP.Helpers.TransparentWindowHelper
 
         private static WinCompositor EnsureCompositor()
         {
-            if (compositor == null)
+            if (compositor is null)
             {
                 lock (locker)
                 {
-                    if (compositor == null)
+                    if (compositor is null)
                     {
                         dispatcherQueue = WinDispatcherQueue.GetForCurrentThread()
                             ?? (dispatcherQueueController = InitializeCoreDispatcher()).DispatcherQueue;

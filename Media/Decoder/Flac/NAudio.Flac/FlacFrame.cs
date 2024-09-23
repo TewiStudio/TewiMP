@@ -71,7 +71,7 @@ namespace NAudio.Flac
 
         private FlacFrame(Stream stream, FlacMetadataStreamInfo streamInfo = null)
         {
-            if (stream == null)
+            if (stream is null)
                 throw new ArgumentNullException("stream");
             if (stream.CanRead == false)
                 throw new ArgumentException("Stream is not readable");
@@ -194,7 +194,7 @@ namespace NAudio.Flac
             return GetBufferInternal(ref buffer);
 #else 
             int desiredsize = Header.BlockSize * Header.Channels * ((Header.BitsPerSample + 7) / 2);
-            if (buffer == null || buffer.Length < desiredsize)
+            if (buffer is null || buffer.Length < desiredsize)
                 buffer = new byte[desiredsize];
 
             fixed (byte* ptrBuffer = buffer)
@@ -247,9 +247,9 @@ namespace NAudio.Flac
 
         private unsafe List<FlacSubFrameData> AllocOuputMemory()
         {
-            if (_destBuffer == null || _destBuffer.Length < Header.Channels * Header.BlockSize)
+            if (_destBuffer is null || _destBuffer.Length < Header.Channels * Header.BlockSize)
                 _destBuffer = new int[Header.Channels * Header.BlockSize];
-            if (_residualBuffer == null || _residualBuffer.Length < Header.Channels * Header.BlockSize)
+            if (_residualBuffer is null || _residualBuffer.Length < Header.Channels * Header.BlockSize)
                 _residualBuffer = new int[Header.Channels * Header.BlockSize];
 
             List<FlacSubFrameData> output = new List<FlacSubFrameData>();

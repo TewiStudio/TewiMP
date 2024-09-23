@@ -171,7 +171,7 @@ namespace TewiMP.Pages
         void InitShyHeader()
         {
             return;
-            if (headerVisual == null) return;
+            if (headerVisual is null) return;
             if (!IsLoaded) return;
 
             scrollerPropertySet?.Dispose();
@@ -337,7 +337,7 @@ namespace TewiMP.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.ReleaseTime).GroupBy(t => t.MusicData.ReleaseTime == null ? "..." : t.MusicData.ReleaseTime.Value.Year.ToString());
+                        return App.localMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.ReleaseTime).GroupBy(t => t.MusicData.ReleaseTime is null ? "..." : t.MusicData.ReleaseTime.Value.Year.ToString());
                     });
                     break;
                 case 4:
@@ -345,7 +345,7 @@ namespace TewiMP.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.localMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.FileTime).GroupBy(t => t.MusicData.FileTime == null ? "..." : t.MusicData.FileTime.Value.Year.ToString());
+                        return App.localMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.FileTime).GroupBy(t => t.MusicData.FileTime is null ? "..." : t.MusicData.FileTime.Value.Year.ToString());
                     });
                     break;
             }

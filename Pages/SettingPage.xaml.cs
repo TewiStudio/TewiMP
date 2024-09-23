@@ -110,11 +110,11 @@ namespace TewiMP.Pages
         {
             // 设置header为顶层
             var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ListViewBase.Header);
-            if (headerPresenter == null) return;
+            if (headerPresenter is null) return;
             var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
             Canvas.SetZIndex(headerContainer, 1);
 
-            if (scrollViewer == null)
+            if (scrollViewer is null)
             {
                 scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;
                 scrollViewer.CanContentRenderOutsideBounds = true;
@@ -204,7 +204,7 @@ namespace TewiMP.Pages
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            if (button == null) return;
+            if (button is null) return;
 
             string tagObj = button.Tag as string;
             string folderPath = null;
@@ -233,11 +233,11 @@ namespace TewiMP.Pages
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            if (button == null) return;
+            if (button is null) return;
 
             string tagObj = button.Tag as string;
             var folder = await FileHelper.UserSelectFolder();
-            if (folder == null) return;
+            if (folder is null) return;
             var folderPath = folder.Path;
             switch (tagObj)
             {
@@ -263,7 +263,7 @@ namespace TewiMP.Pages
         private async void Button_Click_4(object sender, RoutedEventArgs e)
         {
             Button button = sender as Button;
-            if (button == null) return;
+            if (button is null) return;
 
             string tagObj = button.Tag as string;
             string folderPath = null;
@@ -795,7 +795,7 @@ namespace TewiMP.Pages
         private void ToggleSwitch_Toggled_3(object sender, RoutedEventArgs e)
         {
             var toggleSwitch = sender as ToggleSwitch;
-            if (toggleSwitch == null) return;
+            if (toggleSwitch is null) return;
             if (toggleSwitch.Tag as string == "0")
             {
                 MainWindow.SNavView.PaneDisplayMode = toggleSwitch.IsOn ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;

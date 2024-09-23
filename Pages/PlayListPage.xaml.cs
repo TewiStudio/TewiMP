@@ -67,7 +67,7 @@ namespace TewiMP.Pages
             isInUpdate = true;
             playListCards.Clear();
 
-            if (App.playListReader.NowMusicListData == null)
+            if (App.playListReader.NowMusicListData is null)
                 await App.playListReader.Refresh();
 
             int count = 0;
@@ -125,7 +125,7 @@ namespace TewiMP.Pages
         void InitShyHeader()
         {
             if (!IsLoaded) return;
-            if (scrollViewer == null) return;
+            if (scrollViewer is null) return;
 
             var paddingSize = 40;
             var progress = $"Clamp(-scroller.Translation.Y / {paddingSize}, 0, 1.0)";

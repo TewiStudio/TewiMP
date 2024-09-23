@@ -10,7 +10,7 @@ namespace NAudio.Flac
 			int   vali;
 
 			int desiredsize = Header.BlockSize * Header.Channels * ((Header.BitsPerSample + 7) / 2);
-            if (buffer == null || buffer.Length < desiredsize)
+            if (buffer is null || buffer.Length < desiredsize)
                 buffer = new byte[desiredsize];
 
             fixed (byte* ptrBuffer = buffer)

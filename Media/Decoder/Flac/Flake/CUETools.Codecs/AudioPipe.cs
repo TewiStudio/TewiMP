@@ -28,7 +28,7 @@ namespace CUETools.Codecs
                 if (value == _samplePos)
                     return;
 
-                if (_source == null)
+                if (_source is null)
                     throw new NotSupportedException();
 
                 lock (this)
@@ -67,7 +67,7 @@ namespace CUETools.Codecs
         {
             get
             {
-                if (_source == null)
+                if (_source is null)
                     return "";
                 return _source.Path;
             }
@@ -136,7 +136,7 @@ namespace CUETools.Codecs
 
         private void Go()
         {
-            if (_workThread != null || _ex != null || _source == null) return;
+            if (_workThread != null || _ex != null || _source is null) return;
             _workThread = new Thread(Decompress)
             {
                 Priority = priority,
@@ -220,7 +220,7 @@ namespace CUETools.Codecs
             else
                 lock (this)
                 {
-                    while (!_haveData && _ex == null)
+                    while (!_haveData && _ex is null)
                         Monitor.Wait(this);
                     if (_ex != null)
                         throw _ex;

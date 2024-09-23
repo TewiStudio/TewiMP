@@ -184,7 +184,7 @@ namespace TewiMP.Helpers
             picker.ViewMode = viewMode;
             picker.SuggestedStartLocation = suggestedStartLocation;
 
-            if (fileTypeFilter == null) fileTypeFilter = new string[] { "*" };
+            if (fileTypeFilter is null) fileTypeFilter = new string[] { "*" };
             foreach (var i in fileTypeFilter)
             {
                 picker.FileTypeFilter.Add(i);
@@ -204,7 +204,7 @@ namespace TewiMP.Helpers
             picker.ViewMode = viewMode;
             picker.SuggestedStartLocation = suggestedStartLocation;
 
-            if (fileTypeFilter == null) fileTypeFilter = new string[] { "*" };
+            if (fileTypeFilter is null) fileTypeFilter = new string[] { "*" };
             foreach (var i in fileTypeFilter)
             {
                 picker.FileTypeFilter.Add(i);

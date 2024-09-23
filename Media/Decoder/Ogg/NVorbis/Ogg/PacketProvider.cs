@@ -31,7 +31,7 @@ namespace NVorbis.Ogg
 
         public long GetGranuleCount()
         {
-            if (_reader == null) throw new ObjectDisposedException(nameof(PacketProvider));
+            if (_reader is null) throw new ObjectDisposedException(nameof(PacketProvider));
 
             if (!_reader.HasAllPages)
             {
@@ -55,7 +55,7 @@ namespace NVorbis.Ogg
 
         public long SeekTo(long granulePos, int preRoll, GetPacketGranuleCount getPacketGranuleCount)
         {
-            if (_reader == null) throw new ObjectDisposedException(nameof(PacketProvider));
+            if (_reader is null) throw new ObjectDisposedException(nameof(PacketProvider));
 
             int pageIndex = _reader.FindPage(granulePos);
             int packetIndex = FindPacket(pageIndex, preRoll, ref granulePos, getPacketGranuleCount);
@@ -85,7 +85,7 @@ namespace NVorbis.Ogg
                         // this will either be a continued packet OR the last packet of the last page
                         // in both cases that's precisely the value we need
                         var lastPacket = CreatePacket(ref pageIndex, ref lastPacketIndex, false, 0, false, isContinued, lastPacketCount, 0);
-                        if (lastPacket == null)
+                        if (lastPacket is null)
                         {
                             throw new System.IO.InvalidDataException("Could not find end of continuation!");
                         }
@@ -128,7 +128,7 @@ namespace NVorbis.Ogg
                 // it would be nice to pass false instead of isContinued, but (hypothetically) we don't know if getPacketGranuleCount(...) needs the whole thing...
                 // Vorbis doesn't, but someone might decide to try to use us for another purpose so we'll be good here.
                 var packet = CreatePacket(ref pageIndex, ref i, false, pageGranulePos, i == 0 && isResync, isContinued, packetCount, 0);
-                if (packet == null)
+                if (packet is null)
                 {
                     throw new System.IO.InvalidDataException("Could not find end of continuation!");
                 }
@@ -297,9 +297,9 @@ namespace NVorbis.Ogg
 
         private Packet GetNextPacket(ref int pageIndex, ref int packetIndex)
         {
-            if (_reader == null) throw new ObjectDisposedException(nameof(PacketProvider));
+            if (_reader is null) throw new ObjectDisposedException(nameof(PacketProvider));
 
-            if (_lastPacketPacketIndex != packetIndex || _lastPacketPageIndex != pageIndex || _lastPacket == null)
+            if (_lastPacketPacketIndex != packetIndex || _lastPacketPageIndex != pageIndex || _lastPacket is null)
             {
                 _lastPacket = null;
 

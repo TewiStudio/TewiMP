@@ -119,7 +119,7 @@ namespace CUETools.Codecs
             int pos, chunk;
             lock (this)
             {
-                while (FreeSpace == 0 && _ex == null)
+                while (FreeSpace == 0 && _ex is null)
                     Monitor.Wait(this);
                 if (_ex != null)
                     throw _ex;
@@ -144,7 +144,7 @@ namespace CUETools.Codecs
             {
                 lock (this)
                 {
-                    while (FreeSpace == 0 && _ex == null)
+                    while (FreeSpace == 0 && _ex is null)
                         Monitor.Wait(this);
                     if (_ex != null)
                         throw _ex;

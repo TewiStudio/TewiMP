@@ -114,7 +114,7 @@ namespace TewiMP.Media
                 {
                     await Task.Delay(1000);
                 }
-                if (resultPath == null)
+                if (resultPath is null)
                 {
                     while (loadNum > maxLoadNum)
                     {
@@ -166,7 +166,7 @@ namespace TewiMP.Media
         /// <returns>Item1 为 ImageSource，Item2 为获取到 ImageSource 的文件路径</returns>
         public static async Task<Tuple<ImageSource, string>> GetImageSource(MusicListData musicListData, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
         {
-            if (musicListData == null) return null;
+            if (musicListData is null) return null;
 
             foreach (var imageCache in localImageCache)
             {

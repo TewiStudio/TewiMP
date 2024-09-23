@@ -102,7 +102,7 @@ namespace TewiMP.Controls
         int searchNum = -1;
         private void SearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            if (SongItemBinds == null) return;
+            if (SongItemBinds is null) return;
             if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput) // сп bug
             {
                 if (string.IsNullOrEmpty(SearchBox.Text)) return;

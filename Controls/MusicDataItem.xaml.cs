@@ -104,7 +104,7 @@ namespace TewiMP.Controls
         void InitInfo()
         {
             if (!IsLoaded) return;
-            if (songItemBind == null) return;
+            if (songItemBind is null) return;
             Info_Texts_CountRun.Text = songItemBind.MusicData.Count == 0 ? null : $"{songItemBind.MusicData.Count}. ";
             Info_Texts_TitleRun.Text = songItemBind.MusicData.Title;
             Info_Texts_Title2Run.Text = $" {songItemBind.MusicData.Title2}";
@@ -114,20 +114,20 @@ namespace TewiMP.Controls
         int initImageCallCount = 0;
         async void InitImage()
         {
-            if (Info_Image == null) return;
+            if (Info_Image is null) return;
             Info_Image.Source = null;
             Info_Image_Root.Visibility = IsImageShow ? Visibility.Visible : Visibility.Collapsed;
             FileNotExists_Root.Visibility = Visibility.Collapsed;
             SetImageBorder(false);
             if (!IsLoaded) return;
             if (!IsImageShow) return;
-            if (songItemBind == null) return;
+            if (songItemBind is null) return;
             initImageCallCount++;
             await Task.Delay(200);
             initImageCallCount--;
             if (initImageCallCount != 0) return;
             if (!IsLoaded) return;
-            if (songItemBind == null) return;
+            if (songItemBind is null) return;
             if (songItemBind.MusicListData?.ListDataType == DataType.×¨¼­) return;
             if (songItemBind.MusicData.From == MusicFrom.localMusic)
             {
@@ -162,7 +162,7 @@ namespace TewiMP.Controls
             }
 
             if (!IsLoaded) result = null;
-            if (songItemBind == null) result = null;
+            if (songItemBind is null) result = null;
 
             if (result != null)
             {
@@ -223,7 +223,7 @@ namespace TewiMP.Controls
         void InitPlayingState()
         {
             if (!IsLoaded) return;
-            if (songItemBind == null) return;
+            if (songItemBind is null) return;
 
             if (IsMusicDataPlaying)
             {
@@ -284,14 +284,14 @@ namespace TewiMP.Controls
 
         void OnMouseIn()
         {
-            if (songItemBind == null) return;
+            if (songItemBind is null) return;
             Info_Buttons_Root.Visibility = Visibility.Visible;
             backgroundFillVisual.StartAnimation("Opacity", backgroundFillVisualShowAnimation);
             rightButtonVisual.StartAnimation("Opacity", rightButtonVisualShowAnimation);
         }
         void OnMouseLeave()
         {
-            if (songItemBind == null)
+            if (songItemBind is null)
             {
                 rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
                 return;
@@ -315,8 +315,8 @@ namespace TewiMP.Controls
 
         private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (sender == null) return;
-            if (sender.DataContext == null) return;
+            if (sender is null) return;
+            if (sender.DataContext is null) return;
             if (sender.DataContext is not SongItemBindBase) return;
             strokeVisual.Opacity = 0;
             songItemBind = sender.DataContext as SongItemBindBase;

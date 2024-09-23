@@ -74,7 +74,7 @@ namespace TewiMP.Controls
 
         private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (DataContext == null) return;
+            if (DataContext is null) return;
             IsPlaying = MusicData == App.audioPlayer.MusicData;
         }
 

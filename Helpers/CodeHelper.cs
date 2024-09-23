@@ -387,8 +387,8 @@ namespace TewiMP.Helpers
                         f = TagLib.File.Create(path);
                     }
                     catch { }
-                    if (f == null) return null;
-                    if (f.Tag.Pictures == null) return null;
+                    if (f is null) return null;
+                    if (f.Tag.Pictures is null) return null;
                     if (f.Tag.Pictures.Length == 0) return null;
 
                     foreach (var data in f.Tag.Pictures)
@@ -407,7 +407,7 @@ namespace TewiMP.Helpers
                     f.Dispose();
                     return bin;
                 });
-                if (a == null) return null;
+                if (a is null) return null;
                 result = await ImageFromBytes(a, width, height);
             }
             catch { result = null; }
@@ -419,7 +419,7 @@ namespace TewiMP.Helpers
         {
             byte[] result;
             TagLib.File f = null;
-            if (musicData == null) return null;
+            if (musicData is null) return null;
             if (musicData.From != MusicFrom.localMusic) return null;
             if (string.IsNullOrEmpty(musicData.InLocal)) return null;
 
@@ -435,8 +435,8 @@ namespace TewiMP.Helpers
                     {
                         return null;
                     }
-                    if (f == null) return null;
-                    if (f.Tag.Pictures == null) return null;
+                    if (f is null) return null;
+                    if (f.Tag.Pictures is null) return null;
                     if (f.Tag.Pictures.Length == 0) return null;
 
                     foreach (var data in f.Tag.Pictures)
@@ -456,7 +456,7 @@ namespace TewiMP.Helpers
                     f.Dispose();
                     return bin;
                 });
-                if (a == null) return null;
+                if (a is null) return null;
                 result = a;
             }
             catch { result = null; }
@@ -526,7 +526,7 @@ namespace TewiMP.Helpers
                         {
                             var timef = timesAndLyric[i - 1].Replace("[", "");
                             TimeSpan? timesResultBackup = GetLrcTimeStringTimeSpan(timef);
-                            if (timesResultBackup == null) continue;
+                            if (timesResultBackup is null) continue;
                             TimeSpan timesResult = (TimeSpan)timesResultBackup;
 
                             if (!lyricDictionary.ContainsKey(timesResult))
@@ -542,7 +542,7 @@ namespace TewiMP.Helpers
                     {
                         var timef = timesAndLyric[0].Replace("[", "");
                         TimeSpan? timesResultBackup = GetLrcTimeStringTimeSpan(timef);
-                        if (timesResultBackup == null) continue;
+                        if (timesResultBackup is null) continue;
                         TimeSpan timesResult = (TimeSpan)timesResultBackup;
                         
                         var text = timesAndLyric[1];

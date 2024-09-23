@@ -102,7 +102,7 @@ namespace CUETools.Codecs
                 ex = _ex;
             }
             if (!started)
-                throw new Exception(_encoder + ": " + (ex == null ? "please check the path" : ex.Message));
+                throw new Exception(_encoder + ": " + (ex is null ? "please check the path" : ex.Message));
             if (_encoderProcess.StartInfo.RedirectStandardOutput)
             {
                 Stream outputStream = new FileStream(path, FileMode.Create, FileAccess.Write, FileShare.Read);
@@ -133,7 +133,7 @@ namespace CUETools.Codecs
                     ex = _ex;
                 }
                 if (!started)
-                    throw new Exception(_encoder + ": " + (ex == null ? "please check the path" : ex.Message));
+                    throw new Exception(_encoder + ": " + (ex is null ? "please check the path" : ex.Message));
             }
             wrt = null;
             if (!_encoderProcess.HasExited)

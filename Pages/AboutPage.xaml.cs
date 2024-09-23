@@ -42,7 +42,7 @@ namespace TewiMP.Pages
                         if (audio.TryReadNextFrame(out var frame))
                         {
                             var bytes = audio.FrameConvertBytes(&frame);
-                            if (bytes == null)
+                            if (bytes is null)
                                 continue;
                             if (bufferedWaveProvider.BufferLength <= bufferedWaveProvider.BufferedBytes + bytes.Length)
                             {

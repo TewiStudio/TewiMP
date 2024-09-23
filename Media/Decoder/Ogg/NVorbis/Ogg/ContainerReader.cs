@@ -68,7 +68,7 @@ namespace NVorbis.Ogg
         /// <exception cref="ArgumentException"><paramref name="stream"/>'s <see cref="Stream.CanSeek"/> is <c>False</c>.</exception>
         public ContainerReader(Stream stream, bool closeOnDispose)
         {
-            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (stream is null) throw new ArgumentNullException(nameof(stream));
 
             _packetProviders = new List<WeakReference<Contracts.IPacketProvider>>();
 

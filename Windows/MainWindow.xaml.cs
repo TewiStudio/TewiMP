@@ -33,6 +33,8 @@ using WinRT;
 using NAudio.Wave;
 using Newtonsoft.Json.Linq;
 using CommunityToolkit.WinUI;
+using static Vanara.PInvoke.User32;
+using TewiMP.Media;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -178,6 +180,7 @@ namespace TewiMP
         static bool isShowClosingDialog = false;
         public void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
         {
+            Debug.WriteLine("mainwindow closing");
             App.SaveSettings();
             SaveNowPlaying();
 
@@ -199,9 +202,7 @@ namespace TewiMP
             //var result = await ShowDialog("再确认一次", "你真的要退出程序吗？", "取消", "确定", null, ContentDialogButton.Primary);
             //if (result == ContentDialogResult.Primary)
             //{
-            App.Current.Exit();
-            App.Current.Exit();
-            App.Current.Exit();
+            App.ExitApp();
             //}
             //else
             //{
@@ -362,20 +363,25 @@ namespace TewiMP
             var path = System.IO.Path.Combine(DataFolderBase.UserDataFolder, "LastPlaying");
             if (!App.LoadLastExitPlayingSongAndSongList)
             {
-                System.IO.File.Delete(path);
+                await Task.Run(() => System.IO.File.Delete(path));
                 return;
             }
 
-            if (!System.IO.File.Exists(path)) System.IO.File.Create(path).Close();
+            if (!await Task.Run(() => System.IO.File.Exists(path))) await Task.Run(() => System.IO.File.Create(path).Close());
 
-            JArray array = new JArray();
-            foreach (var a in App.playingList.PlayBehavior == PlayBehavior.随机播放 ? App.playingList.RandomSavePlayingList : App.playingList.NowPlayingList)
-                array.Add(JObject.FromObject(a));
-            JObject jobject = new JObject() {
-                { "music", JObject.FromObject(App.audioPlayer.MusicData) },
-                { "list", array }
-            };
-            await System.IO.File.WriteAllTextAsync(path, jobject.ToString());
+            JObject jObject = null;
+            await Task.Run(() =>
+            {
+                JArray array = new JArray();
+                foreach (var a in App.playingList.PlayBehavior == PlayBehavior.随机播放 ? App.playingList.RandomSavePlayingList : App.playingList.NowPlayingList)
+                    array.Add(JObject.FromObject(a));
+                jObject = new JObject() {
+                    { "music", JObject.FromObject(App.audioPlayer.MusicData) },
+                    { "list", array }
+                };
+            });
+            if (jObject is null) return;
+            await System.IO.File.WriteAllTextAsync(path, jObject.ToString());
             Debug.WriteLine("[SavePlayingList]: 正在播放列表已保存！");
         }
 
@@ -430,7 +436,7 @@ namespace TewiMP
             InitializeTitleBar(SWindowGridBaseTop.RequestedTheme);
         }
 
-        private void UpdateWhenDataLate()
+        private void UpdateWhenDataLated()
         {
             AudioPlayer_SourceChanged(App.audioPlayer);
             AudioPlayer_PlayStateChanged(App.audioPlayer);
@@ -468,7 +474,7 @@ namespace TewiMP
             App.downloadManager.OnDownloadError += DownloadManager_AddDownload;
 
             isAddEvents = true;
-            UpdateWhenDataLate();
+            UpdateWhenDataLated();
             MainViewStateChanged?.Invoke(true);
             Debug.WriteLine("[MainWindow]: Added Events.");
         }
@@ -584,21 +590,6 @@ namespace TewiMP
 
         private static void Window_Closed(object sender, WindowEventArgs args)
         {
-            /*
-            if (m_micaController != null)
-            {
-                m_micaController.Dispose();
-                m_micaController = null;
-            }
-            if (m_acrylicController != null)
-            {
-                m_acrylicController.Dispose();
-                m_acrylicController = null;
-            }*/
-            if (DesktopLyricWindow != null)
-                DesktopLyricWindow.Close();
-            SWindow.Activated -= Window_Activated;
-            m_configurationSource = null;
         }
 
         private async void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -893,8 +884,8 @@ namespace TewiMP
         {
             try
             {
-                if (_ == null) { SetLyricToNormal(); return; }
-                if (_.Lyric == null) { SetLyricToNormal(); return; }
+                if (_ is null) { SetLyricToNormal(); return; }
+                if (_.Lyric is null) { SetLyricToNormal(); return; }
                 if (!_.Lyric.Any()) { SetLyricToNormal(); return; }
 
                 int tcount = 1;
@@ -1001,7 +992,7 @@ namespace TewiMP
             PlayRing.Foreground = App.Current.Resources["SystemFillColorCautionBrush"] as SolidColorBrush;
             isCodeChangedSilderValue = true;
             PlayRing.Maximum = 100;
-            if (data == null)
+            if (data is null)
             {
                 PlayRing.IsIndeterminate = true;
                 PlayRing.Value = 0;
@@ -1041,7 +1032,7 @@ namespace TewiMP
         MusicData pointConnectAnimationMusicData = null;
         private void AudioPlayer_SourceChanged(Media.AudioPlayer audioPlayer)
         {
-            if (audioPlayer.MusicData == null) return;
+            if (audioPlayer.MusicData is null) return;
             if (pointConnectAnimationMusicData == audioPlayer.MusicData) return;
             pointConnectAnimationMusicData = audioPlayer.MusicData;
             PlayTitle.Text = audioPlayer.MusicData.Title;
@@ -1110,7 +1101,7 @@ namespace TewiMP
         private void AudioPlayer_TimingChanged(Media.AudioPlayer audioPlayer)
         {
             if (doNotChangeTiming) return;
-            if (audioPlayer.FileReader == null) return;
+            if (audioPlayer.FileReader is null) return;
             PlayRing.Minimum = 0;
             PlayRing.Maximum = audioPlayer.TotalTime.Ticks;
             PlayRing.Value = audioPlayer.CurrentTime.Ticks;
@@ -1135,7 +1126,7 @@ namespace TewiMP
         public static string ImagePath = null;
 
 
-        public static void SetBackdrop(BackdropType type)
+        public static void SetBackdrop(BackdropType type, bool disappearDo = false)
         {
             m_currentBackdrop = BackdropType.DefaultColor;
             if (m_micaController != null)
@@ -1421,7 +1412,7 @@ namespace TewiMP
 
         public static void SetNavViewContent(Type type, object param = null, NavigationTransitionInfo navigationTransitionInfo = null)
         {
-            if (navigationTransitionInfo == null) navigationTransitionInfo = new EntranceNavigationTransitionInfo();
+            if (navigationTransitionInfo is null) navigationTransitionInfo = new EntranceNavigationTransitionInfo();
             SContentFrame.Navigate(type, param, navigationTransitionInfo);
             SNavView.IsBackEnabled = SContentFrame.CanGoBack;
             UpdateNavViewSelectedItem(true);
@@ -1436,7 +1427,7 @@ namespace TewiMP
         public static bool IsBackRequest = false;
         private async void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
-            if (IsBackRequest || sender.SelectedItem == null || IsJustUpdate)
+            if (IsBackRequest || sender.SelectedItem is null || IsJustUpdate)
             {
                 return;
             }
@@ -1461,7 +1452,7 @@ namespace TewiMP
             else
             {
                 // TOFIX: 快速切换到 PlayList 页面会导致 SelectedItem 为 null
-                if (sender.SelectedItem == null)
+                if (sender.SelectedItem is null)
                 {
                     Debug.WriteLine("[MainWindow][NavigationSelectionChanged] SelectedItem 为 null");
                 }
@@ -1736,8 +1727,8 @@ namespace TewiMP
         static bool isHiddenMusicPageAnimationNotCompleted = false;
         public static void OpenOrCloseMusicPage()
         {
-            if (App.audioPlayer.MusicData == null) return;
-            if (musicPageVisual == null) InitMusicPageVisuals();
+            if (App.audioPlayer.MusicData is null) return;
+            if (musicPageVisual is null) InitMusicPageVisuals();
             else InitMusicPageVisuals(true);
 
             SMusicPageBaseFrame.Content = SMusicPage;
@@ -2113,7 +2104,7 @@ namespace TewiMP
             {
                 isInChangingLyricWindow = true;
                 IsDesktopLyricWindowOpen = true;
-                if (DesktopLyricWindow == null)
+                if (DesktopLyricWindow is null)
                 {
                     DesktopLyricWindow = new();
                     DesktopLyricWindow.Closed += DesktopLyricWindow_Closed;
@@ -2357,7 +2348,7 @@ namespace TewiMP
             Title = title;
             Message = message;
             Severity = severity;
-            ResidenceTime = residenceTime == null ? TimeSpan.FromSeconds(5) : (TimeSpan)residenceTime;
+            ResidenceTime = residenceTime is null ? TimeSpan.FromSeconds(5) : (TimeSpan)residenceTime;
         }
     }
 }

@@ -26,9 +26,9 @@ namespace TewiMP.Background
             get => _nowLyricsData;
             set
             {
-                //if (_nowLyricsData == null || value == null) return;
+                //if (_nowLyricsData is null || value is null) return;
                 if (value == _nowLyricsData) return;
-                if (value == null)
+                if (value is null)
                 {
                     _nowLyricsData = value;
                     InovkeLyricChangeEvent(value);
@@ -68,7 +68,7 @@ namespace TewiMP.Background
         public async Task InitLyricList(MusicData musicData)
         {
             Debug.WriteLine($"[LyricManager]: 初始化歌词：\"{musicData.Title}\"");
-            if (musicData == null) return;
+            if (musicData is null) return;
             NowPlayingLyrics.Clear();
 
             string cachePath = await FileHelper.GetLyricCache(musicData);
@@ -111,7 +111,7 @@ namespace TewiMP.Background
                     lyricTuple = null;
                 }
 
-                if (lyricTuple == null)
+                if (lyricTuple is null)
                 {
                     resultPath = null;
                 }
@@ -138,7 +138,7 @@ namespace TewiMP.Background
         public async Task InitLyricList(TagLib.File file)
         {
             Debug.WriteLine($"[LyricManager]: 从 IDv3 标签中获取歌词");
-            if (file == null)
+            if (file is null)
             {
                 await InitLyricList("");
                 return;
@@ -214,7 +214,7 @@ namespace TewiMP.Background
         public void ReCallUpdate()
         {
             timer.Start();
-            if (PlayingLyricSelectedChange == null) StopTimer();
+            if (PlayingLyricSelectedChange is null) StopTimer();
             if (!NowPlayingLyrics.Any()) StopTimer();
             if (NowPlayingLyrics.Count <= 3) StopTimer();
 

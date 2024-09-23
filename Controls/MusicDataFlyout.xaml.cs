@@ -69,29 +69,29 @@ namespace TewiMP.Controls
 
         public void ShowAt(FrameworkElement element)
         {
-            if (songItemBind == null) return;
-            if (songItemBind.MusicData == null) return;
+            if (songItemBind is null) return;
+            if (songItemBind.MusicData is null) return;
             root.ShowAt(element);
         }
         
         public void ShowAt(UIElement element, Point point)
         {
-            if (songItemBind == null) return;
-            if (songItemBind.MusicData == null) return;
+            if (songItemBind is null) return;
+            if (songItemBind.MusicData is null) return;
             root.ShowAt(element, point);
         }
         
         public void ShowAt(DependencyObject element, FlyoutShowOptions flyoutShowOptions)
         {
-            if (songItemBind == null) return;
-            if (songItemBind.MusicData == null) return;
+            if (songItemBind is null) return;
+            if (songItemBind.MusicData is null) return;
             root.ShowAt(element, flyoutShowOptions);
         }
 
         private void root_Opened(object sender, object e)
         {
-            if (songItemBind == null) return;
-            if (songItemBind.MusicData == null) return;
+            if (songItemBind is null) return;
+            if (songItemBind.MusicData is null) return;
             Init();
             InitFlyout();
         }
@@ -213,7 +213,7 @@ namespace TewiMP.Controls
                         err = ex;
                         itema.SetNotifyItemData("É¾³ýÊ§°Ü¡£", null, NotifySeverity.Error);
                     }
-                    if (err == null)
+                    if (err is null)
                     {
                         itema.SetNotifyItemData("É¾³ý³É¹¦¡£", null, NotifySeverity.Complete);
                     }

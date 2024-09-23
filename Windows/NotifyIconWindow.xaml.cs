@@ -53,7 +53,7 @@ namespace TewiMP.Windowed
             notifyIcon.Visible = isVisible;
 
             #region others
-            if (MicaController.IsSupported())
+            if (MicaController.IsSupported()) // 确认系统版本为 win11
             {
                 hwnd = WindowHelperzn.WindowHelper.GetWindowHandle(this);
                 var preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
@@ -156,7 +156,7 @@ namespace TewiMP.Windowed
             LoadingRing.IsIndeterminate = false;
             LoadingRoot.Visibility = Visibility.Collapsed;
 
-            if (audioPlayer.MusicData == null || true)
+            if (audioPlayer.MusicData is null || true)
             {
                 notifyIcon.Text = App.AppName;
             }
@@ -238,7 +238,7 @@ namespace TewiMP.Windowed
         MusicData MusicData = null;
         private void AudioPlayer_SourceChanged(AudioPlayer audioPlayer)
         {
-            if (audioPlayer.MusicData == null) return;
+            if (audioPlayer.MusicData is null) return;
             if (audioPlayer.MusicData == MusicData) return;
             PlayingBarRoot.Visibility = Visibility.Visible;
             MusicData = audioPlayer.MusicData;
@@ -455,7 +455,7 @@ namespace TewiMP.Windowed
                     case ElementTheme.Default: m_configurationSource.Theme = SystemBackdropTheme.Default; break;
                 }
 
-                if (m_acrylicController == null)
+                if (m_acrylicController is null)
                     m_acrylicController = new DesktopAcrylicController();
                 if (App.Current.RequestedTheme == ApplicationTheme.Dark)
                 {
@@ -488,9 +488,7 @@ namespace TewiMP.Windowed
                 case "off":
                     notifyIcon.Visible = false;
                     // :(
-                    App.Current.Exit();
-                    App.Current.Exit();
-                    App.Current.Exit();
+                    App.ExitApp();
                     break;
                 case "returnBack":
                     MainWindow.AppWindowLocal.Show();
@@ -557,7 +555,7 @@ namespace TewiMP.Windowed
         private void MainWindow_DesktopLyricWindowClosedEvent()
         {
             isCodeChangedDesktopLyricWindow = true;
-            TB_Lyric.IsChecked = MainWindow.DesktopLyricWindow == null;
+            TB_Lyric.IsChecked = MainWindow.DesktopLyricWindow is null;
             isCodeChangedDesktopLyricWindow = false;
         }
 

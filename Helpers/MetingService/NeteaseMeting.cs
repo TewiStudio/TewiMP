@@ -206,7 +206,7 @@ namespace TewiMP.Helpers.MetingService
 
         public List<MusicData> UnpackMusicData(JToken token)
         {
-            if (token == null) return null;
+            if (token is null) return null;
             var datas = new List<MusicData>();
             foreach (JObject md in token)
             {
