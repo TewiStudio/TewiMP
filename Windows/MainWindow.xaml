@@ -767,17 +767,27 @@
                 HorizontalAlignment="Stretch"
                 Fill="{ThemeResource AcrylicNormal}"
                 Stroke="{ThemeResource ControlElevationBorderBrush}"
-                StrokeThickness="1"
+                StrokeThickness="0"
                 RadiusX="8"
                 RadiusY="8">
             </Rectangle>
-            <TextBlock
-                Text="在此程序中打开"
-                Opacity="0.3"
-                FontSize="32"
+            <StackPanel
+                Orientation="Horizontal"
                 VerticalAlignment="Center"
-                HorizontalAlignment="Center">
-            </TextBlock>
+                HorizontalAlignment="Center"
+                Spacing="4">
+                <FontIcon
+                    VerticalAlignment="Center"
+                    Glyph="&#xE8A7;"
+                    FontSize="36"
+                    Opacity="0.3"/>
+                <TextBlock
+                    VerticalAlignment="Center"
+                    Text="在此程序中打开"
+                    Opacity="0.3"
+                    FontSize="32">
+                </TextBlock>
+            </StackPanel>
         </Grid>
     </Grid>
 </Window>

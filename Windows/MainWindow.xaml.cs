@@ -1983,6 +1983,11 @@ namespace TewiMP
         // 静音按钮点击事件
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
+            MuteOrUnmuteVolume();
+        }
+
+        public static void MuteOrUnmuteVolume()
+        {
             if (App.audioPlayer.Volume != 0)
             {
                 NoVolumeValue = App.audioPlayer.Volume;

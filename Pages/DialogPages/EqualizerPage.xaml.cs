@@ -243,7 +243,7 @@ namespace TewiMP.Pages.DialogPages
         }
     }
 
-    public class ThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
+    public partial class ThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {

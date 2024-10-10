@@ -16,6 +16,9 @@ using static TewiMP.Windowed.RoundWindow;
 using Windows.UI;
 using WinRT;
 using NAudio.Wave;
+using TewiMP.Pages;
+using TewiMP.Background;
+using System.Linq;
 
 namespace TewiMP.Windowed
 {
@@ -103,6 +106,7 @@ namespace TewiMP.Windowed
             AudioPlayer_VolumeChanged(App.audioPlayer, App.audioPlayer.Volume);
             PlayingList_NowPlayingImageLoaded(App.playingList.NowPlayingImage, null);
             App.audioPlayer.ReCallTiming();
+            SetPlayModeIconAndName(App.playingList.PlayBehavior);
 
             isCodeChangedDesktopLyricWindow = true;
             TB_Lyric.IsChecked = MainWindow.DesktopLyricWindow != null;
@@ -247,6 +251,7 @@ namespace TewiMP.Windowed
             ArtistTB.Text = audioPlayer.MusicData.ArtistName;
             AlbumTB.Text = string.IsNullOrEmpty(audioPlayer.MusicData.Album.Title2) ? audioPlayer.MusicData.Album.Title :
                 $"{audioPlayer.MusicData.Album.Title}（{audioPlayer.MusicData.Album.Title2}）";
+            TB_OutputSelector_Name.Text = audioPlayer.NowOutDevice.ToString();
 
             MoveToPosition();
         }
@@ -484,10 +489,13 @@ namespace TewiMP.Windowed
             switch ((sender as FrameworkElement).Tag)
             {
                 case "setting":
+                    MainWindow.AppWindowLocal.Show();
+                    MainWindow.OverlappedPresenter.Restore();
+                    PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
+                    MainWindow.SetNavViewContent(typeof(SettingPage));
                     break;
                 case "off":
                     notifyIcon.Visible = false;
-                    // :(
                     App.ExitApp();
                     break;
                 case "returnBack":
@@ -529,7 +537,7 @@ namespace TewiMP.Windowed
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-
+            MainWindow.MuteOrUnmuteVolume();
         }
 
         private void VolumeSD_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
@@ -580,6 +588,80 @@ namespace TewiMP.Windowed
             {
                 root.BorderThickness = new(1);
             }
+        }
+
+        private void C_Click(object sender, RoutedEventArgs e)
+        {
+            var a = (OutDevice)(sender as MenuFlyoutItem).Tag;
+            App.audioPlayer.NowOutDevice = a;
+            TB_OutputSelector_Name.Text = App.audioPlayer.NowOutDevice.ToString();
+
+            App.audioPlayer.SetReloadAsync();
+        }
+        
+        private async void AddOutDeviceToFlyOut()
+        {
+            var a = await OutDevice.GetOutDevicesAsync();
+            OutputFlyout.Items.Clear();
+            foreach (var b in a)
+            {
+                var c = new MenuFlyoutItem() { Text = b.ToString(), Tag = b };
+                c.Click += C_Click;
+                OutputFlyout.Items.Add(c);
+            }
+        }
+
+        private void TB_OutputSelector_Click(object sender, RoutedEventArgs e)
+        {
+            AddOutDeviceToFlyOut();
+        }
+
+        private void B_Click(object sender, RoutedEventArgs e)
+        {
+            var a = (PlayBehavior)(sender as MenuFlyoutItem).Tag;
+            App.playingList.PlayBehavior = a;
+            SetPlayModeIconAndName(App.playingList.PlayBehavior);
+        }
+
+        private void SetPlayModeIconAndName(PlayBehavior playBehavior)
+        {
+            switch (playBehavior)
+            {
+                case PlayBehavior.循环播放:
+                    TB_PlayModeSelector_Icon.Glyph = "\uE895";
+                    break;
+                case PlayBehavior.单曲循环:
+                    TB_PlayModeSelector_Icon.Glyph = "\uE777";
+                    break;
+                case PlayBehavior.随机播放:
+                    TB_PlayModeSelector_Icon.Glyph = "\uE8B1";
+                    break;
+                case PlayBehavior.顺序播放:
+                    TB_PlayModeSelector_Icon.Glyph = "\uE8AB";
+                    break;
+                case PlayBehavior.播放完成后停止:
+                    TB_PlayModeSelector_Icon.Glyph = "\uE71A";
+                    break;
+            }
+
+            TB_PlayModeSelector_Name.Text = playBehavior.ToString();
+        }
+
+        private void TB_PlayModeSelector_Click(object sender, RoutedEventArgs e)
+        {
+            var pList = Enum.GetNames(typeof(PlayBehavior)).ToList();
+            PlayModeFlyout.Items.Clear();
+            foreach (var p in pList)
+            {
+                var b = new MenuFlyoutItem() { Text = p, Tag = pList.IndexOf(p) };
+                b.Click += B_Click;
+                PlayModeFlyout.Items.Add(b);
+            }
+        }
+
+        private void TB_PlayModeSelector_Base_Loaded(object sender, RoutedEventArgs e)
+        {
+            SetPlayModeIconAndName(App.playingList.PlayBehavior);
         }
     }
 

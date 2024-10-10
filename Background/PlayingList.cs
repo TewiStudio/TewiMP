@@ -261,26 +261,27 @@ namespace TewiMP.Background
                 LogHelper.WriteLog("PlayingList Play Error", e.ToString(), false);
                 a = false;
 
+#if DEBUG
+                MainWindow.AddNotify("播放音频时出现错误", e.ToString(), NotifySeverity.Error);
+#else
+                MainWindow.AddNotify("播放音频时出现错误", e.Message, NotifySeverity.Error);
+#endif
+
                 if (NextWhenPlayError)
                 {
                     if (isNextPlay == SetPlayInfo.Next)
                     {
                         var index = NowPlayingList.IndexOf(musicData) + 1;
                         if (index > NowPlayingList.Count - 1) index = 0;
-                        Play(NowPlayingList[index], true, isNextPlay);
+                        await Play(NowPlayingList[index], true, isNextPlay);
                     }
                     else if (isNextPlay == SetPlayInfo.Previous)
                     {
                         var index = NowPlayingList.IndexOf(musicData) - 1;
                         if (index < 0) index = NowPlayingList.Count - 1;
-                        Play(NowPlayingList[index], true, isNextPlay);
+                        await Play(NowPlayingList[index], true, isNextPlay);
                     }
                 }
-#if DEBUG
-                MainWindow.AddNotify("播放音频时出现错误", e.ToString(), NotifySeverity.Error);
-#else
-                MainWindow.AddNotify("播放音频时出现错误", e.Message, NotifySeverity.Error);
-#endif
             }
 
             return a;

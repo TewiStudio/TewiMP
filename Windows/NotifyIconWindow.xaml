@@ -8,6 +8,7 @@
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     xmlns:c="using:TewiMP.Controls"
     xmlns:cc="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:uis="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
     <Grid Background="Transparent" x:Name="root" VerticalAlignment="Bottom" SizeChanged="root_SizeChanged"
           BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" Loaded="root_Loaded">
@@ -25,22 +26,42 @@
                 <RowDefinition Height="auto"/>
             </Grid.RowDefinitions>
             <StackPanel x:Name="PlayingBarRoot" Visibility="Collapsed">
-                <Grid MaxHeight="120">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto"/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <Grid Margin="24,24,12,0" CornerRadius="8" VerticalAlignment="Top" MaxWidth="140">
-                        <c:ImageEx x:Name="LogoImage" CornerRadius="8"/>
-                        <Grid x:Name="LoadingRoot" Background="{ThemeResource AcrylicNormal}" Opacity="0"
-                              IsHitTestVisible="False">
+                    <Grid
+                        Margin="24,24,0,0"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left"
+                        Height="100"
+                        MaxWidth="140">
+                        <Border x:Name="AlbumImageShadowTarget"/>
+                        <c:ImageEx
+                            x:Name="LogoImage"
+                            CornerRadius="4"
+                            BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                            BorderThickness="1">
+                            <uis:Effects.Shadow>
+                                <uis:AttachedDropShadow
+                                    BlurRadius="15"
+                                    Color="#30000000"
+                                    CastTo="{x:Bind AlbumImageShadowTarget}"
+                                    Offset="1,2"/>
+                            </uis:Effects.Shadow>
+                        </c:ImageEx>
+                        <Grid x:Name="LoadingRoot" Opacity="0"
+                              IsHitTestVisible="False"
+                              CornerRadius="4"
+                              Background="{ThemeResource AcrylicNormal}">
                             <Grid.OpacityTransition>
                                 <ScalarTransition Duration="0:0:0.25"/>
                             </Grid.OpacityTransition>
                             <ProgressRing x:Name="LoadingRing" Width="68" Height="68" IsIndeterminate="False"/>
                         </Grid>
                     </Grid>
-                    <Grid Grid.Column="1" VerticalAlignment="Stretch" Margin="0,24,24,0">
+                    <Grid Grid.Column="1" VerticalAlignment="Stretch" Margin="12,28,24,0">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="*"/>
@@ -61,7 +82,9 @@
                                 </Grid.ColumnDefinitions>
                                 <FontIcon Glyph="&#xE77B;" FontSize="16" Margin="0,0,4,0"
                                           Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                                <c:AutoScrollViewer x:Name="ArtistTBBase" Grid.Column="1">
+                                <c:AutoScrollViewer x:Name="ArtistTBBase"
+                                                    Grid.Column="1"
+>
                                     <TextBlock x:Name="ArtistTB" Text="无"
                                                TextTrimming="CharacterEllipsis" TextWrapping="WrapWholeWords"
                                                MaxLines="1"
@@ -130,12 +153,17 @@
                     </Button>
                 </Grid>
             </StackPanel>
-            <Rectangle HorizontalAlignment="Stretch" Height="1" Fill="{ThemeResource CardStrokeColorDefaultBrush}" VerticalAlignment="Top" Grid.Row="1"/>
+            <Rectangle HorizontalAlignment="Stretch" Height="1" Fill="{ThemeResource CardStrokeColorDefaultBrush}" VerticalAlignment="Top" Grid.Row="1" Margin="24, 0"/>
             <ScrollViewer Grid.Row="1" Visibility="Visible">
                 <ScrollViewer.Resources>
                     <Style TargetType="TextBlock">
-                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="TextAlignment" Value="Center"/>
                         <Setter Property="Margin" Value="0,4,0,12"/>
+                        <Setter Property="MaxWidth" Value="100"/>
+                        <Setter Property="MaxLines" Value="2"/>
+                        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
+                        <Setter Property="TextTrimming" Value="WordEllipsis"/>
                     </Style>
                     <Style TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
                         <Setter Property="CornerRadius" Value="4"/>
@@ -143,7 +171,7 @@
                         <Setter Property="Width" Value="100"/>
                         <Setter Property="Height" Value="50"/>
                         <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                        <Setter Property="VerticalAlignment" Value="Stretch"/>
+                        <Setter Property="VerticalAlignment" Value="Top"/>
                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                     </Style>
@@ -153,22 +181,63 @@
                         <Setter Property="Width" Value="100"/>
                         <Setter Property="Height" Value="50"/>
                         <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                        <Setter Property="VerticalAlignment" Value="Stretch"/>
+                        <Setter Property="VerticalAlignment" Value="Top"/>
+                        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                        <Setter Property="VerticalContentAlignment" Value="Center"/>
+                    </Style>
+                    <Style TargetType="DropDownButton">
+                        <Setter Property="CornerRadius" Value="4"/>
+                        <Setter Property="Margin" Value="0,0,0,0"/>
+                        <Setter Property="Width" Value="100"/>
+                        <Setter Property="Height" Value="50"/>
+                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                        <Setter Property="VerticalAlignment" Value="Top"/>
                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
                         <Setter Property="VerticalContentAlignment" Value="Center"/>
                     </Style>
                 </ScrollViewer.Resources>
 
-                <cc:WrapPanel Margin="24,24,24,12" HorizontalSpacing="16">
+                <cc:WrapPanel
+                    Margin="24,24,24,12"
+                    HorizontalSpacing="16"
+                    VerticalSpacing="4">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition />
+                            <RowDefinition Height="auto"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
                         <ToggleButton x:Name="TB_Lyric" Click="TB_Lyric_Click" AccessKey="A">
                             <FontIcon Glyph="&#xED1E;" FontSize="16"/>
                         </ToggleButton>
                         <TextBlock Text="桌面歌词" Grid.Row="1"/>
+                    </Grid>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <DropDownButton x:Name="TB_OutputSelector" Click="TB_OutputSelector_Click" AccessKey="A">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout x:Name="OutputFlyout"/>
+                            </DropDownButton.Flyout>
+                            <FontIcon Glyph="&#xF4C3;" FontSize="16"/>
+                        </DropDownButton>
+                        <TextBlock x:Name="TB_OutputSelector_Name" Text="无音频输出" Grid.Row="1"/>
+                    </Grid>
+                    <Grid
+                        x:Name="TB_PlayModeSelector_Base"
+                        Loaded="TB_PlayModeSelector_Base_Loaded">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <DropDownButton x:Name="TB_PlayModeSelector" Click="TB_PlayModeSelector_Click" AccessKey="A">
+                            <DropDownButton.Flyout>
+                                <MenuFlyout x:Name="PlayModeFlyout"/>
+                            </DropDownButton.Flyout>
+                            <FontIcon x:Name="TB_PlayModeSelector_Icon" Glyph="&#xE8AB;" FontSize="16"/>
+                        </DropDownButton>
+                        <TextBlock x:Name="TB_PlayModeSelector_Name" Text="顺序播放" Grid.Row="1"/>
                     </Grid>
                 </cc:WrapPanel>
             </ScrollViewer>
@@ -184,9 +253,34 @@
                         <FontIcon x:Name="VolumeIconBase" Glyph="&#xe995;" FontSize="16"/>
                     </Grid>
                 </Button>
-                <Slider x:Name="VolumeSD" Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0"
-                        ValueChanged="VolumeSD_ValueChanged" IsThumbToolTipEnabled="False"/>
-                <TextBlock Grid.Column="2" Width="24" VerticalAlignment="Center" TextAlignment="Center" Text="{Binding ElementName=VolumeSD,Path=Value}"/>
+                <Slider 
+                    x:Name="VolumeSD" Grid.Column="1" VerticalAlignment="Center" Margin="12,0,12,0"
+                    ValueChanged="VolumeSD_ValueChanged" IsThumbToolTipEnabled="False"/>
+                <TextBlock
+                    Grid.Column="2"
+                    Width="24"
+                    VerticalAlignment="Center"
+                    TextAlignment="Center"
+                    Text="{Binding ElementName=VolumeSD,Path=Value}"
+                    Opacity="1"/>
+                <Button
+                    Visibility="Collapsed"
+                    Height="40" Width="40"
+                    Padding="0"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    HorizontalAlignment="Center"
+                    Background="Transparent"
+                    BorderThickness="0">
+                    <StackPanel
+                        Spacing="0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                        <FontIcon Glyph="&#xE9E9;" FontSize="14"/>
+                        <FontIcon Glyph="&#xE76C;" FontSize="14"/>
+                    </StackPanel>
+                </Button>
             </Grid>
         </Grid>
         <Grid VerticalAlignment="Bottom" Grid.Row="1" x:Name="BottomBarRoot">

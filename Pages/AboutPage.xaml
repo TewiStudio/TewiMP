@@ -87,6 +87,12 @@
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
                                          Click="SettingsCard_Click"
+                                         Tag="https://github.com/CommunityToolkit/WindowsCommunityToolkit"
+                                         Header="Windows Community Toolkit"
+                                         Description="Collection of controls for WinUI 2, WinUI 3, and Uno Platform developers. Simplifies and demonstrates common developer tasks building experiences for Windows with .NET."/>
+                        <cc:SettingsCard IsClickEnabled="True"
+                                         ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
+                                         Click="SettingsCard_Click"
                                          Tag="https://github.com/mono/taglib-sharp"
                                          Header="taglib-sharp"
                                          Description="Library for reading and writing metadata in media files."/>
@@ -99,9 +105,9 @@
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
                                          Click="SettingsCard_Click"
-                                         Tag="https://github.com/CommunityToolkit/WindowsCommunityToolkit"
-                                         Header="Windows Community Toolkit"
-                                         Description="Collection of controls for WinUI 2, WinUI 3, and Uno Platform developers. Simplifies and demonstrates common developer tasks building experiences for Windows with .NET."/>
+                                         Tag="https://github.com/owoudenberg/soundtouch.net"
+                                         Header="SoundTouch.net"
+                                         Description="The SoundTouch Library is originally written by Olli Parviainen in C++. Although a .NET wrapper library is available, this library aims to be a complete rewrite in C#."/>
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
                                          Click="SettingsCard_Click"
@@ -126,12 +132,6 @@
                                          Tag="https://github.com/JamesNK/Newtonsoft.Json"
                                          Header="Json.NET"
                                          Description="Json.NET is a popular high-performance JSON framework for .NET."/>
-                        <cc:SettingsCard IsClickEnabled="True"
-                                         ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
-                                         Click="SettingsCard_Click"
-                                         Tag="https://github.com/owoudenberg/soundtouch.net"
-                                         Header="SoundTouch.net"
-                                         Description="The SoundTouch Library is originally written by Olli Parviainen in C++. Although a .NET wrapper library is available, this library aims to be a complete rewrite in C#."/>
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
                                          Click="SettingsCard_Click"
