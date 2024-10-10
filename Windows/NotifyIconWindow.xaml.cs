@@ -611,6 +611,11 @@ namespace TewiMP.Windowed
             }
         }
 
+        private void TB_OutputSelector_Loaded(object sender, RoutedEventArgs e)
+        {
+            AddOutDeviceToFlyOut();
+        }
+
         private void TB_OutputSelector_Click(object sender, RoutedEventArgs e)
         {
             AddOutDeviceToFlyOut();

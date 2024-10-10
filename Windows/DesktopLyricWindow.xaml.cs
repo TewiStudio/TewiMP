@@ -350,18 +350,21 @@ namespace TewiMP.Windowed
                 {
                     V1.HorizontalAlignment = HorizontalAlignment.Center;
                     V2.HorizontalAlignment = HorizontalAlignment.Center;
+                    TRBaseParent.HorizontalAlignment = HorizontalAlignment.Center;
                     //progressRoot.HorizontalAlignment = HorizontalAlignment.Center;
                 }
                 else if (LyricTranslateTextPosition == LyricTranslateTextPosition.Left)
                 {
                     V1.HorizontalAlignment = HorizontalAlignment.Left;
                     V2.HorizontalAlignment = HorizontalAlignment.Left;
+                    TRBaseParent.HorizontalAlignment = HorizontalAlignment.Left;
                     //progressRoot.HorizontalAlignment = HorizontalAlignment.Left;
                 }
                 else
                 {
                     V1.HorizontalAlignment = HorizontalAlignment.Right;
                     V2.HorizontalAlignment = HorizontalAlignment.Right;
+                    TRBaseParent.HorizontalAlignment = HorizontalAlignment.Right;
                     //progressRoot.HorizontalAlignment = HorizontalAlignment.Right;
                 }
                 if (LyricTranslateTextBehavior == LyricTranslateTextBehavior.MainLyric)
@@ -417,21 +420,25 @@ namespace TewiMP.Windowed
                 {
                     V1.HorizontalAlignment = HorizontalAlignment.Left;
                     V2.HorizontalAlignment = HorizontalAlignment.Right;
+                    TRBaseParent.HorizontalAlignment = HorizontalAlignment.Center;
                 }
                 else if (LyricTextPosition == LyricTextPosition.Left)
                 {
                     V1.HorizontalAlignment = HorizontalAlignment.Left;
                     V2.HorizontalAlignment = HorizontalAlignment.Left;
+                    TRBaseParent.HorizontalAlignment = HorizontalAlignment.Left;
                 }
                 else if (LyricTextPosition == LyricTextPosition.Right)
                 {
                     V1.HorizontalAlignment = HorizontalAlignment.Right;
                     V2.HorizontalAlignment = HorizontalAlignment.Right;
+                    TRBaseParent.HorizontalAlignment = HorizontalAlignment.Right;
                 }
                 else if (LyricTextPosition == LyricTextPosition.Center)
                 {
                     V1.HorizontalAlignment = HorizontalAlignment.Center;
                     V2.HorizontalAlignment = HorizontalAlignment.Center;
+                    TRBaseParent.HorizontalAlignment = HorizontalAlignment.Center;
                 }
 
                 bool RomajiEnable = !string.IsNullOrEmpty(nowLyricsData.Romaji);

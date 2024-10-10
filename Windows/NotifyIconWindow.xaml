@@ -159,11 +159,12 @@
                     <Style TargetType="TextBlock">
                         <Setter Property="HorizontalAlignment" Value="Stretch"/>
                         <Setter Property="TextAlignment" Value="Center"/>
-                        <Setter Property="Margin" Value="0,4,0,12"/>
+                        <Setter Property="Margin" Value="0,8,0,0"/>
                         <Setter Property="MaxWidth" Value="100"/>
                         <Setter Property="MaxLines" Value="2"/>
                         <Setter Property="TextWrapping" Value="WrapWholeWords"/>
                         <Setter Property="TextTrimming" Value="WordEllipsis"/>
+                        <Setter Property="FontSize" Value="12"/>
                     </Style>
                     <Style TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">
                         <Setter Property="CornerRadius" Value="4"/>
@@ -198,9 +199,9 @@
                 </ScrollViewer.Resources>
 
                 <cc:WrapPanel
-                    Margin="24,24,24,12"
+                    Margin="24,12,24,12"
                     HorizontalSpacing="16"
-                    VerticalSpacing="4">
+                    VerticalSpacing="24">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="auto"/>
@@ -216,7 +217,7 @@
                             <RowDefinition Height="auto"/>
                             <RowDefinition Height="auto"/>
                         </Grid.RowDefinitions>
-                        <DropDownButton x:Name="TB_OutputSelector" Click="TB_OutputSelector_Click" AccessKey="A">
+                        <DropDownButton x:Name="TB_OutputSelector" Click="TB_OutputSelector_Click" AccessKey="A" Loaded="TB_OutputSelector_Loaded">
                             <DropDownButton.Flyout>
                                 <MenuFlyout x:Name="OutputFlyout"/>
                             </DropDownButton.Flyout>
