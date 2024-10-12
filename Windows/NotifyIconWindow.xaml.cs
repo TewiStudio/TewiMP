@@ -106,6 +106,7 @@ namespace TewiMP.Windowed
             AudioPlayer_VolumeChanged(App.audioPlayer, App.audioPlayer.Volume);
             PlayingList_NowPlayingImageLoaded(App.playingList.NowPlayingImage, null);
             App.audioPlayer.ReCallTiming();
+            TB_OutputSelector_Name.Text = $"{App.audioPlayer.NowOutDevice.DeviceType} - {App.audioPlayer.NowOutDevice.DeviceName}";
             SetPlayModeIconAndName(App.playingList.PlayBehavior);
 
             isCodeChangedDesktopLyricWindow = true;
@@ -594,7 +595,7 @@ namespace TewiMP.Windowed
         {
             var a = (OutDevice)(sender as MenuFlyoutItem).Tag;
             App.audioPlayer.NowOutDevice = a;
-            TB_OutputSelector_Name.Text = App.audioPlayer.NowOutDevice.ToString();
+            TB_OutputSelector_Name.Text = $"{App.audioPlayer.NowOutDevice.DeviceType} - {App.audioPlayer.NowOutDevice.DeviceName}";
 
             App.audioPlayer.SetReloadAsync();
         }

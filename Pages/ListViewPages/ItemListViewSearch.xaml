@@ -26,19 +26,20 @@
                   ScrollViewer.CanContentRenderOutsideBounds="True"
                   Padding="0,0,0,54"
                   ItemsSource="{x:Bind MusicDataList}"
-                  SelectionMode="None">
+                  SelectionMode="None"
+                  SizeChanged="Result_BaseGrid_SizeChanged">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="helper:SongItemBindBase">
                     <controlszn:MusicDataItem Margin="0,0,4,2"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.Header>
-                <Border VerticalAlignment="Top"
-                        x:Name="menu_border"
-                        BorderBrush="{ThemeResource BorderNormal}"
-                        Loaded="menu_border_Loaded"
-                        Margin="0,0,0,6">
-                    <Grid SizeChanged="Result_BaseGrid_SizeChanged">
+                <Grid VerticalAlignment="Top"
+                      x:Name="menu_border"
+                      BorderBrush="{ThemeResource BorderNormal}"
+                      Loaded="menu_border_Loaded"
+                      Margin="0,0,0,6">
+                    <Grid>
                         <Border x:Name="BackColorBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                 BorderThickness="0,0,0,1"/>
@@ -241,61 +242,16 @@
 
                         </StackPanel>
                     </Grid>
-                </Border>
+                    <Grid x:Name="ItemsList_Header_Foot_Root">
+                        <controlszn:ScrollFootButton
+                            x:Name="ItemsList_Header_Foot_Buttons"
+                            VerticalAlignment="Bottom"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                </Grid>
             </ListView.Header>
         </ListView>
         <Rectangle x:Name="ItemPresenterControlBridge"/>
-        <Grid VerticalAlignment="Bottom"
-              HorizontalAlignment="Right"
-              CornerRadius="4" Margin="0,0,16,8">
-            <Grid.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="Margin" Value="4,0,0,0"/>
-                    <Setter Property="Width" Value="38"/>
-                    <Setter Property="Height" Value="38"/>
-                </Style>
-                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Padding" Value="10"/>
-                    <Setter Property="VerticalAlignment" Value="Stretch"/>
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                </Style>
-            </Grid.Resources>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Border CornerRadius='4'
-                    Background="{ThemeResource AcrylicNormal}">
-                <Button Click="Button_Click_8" Tag="1" AccessKey="C"
-                        ToolTipService.ToolTip="滚动到底部">
-                    <AnimatedIcon>
-                        <AnimatedIcon.Source>
-                            <m:AnimatedChevronDownSmallVisualSource/>
-                        </AnimatedIcon.Source>
-                    </AnimatedIcon>
-                </Button>
-            </Border>
-            <Border CornerRadius='4' Grid.Column="1"
-                    Background="{ThemeResource AcrylicNormal}">
-                <Button Click="Button_Click_8" Tag="0" AccessKey="V"
-                        ToolTipService.ToolTip="滚动到顶部">
-                    <AnimatedIcon>
-                        <AnimatedIcon.Source>
-                            <m:AnimatedChevronUpDownSmallVisualSource/>
-                        </AnimatedIcon.Source>
-                    </AnimatedIcon>
-                </Button>
-            </Border>
-            <Border CornerRadius='4' Grid.Column="2"
-                    Background="{ThemeResource AcrylicNormal}">
-                <Button Click="Button_Click_8" Tag="2" AccessKey="N"
-                        ToolTipService.ToolTip="滚动到当前正在播放的歌曲">
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE759;" FontSize="16"/>
-                </Button>
-            </Border>
-        </Grid>
         <controlszn:LoadingTip x:Name="LoadingTipControl"
                                VerticalAlignment="Bottom"
                                HorizontalAlignment="Center"

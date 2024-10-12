@@ -43,6 +43,7 @@ namespace TewiMP.Pages
             NowMusicFrom = a.From;
             NowSearchMode = a.SearchDataType;
             musicListData = new() { ListDataType = DataType.歌曲 };
+            UpdateShyHeader();
             InitData();
         }
 
@@ -160,6 +161,7 @@ namespace TewiMP.Pages
 
             System.Diagnostics.Debug.WriteLine("加载完成。");
             LoadingTipControl.UnShowLoading();
+            UpdateShyHeader();
         }
 
         CompositionPropertySet scrollerPropertySet;
@@ -168,6 +170,7 @@ namespace TewiMP.Pages
         Visual backgroundVisual;
         Visual logoVisual;
         Visual stackVisual;
+        Visual headerFootRootVisual;
         public void UpdateShyHeader()
         {
             if (scrollViewer is null) return;
@@ -181,6 +184,7 @@ namespace TewiMP.Pages
                 compositor = scrollerPropertySet.Compositor;
                 headerVisual = ElementCompositionPreview.GetElementVisual(menu_border);
                 backgroundVisual = ElementCompositionPreview.GetElementVisual(BackColorBaseRectangle);
+                headerFootRootVisual = ElementCompositionPreview.GetElementVisual(ItemsList_Header_Foot_Root);
             }
 
             var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {anotherHeight}");
@@ -190,6 +194,20 @@ namespace TewiMP.Pages
             var backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
             backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
+
+            var headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
+                $"Lerp(" +
+                    $"Vector3(" +
+                        $"-16," +
+                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                        $"0)," +
+                    $"Vector3(" +
+                        $"-16," +
+                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                        $"0)," +
+                    $"{progress})");
+            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
         }
 
         private async void UpdateCommandToolBarWidth()
@@ -199,8 +217,38 @@ namespace TewiMP.Pages
             ToolsCommandBar.Width = double.NaN;
         }
 
+        private async void PositionToButton_Click(object sender, RoutedEventArgs e)
+        {
+            var btn = sender as Button;
+            switch ((ScrollFootButton.ButtonType)btn.Tag)
+            {
+                case ScrollFootButton.ButtonType.NowPlaying:
+                    foreach (var i in MusicDataList)
+                    {
+                        if (i.MusicData != App.audioPlayer.MusicData) continue;
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
+                        MusicDataItem.TryHighlightPlayingItem();
+                    }
+                    break;
+                case ScrollFootButton.ButtonType.Top:
+                    scrollViewer.ChangeView(null, 0, null);
+                    break;
+                case ScrollFootButton.ButtonType.Bottom:
+                    scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
+                    break;
+            }
+        }
+
         private void menu_border_Loaded(object sender, RoutedEventArgs e)
         {
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click += PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click += PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click += PositionToButton_Click;
+
             if (scrollViewer is null)
             {
                 scrollViewer = (VisualTreeHelper.GetChild(Children, 0) as Border).Child as ScrollViewer;
@@ -215,6 +263,13 @@ namespace TewiMP.Pages
 
             UpdateShyHeader();
             UpdateCommandToolBarWidth();
+        }
+
+        private void Artist_Image_Unloaded(object sender, RoutedEventArgs e)
+        {
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
         }
 
         private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)

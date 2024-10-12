@@ -262,33 +262,39 @@ namespace TewiMP.Pages
 
         private async void Button_Click_4(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
-            if (button is null) return;
+            if (sender is Button button)
+            {
+                var result = await MainWindow.ShowDialog(
+                    "删除缓存",
+                    "此操作会将缓存路径中的文件全部删除，\n如果缓存路径中存在其它文件数据，也会一并删除。\n是否确定删除？",
+                    "取消", "确定删除", null, ContentDialogButton.Primary);
+                if (result != ContentDialogResult.Primary) return;
 
-            string tagObj = button.Tag as string;
-            string folderPath = null;
-            switch (tagObj)
-            {
-                case "0":
-                    folderPath = AudioCachePath;
-                    break;
-                case "1":
-                    folderPath = ImageCachePath;
-                    break;
-                case "2":
-                    folderPath = LyricCachePath;
-                    break;
-            }
-            await Task.Run(() =>
-            {
-                var files = Directory.EnumerateFiles(folderPath);
-                foreach (var file in files)
+                string tagObj = button.Tag as string;
+                string folderPath = null;
+                switch (tagObj)
                 {
-                    File.Delete(file);
+                    case "0":
+                        folderPath = AudioCachePath;
+                        break;
+                    case "1":
+                        folderPath = ImageCachePath;
+                        break;
+                    case "2":
+                        folderPath = LyricCachePath;
+                        break;
                 }
-            });
+                await Task.Run(() =>
+                {
+                    var files = Directory.EnumerateFiles(folderPath);
+                    foreach (var file in files)
+                    {
+                        File.Delete(file);
+                    }
+                });
 
-            (VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(button))) as CommunityToolkit.WinUI.Controls.SettingsCard).Description = "当前占用：0B";
+                (VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(button))) as CommunityToolkit.WinUI.Controls.SettingsCard).Description = "当前占用：0B";
+            }
         }
         #endregion
 

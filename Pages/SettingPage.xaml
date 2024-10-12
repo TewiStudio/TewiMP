@@ -54,8 +54,16 @@
                         <FontIcon Glyph="&#xE8B7;"/>
                     </cc:SettingsCard.HeaderIcon>
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="打开文件夹" Tag="0" Click="Button_Click"/>
-                        <Button Content="设置路径" Tag="0" Click="Button_Click_1" Margin="4,0,0,0"/>
+                        <Button
+                            Content="打开文件夹"
+                            Tag="0"
+                            Click="Button_Click"
+                            Style="{ThemeResource LeftButtonStyle}"/>
+                        <Button
+                            Content="设置路径"
+                            Tag="0"
+                            Click="Button_Click_1"
+                            Style="{ThemeResource RightButtonStyle}"/>
                     </StackPanel>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="音频缓存路径"
@@ -64,8 +72,16 @@
                         <FontIcon Glyph="&#xE8D6;"/>
                     </cc:SettingsCard.HeaderIcon>
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="打开文件夹" Tag="1" Click="Button_Click"/>
-                        <Button Content="设置路径" Tag="1" Click="Button_Click_1" Margin="4,0,0,0"/>
+                        <Button
+                            Content="打开文件夹"
+                            Tag="1"
+                            Click="Button_Click"
+                            Style="{ThemeResource LeftButtonStyle}"/>
+                        <Button
+                            Content="设置路径"
+                            Tag="1"
+                            Click="Button_Click_1"
+                            Style="{ThemeResource RightButtonStyle}"/>
                     </StackPanel>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="图片缓存路径"
@@ -74,8 +90,16 @@
                         <FontIcon Glyph="&#xE91B;"/>
                     </cc:SettingsCard.HeaderIcon>
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="打开文件夹" Tag="2" Click="Button_Click"/>
-                        <Button Content="设置路径" Tag="2" Click="Button_Click_1" Margin="4,0,0,0"/>
+                        <Button
+                            Content="打开文件夹"
+                            Tag="2"
+                            Click="Button_Click"
+                            Style="{ThemeResource LeftButtonStyle}"/>
+                        <Button
+                            Content="设置路径"
+                            Tag="2"
+                            Click="Button_Click_1"
+                            Style="{ThemeResource RightButtonStyle}"/>
                     </StackPanel>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="歌词缓存路径"
@@ -84,8 +108,16 @@
                         <FontIcon Glyph="&#xE8E4;"/>
                     </cc:SettingsCard.HeaderIcon>
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="打开文件夹" Tag="3" Click="Button_Click"/>
-                        <Button Content="设置路径" Tag="3" Click="Button_Click_1" Margin="4,0,0,0"/>
+                        <Button
+                            Content="打开文件夹"
+                            Tag="3"
+                            Click="Button_Click"
+                            Style="{ThemeResource LeftButtonStyle}"/>
+                        <Button
+                            Content="设置路径"
+                            Tag="3"
+                            Click="Button_Click_1"
+                            Style="{ThemeResource RightButtonStyle}"/>
                     </StackPanel>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="清理音频缓存文件"
@@ -119,8 +151,8 @@
                         <FontIcon Glyph="&#xE8B7;"/>
                     </cc:SettingsCard.HeaderIcon>
                     <StackPanel Orientation="Horizontal">
-                        <Button Content="打开路径" Tag="4" Click="Button_Click"/>
-                        <Button Content="更改" Tag="4" Click="Button_Click_1" Margin="4,0,0,0"/>
+                        <Button Content="打开路径" Tag="4" Click="Button_Click" Style="{ThemeResource LeftButtonStyle}"/>
+                        <Button Content="更改" Tag="4" Click="Button_Click_1" Style="{ThemeResource RightButtonStyle}"/>
                     </StackPanel>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="下载质量">

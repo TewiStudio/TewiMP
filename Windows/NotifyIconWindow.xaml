@@ -162,8 +162,8 @@
                         <Setter Property="Margin" Value="0,8,0,0"/>
                         <Setter Property="MaxWidth" Value="100"/>
                         <Setter Property="MaxLines" Value="2"/>
-                        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                        <Setter Property="TextTrimming" Value="WordEllipsis"/>
+                        <Setter Property="TextWrapping" Value="Wrap"/>
+                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
                         <Setter Property="FontSize" Value="12"/>
                     </Style>
                     <Style TargetType="ToggleButton" BasedOn="{StaticResource DefaultToggleButtonStyle}">

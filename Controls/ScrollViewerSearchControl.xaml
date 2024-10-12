@@ -65,7 +65,7 @@
                 </Style>
             </StackPanel.Resources>
             <Button
-                CornerRadius="4,0,0,4" BorderThickness="1,1,0,1"
+                Style="{ThemeResource LeftButtonStyle}"
                 Click="Button_Click"
                 Tag="0"
                 IsEnabled="{Binding ElementName=SearchBox, Path=IsEnabled}"
@@ -80,7 +80,7 @@
                 </AnimatedIcon>
             </Button>
             <Button
-                CornerRadius="0,4,4,0" BorderThickness="1,1,1,1"
+                Style="{ThemeResource RightButtonStyle}"
                 Click="Button_Click"
                 Tag="1"
                 IsEnabled="{Binding ElementName=SearchBox, Path=IsEnabled}"
@@ -101,10 +101,9 @@
             Grid.Column="2"
             Orientation="Horizontal">
             <Button
-                MaxHeight="32" 
-                CornerRadius="4,0,0,4"
-                BorderThickness="1,1,0,1"
-                Padding="7"
+                Height="32" 
+                Padding="10,7"
+                Style="{ThemeResource LeftButtonStyleNonBorder}"
                 IsEnabled="{Binding ElementName=SearchBox, Path=IsEnabled}"
                 ToolTipService.ToolTip="搜索选项">
                 <Button.Flyout>
@@ -130,10 +129,9 @@
                 </AnimatedIcon>
             </Button>
             <Button
-                Width="32" Height="32"
-                CornerRadius="0,4,4,0"
-                BorderThickness="0,1,1,1" Tag="2"
-                Padding="0" Click="Button_Click"
+                Height="32"
+                Style="{ThemeResource RightButtonStyle}" Tag="2"
+                Padding="10,0" Click="Button_Click"
                 IsEnabled="{Binding ElementName=SearchBox, Path=IsEnabled}"
                 ToolTipService.ToolTip="关闭搜索栏">
                 <FontIcon Glyph="&#xE711;" FontSize="16"/>

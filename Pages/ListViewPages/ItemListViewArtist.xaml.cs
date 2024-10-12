@@ -147,7 +147,8 @@ namespace TewiMP.Pages
         Visual backgroundVisual;
         Visual tbVisual;
         Visual ImageScrollVisual;
-        public void UpdateShyHeader()
+        Visual headerFootRootVisual;
+        public void UpdateShyHeader(bool footBarUpdate = true)
         {
             if (scrollViewer is null) return;
 
@@ -162,6 +163,7 @@ namespace TewiMP.Pages
                 backgroundVisual = ElementCompositionPreview.GetElementVisual(BackColorBaseRectangle);
                 tbVisual = ElementCompositionPreview.GetElementVisual(ArtistTb);
                 ImageScrollVisual = ElementCompositionPreview.GetElementVisual(Artist_ImageBaseBorder);
+                headerFootRootVisual = ElementCompositionPreview.GetElementVisual(ItemsList_Header_Foot_Root);
             }
 
             var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {anotherHeight}");
@@ -175,6 +177,21 @@ namespace TewiMP.Pages
             var ImageVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(0,0,0), Vector3(0,{menu_border.ActualHeight / 2},0), {progress})");
             ImageVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             ImageScrollVisual.StartAnimation(nameof(ImageScrollVisual.Offset), ImageVisualOffsetAnimation);
+
+            if (!footBarUpdate) return;
+            var headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
+                $"Lerp(" +
+                    $"Vector3(" +
+                        $"-16," +
+                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                        $"0)," +
+                    $"Vector3(" +
+                        $"-16," +
+                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                        $"0)," +
+                    $"{progress})");
+            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
         }
 
         private async void UpdateCommandToolBarWidth()
@@ -184,9 +201,39 @@ namespace TewiMP.Pages
             ToolsCommandBar.Width = double.NaN;
         }
 
-        Vector3 ATBOffset = default;
-        private async void menu_border_Loaded(object sender, RoutedEventArgs e)
+        private async void PositionToButton_Click(object sender, RoutedEventArgs e)
         {
+            var btn = sender as Button;
+            switch ((ScrollFootButton.ButtonType)btn.Tag)
+            {
+                case ScrollFootButton.ButtonType.NowPlaying:
+                    foreach (var i in MusicDataList)
+                    {
+                        if (i.MusicData != App.audioPlayer.MusicData) continue;
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
+                        MusicDataItem.TryHighlightPlayingItem();
+                    }
+                    break;
+                case ScrollFootButton.ButtonType.Top:
+                    scrollViewer.ChangeView(null, 0, null);
+                    break;
+                case ScrollFootButton.ButtonType.Bottom:
+                    scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
+                    break;
+            }
+        }
+
+        Vector3 ATBOffset = default;
+        private void menu_border_Loaded(object sender, RoutedEventArgs e)
+        {
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click += PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click += PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click += PositionToButton_Click;
+
             if (scrollViewer is null)
             {
                 scrollViewer = (VisualTreeHelper.GetChild(Children, 0) as Border).Child as ScrollViewer;
@@ -203,17 +250,33 @@ namespace TewiMP.Pages
             Result_BaseGrid_SizeChanged(null, null);
         }
 
-        private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
+        private void Artist_Image_Unloaded(object sender, RoutedEventArgs e)
         {
-            headerVisual.IsPixelSnappingEnabled = true;
+            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
+            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
         }
 
-        private void Result_BaseGrid_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
+        {
+            headerVisual!.IsPixelSnappingEnabled = true;
+        }
+
+        int resizeCounter = 0;
+        private async void Result_BaseGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             menu_border.MinHeight = LittleBarGrid.ActualHeight;
-            try { menu_border.Height = ActualHeight - 54; }
+            try { menu_border.Height = ActualHeight - 58; }
             catch { }
             ImageClip.Rect = new(0, 0, Artist_ImageBaseGrid.ActualWidth, Artist_ImageBaseGrid.ActualHeight);
+
+            UpdateShyHeader(false); // headerFootRoot 会因为 menu_border 改变高度而闪烁
+            if (resizeCounter > 1) ItemsList_Header_Foot_Root.Opacity = 0;
+            resizeCounter++;
+            await Task.Delay(200);
+            resizeCounter--;
+            if (resizeCounter != 0) return;
+            ItemsList_Header_Foot_Root.Opacity = 1;
             UpdateShyHeader();
         }
 

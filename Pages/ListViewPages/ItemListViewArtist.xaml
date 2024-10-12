@@ -21,26 +21,26 @@
                   ScrollViewer.CanContentRenderOutsideBounds="True"
                   Padding="0,0,0,54"
                   ItemsSource="{x:Bind MusicDataList}"
-                  SelectionMode="None">
+                  SelectionMode="None"
+                  SizeChanged="Result_BaseGrid_SizeChanged">
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="helper:SongItemBindBase">
                     <controlszn:MusicDataItem Margin="0,0,4,2"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.Header>
-                <Border VerticalAlignment="Stretch"
-                        x:Name="menu_border"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1"
-                        Margin="0,0,0,6">
-                    <Grid SizeChanged="Result_BaseGrid_SizeChanged" Name="Artist_ImageBaseGrid">
+                <Grid VerticalAlignment="Top"
+                      x:Name="menu_border"
+                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                      Margin="0,0,0,6">
+                    <Grid Name="Artist_ImageBaseGrid">
                         <Grid.Clip>
                             <RectangleGeometry x:Name="ImageClip" Rect="0,0,0,0"/>
                         </Grid.Clip>
                         <Border CornerRadius="0"
                                 BorderThickness="0"
                                 x:Name="Artist_ImageBaseBorder">
-                            <controlszn:ImageEx x:Name="Artist_Image" Loaded="menu_border_Loaded" SizeChanged="Result_BaseGrid_SizeChanged" IsHitTestVisible="False" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            <controlszn:ImageEx x:Name="Artist_Image" Loaded="menu_border_Loaded" Unloaded="Artist_Image_Unloaded" SizeChanged="Result_BaseGrid_SizeChanged" IsHitTestVisible="False" Stretch="UniformToFill" VerticalAlignment="Center" HorizontalAlignment="Center"/>
                         </Border>
                         <Grid VerticalAlignment="Bottom" x:Name="HLGrid">
                             <Grid.RowDefinitions>
@@ -100,7 +100,7 @@
                                     </Border>
                                 </StackPanel>
                             </Grid>
-                            
+
                             <Border Grid.Row="1" x:Name="BackColorBaseRectangle"
                                     Background="{ThemeResource AcrylicNormal}"
                                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
@@ -126,7 +126,7 @@
                                             DefaultLabelPosition="Right"
                                             Margin="0,0,14,0"
                                             Background="Transparent">
-                                    
+
                                     <AppBarButton Click="Button_Click"
                                                   Label="播放全部（Alt+Q）"
                                                   AccessKey="Q"
@@ -225,60 +225,16 @@
 
                         </Grid>
                     </Grid>
-                </Border>
+                    <Grid
+                        x:Name="ItemsList_Header_Foot_Root">
+                        <controlszn:ScrollFootButton
+                            x:Name="ItemsList_Header_Foot_Buttons"
+                            VerticalAlignment="Bottom"
+                            HorizontalAlignment="Right"/>
+                    </Grid>
+                </Grid>
             </ListView.Header>
         </ListView>
-        <Grid VerticalAlignment="Bottom"
-              HorizontalAlignment="Right"
-              CornerRadius="4" Margin="0,0,16,8">
-            <Grid.Resources>
-                <Style TargetType="Border">
-                    <Setter Property="Margin" Value="4,0,0,0"/>
-                    <Setter Property="Width" Value="38"/>
-                    <Setter Property="Height" Value="38"/>
-                </Style>
-                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                    <Setter Property="Background" Value="Transparent"/>
-                    <Setter Property="Padding" Value="10"/>
-                    <Setter Property="VerticalAlignment" Value="Stretch"/>
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                </Style>
-            </Grid.Resources>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Border CornerRadius='4'
-                    Background="{ThemeResource AcrylicNormal}">
-                <Button Click="Button_Click_7" Tag="1" AccessKey="C"
-                        ToolTipService.ToolTip="滚动到底部">
-                    <AnimatedIcon>
-                        <AnimatedIcon.Source>
-                            <m:AnimatedChevronDownSmallVisualSource/>
-                        </AnimatedIcon.Source>
-                    </AnimatedIcon>
-                </Button>
-            </Border>
-            <Border CornerRadius='4' Grid.Column="1" AccessKey="V"
-                    Background="{ThemeResource AcrylicNormal}">
-                <Button Click="Button_Click_7" Tag="0"
-                        ToolTipService.ToolTip="滚动到顶部">
-                    <AnimatedIcon>
-                        <AnimatedIcon.Source>
-                            <m:AnimatedChevronUpDownSmallVisualSource/>
-                        </AnimatedIcon.Source>
-                    </AnimatedIcon>
-                </Button>
-            </Border>
-            <Border CornerRadius='4' Grid.Column="2"
-                    Background="{ThemeResource AcrylicNormal}">
-                <Button Click="Button_Click_7" Tag="2" AccessKey="N"
-                        ToolTipService.ToolTip="滚动到当前正在播放的歌曲">
-                    <FontIcon FontFamily="Segoe Fluent Icons" Glyph="&#xE759;" FontSize="16"/>
-                </Button>
-            </Border>
-        </Grid>
         <controlszn:LoadingTip x:Name="LoadingTipControl"
                                VerticalAlignment="Bottom"
                                HorizontalAlignment="Center"

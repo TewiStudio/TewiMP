@@ -47,6 +47,22 @@
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
+            <Style x:Key="LeftButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="CornerRadius" Value="4,0,0,4"/>
+            </Style>
+            <Style x:Key="LeftButtonStyleNonBorder" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="CornerRadius" Value="4,0,0,4"/>
+                <Setter Property="BorderThickness" Value="1,1,0,1"/>
+            </Style>
+            <Style x:Key="CenterButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="CornerRadius" Value="0"/>
+                <Setter Property="BorderThickness" Value="0,1,1,1"/>
+            </Style>
+            <Style x:Key="RightButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                <Setter Property="CornerRadius" Value="0,4,4,0"/>
+                <Setter Property="BorderThickness" Value="0,1,1,1"/>
+            </Style>
+            
             <SolidColorBrush x:Key="LrcWindowForeground" Color="#CCEEEEEE"/>
 
             <x:Double x:Key="VolumeOpacity">0.24</x:Double>
