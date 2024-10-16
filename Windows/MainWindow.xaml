@@ -503,7 +503,7 @@
                                         x:Name="PlayingListHeader"
                                         Background="{ThemeResource AcrylicNormal}"
                                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                        BorderThickness="0,0,0,1" Margin="0,0,0,7">
+                                        BorderThickness="0,0,0,1" Margin="0,0,0,6">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
                                             <ColumnDefinition Width="auto"/>

@@ -44,7 +44,7 @@
             Opacity="0"
             RadiusX="2" RadiusY="2"
             Width="3"
-            Margin="5,14"
+            Margin="4,14"
             HorizontalAlignment="Left">
             <Rectangle.OpacityTransition>
                 <ScalarTransition Duration="0:0:0.15"/>
@@ -60,10 +60,10 @@
                 Background="Transparent"
                 Tapped="Grid_Tapped">
                 <StackPanel
-                    Padding="12,8,8,8"
+                    Padding="16,8,8,8"
                     Tag="{Binding MD5}">
                     <TextBlock TextTrimming="CharacterEllipsis">
-                <Run Text="{Binding Title}"/>
+                        <Run Text="{Binding Title}"/>
                     </TextBlock>
                     <TextBlock
                         Text="{Binding ButtonName}"

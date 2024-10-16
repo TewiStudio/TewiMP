@@ -213,6 +213,18 @@
                         <FontIcon Glyph="&#xE9E9;"/>
                     </cc:SettingsCard.HeaderIcon>
                 </cc:SettingsCard>
+                <cc:SettingsCard Header="定时"
+                                 VerticalContentAlignment="Top"
+                                 Description="启动定时并设置定时任务"
+                                 IsClickEnabled="True"
+                                 Click="SettingsCard_Click_1"
+                                 x:Name="TimeEventCard"
+                                 Loaded="TimeEventCard_Loaded"
+                                 Unloaded="TimeEventCard_UnLoaded">
+                    <cc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEC92;"/>
+                    </cc:SettingsCard.HeaderIcon>
+                </cc:SettingsCard>
                 <cc:SettingsCard Header="行为">
                     <ComboBox Loaded="ComboBox_Loaded_1" SelectionChanged="ComboBox_SelectionChanged">
                         <x:String>循环播放</x:String>
@@ -221,47 +233,6 @@
                         <x:String>随机播放</x:String>
                         <x:String>播放完成后停止</x:String>
                     </ComboBox>
-                </cc:SettingsCard>
-                <cc:SettingsCard Header="定时"
-                                 VerticalContentAlignment="Top">
-                    <cc:SettingsCard.Description>
-                        <Grid Loaded="Grid_Loaded">
-                            <TextBlock x:Name="timeup_event_description" Text="启动定时并设置定时任务"/>
-                            <community:WrapPanel Orientation="Horizontal"
-                                                 Visibility="Collapsed"
-                                                 Margin="0,8,0,0"
-                                                 VerticalSpacing="4"
-                                                 x:Name="timeup_event_base">
-                                <community:WrapPanel.Resources>
-                                    <Style TargetType="NumberBox">
-                                        <Setter Property="Foreground" Value="{ThemeResource ApplicationForegroundThemeBrush}"/>
-                                        <Setter Property="FontSize" Value="14"/>
-                                    </Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Foreground" Value="{ThemeResource ApplicationForegroundThemeBrush}"/>
-                                        <Setter Property="FontSize" Value="14"/>
-                                        <Setter Property="VerticalAlignment" Value="Center"/>
-                                        <Setter Property="Margin" Value="8,0"/>
-                                        <Setter Property="TextWrapping" Value="WrapWholeWords"/>
-                                    </Style>
-                                </community:WrapPanel.Resources>
-                                <NumberBox Text="0"/>
-                                <TextBlock Text="时"/>
-                                <NumberBox Text="25" />
-                                <TextBlock Text="分后，将执行"/>
-                                <ComboBox SelectedIndex="0"
-                                          SelectionChanged="ComboBox_SelectionChanged_2">
-                                    <x:String>暂停</x:String>
-                                    <x:String>退出程序</x:String>
-                                    <x:String>注销</x:String>
-                                    <x:String>关机</x:String>
-                                </ComboBox>
-                                <CheckBox Content="播放完整首歌后再执行操作"
-                                          HorizontalAlignment="Stretch"/>
-                            </community:WrapPanel>
-                        </Grid>
-                    </cc:SettingsCard.Description>
-                    <ToggleSwitch Toggled="ToggleSwitch_Toggled"/>
                 </cc:SettingsCard>
                 <cc:SettingsCard>
                     <cc:SettingsCard.Header>

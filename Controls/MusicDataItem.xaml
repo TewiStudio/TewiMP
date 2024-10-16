@@ -158,14 +158,14 @@
                     VerticalAlignment="Center"
                     Grid.Column="1">
                     <StackPanel.Resources>
-                        <Style TargetType="Button">
+                        <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                             <Setter Property="Width" Value="38"/>
                             <Setter Property="Height" Value="38"/>
                             <Setter Property="CornerRadius" Value="38"/>
                             <Setter Property="BorderBrush" Value="{ThemeResource CircleElevationBorderBrush}"/>
                         </Style>
                         <Style TargetType="FontIcon">
-                            <Setter Property="FontSize" Value="14"/>
+                            <Setter Property="FontSize" Value="13"/>
                         </Style>
                     </StackPanel.Resources>
                     <Button Click="Button_Click_1">

@@ -241,11 +241,11 @@ namespace TewiMP.Pages
             offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
             headerVisual.StartAnimation("Offset.Y", offsetExpression);
 
-            var blurAlbumRootVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
+            var blurAlbumRootVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(1, 0, {progress})");
             blurAlbumRootVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             blurAlbumRootVisual.StartAnimation("Opacity", blurAlbumRootVisualOpacityAnimation);
 
-            var massAlbumRootVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(1, 0, {progress})");
+            var massAlbumRootVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
             massAlbumRootVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             massAlbumRootVisual.StartAnimation("Opacity", massAlbumRootVisualOpacityAnimation);
 /*

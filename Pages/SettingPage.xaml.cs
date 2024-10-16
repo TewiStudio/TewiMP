@@ -678,9 +678,9 @@ namespace TewiMP.Pages
 
         private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
         {
-            ToggleSwitch toggleSwitch = sender as ToggleSwitch;
-            timeup_event_base.Visibility = toggleSwitch.IsOn ? Visibility.Visible : Visibility.Collapsed;
-            timeup_event_description.Visibility = toggleSwitch.IsOn ? Visibility.Collapsed : Visibility.Visible;
+            //ToggleSwitch toggleSwitch = sender as ToggleSwitch;
+            //timeup_event_base.Visibility = toggleSwitch.IsOn ? Visibility.Visible : Visibility.Collapsed;
+            //timeup_event_description.Visibility = toggleSwitch.IsOn ? Visibility.Collapsed : Visibility.Visible;
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
@@ -847,14 +847,47 @@ namespace TewiMP.Pages
             MainWindow.SetNavViewContent(typeof(SettingHotKeyPage));
         }
 
-        private void SettingsCard_Click(object sender, RoutedEventArgs e)
+        private async void SettingsCard_Click(object sender, RoutedEventArgs e)
         {
-
+            await MainWindow.ShowEqualizerDialog();
         }
 
-        private void timeup_event_description_Loaded(object sender, RoutedEventArgs e)
+        private void TimeEventCard_Loaded(object sender, RoutedEventArgs e)
         {
+            if (TimeEventPage.TimingTimer is null) return;
+            TimeEventPage.TimingTimer.Tick -= TimingTimer_Tick;
+            TimeEventPage.TimingTimer.Tick += TimingTimer_Tick;
+            TimingTimer_Tick(null, null);
+        }
 
+        private void TimeEventCard_UnLoaded(object sender, RoutedEventArgs e)
+        {
+            if (TimeEventPage.TimingTimer is null) return;
+            TimeEventPage.TimingTimer.Tick -= TimingTimer_Tick;
+        }
+
+        private void TimingTimer_Tick(object sender, object e)
+        {
+            TimeEventCard.Description =
+                TimeEventPage.LeftTime < TimeSpan.Zero ? 
+                "启动定时并设置定时任务" : 
+                $"定时剩余时间：{TimeEventPage.LeftTime}";
+        }
+
+
+        public static DialogPages.TimeEventPage TimeEventPage = new DialogPages.TimeEventPage();
+        private async void SettingsCard_Click_1(object sender, RoutedEventArgs e)
+        {
+            await MainWindow.ShowDialog("播放定时", TimeEventPage, "返回");
+
+            if (TimeEventPage.TimingTimer is null)
+            {
+                TimeEventCard.Description = "启动定时并设置定时任务";
+                return;
+            }
+            TimeEventPage.TimingTimer.Tick -= TimingTimer_Tick;
+            TimeEventPage.TimingTimer.Tick += TimingTimer_Tick;
+            TimingTimer_Tick(null, null);
         }
     }
 }
