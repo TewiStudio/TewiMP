@@ -26,13 +26,13 @@
             <Grid x:Name="V1" Grid.Row="0" HorizontalAlignment="Stretch">
                 <Viewbox x:Name="T1BaseViewbox">
                     <Grid x:Name="T1BaseParent">
+                        <Grid.Transitions>
+                            <TransitionCollection>
+                                <ContentThemeTransition/>
+                            </TransitionCollection>
+                        </Grid.Transitions>
                         <Border x:Name="T1ShadowTarget"/>
                         <TextBlock x:Name="T1Base">
-                            <TextBlock.Transitions>
-                                <TransitionCollection>
-                                    <ContentThemeTransition/>
-                                </TransitionCollection>
-                            </TextBlock.Transitions>
                             <ui:Effects.Shadow>
                                 <ui:AttachedDropShadow Opacity="1" BlurRadius="10" Color="#88333333" Offset="0,0.2" CastTo="{x:Bind T1ShadowTarget}"/>
                             </ui:Effects.Shadow>
@@ -45,13 +45,13 @@
             <Grid x:Name="V2" Grid.Row="1" HorizontalAlignment="Stretch">
                 <Viewbox x:Name="T2BaseViewbox">
                     <Grid x:Name="T2BaseParent">
+                        <Grid.Transitions>
+                            <TransitionCollection>
+                                <ContentThemeTransition/>
+                            </TransitionCollection>
+                        </Grid.Transitions>
                         <Border x:Name="T2ShadowTarget"/>
                         <TextBlock x:Name="T2Base">
-                            <TextBlock.Transitions>
-                                <TransitionCollection>
-                                    <ContentThemeTransition/>
-                                </TransitionCollection>
-                            </TextBlock.Transitions>
                             <ui:Effects.Shadow>
                                 <ui:AttachedDropShadow Opacity="1" BlurRadius="10" Color="#88333333" Offset="0,0.2" CastTo="{x:Bind T2ShadowTarget}"/>
                             </ui:Effects.Shadow>
@@ -133,6 +133,11 @@
         </Grid>
         <Grid x:Name="TRBaseParent"
               HorizontalAlignment="Center">
+            <Grid.Transitions>
+                <TransitionCollection>
+                    <ContentThemeTransition/>
+                </TransitionCollection>
+            </Grid.Transitions>
             <Border x:Name="TRShadowTarget"/>
             <TextBlock x:Name="LyricRomajiPopup_tb"
                        FontSize="14"
@@ -141,11 +146,6 @@
                        IsHitTestVisible="False"
                        VerticalAlignment="Top"
                        HorizontalAlignment="Center">
-                <TextBlock.Transitions>
-                    <TransitionCollection>
-                        <ContentThemeTransition/>
-                    </TransitionCollection>
-                </TextBlock.Transitions>
                 <ui:Effects.Shadow>
                     <ui:AttachedDropShadow Opacity="1" BlurRadius="3" Color="#AA000000" Offset="0,0.5" CastTo="{x:Bind TRShadowTarget}"/>
                 </ui:Effects.Shadow>
