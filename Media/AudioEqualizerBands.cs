@@ -3,6 +3,30 @@ using System.Collections.Generic;
 
 namespace TewiMP.Media
 {
+    public struct EQData
+    {
+        public float CentreFrequency { get; set; }
+        public float Width { get; set; }
+        public float Decibels { get; set; }
+    }
+
+    public struct LowPassData
+    {
+        public float CutoffFrequency { get; set; }
+        public float Width { get; set; }
+    }
+    
+    public struct HighPassData
+    {
+        public float CutoffFrequency { get; set; }
+        public float Width { get; set; }
+    }
+
+    public static class AudioFilterStatic
+    {
+
+    }
+
     public static class AudioEqualizerBands
     {
         public static Tuple<string, string>[] BandNames = new Tuple<string, string>[]

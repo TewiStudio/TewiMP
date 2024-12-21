@@ -64,7 +64,6 @@
 		<None Remove="Controls\ScrollViewerSearchControl.xaml" />
 		<None Remove="Controls\SongHistoryCard.xaml" />
 		<None Remove="Controls\SongHistoryInfo.xaml" />
-		<None Remove="Controls\SongItem.xaml" />
 		<None Remove="Controls\ImageEx.xaml" />
 		<None Remove="DesktopLyricWindow.xaml" />
 		<None Remove="Pages\BrowsePage.xaml" />

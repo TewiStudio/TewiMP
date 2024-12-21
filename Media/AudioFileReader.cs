@@ -193,6 +193,7 @@ namespace TewiMP.Media
         public BiQuadFilter BiQuadFilterPeak(float centreFrequency, float q, float dbGain)
         {
             BiQuadFilter filter = BiQuadFilter.PeakingEQ(WaveFormat.SampleRate, centreFrequency, q, dbGain);
+            filter.SetLowPassFilter(WaveFormat.SampleRate, 500, .8f);
             return filter;
         }
 
@@ -212,6 +213,7 @@ namespace TewiMP.Media
                         try
                         {
                             buffer[offset + i] = _filters[a][ch].Transform(buffer[offset + i]);
+                            
                         }
                         catch { }
                     }

@@ -193,7 +193,7 @@ namespace TewiMP.Background
                 return;
             }
 
-            string lastName = Path.GetExtension(addressPath);
+            string lastName = Path.GetExtension(addressPath.Split("?").First());
             string downloadPath = downloadPath1 + lastName;
             string lyricPath = downloadPath1 + ".lrc";
             //await WebHelper.DownloadFileAsync(addressPath, downloadPath);

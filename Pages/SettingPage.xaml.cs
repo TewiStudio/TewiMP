@@ -849,7 +849,8 @@ namespace TewiMP.Pages
 
         private async void SettingsCard_Click(object sender, RoutedEventArgs e)
         {
-            await MainWindow.ShowEqualizerDialog();
+            //await MainWindow.ShowEqualizerDialog();
+            MainWindow.SetNavViewContent(typeof(SettingEqPage));
         }
 
         private void TimeEventCard_Loaded(object sender, RoutedEventArgs e)
