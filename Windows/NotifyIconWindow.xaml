@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     xmlns:c="using:TewiMP.Controls"
-    xmlns:cc="using:CommunityToolkit.WinUI.UI.Controls"
+    xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:uis="using:CommunityToolkit.WinUI"
     mc:Ignorable="d">
     <Grid Background="Transparent" x:Name="root" VerticalAlignment="Bottom" SizeChanged="root_SizeChanged"

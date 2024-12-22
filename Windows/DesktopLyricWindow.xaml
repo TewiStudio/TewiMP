@@ -7,8 +7,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" SizeChanged="Window_SizeChanged"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
-    xmlns:media="using:CommunityToolkit.WinUI.UI.Media">
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:media="using:CommunityToolkit.WinUI.Media">
     <Grid x:Name="root" SizeChanged="root_SizeChanged" Loaded="root_Loaded"
           Padding="0" Background="Transparent">
         <Grid.Resources>

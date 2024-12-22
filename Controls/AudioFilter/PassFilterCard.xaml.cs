@@ -6,15 +6,15 @@ using TewiMP.Media;
 
 namespace TewiMP.Controls
 {
-    public partial class EQCard : Grid
+    public partial class PassFilterCard : Grid
     {
-        public new EQData DataContext
+        public new PassFilterData DataContext
         {
-            get => (EQData)base.DataContext; 
+            get => (PassFilterData)base.DataContext; 
             set => base.DataContext = value;
         }
 
-        public EQCard()
+        public PassFilterCard()
         {
             InitializeComponent();
             Loaded += EQCard_Loaded;
@@ -73,49 +73,13 @@ namespace TewiMP.Controls
 
         private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            AudioFilterStatic.EQDatas.Remove(DataContext);
+            AudioFilterStatic.PassFilterDatas.Remove(DataContext);
             App.audioPlayer.UpdateEqualizer();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Menu.ShowAt(sender as FrameworkElement);
-        }
-    }
-
-    public partial class GainThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is double)
-            {
-                double dValue = System.Convert.ToDouble(value) / 10;
-                return dValue;
-            }
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            return null;
-        }
-    }
-
-    public partial class ThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is double)
-            {
-                double dValue = System.Convert.ToDouble(value);
-                return dValue;
-            }
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            return null;
         }
     }
 }

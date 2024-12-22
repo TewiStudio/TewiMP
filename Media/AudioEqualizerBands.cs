@@ -7,6 +7,7 @@ using Windows.UI;
 namespace TewiMP.Media
 {
     public enum Channel { Left, Dual, Right };
+    public enum PassFilterType { LowPass, HighPass, AllPass, BandPassPeak, BandPassSkirt, LowShelf, HighShelf, Notch };
 
     public class EQData
     {
@@ -68,25 +69,75 @@ namespace TewiMP.Media
         public Color Color { get; set; }
     }
 
-    public struct LowPassData
+    public class PassFilterData
     {
-        public float CutoffFrequency { get; set; }
-        public float Q { get; set; }
+        private PassFilterType passFilterType;
+        public PassFilterType PassFilterType
+        {
+            get => passFilterType;
+            set
+            {
+                passFilterType = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+        
+        private float frequency;
+        public float Frequency
+        {
+            get => frequency;
+            set
+            {
+                frequency = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+        private float q;
+        public float Q
+        {
+            get => q;
+            set
+            {
+                q = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+
+        private int channel;
+        public int Channel
+        {
+            get => channel;
+            set
+            {
+                channel = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+        private bool isEnable;
+        public bool IsEnable
+        {
+            get => isEnable;
+            set
+            {
+                isEnable = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+        public Color Color { get; set; }
     }
     
-    public struct HighPassData
-    {
-        public float CutoffFrequency { get; set; }
-        public float Q { get; set; }
-    }
-
     public static class AudioFilterStatic
     {
-        public static ObservableCollection<EQData> EQDatas = 
+        public static ObservableCollection<EQData> EQDatas = [];
+        public static ObservableCollection<PassFilterData> PassFilterDatas = 
         [
-            new() { CentreFrequency = 20, Channel = (int)Channel.Left, Decibels = -20, Q = 18f, IsEnable = true },
-            new() { CentreFrequency = 1512, Channel = (int)Channel.Dual, Decibels = 60, Q = 12f, IsEnable = true },
-            new() { CentreFrequency = 12000, Channel = (int)Channel.Right, Decibels = 110, Q = 1f, IsEnable = false },
+            new() { Frequency = 20, Channel = (int)Channel.Left, Q = 18f, IsEnable = true },
+            new() { Frequency = 1512, Channel = (int)Channel.Dual, Q = 12f, IsEnable = true },
+            new() { Frequency = 12000, Channel = (int)Channel.Right, Q = 1f, IsEnable = true },
         ];
     }
 

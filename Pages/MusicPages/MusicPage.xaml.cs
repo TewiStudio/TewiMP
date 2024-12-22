@@ -14,7 +14,7 @@ using TewiMP.Controls;
 using TewiMP.DataEditor;
 using NAudio.Wave;
 using Windows.System;
-using CommunityToolkit.WinUI.UI;
+using CommunityToolkit.WinUI;
 
 namespace TewiMP.Pages.MusicPages
 {

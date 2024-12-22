@@ -5,8 +5,6 @@
     xmlns:local="using:TewiMP"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:controls="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:ccc="using:CommunityToolkit.WinUI.UI.Controls"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:control="using:TewiMP.Controls"
@@ -16,7 +14,7 @@
             <StackPanel HorizontalAlignment="Stretch"
                         Orientation="Vertical"
                         Margin="16" Spacing="12">
-                <ccc:WrapPanel VerticalSpacing="12" HorizontalSpacing="12">
+                <cc:WrapPanel VerticalSpacing="12" HorizontalSpacing="12">
                     <Border CornerRadius="6"
                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                             BorderThickness="1"
@@ -38,7 +36,7 @@
                             <RowDefinition/>
                             <RowDefinition/>
                         </Grid.RowDefinitions>
-                        <ccc:WrapPanel Orientation="Horizontal" HorizontalSpacing="4"
+                        <cc:WrapPanel Orientation="Horizontal" HorizontalSpacing="4"
                                     VerticalAlignment="Top">
                             <TextBlock Text="TewiMP"
                                        Style="{ThemeResource SubTBHeader}"/>
@@ -47,7 +45,7 @@
                                        VerticalAlignment="Bottom"
                                        FontSize="12" Margin="0,0,0,3"
                                        Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                        </ccc:WrapPanel>
+                        </cc:WrapPanel>
                         <StackPanel VerticalAlignment="Bottom"
                                     Grid.Row="1">
                             <TextBlock TextWrapping="Wrap">
@@ -56,7 +54,7 @@
                             <TextBlock TextWrapping="Wrap" Text="© 2020-2024 zilongww. All Rights Reserved." Margin="0,4,0,0"/>
                         </StackPanel>
                     </Grid>
-                </ccc:WrapPanel>
+                </cc:WrapPanel>
                 <cc:SettingsExpander Header="使用的开放源代码库"
                                      HorizontalAlignment="Stretch"
                                      Margin="0,0,0,0">

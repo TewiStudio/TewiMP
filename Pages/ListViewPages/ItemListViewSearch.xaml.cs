@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -13,8 +12,8 @@ using Microsoft.UI.Composition;
 using TewiMP.Helpers;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
-using CommunityToolkit.WinUI.UI;
 using TewiMP.Pages.ListViewPages;
+using CommunityToolkit.WinUI;
 
 namespace TewiMP.Pages
 {

@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
 using System.Collections.ObjectModel;
 using TewiMP.Media;
+using Windows.UI;
 
 namespace TewiMP.Pages
 {
@@ -78,11 +79,40 @@ namespace TewiMP.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             EQList.ItemsSource = AudioFilterStatic.EQDatas;
+            PassFilterList.ItemsSource = AudioFilterStatic.PassFilterDatas;
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             EQList.ItemsSource = null;
+            PassFilterList.ItemsSource = null;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Random r = new();
+            AudioFilterStatic.EQDatas.Add(new()
+            {
+                CentreFrequency = 31,
+                Q = 15,
+                Decibels = 0,
+                Channel = 1,
+                IsEnable = true,
+                Color = Color.FromArgb(255, (byte)r.Next(0, 255), (byte)r.Next(0, 255), (byte)r.Next(0, 255))
+            });
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            Random r = new();
+            AudioFilterStatic.PassFilterDatas.Add(new()
+            {
+                Frequency = 31,
+                Q = 15,
+                Channel = 1,
+                IsEnable = true,
+                Color = Color.FromArgb(255, (byte)r.Next(0, 255), (byte)r.Next(0, 255), (byte)r.Next(0, 255))
+            });
         }
     }
 }

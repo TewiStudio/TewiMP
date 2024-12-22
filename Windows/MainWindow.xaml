@@ -3,10 +3,10 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TewiMP"
-    xmlns:cc="using:CommunityToolkit.WinUI.UI.Controls"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:cc="using:CommunityToolkit.WinUI.Controls"
+    xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
     xmlns:data="using:TewiMP.DataEditor"
     xmlns:media="using:Microsoft.UI.Xaml.Media"
     xmlns:controls="using:TewiMP.Controls"
@@ -495,15 +495,15 @@
                                 Background="Transparent"
                                 AllowDrop="True"
                                 CanReorderItems="True">
-                                <interactivity:Interaction.Behaviors>
-                                    <behaviors:StickyHeaderBehavior/>
-                                </interactivity:Interaction.Behaviors>
                                 <ListView.Header>
                                     <Grid
                                         x:Name="PlayingListHeader"
                                         Background="{ThemeResource AcrylicNormal}"
                                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                         BorderThickness="0,0,0,1" Margin="0,0,0,6">
+                                        <interactivity:Interaction.Behaviors>
+                                            <behaviors:StickyHeaderBehavior/>
+                                        </interactivity:Interaction.Behaviors>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition/>
                                             <ColumnDefinition Width="auto"/>

@@ -7,10 +7,9 @@
     xmlns:local="using:TewiMP.Pages"
     xmlns:helper="using:TewiMP.Helpers"
     xmlns:controls="using:TewiMP.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
-    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:behaviors="using:CommunityToolkit.WinUI.UI.Behaviors"
+    xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
     mc:Ignorable="d"
     SizeChanged="Page_SizeChanged"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded">

@@ -3,13 +3,13 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TewiMP"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI.Controls"    
+    xmlns:uis="using:CommunityToolkit.WinUI"
+    xmlns:ui="using:CommunityToolkit.WinUI.Controls"    
+    xmlns:brush="using:CommunityToolkit.WinUI.Media"
     xmlns:data="using:TewiMP.DataEditor"
     xmlns:binding="using:TewiMP.Helpers"
     xmlns:controls="using:TewiMP.Controls"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-    xmlns:brush="using:CommunityToolkit.WinUI.UI.Media"
-    xmlns:uis="using:CommunityToolkit.WinUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="pageRoot" Loaded="pageRoot_Loaded" x:FieldModifier="Public"
@@ -66,7 +66,7 @@
             </Grid.OpacityTransition>
             <Rectangle>
                 <Rectangle.Fill>
-                    <brush:AcrylicBrush BlurAmount="50" TintOpacity="0" />
+                    <brush:BackdropBlurBrush Amount="50" />
                 </Rectangle.Fill>
             </Rectangle>
             <Rectangle>

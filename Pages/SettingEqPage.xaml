@@ -5,6 +5,7 @@
     xmlns:local="using:TewiMP.Pages"
     xmlns:controls="using:TewiMP.Controls"
     xmlns:datas="using:TewiMP.Media"
+    xmlns:controlsPrimitives="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" SizeChanged="Page_SizeChanged"
@@ -20,10 +21,12 @@
                 <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="0,0,0,1"/>
-                <TextBlock x:Name="HeaderBaseTextBlock" Text="过滤器" Style="{ThemeResource TBHeader}"/>
+                <TextBlock x:Name="HeaderBaseTextBlock" Text="音效" Style="{ThemeResource TBHeader}"/>
             </Grid>
         </ListView.Header>
 
+        <!--参数均衡器-->
+        <TextBlock Text="参数均衡器" Style="{ThemeResource SubTBHeader}"/>
         <ScrollViewer
             HorizontalScrollMode="Enabled"
             HorizontalScrollBarVisibility="Auto"
@@ -38,12 +41,12 @@
                     ScrollViewer.VerticalScrollBarVisibility="Hidden">
                     <GridView.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <VirtualizingStackPanel Orientation="Horizontal" />
+                            <VirtualizingStackPanel Orientation="Horizontal"/>
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
                     <GridView.ItemTemplate>
                         <DataTemplate x:DataType="datas:EQData">
-                            <controls:EQCard/>
+                            <controls:EQCard Margin="0,0,0,0"/>
                         </DataTemplate>
                     </GridView.ItemTemplate>
                 </GridView>
@@ -53,15 +56,91 @@
                     CornerRadius="8"
                     Padding="16"
                     Margin="0,0,0,16"
+                    Width="120"
                     HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch">
+                    VerticalAlignment="Center"
+                    Click="Button_Click">
+                    <Button.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </Button.Transitions>
+                    <StackPanel>
+                        <Grid>
+                            <Path
+                                Fill="{ThemeResource ApplicationForegroundThemeBrush}"
+                                Data="{ThemeResource 音波}"
+                                Width="30"
+                                Height="30"
+                                Stretch="Fill"/>
+                            <TextBlock
+                                Text="+"
+                                Margin="4,14,0,0"
+                                FontSize="24"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom"/>
+                        </Grid>
+                        <TextBlock
+                            Text="添加频段"
+                            TextAlignment="Center"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </ScrollViewer>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock
+                Text="预设："
+                VerticalAlignment="Center"/>
+            <ComboBox/>
+        </StackPanel>
+
+        <!--滤波器-->
+        <TextBlock Text="滤波器" Style="{ThemeResource SubTBHeader}"/>
+        <ScrollViewer
+            HorizontalScrollMode="Enabled"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollMode="Disabled"
+            VerticalScrollBarVisibility="Disabled">
+            <StackPanel
+                Orientation="Horizontal">
+                <GridView
+                    x:Name="PassFilterList"
+                    SelectionMode="None"
+                    ScrollViewer.VerticalScrollMode="Disabled"
+                    ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                    <GridView.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </GridView.ItemsPanel>
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="datas:PassFilterData">
+                            <controls:PassFilterCard Margin="0,0,0,0"/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
+                </GridView>
+                <Button
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="0,0,0,16"
+                    Width="120"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Center"
+                    Click="Button_Click_1">
+                    <Button.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </Button.Transitions>
                     <StackPanel>
                         <TextBlock
                             Text="+"
                             FontSize="38"
                             TextAlignment="Center"/>
                         <TextBlock
-                            Text="添加 EQ 均衡器"
+                            Text="添加滤波器"
                             TextAlignment="Center"/>
                     </StackPanel>
                 </Button>
