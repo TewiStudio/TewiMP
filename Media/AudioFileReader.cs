@@ -179,12 +179,27 @@ namespace TewiMP.Media
         {
             _filters.Clear();
 
-            foreach (float[] floats in AudioEqualizerBands.NormalBands)
+            foreach (var eqData in AudioFilterStatic.EQDatas)
             {
+                if (!eqData.IsEnable) continue;
                 var filter = new BiQuadFilter[WaveFormat.Channels];
-                for (int n = 0; n < WaveFormat.Channels; n++)
+                switch (eqData.Channel)
                 {
-                    filter[n] = BiQuadFilterPeak(floats[0], floats[1], floats[2]);
+                    case 0:
+                        filter[0] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q / 10f, eqData.Decibels / 10f);
+                        break;
+                    case 1:
+                        for (int n = 0; n < WaveFormat.Channels; n++)
+                        {
+                            filter[n] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q / 10f, eqData.Decibels / 10f);
+                        }
+                        break;
+                    case 2:
+                        if (filter.Length >= 2)
+                        {
+                            filter[1] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q / 10f, eqData.Decibels / 10f);
+                        }
+                        break;
                 }
                 _filters.Add(filter);
             }
@@ -193,7 +208,7 @@ namespace TewiMP.Media
         public BiQuadFilter BiQuadFilterPeak(float centreFrequency, float q, float dbGain)
         {
             BiQuadFilter filter = BiQuadFilter.PeakingEQ(WaveFormat.SampleRate, centreFrequency, q, dbGain);
-            filter.SetLowPassFilter(WaveFormat.SampleRate, 500, .8f);
+            //filter.SetLowPassFilter(WaveFormat.SampleRate, 16000, .03f);
             return filter;
         }
 
@@ -205,19 +220,26 @@ namespace TewiMP.Media
                 int samplesRead = sampleChannel.Read(buffer, offset, count);
                 if (!EqEnabled) return samplesRead;
 
-                for (var a = 0; a < AudioEqualizerBands.NormalBands.Count; a++)
+                try
                 {
-                    for (int i = 0; i < samplesRead; i++)
+                    for (var a = 0; a < _filters.Count; a++)
                     {
-                        var ch = i % WaveFormat.Channels;
-                        try
+                        for (int i = 0; i < samplesRead; i++)
                         {
-                            buffer[offset + i] = _filters[a][ch].Transform(buffer[offset + i]);
-                            
+                            var ch = i % WaveFormat.Channels;
+                            var filterArray = _filters[a];
+                            if (ch <= filterArray.Length - 1)
+                            {
+                                var filter = filterArray[ch];
+                                if (filter is not null)
+                                {
+                                    buffer[offset + i] = filter.Transform(buffer[offset + i]);
+                                }
+                            }
                         }
-                        catch { }
                     }
                 }
+                catch { }
                 return samplesRead;
             }
         }

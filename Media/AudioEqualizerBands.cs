@@ -1,30 +1,93 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using TagLib.IIM;
+using Windows.UI;
 
 namespace TewiMP.Media
 {
-    public struct EQData
+    public enum Channel { Left, Dual, Right };
+
+    public class EQData
     {
-        public float CentreFrequency { get; set; }
-        public float Width { get; set; }
-        public float Decibels { get; set; }
+        private float centreFrequency;
+        public float CentreFrequency
+        {
+            get => centreFrequency;
+            set
+            {
+                centreFrequency = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+        private float q;
+        public float Q
+        {
+            get => q;
+            set
+            {
+                q = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+        private float decibels;
+        public float Decibels
+        {
+            get => decibels;
+            set
+            {
+                decibels = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+        private int channel;
+        public int Channel
+        {
+            get => channel;
+            set
+            {
+                channel = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+        private bool isEnable;
+        public bool IsEnable
+        {
+            get => isEnable;
+            set
+            {
+                isEnable = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
+        public Color Color { get; set; }
     }
 
     public struct LowPassData
     {
         public float CutoffFrequency { get; set; }
-        public float Width { get; set; }
+        public float Q { get; set; }
     }
     
     public struct HighPassData
     {
         public float CutoffFrequency { get; set; }
-        public float Width { get; set; }
+        public float Q { get; set; }
     }
 
     public static class AudioFilterStatic
     {
-
+        public static ObservableCollection<EQData> EQDatas = 
+        [
+            new() { CentreFrequency = 20, Channel = (int)Channel.Left, Decibels = -20, Q = 18f, IsEnable = true },
+            new() { CentreFrequency = 1512, Channel = (int)Channel.Dual, Decibels = 60, Q = 12f, IsEnable = true },
+            new() { CentreFrequency = 12000, Channel = (int)Channel.Right, Decibels = 110, Q = 1f, IsEnable = false },
+        ];
     }
 
     public static class AudioEqualizerBands

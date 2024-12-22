@@ -4,6 +4,8 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
+using System.Collections.ObjectModel;
+using TewiMP.Media;
 
 namespace TewiMP.Pages
 {
@@ -71,6 +73,16 @@ namespace TewiMP.Pages
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateShyHeader();
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            EQList.ItemsSource = AudioFilterStatic.EQDatas;
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            EQList.ItemsSource = null;
         }
     }
 }

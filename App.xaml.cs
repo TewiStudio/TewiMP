@@ -17,6 +17,7 @@ using Windows.UI.Popups;
 using Newtonsoft.Json.Linq;
 using TewiMP.Pages;
 using Microsoft.UI.Windowing;
+using static Vanara.PInvoke.User32;
 
 namespace TewiMP
 {
@@ -104,6 +105,7 @@ namespace TewiMP
             SMTC.IsPreviousEnabled = true;
             SMTC.IsStopEnabled = true;
             SMTC.DisplayUpdater.Type = Windows.Media.MediaPlaybackType.Music;
+            SMTC.DisplayUpdater.AppMediaId = AppName;
             SMTC.DisplayUpdater.MusicProperties.Title = AppName;
             SMTC.DisplayUpdater.MusicProperties.Artist = "没有正在播放的歌曲";
             SMTC.DisplayUpdater.Update();

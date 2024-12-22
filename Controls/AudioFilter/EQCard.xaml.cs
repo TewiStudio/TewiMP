@@ -1,11 +1,18 @@
 using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using TewiMP.Media;
 
 namespace TewiMP.Controls
 {
     public partial class EQCard : Grid
     {
+        public new EQData DataContext
+        {
+            get => (EQData)base.DataContext; 
+            set => base.DataContext = value;
+        }
+
         public EQCard()
         {
             InitializeComponent();
@@ -15,7 +22,19 @@ namespace TewiMP.Controls
         private void SongHistoryCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (DataContext is null) return;
-            //songHistoryData = DataContext as SongHistoryData;
+
+        }
+
+        private void Silder_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+        }
+
+        private void Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+        }
+
+        private void ToggleOnButton_Checked(object sender, RoutedEventArgs e)
+        {
         }
     }
 

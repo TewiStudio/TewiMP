@@ -4,9 +4,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TewiMP.Pages"
     xmlns:controls="using:TewiMP.Controls"
+    xmlns:datas="using:TewiMP.Media"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
+    mc:Ignorable="d" SizeChanged="Page_SizeChanged"
+    Loaded="Page_Loaded" Unloaded="Page_Unloaded">
 
     <ListView
         x:Name="ListViewBase"
@@ -30,6 +32,7 @@
             <StackPanel
                 Orientation="Horizontal">
                 <GridView
+                    x:Name="EQList"
                     SelectionMode="None"
                     ScrollViewer.VerticalScrollMode="Disabled"
                     ScrollViewer.VerticalScrollBarVisibility="Hidden">
@@ -38,10 +41,11 @@
                             <VirtualizingStackPanel Orientation="Horizontal" />
                         </ItemsPanelTemplate>
                     </GridView.ItemsPanel>
-                    <controls:EQCard/>
-                    <controls:EQCard/>
-                    <controls:EQCard/>
-                    <controls:EQCard/>
+                    <GridView.ItemTemplate>
+                        <DataTemplate x:DataType="datas:EQData">
+                            <controls:EQCard/>
+                        </DataTemplate>
+                    </GridView.ItemTemplate>
                 </GridView>
                 <Button
                     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"

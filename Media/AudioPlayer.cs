@@ -763,12 +763,12 @@ namespace TewiMP.Media
                 }
                 UpdateInfo();
 
-                fileProvider = new AudioEffects.SoundTouchWaveProvider(fileReader);
+                //fileProvider = new AudioEffects.SoundTouchWaveProvider(fileReader);
                 fileReader.EqEnabled = EqEnabled;
                 fileReader.Volume = Volume / 100;
-                fileProvider.Pitch = Pitch;
-                fileProvider.Tempo = Tempo;
-                fileProvider.Rate = Rate;
+                //fileProvider.Pitch = Pitch;
+                //fileProvider.Tempo = Tempo;
+                //fileProvider.Rate = Rate;
             });
             await Task.Run(DisposeAll);
             FileReader = fileReader;
@@ -814,7 +814,7 @@ namespace TewiMP.Media
                         await Task.Run(() => NowOutObj = new WaveOutEvent());
                         (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
                         (NowOutObj as WaveOutEvent).NumberOfBuffers = Latency;
-                        NowOutObj.Init(FileProvider);
+                        NowOutObj.Init(fileReader);
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                     case OutApi.DirectSound:
@@ -941,6 +941,11 @@ namespace TewiMP.Media
                     WaveInfo = "未知";
                 }
             }
+        }
+
+        public void UpdateEqualizer()
+        {
+            FileReader?.CreateFilters();
         }
 
         [Obsolete(message:"不建议使用，性能较差")]
