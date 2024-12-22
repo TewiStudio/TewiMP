@@ -81,6 +81,41 @@ namespace TewiMP.Controls
         {
             Menu.ShowAt(sender as FrameworkElement);
         }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                NumberBox numberBox = new NumberBox()
+                {
+                    Value = btn.Tag switch
+                    {
+                        "Q" => DataContext.Q / 10f,
+                        "Frequency" => DataContext.CentreFrequency,
+                        "dbGain" => DataContext.Decibels / 10f
+                    },
+                    SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline,
+                };
+                var result = await MainWindow.ShowDialog($"设置 \"{btn.Tag}\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
+                if (result != ContentDialogResult.Primary) return;
+                switch (btn.Tag)
+                {
+                    case "Q":
+                        DataContext.Q = (float)numberBox.Value * 10f;
+                        break;
+                    case "Frequency":
+                        DataContext.CentreFrequency = (float)numberBox.Value;
+                        break;
+                    case "dbGain":
+                        DataContext.Decibels = (float)numberBox.Value * 10f;
+                        break;
+                }
+                var dataContextTemp = DataContext;
+                DataContext = null;
+                DataContext = dataContextTemp;
+                dataContextTemp = null;
+            }
+        }
     }
 
     public partial class GainThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter

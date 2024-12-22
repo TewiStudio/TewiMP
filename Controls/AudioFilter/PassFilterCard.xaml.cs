@@ -100,6 +100,45 @@ namespace TewiMP.Controls
             {
                 dbGainRoot.Visibility = Visibility.Visible;
             }
+            else
+            {
+                dbGainRoot.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn)
+            {
+                NumberBox numberBox = new NumberBox()
+                {
+                    Value = btn.Tag switch
+                    {
+                        "Q" => DataContext.Q / 100f,
+                        "Frequency" => DataContext.Frequency,
+                        "dbGain" => DataContext.Decibels / 10f
+                    },
+                    SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline,
+                };
+                var result = await MainWindow.ShowDialog($"设置 \"{btn.Tag}\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
+                if (result != ContentDialogResult.Primary) return;
+                switch (btn.Tag)
+                {
+                    case "Q":
+                        DataContext.Q = (float)numberBox.Value * 100f;
+                        break;
+                    case "Frequency":
+                        DataContext.Frequency = (float)numberBox.Value;
+                        break;
+                    case "dbGain":
+                        DataContext.Decibels = (float)numberBox.Value * 10f;
+                        break;
+                }
+                var dataContextTemp = DataContext;
+                DataContext = null;
+                DataContext = dataContextTemp;
+                dataContextTemp = null;
+            }
         }
     }
 

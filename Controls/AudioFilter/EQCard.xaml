@@ -105,7 +105,8 @@
                         TickFrequency="30"
                         HorizontalAlignment="Center"/>
                     <Button
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}">
+                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
+                        Click="Button_Click_1" Tag="dbGain">
                         <StackPanel>
                             <TextBlock
                                 Text="{Binding ElementName=gainSilder,Path=Value,Converter={StaticResource gainValueC}}"
@@ -131,7 +132,8 @@
                         Maximum="120"
                         HorizontalAlignment="Center"/>
                     <Button
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}">
+                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
+                        Click="Button_Click_1" Tag="Q">
                         <StackPanel>
                             <TextBlock
                                 Text="{Binding ElementName=QSilder,Path=Value,Converter={StaticResource gainValueC}}"
@@ -158,7 +160,8 @@
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        HorizontalAlignment="Stretch">
+                        HorizontalAlignment="Stretch"
+                        Click="Button_Click_1" Tag="Frequency">
                         <StackPanel>
                             <TextBlock
                                 Text="{Binding ElementName=FreSilder,Path=Value}"
