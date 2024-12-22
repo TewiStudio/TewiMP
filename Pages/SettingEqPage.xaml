@@ -26,7 +26,18 @@
         </ListView.Header>
 
         <!--参数均衡器-->
-        <TextBlock Text="参数均衡器" Style="{ThemeResource SubTBHeader}"/>
+        <StackPanel Orientation="Horizontal" Spacing="16">
+            <TextBlock Text="参数均衡器" Style="{ThemeResource SubTBHeader}"/>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock
+                    Text="预设："
+                    VerticalAlignment="Bottom"/>
+                <ComboBox
+                    SelectedIndex="0">
+                    <x:String>无</x:String>
+                </ComboBox>
+            </StackPanel>
+        </StackPanel>
         <ScrollViewer
             HorizontalScrollMode="Enabled"
             HorizontalScrollBarVisibility="Auto"
@@ -87,12 +98,6 @@
                 </Button>
             </StackPanel>
         </ScrollViewer>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock
-                Text="预设："
-                VerticalAlignment="Center"/>
-            <ComboBox/>
-        </StackPanel>
 
         <!--滤波器-->
         <TextBlock Text="滤波器" Style="{ThemeResource SubTBHeader}"/>

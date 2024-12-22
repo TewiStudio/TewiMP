@@ -7,7 +7,8 @@ using Windows.UI;
 namespace TewiMP.Media
 {
     public enum Channel { Left, Dual, Right };
-    public enum PassFilterType { LowPass, HighPass, AllPass, BandPassPeak, BandPassSkirt, LowShelf, HighShelf, Notch };
+    public enum PassFilterType { LowPass, HighPass, AllPass, BandPassPeak, BandPassSkirt, Notch, LowShelf, HighShelf };
+    public enum PassFilterZHType { 低通, 高通, 全通, 带通峰值, 带通抖动, 陷波, 低切, 高切 };
 
     public class EQData
     {
@@ -105,6 +106,17 @@ namespace TewiMP.Media
         }
 
 
+        private float decibels;
+        public float Decibels
+        {
+            get => decibels;
+            set
+            {
+                decibels = value;
+                App.audioPlayer.UpdateEqualizer();
+            }
+        }
+
         private int channel;
         public int Channel
         {
@@ -133,12 +145,7 @@ namespace TewiMP.Media
     public static class AudioFilterStatic
     {
         public static ObservableCollection<EQData> EQDatas = [];
-        public static ObservableCollection<PassFilterData> PassFilterDatas = 
-        [
-            new() { Frequency = 20, Channel = (int)Channel.Left, Q = 18f, IsEnable = true },
-            new() { Frequency = 1512, Channel = (int)Channel.Dual, Q = 12f, IsEnable = true },
-            new() { Frequency = 12000, Channel = (int)Channel.Right, Q = 1f, IsEnable = true },
-        ];
+        public static ObservableCollection<PassFilterData> PassFilterDatas = [];
     }
 
     public static class AudioEqualizerBands

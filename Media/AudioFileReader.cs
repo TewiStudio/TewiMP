@@ -203,12 +203,70 @@ namespace TewiMP.Media
                 }
                 _filters.Add(filter);
             }
+
+            foreach (var passFilterData in AudioFilterStatic.PassFilterDatas)
+            {
+                if (!passFilterData.IsEnable) continue;
+                var filter = new BiQuadFilter[WaveFormat.Channels];
+                switch (passFilterData.Channel)
+                {
+                    case 0:
+                        filter[0] = GetPassFilter(passFilterData);
+                        break;
+                    case 1:
+                        for (int n = 0; n < WaveFormat.Channels; n++)
+                        {
+                            filter[n] = GetPassFilter(passFilterData);
+                        }
+                        break;
+                    case 2:
+                        if (filter.Length >= 2)
+                        {
+                            filter[1] = GetPassFilter(passFilterData);
+                        }
+                        break;
+                }
+                _filters.Add(filter);
+            }
         }
 
         public BiQuadFilter BiQuadFilterPeak(float centreFrequency, float q, float dbGain)
         {
             BiQuadFilter filter = BiQuadFilter.PeakingEQ(WaveFormat.SampleRate, centreFrequency, q, dbGain);
             //filter.SetLowPassFilter(WaveFormat.SampleRate, 16000, .03f);
+            return filter;
+        }
+
+        public BiQuadFilter GetPassFilter(PassFilterData filterData)
+        {
+            BiQuadFilter filter = null;
+            switch (filterData.PassFilterType)
+            {
+                case PassFilterType.LowPass:
+                    filter = BiQuadFilter.LowPassFilter(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    break;
+                case PassFilterType.HighPass:
+                    filter = BiQuadFilter.HighPassFilter(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    break;
+                case PassFilterType.AllPass:
+                    filter = BiQuadFilter.AllPassFilter(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    break;
+                case PassFilterType.BandPassPeak:
+                    filter = BiQuadFilter.BandPassFilterConstantPeakGain(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    break;
+                case PassFilterType.BandPassSkirt:
+                    filter = BiQuadFilter.BandPassFilterConstantSkirtGain(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    break;
+                case PassFilterType.LowShelf:
+                    filter = BiQuadFilter.LowShelf(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f, filterData.Decibels / 10f);
+                    break;
+                case PassFilterType.HighShelf:
+                    filter = BiQuadFilter.HighShelf(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f, filterData.Decibels / 10f);
+                    break;
+                case PassFilterType.Notch:
+                    filter = BiQuadFilter.NotchFilter(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    break;
+            }
             return filter;
         }
 

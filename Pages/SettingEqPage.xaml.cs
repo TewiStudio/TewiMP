@@ -107,8 +107,8 @@ namespace TewiMP.Pages
             Random r = new();
             AudioFilterStatic.PassFilterDatas.Add(new()
             {
-                Frequency = 31,
-                Q = 15,
+                Frequency = 16000,
+                Q = 1f,
                 Channel = 1,
                 IsEnable = true,
                 Color = Color.FromArgb(255, (byte)r.Next(0, 255), (byte)r.Next(0, 255), (byte)r.Next(0, 255))

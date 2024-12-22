@@ -61,7 +61,7 @@
         </Grid.RowDefinitions>
 
         <StackPanel
-            Orientation="Vertical"
+            Orientation="Horizontal"
             Padding="16"
             Spacing="16"
             Margin="0">
@@ -69,6 +69,7 @@
                 <Grid.Resources>
                     <local:GainThumbToolTipValueConverter x:Key="gainValueC"/>
                     <local:ThumbToolTipValueConverter x:Key="doubleValueC"/>
+                    <local:PassFilterQValueConverter x:Key="passValueC"/>
                     <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Setter Property="Padding" Value="0"/>
                         <Setter Property="Margin" Value="0,-4"/>
@@ -84,17 +85,72 @@
                         <Setter Property="Orientation" Value="Vertical"/>
                         <Setter Property="Height" Value="160"/>
                         <Setter Property="TickPlacement" Value="Outside"/>
-                        <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource gainValueC}"/>
+                        <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource passValueC}"/>
                     </Style>
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel
                     Spacing="16"
                     HorizontalAlignment="Center">
+                    <Slider
+                        x:Name="QSilder"
+                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
+                        Value="{Binding Q,Mode=TwoWay}"
+                        ValueChanged="Silder_ValueChanged"
+                        TickFrequency="297"
+                        Minimum="1"
+                        Maximum="1200"
+                        HorizontalAlignment="Center"/>
+                    <Button
+                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}">
+                        <StackPanel>
+                            <TextBlock
+                                Text="{Binding ElementName=QSilder,Path=Value,Converter={StaticResource passValueC}}"
+                                TextAlignment="Center"/>
+                            <TextBlock
+                                Text="Q"
+                                FontWeight="Bold"
+                                TextAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel
+                    Spacing="16"
+                    Grid.Column="1">
+                    <Slider
+                        x:Name="FreSilder"
+                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
+                        Value="{Binding Frequency,Mode=TwoWay}"
+                        ThumbToolTipValueConverter="{StaticResource doubleValueC}"
+                        ValueChanged="Silder_ValueChanged"
+                        TickFrequency="3990"
+                        Minimum="20"
+                        Maximum="16000"
+                        HorizontalAlignment="Center"/>
+                    <Button
+                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
+                        HorizontalAlignment="Stretch">
+                        <StackPanel>
+                            <TextBlock
+                                Text="{Binding ElementName=FreSilder,Path=Value}"
+                                TextAlignment="Center"/>
+                            <TextBlock
+                                Text="频率"
+                                FontWeight="Bold"
+                                TextAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel
+                    x:Name="dbGainRoot"
+                    HorizontalAlignment="Center"
+                    Visibility="Collapsed"
+                    Spacing="16"
+                    Grid.Column="2">
                     <Slider
                         x:Name="gainSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
@@ -117,82 +173,40 @@
                         </StackPanel>
                     </Button>
                 </StackPanel>
-                <StackPanel
-                    Spacing="16"
-                    Grid.Column="1"
-                    HorizontalAlignment="Center">
-                    <Slider
-                        x:Name="QSilder"
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Value="{Binding Q,Mode=TwoWay}"
-                        ValueChanged="Silder_ValueChanged"
-                        TickFrequency="29.7"
-                        Minimum="1"
-                        Maximum="120"
-                        HorizontalAlignment="Center"/>
-                    <Button
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}">
-                        <StackPanel>
-                            <TextBlock
-                                Text="{Binding ElementName=QSilder,Path=Value,Converter={StaticResource gainValueC}}"
-                                TextAlignment="Center"/>
-                            <TextBlock
-                                Text="Q"
-                                FontWeight="Bold"
-                                TextAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <StackPanel
-                    Spacing="16"
-                    Grid.Column="2">
-                    <Slider
-                        x:Name="FreSilder"
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Value="{Binding CentreFrequency,Mode=TwoWay}"
-                        ThumbToolTipValueConverter="{StaticResource doubleValueC}"
-                        ValueChanged="Silder_ValueChanged"
-                        TickFrequency="8020"
-                        Minimum="20"
-                        Maximum="16000"
-                        HorizontalAlignment="Center"/>
-                    <Button
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        HorizontalAlignment="Stretch">
-                        <StackPanel>
-                            <TextBlock
-                                Text="{Binding ElementName=FreSilder,Path=Value}"
-                                TextAlignment="Center"/>
-                            <TextBlock
-                                Text="频率"
-                                FontWeight="Bold"
-                                TextAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
             </Grid>
-            <community:Segmented
-                IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                HorizontalAlignment="Stretch"
-                SelectedIndex="{Binding Channel,Mode=TwoWay}"
-                SelectionChanged="Segmented_SelectionChanged">
-                <community:SegmentedItem
-                    Content="L"
-                    ToolTipService.ToolTip="左声道" />
-                <community:SegmentedItem
-                    Content="LR"
-                    ToolTipService.ToolTip="双声道" />
-                <community:SegmentedItem
-                    Content="R"
-                    ToolTipService.ToolTip="右声道" />
-            </community:Segmented>
-            <ToggleButton
-                x:Name="ToggleOnButton"
-                HorizontalAlignment="Stretch"
-                IsChecked="{Binding IsEnable,Mode=TwoWay}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultSolidBrush}"
-                ToolTipService.ToolTip="开关"
-                Checked="ToggleOnButton_Checked"/>
+            <StackPanel
+                VerticalAlignment="Center"
+                Spacing="16">
+                <ComboBox
+                    x:Name="TypeCombo"
+                    Loaded="TypeCombo_Loaded"
+                    Unloaded="TypeCombo_Unloaded"
+                    SelectedValue="{Binding PassFilterType}"
+                    SelectionChanged="TypeCombo_SelectionChanged"
+                    IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"/>
+                <community:Segmented
+                    IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
+                    HorizontalAlignment="Stretch"
+                    SelectedIndex="{Binding Channel,Mode=TwoWay}"
+                    SelectionChanged="Segmented_SelectionChanged">
+                    <community:SegmentedItem
+                        Content="L"
+                        ToolTipService.ToolTip="左声道" />
+                    <community:SegmentedItem
+                        Content="LR"
+                        ToolTipService.ToolTip="双声道" />
+                    <community:SegmentedItem
+                        Content="R"
+                        ToolTipService.ToolTip="右声道" />
+                </community:Segmented>
+                <ToggleButton
+                    x:Name="ToggleOnButton"
+                    HorizontalAlignment="Stretch"
+                    IsChecked="{Binding IsEnable,Mode=TwoWay}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultSolidBrush}"
+                    ToolTipService.ToolTip="开关"
+                    Checked="ToggleOnButton_Checked"/>
+            </StackPanel>
         </StackPanel>
 
         <Button

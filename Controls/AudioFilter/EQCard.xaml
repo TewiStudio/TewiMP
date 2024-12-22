@@ -152,7 +152,7 @@
                         Value="{Binding CentreFrequency,Mode=TwoWay}"
                         ThumbToolTipValueConverter="{StaticResource doubleValueC}"
                         ValueChanged="Silder_ValueChanged"
-                        TickFrequency="8020"
+                        TickFrequency="3990"
                         Minimum="20"
                         Maximum="16000"
                         HorizontalAlignment="Center"/>

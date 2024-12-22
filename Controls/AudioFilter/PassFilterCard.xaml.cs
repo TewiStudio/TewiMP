@@ -46,7 +46,7 @@ namespace TewiMP.Controls
         private void SongHistoryCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (DataContext is null) return;
-
+            TypeCombo.SelectedIndex = (int)DataContext.PassFilterType;
         }
 
         private void Silder_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
@@ -81,5 +81,44 @@ namespace TewiMP.Controls
         {
             Menu.ShowAt(sender as FrameworkElement);
         }
+
+        private void TypeCombo_Loaded(object sender, RoutedEventArgs e)
+        {
+            TypeCombo.ItemsSource = Enum.GetValues(typeof(PassFilterZHType));
+        }
+
+        private void TypeCombo_Unloaded(object sender, RoutedEventArgs e)
+        {
+            TypeCombo.ItemsSource = null;
+        }
+
+        private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (TypeCombo.SelectedItem == null) return;
+            DataContext.PassFilterType = (PassFilterType)TypeCombo.SelectedItem;
+            if (DataContext.PassFilterType is PassFilterType.LowShelf or PassFilterType.HighShelf)
+            {
+                dbGainRoot.Visibility = Visibility.Visible;
+            }
+        }
     }
+
+    public partial class PassFilterQValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is double)
+            {
+                double dValue = System.Convert.ToDouble(value) / 100;
+                return dValue;
+            }
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            return null;
+        }
+    }
+
 }
