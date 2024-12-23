@@ -179,6 +179,16 @@ namespace TewiMP.Media
         {
             _filters.Clear();
 
+            foreach (float[] floats in AudioEqualizerBands.NormalBands)
+            {
+                var filter = new BiQuadFilter[WaveFormat.Channels];
+                for (int n = 0; n < WaveFormat.Channels; n++)
+                {
+                    filter[n] = BiQuadFilterPeak(floats[0], floats[1], floats[2]);
+                }
+                _filters.Add(filter);
+            }
+
             foreach (var eqData in AudioFilterStatic.EQDatas)
             {
                 if (!eqData.IsEnable) continue;

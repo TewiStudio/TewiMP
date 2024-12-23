@@ -144,6 +144,25 @@ namespace TewiMP.Media
     
     public static class AudioFilterStatic
     {
+        public static bool EqEnabled
+        {
+            get
+            {
+                if (App.audioPlayer != null)
+                {
+                    return App.audioPlayer.EqEnabled;
+                }
+                else
+                {
+                    return (bool)DataEditor.DataFolderBase.JSettingData[DataEditor.DataFolderBase.SettingParams.EqualizerEnable.ToString()];
+                }
+            }
+            set
+            {
+                App.audioPlayer.EqEnabled = value;
+            }
+        }
+
         public static ObservableCollection<EQData> EQDatas = [];
         public static ObservableCollection<PassFilterData> PassFilterDatas = [];
     }
