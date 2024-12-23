@@ -261,7 +261,8 @@ namespace TewiMP.Media
         public event AudioPlayerDataDelegate VolumeChanged;
         public event AudioPlayerDataDelegate CacheLoadingChanged;
         public event AudioPlayerDelegate CacheLoadedChanged;
-        public event AudioPlayerDelegate EqualizerBandChanged;
+        public event AudioPlayerDelegate EqEnableChanged;
+        public event AudioPlayerDelegate EqBandChanged;
 
         DispatcherTimer timer;
 
@@ -298,7 +299,7 @@ namespace TewiMP.Media
                         }
                         FileReader.CreateFilters();
                     }
-                    EqualizerBandChanged?.Invoke(this);
+                    EqBandChanged?.Invoke(this);
                 }
             }
         }
@@ -313,6 +314,7 @@ namespace TewiMP.Media
             set
             {
                 _eqEnalbed = value;
+                EqEnableChanged?.Invoke(this);
                 if (FileReader != null)
                 {
                     EqualizerBand = EqualizerBand;

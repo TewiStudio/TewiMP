@@ -7,28 +7,9 @@ namespace TewiMP.Pages.DialogPages
 {
     public partial class EqualizerPage : Page
     {
-        public Media.AudioPlayer AudioPlayer { get; set; }
+        public Media.AudioPlayer AudioPlayer => App.audioPlayer;
         public List<Slider> EqSliders { get; set; } = new();
 
-        public bool EqEnabled
-        {
-            get
-            {
-                if (AudioPlayer != null)
-                {
-                    return AudioPlayer.EqEnabled;
-                }
-                else
-                {
-                    return (bool)DataEditor.DataFolderBase.JSettingData[DataEditor.DataFolderBase.SettingParams.EqualizerEnable.ToString()];
-                }
-            }
-            set
-            {
-                AudioPlayer.EqEnabled = value;
-            }
-        }
-        
         public bool WasapiOnly
         {
             get
@@ -91,6 +72,13 @@ namespace TewiMP.Pages.DialogPages
         public EqualizerPage()
         {
             InitializeComponent();
+            Loaded += EqualizerPage_Loaded;
+            Unloaded += EqualizerPage_Unloaded;
+        }
+
+        private void EqualizerPage_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (IsLoaded) return;
             DataContext = this;
             foreach (StackPanel slider in SliderStackBase.Children)
             {
@@ -98,10 +86,26 @@ namespace TewiMP.Pages.DialogPages
                 EqSliders.Add(a);
                 a.ValueChanged += A_ValueChanged;
             }
-            AudioPlayer = App.audioPlayer;
             AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-            AudioPlayer.EqualizerBandChanged += AudioPlayer_EqualizerBandChanged;
+            AudioPlayer.EqEnableChanged += AudioPlayer_EqEnableChanged;
+            AudioPlayer.EqBandChanged += AudioPlayer_EqualizerBandChanged;
             AudioPlayer.PreviewSourceChanged += AudioPlayer_PreviewSourceChanged;
+            AudioPlayer_EqEnableChanged(AudioPlayer);
+        }
+
+        private void EqualizerPage_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (!IsLoaded || AudioPlayer is null) return;
+            DataContext = null;
+            AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            AudioPlayer.EqEnableChanged -= AudioPlayer_EqEnableChanged;
+            AudioPlayer.EqBandChanged -= AudioPlayer_EqualizerBandChanged;
+            AudioPlayer.PreviewSourceChanged -= AudioPlayer_PreviewSourceChanged;
+        }
+
+        private void AudioPlayer_EqEnableChanged(Media.AudioPlayer audioPlayer)
+        {
+            EqEnableTS.IsOn = audioPlayer.EqEnabled;
         }
 
         private void AudioPlayer_SourceChanged(Media.AudioPlayer audioPlayer)
@@ -240,6 +244,11 @@ namespace TewiMP.Pages.DialogPages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             AudioPlayer_SourceChanged(App.audioPlayer);
+        }
+
+        private void EqEnableTS_Toggled(object sender, RoutedEventArgs e)
+        {
+            AudioPlayer.EqEnabled = EqEnableTS.IsOn;
         }
     }
 

@@ -17,8 +17,8 @@
         <ScrollViewer HorizontalScrollMode="Disabled">
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="均衡器" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Margin="0,0,4,0"/>
-                    <ToggleSwitch x:Name="EqEnableTS" AccessKey="E" VerticalAlignment="Center" IsOn="{Binding EqEnabled, Mode=TwoWay}"/>
+                    <TextBlock Text="总开关" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" Margin="0,0,4,0"/>
+                    <ToggleSwitch x:Name="EqEnableTS" AccessKey="E" VerticalAlignment="Center" Toggled="EqEnableTS_Toggled"/>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <TextBlock Text="预设" VerticalAlignment="Center" Margin="0,0,12,0"/>

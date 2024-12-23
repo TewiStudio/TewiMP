@@ -1,20 +1,33 @@
 ﻿using System;
+using Windows.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
-using System.Collections.ObjectModel;
 using TewiMP.Media;
-using Windows.UI;
 
 namespace TewiMP.Pages
 {
     public partial class SettingEqPage : Page
     {
+        public AudioPlayer AudioPlayer => App.audioPlayer;
+        public bool EqEnabled
+        {
+            get
+            {
+                return App.audioPlayer.EqEnabled;
+            }
+            set
+            {
+                App.audioPlayer.EqEnabled = value;
+            }
+        }
+
         public SettingEqPage()
         {
             InitializeComponent();
+            DataContext = this;
         }
 
         public void UpdateShyHeader()
@@ -71,21 +84,85 @@ namespace TewiMP.Pages
             backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
         }
 
+        private async void AddOutDeviceToFlyOut()
+        {/*
+            var a = await OutDevice.GetOutDevicesAsync();
+            OutDevicesFlyout.Items.Clear();
+            foreach (var b in a)
+            {
+                var c = new MenuFlyoutItem() { Text = b.ToString(), Tag = b };
+                c.Click += C_Click;
+                c.Unloaded += C_Unloaded;
+                OutDevicesFlyout.Items.Add(c);
+            }*/
+        }
+
+        private void AudioPlayer_EqEnableChanged(AudioPlayer audioPlayer)
+        {
+            EqEnableSwitcher.IsOn = audioPlayer.EqEnabled;
+        }
+
+        bool inEqBandChange = false;
+        private void AudioPlayer_EqualizerBandChanged(AudioPlayer audioPlayer)
+        {
+            if (!inEqBandChange)
+            {
+                inEqBandChange = true;
+                for (int f = 0; f < audioPlayer.EqualizerBand.Count; f++)
+                {
+                    ((SliderStackBase.Children[f] as StackPanel).Children[0] as Slider).Value = audioPlayer.EqualizerBand[f][2] * 10;
+                }
+                if (!inComboChange)
+                    GraphicEqComboBox.SelectedItem = AudioEqualizerBands.NameGetCHName(AudioEqualizerBands.GetNameFromBands(audioPlayer.EqualizerBand));
+                inEqBandChange = false;
+            }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            AudioPlayer.EqEnableChanged += AudioPlayer_EqEnableChanged;
+            AudioPlayer.EqBandChanged += AudioPlayer_EqualizerBandChanged;
+            EQList.ItemsSource = AudioFilterStatic.EQDatas;
+            PassFilterList.ItemsSource = AudioFilterStatic.PassFilterDatas;
+
+            AddOutDeviceToFlyOut();
+            AudioPlayer_EqEnableChanged(AudioPlayer);
+            AudioPlayer_EqualizerBandChanged(AudioPlayer);
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            AudioPlayer.EqEnableChanged -= AudioPlayer_EqEnableChanged;
+            AudioPlayer.EqBandChanged -= AudioPlayer_EqualizerBandChanged;
+            EQList.ItemsSource = null;
+            PassFilterList.ItemsSource = null;
+        }
+
+        private void C_Click(object sender, RoutedEventArgs e)
+        {
+            var a = (OutDevice)(sender as MenuFlyoutItem).Tag;
+            AudioPlayer.NowOutDevice = a;
+            //OutDevicesTextBlock.Text = AudioPlayer.NowOutDevice.ToString();
+            AudioPlayer.SetReloadAsync();
+        }
+
+        private void C_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem c)
+            {
+                c.Click -= C_Click;
+                c.Unloaded -= C_Unloaded;
+            }
+        }
+
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             UpdateShyHeader();
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private void EqEnableSwitcher_Toggled(object sender, RoutedEventArgs e)
         {
-            EQList.ItemsSource = AudioFilterStatic.EQDatas;
-            PassFilterList.ItemsSource = AudioFilterStatic.PassFilterDatas;
-        }
-
-        private void Page_Unloaded(object sender, RoutedEventArgs e)
-        {
-            EQList.ItemsSource = null;
-            PassFilterList.ItemsSource = null;
+            AudioPlayer.EqEnabled = EqEnableSwitcher.IsOn;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -113,6 +190,100 @@ namespace TewiMP.Pages
                 IsEnable = true,
                 Color = Color.FromArgb(255, (byte)r.Next(0, 255), (byte)r.Next(0, 255), (byte)r.Next(0, 255))
             });
+        }
+
+        private void GraphicEqComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+            if ((GraphicEqComboBox.SelectedItem as string) == "自定义")
+            {
+                GraphicResetButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                GraphicResetButton.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        bool inComboChange = false;
+        private void GraphicEqComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (inEqBandChange) return;
+
+            inComboChange = true;
+            var a = sender as ComboBox;
+            foreach (var b in AudioEqualizerBands.BandNames)
+            {
+                if (b.Item2 == (a.SelectedItem as string))
+                {
+                    AudioPlayer.EqualizerBand = AudioEqualizerBands.GetBandFromString(b.Item1);
+                    AudioPlayer.NameOfBand = b.Item1;
+                    AudioPlayer.NameOfBandCH = b.Item2;
+                    break;
+                }
+            }
+            if ((a.SelectedItem as string) == "自定义")
+            {
+                GraphicResetButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                GraphicResetButton.Visibility = Visibility.Collapsed;
+            }
+            inComboChange = false;
+        }
+
+        private void GraphicEQSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            if (!inEqBandChange)
+            {
+                var a = sender as Slider;
+
+                GraphicEqComboBox.SelectedItem = "自定义";
+                AudioEqualizerBands.CustomBands[int.Parse(a.Name.Remove(0, 2))][2] = (float)a.Value / 10;
+                AudioPlayer.EqualizerBand = AudioEqualizerBands.CustomBands;
+            }
+        }
+
+        private void GraphicResetButton_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (var a in AudioEqualizerBands.CustomBands)
+            {
+                a[2] = 0;
+            }
+            AudioPlayer.EqualizerBand = AudioEqualizerBands.CustomBands;
+        }
+
+        private void EqComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+        }
+
+        private void ResetEButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void EqComboBox_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+    }
+
+    public partial class ThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, string language)
+        {
+            if (value is double)
+            {
+                double dValue = System.Convert.ToDouble(value) / 10;
+                return dValue;
+            }
+            return null;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, string language)
+        {
+            return null;
         }
     }
 }
