@@ -182,6 +182,7 @@ namespace TewiMP.Pages.DialogPages
                     {
                         channelsText = $"{App.audioPlayer.FileReader.WaveFormat.Channels} 声道";
                     }
+                    ((TextBlock)OutInfoSp.Children[10]).Text = $"{App.audioPlayer.Latency} ms";
                 }
                 else
                 {
@@ -199,13 +200,13 @@ namespace TewiMP.Pages.DialogPages
                     {
                         channelsText = $"{asioOut.OutputWaveFormat.Channels} 声道";
                     }
+                    ((TextBlock)OutInfoSp.Children[10]).Text = $"{(App.audioPlayer.NowOutObj as AsioOut).PlaybackLatency} ms";
                 }
 
                 ((TextBlock)OutInfoSp.Children[2]).Text = outInfo;
                 ((TextBlock)OutInfoSp.Children[4]).Text = string.IsNullOrEmpty(App.audioPlayer.FileReader.DecodeName) ? "未知" : App.audioPlayer.FileReader.DecodeName;
                 ((TextBlock)OutInfoSp.Children[6]).Text = sampleRateText;
                 ((TextBlock)OutInfoSp.Children[8]).Text = channelsText;
-                ((TextBlock)OutInfoSp.Children[10]).Text = $"{App.audioPlayer.Latency} ms";
             }
         }
 

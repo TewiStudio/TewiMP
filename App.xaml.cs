@@ -39,7 +39,7 @@ namespace TewiMP
         public static HotKeyManager hotKeyManager { get; private set; } = null;
         public static App AppStatic { get; private set; } = null;
         public static string AppName { get; } = "TewiMP";
-        public static string AppVersion { get; } = "0.4.6 Preview";
+        public static string AppVersion { get; } = "0.4.7 Preview";
 
         public static Window WindowLocal;
         public static NotifyIconWindow NotifyIconWindow;
