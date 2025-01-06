@@ -14,6 +14,7 @@ using TewiMP.Controls;
 using TewiMP.DataEditor;
 using TewiMP.Pages.ListViewPages;
 using CommunityToolkit.WinUI;
+using System.Collections.Generic;
 
 namespace TewiMP.Pages
 {
@@ -59,6 +60,7 @@ namespace TewiMP.Pages
         }
 
         public ObservableCollection<SongItemBindBase> MusicDataList = new();
+        public ObservableCollection<SearchItemBindBase> SearchList = new();
         object searchDatas = null;
         static bool firstInit = false;
         int pageNumber = 1;
@@ -133,6 +135,9 @@ namespace TewiMP.Pages
                 switch (NowSearchMode)
                 {
                     case SearchDataType.歌曲:
+                        Children.ItemsSource = MusicDataList;
+                        Children.ItemTemplate = this.Resources["SongItemTemplate"] as DataTemplate;
+
                         MusicData[] array = (searchDatas as MusicListData).Songs.ToArray();
                         int count = pageNumber * pageSize - pageSize;
                         foreach (var i in array)
@@ -141,15 +146,34 @@ namespace TewiMP.Pages
                             i.Count = count;
                             MusicDataList.Add(new() { MusicData = i, MusicListData = musicListData, ImageScaleDPI = dpi });
                         }
-                        ItemPresenterControlBridge.Margin = new(14, 0, 16, 0);
                         break;
-                    case SearchDataType.艺术家:
-                        /*foreach (var i in searchDatas as List<Artist>)
+                    default:
+                        Children.ItemsSource = SearchList;
+                        Children.ItemTemplate = this.Resources["SearchItemTemplate"] as DataTemplate;
+
+                        if (NowSearchMode == SearchDataType.艺术家)
                         {
-                            var a = new Controls.ArtistCard() { Artist = i, ImageScaleDPI = dpi };
-                            Children.Items.Add(a);
+                            foreach (var i in searchDatas as List<Artist>)
+                            {
+                                SearchList.Add(new()
+                                {
+                                    DataType = SearchBindDataType.Artist,
+                                    Artist = i,
+                                });
+                            }
                         }
-                        ItemPresenterControlBridge.Margin = new(14, 14, 16, 14);*/
+                        else if (NowSearchMode == SearchDataType.歌单)
+                        {
+                            foreach (var i in searchDatas as List<object[]>)
+                            {
+                                SearchList.Add(new()
+                                {
+                                    DataType = SearchBindDataType.PlayList,
+                                    PlayList = i[0] as MusicListData,
+                                    PlayList_Count = (int)i[1]
+                                });
+                            }
+                        }
                         break;
                 }
             }

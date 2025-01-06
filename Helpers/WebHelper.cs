@@ -44,6 +44,7 @@ namespace TewiMP.Helpers
         /// <exception cref="FileNotFoundException"></exception>
         public static async Task DownloadFileAsync(string address, string downloadPath)
         {
+            if (address is null) return;
             if (downloadPath.Contains(address)) return;
             DownloadingPathCache.Add(address);
             bool err1 = false;

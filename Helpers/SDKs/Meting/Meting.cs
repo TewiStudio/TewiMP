@@ -573,7 +573,7 @@ namespace Meting4Net.Core
                         {
                             cmd = "playInfo",
                             hash = id,
-                            from = "mkugou"
+                            from = "m.kugou"
                         }),
                         format = ""
                     };

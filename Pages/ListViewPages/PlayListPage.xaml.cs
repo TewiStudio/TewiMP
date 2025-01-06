@@ -35,7 +35,13 @@ namespace TewiMP.Pages.ListViewPages
         {
             base.OnNavigatedTo(e);
             pageData = e.Parameter as PageData;
-            md5 = pageData.Param as string;
+            if (pageData.Param is string m)
+                md5 = m;
+            else if (pageData.Param is MusicListData data)
+            {
+                md5 = null;
+                musicListData = data;
+            }
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -454,6 +460,14 @@ namespace TewiMP.Pages.ListViewPages
             if (!IsLoaded) return;
             if (isInInitBindings) return;
             isInInitBindings = true;
+            LoadingTipControl.ShowLoading();
+
+            if (musicListData.Songs is null && musicListData.ListFrom == MusicFrom.neteaseMusic)
+            {
+                musicListData = await App.metingServices.NeteaseServices.GetPlayList(musicListData.ID);
+                InitInfo();
+            }
+
             var scs = musicListData.PlaySort;
             List<MusicData> array = [];
             await Task.Run(() =>
@@ -506,7 +520,8 @@ namespace TewiMP.Pages.ListViewPages
             musicListBind.Clear();
             if (!IsLoaded || musicListData is null)
             {
-                array = null;
+                array = null; isInInitBindings = false;
+                LoadingTipControl.UnShowLoading();
                 return;
             }
             int count = 1;
@@ -518,18 +533,22 @@ namespace TewiMP.Pages.ListViewPages
             }
 
             SortComboBox.SelectedIndex = (int)musicListData.PlaySort;
+            LoadingTipControl.UnShowLoading();
             isInInitBindings = false;
         }
 
         void InitInfo()
         {
             if (!IsLoaded) return;
-            foreach (var mld in App.playListReader.NowMusicListData)
+            if (md5 != null)
             {
-                if (mld.MD5 == md5)
+                foreach (var mld in App.playListReader.NowMusicListData)
                 {
-                    musicListData = mld;
-                    break;
+                    if (mld.MD5 == md5)
+                    {
+                        musicListData = mld;
+                        break;
+                    }
                 }
             }
 
@@ -541,7 +560,7 @@ namespace TewiMP.Pages.ListViewPages
             MainWindow.WindowDpiChanged -= MainWindow_WindowDpiChanged;
             MainWindow.WindowDpiChanged += MainWindow_WindowDpiChanged;
             ItemsList_Header_Info_TitleTextBlock.Text = musicListData.ListShowName;
-            ItemsList_Header_Info_OtherTextBlock.Text = $"{musicListData.Songs.Count} Ê×¸èÇú";
+            ItemsList_Header_Info_OtherTextBlock.Text = $"{musicListData.Songs?.Count} Ê×¸èÇú";
         }
 
         static Thickness thickness0 = new(0);

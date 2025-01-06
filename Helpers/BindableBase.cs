@@ -5,6 +5,8 @@ using TewiMP.DataEditor;
 
 namespace TewiMP.Helpers
 {
+    public enum SearchBindDataType { Artist, Album, PlayList, User }
+
     public class SongItemBindBase : BindableBase
     {
         MusicData _musicData;
@@ -85,6 +87,14 @@ namespace TewiMP.Helpers
                 OnPropertyChanged(nameof(SearchText));
             }
         }
+    }
+
+    public class SearchItemBindBase
+    {
+        public SearchBindDataType DataType { get; set; }
+        public Artist Artist { get; set; }
+        public MusicListData PlayList { get; set; }
+        public int PlayList_Count { get; set; }
     }
 
     /// <summary>

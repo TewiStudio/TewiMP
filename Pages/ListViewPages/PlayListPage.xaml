@@ -303,5 +303,9 @@
                 </Grid>
             </ListView.Footer>
         </ListView>
+        <controls:LoadingTip x:Name="LoadingTipControl"
+                             VerticalAlignment="Bottom"
+                             HorizontalAlignment="Center"
+                             Margin="0,0,0,54"/>
     </Grid>
 </Page>

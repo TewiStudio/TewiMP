@@ -229,7 +229,9 @@ namespace TewiMP.DataEditor
 
         }
 
-
+        /// <summary>
+        /// 设置 <see cref="ArtistName"/> 和 <see cref="ButtonName"/>
+        /// </summary>
         private void SetABName()
         {
             for (int i = 0; i < Artists.Count; i++)

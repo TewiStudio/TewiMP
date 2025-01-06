@@ -5,18 +5,18 @@ using TewiMP.Helpers.MetingService;
 
 namespace TewiMP.Helpers
 {
-    public abstract class IMetingService
+    public interface IMetingService
     {
-        public abstract Meting4Net.Core.Meting Services { get; set; }
-        public abstract Task<string> GetUrl(string id, int br);
-        public abstract Task<Tuple<string, string>> GetLyric(string id);
-        public abstract Task<string> GetPic(string id);
-        public abstract Task<string> GetPicFromMusicData(MusicData musicData);
-        public abstract Task<object> GetSearch(string keyword, int pageNumber = 1, int pageSize = 30, int type = 0);
-        public abstract Task<MusicListData> GetPlayList(string id);
-        public abstract Task<Artist> GetArtist(string id);
-        public abstract Task<Album> GetAlbum(string id);
-        public abstract Task<MusicData> GetMusicData(string id);
+        public Meting4Net.Core.Meting Services { get; set; }
+        public Task<string> GetUrl(string id, int br);
+        public Task<Tuple<string, string>> GetLyric(string id);
+        public Task<string> GetPic(string id);
+        public Task<string> GetPicFromMusicData(MusicData musicData);
+        public Task<object> GetSearch(string keyword, int pageNumber = 1, int pageSize = 30, int type = 0);
+        public Task<MusicListData> GetPlayList(string id);
+        public Task<Artist> GetArtist(string id);
+        public Task<Album> GetAlbum(string id);
+        public Task<MusicData> GetMusicData(string id);
     }
 
     public class MetingServices

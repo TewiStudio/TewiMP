@@ -6,18 +6,26 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TewiMP.DataEditor;
+using static TewiMP.Helpers.MetingService.KgMeting;
 
 namespace TewiMP.Helpers.MetingService
 {
     class KgMeting : IMetingService
     {
-        public override Meting4Net.Core.Meting Services { get; set; }
+        public class KgMusicData : MusicData
+        {
+            public string Lyric { get; set; }
+            public KgMusicData() { }
+        }
+
+        public Meting4Net.Core.Meting Services { get; set; }
+
         public KgMeting(Meting4Net.Core.Meting meting)
         {
             Services = meting;
         }
 
-        public override async Task<object> GetSearch(string keyword, int pageNumber = 1, int pageSize = 30, int type = 0)
+        public async Task<object> GetSearch(string keyword, int pageNumber = 1, int pageSize = 30, int type = 0)
         {
             return await Task.Run(() =>
             {
@@ -67,7 +75,7 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public override async Task<string> GetUrl(string id, int br)
+        public async Task<string> GetUrl(string id, int br)
         {
             return await Task.Run(() =>
             {
@@ -105,12 +113,7 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public class KgMusicData : MusicData
-        {
-            public string Lyric { get; set; }
-            public KgMusicData() { }
-        }
-        public override async Task<MusicData> GetMusicData(string id)
+        public async Task<MusicData> GetMusicData(string id)
         {
             return await Task.Run(() =>
             {
@@ -168,12 +171,13 @@ namespace TewiMP.Helpers.MetingService
         }
 
         private List<string> PictureLoadingList = new();
+
         /// <summary>
-        /// 获取到的是歌手图片，如果要获取专辑图片使用 GetPicFromMusicData
+        /// 获取到的是歌手图片，如果要获取专辑图片使用 <see cref="GetPicFromMusicData"/>
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public override async Task<string> GetPic(string id)
+        public async Task<string> GetPic(string id)
         {
             while (PictureLoadingList.Count > 3)
             {
@@ -210,13 +214,13 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public override async Task<string> GetPicFromMusicData(MusicData musicData)
+        public async Task<string> GetPicFromMusicData(MusicData musicData)
         {
             return await Task.Run(async () =>
             {
+                return null;
                 var getPicAction = async Task<string> () =>
                 {
-                    return null;
                     try
                     {
                         return (await GetMusicData(musicData.ID)).Album?.PicturePath;
@@ -246,12 +250,12 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public override Task<Artist> GetArtist(string id)
+        public Task<Artist> GetArtist(string id)
         {
             throw new NotImplementedException();
         }
 
-        public override async Task<Album> GetAlbum(string id)
+        public async Task<Album> GetAlbum(string id)
         {
             return await Task.Run(() =>
             {
@@ -323,14 +327,41 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public override Task<Tuple<string, string>> GetLyric(string id)
+        public Task<Tuple<string, string>> GetLyric(string id)
         {
             throw new NotImplementedException ();
         }
 
-        public override Task<MusicListData> GetPlayList(string id)
+        public async Task<MusicListData> GetPlayList(string id)
         {
-            throw new NotImplementedException();
+            var getListAction = async Task<string> () =>
+            {
+                try
+                {
+                    return Services.FormatMethod(false).Playlist(id);
+                }
+                catch
+                {
+                    return null;
+                }
+            };
+
+            for (int i = 0; i <= App.metingServices.RetryCount; i++)
+            {
+                string a = null;
+                try
+                {
+                    a = await getListAction();
+                }
+                catch (Exception err) { a = null; }
+
+                if (a != null)
+                {
+                    //return a;
+                }
+            }
+
+            return null;
         }
     }
 }

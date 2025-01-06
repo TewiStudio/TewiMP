@@ -45,7 +45,20 @@ namespace TewiMP.Pages.DialogPages
                 {
                     try
                     {
-                        var pl = await App.metingServices.NeteaseServices.GetPlayList(AddOutSidePage_IDTb.Text);
+                        var platform = (MusicFrom)AddOutSidePage_PlatfromCb.SelectedIndex;
+
+                        MusicListData pl = null;
+
+                        switch (platform)
+                        {
+                            case MusicFrom.neteaseMusic:
+                                pl = await App.metingServices.NeteaseServices.GetPlayList(AddOutSidePage_IDTb.Text);
+                                break;
+                            case MusicFrom.kgMusic:
+                                pl = await App.metingServices.KgServices.GetPlayList(AddOutSidePage_IDTb.Text);
+                                break;
+                        }
+                        
                         if (pl != null)
                         {
                             musicListData = pl;

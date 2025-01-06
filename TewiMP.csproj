@@ -43,7 +43,6 @@
 
 	<ItemGroup>
 		<None Remove="Background.zip" />
-		<None Remove="Controls\ArtistCard.xaml" />
 		<None Remove="Controls\AutoView.xaml" />
 		<None Remove="Controls\DownloadCard.xaml" />
 		<None Remove="Controls\ImageEx.xaml" />
@@ -217,7 +216,7 @@
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 			<SubType>Designer</SubType>
 		</Page>
-		<Page Update="Controls\ArtistCard.xaml">
+		<Page Update="Controls\SearchCard.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 			<SubType>Designer</SubType>
 		</Page>

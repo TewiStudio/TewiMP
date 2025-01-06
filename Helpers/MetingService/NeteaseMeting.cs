@@ -10,13 +10,13 @@ namespace TewiMP.Helpers.MetingService
 {
     public class NeteaseMeting: IMetingService
     {
-        public override Meting4Net.Core.Meting Services { get; set; }
+        public Meting4Net.Core.Meting Services { get; set; }
         public NeteaseMeting(Meting4Net.Core.Meting meting)
         {
             Services = meting;
         }
 
-        public override async Task<string> GetUrl(string id, int br)
+        public async Task<string> GetUrl(string id, int br)
         {
             return await Task.Run(() =>
             {
@@ -62,7 +62,7 @@ namespace TewiMP.Helpers.MetingService
         /// item1歌词
         /// item2歌词翻译
         /// </returns>
-        public override async Task<Tuple<string, string>> GetLyric(string id)
+        public async Task<Tuple<string, string>> GetLyric(string id)
         {
             return await Task.Run(() =>
             {
@@ -98,7 +98,7 @@ namespace TewiMP.Helpers.MetingService
         }
 
         private List<string> PictureLoadingList = new();
-        public override async Task<string> GetPic(string id)
+        public async Task<string> GetPic(string id)
         {
             while (PictureLoadingList.Count > 3)
             {
@@ -134,12 +134,13 @@ namespace TewiMP.Helpers.MetingService
             });
         }
         
-        public override async Task<object> GetSearch(
+        public async Task<object> GetSearch(
             string keyword,
             int pageNumber = 1,
             int pageSize = 30,
             int type = 0)
         {
+            SearchDataType dataType = (SearchDataType)type;
             return await Task.Run(() =>
             {
                 var getSearchAction = object () =>
@@ -151,7 +152,7 @@ namespace TewiMP.Helpers.MetingService
                         var a = JObject.Parse(data);
                         if (a.ContainsKey("result"))
                         {
-                            if (type == (int)SearchDataType.歌曲)
+                            if (dataType == SearchDataType.歌曲)
                             {
                                 MusicListData ld = new(keyword, keyword, null, MusicFrom.neteaseMusic, null, null);
                                 ld.Songs = UnpackMusicData(a["result"]["songs"]);
@@ -159,11 +160,16 @@ namespace TewiMP.Helpers.MetingService
                                     return ld;
                                 else return null;
                             }
-                            else if (type == (int)SearchDataType.歌单)
+                            else if (dataType == SearchDataType.歌单)
                             {
-
+                                List<object[]> list = new();
+                                foreach (var musicList in a["result"]["playlists"])
+                                {
+                                    list.Add([GetMusicListDataFromJson(musicList), (int)musicList["trackCount"]]);
+                                }
+                                return list;
                             }
-                            else if (type == (int)SearchDataType.艺术家)
+                            else if (dataType == SearchDataType.艺术家)
                             {
                                 List<Artist> artists = new();
                                 foreach (var artist in a["result"]["artists"])
@@ -177,11 +183,11 @@ namespace TewiMP.Helpers.MetingService
                                 }
                                 return artists;
                             }
-                            else if (type == (int)SearchDataType.用户)
+                            else if (dataType == SearchDataType.用户)
                             {
 
                             }
-                            else if (type == (int)SearchDataType.专辑)
+                            else if (dataType == SearchDataType.专辑)
                             {
 
                             }
@@ -204,7 +210,24 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public List<MusicData> UnpackMusicData(JToken token)
+        public static MusicListData GetMusicListDataFromJson(JToken playlistJson)
+        {
+            MusicListData musicListData = new();
+
+            musicListData.ListShowName = (string)playlistJson["name"];
+            musicListData.ID = (string)playlistJson["id"];
+            musicListData.PicturePath = (string)playlistJson["coverImgUrl"];
+            musicListData.ListFrom = MusicFrom.neteaseMusic;
+            musicListData.ListDataType = DataType.歌单;
+
+            var plt = playlistJson["tracks"];
+            musicListData.Songs = UnpackMusicData(plt);
+            musicListData.ListName = $"{musicListData.ListFrom}{musicListData.ListDataType}{musicListData.ID}";
+
+            return musicListData;
+        }
+
+        public static List<MusicData> UnpackMusicData(JToken token)
         {
             if (token is null) return null;
             var datas = new List<MusicData>();
@@ -256,7 +279,7 @@ namespace TewiMP.Helpers.MetingService
         }
 
         private List<string> PlayListLoadingList = new();
-        public override async Task<MusicListData> GetPlayList(string id)
+        public async Task<MusicListData> GetPlayList(string id)
         {
             while (PlayListLoadingList.Count > 3)
             {
@@ -274,21 +297,7 @@ namespace TewiMP.Helpers.MetingService
 
                         if (pls["code"].ToString() == "200")
                         {
-                            MusicListData musicListData = new();
-
-                            var pld = pls["playlist"];
-                            musicListData.ListShowName = (string)pld["name"];
-                            musicListData.ID = (string)pld["id"];
-                            musicListData.PicturePath = (string)pld["coverImgUrl"];
-                            musicListData.ListFrom = MusicFrom.neteaseMusic;
-                            musicListData.ListDataType = DataType.歌单;
-
-                            var plt = pld["tracks"];
-                            musicListData.Songs = UnpackMusicData(plt);
-
-                            musicListData.ListName = $"{musicListData.ListFrom}{musicListData.ListDataType}{musicListData.ID}";
-
-                            //System.Diagnostics.Debug.WriteLine(musicListData.MD5);
+                            MusicListData musicListData = GetMusicListDataFromJson(pls["playlist"]);
                             if (musicListData.Songs.Any()) return musicListData;
                         }
                         else
@@ -315,7 +324,7 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public override async Task<Artist> GetArtist(string id)
+        public async Task<Artist> GetArtist(string id)
         {
             return await Task.Run(() =>
             {
@@ -367,7 +376,7 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public override async Task<Album> GetAlbum(string id)
+        public async Task<Album> GetAlbum(string id)
         {
             return await Task.Run(() =>
             {
@@ -440,7 +449,7 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public override async Task<MusicData> GetMusicData(string songid)
+        public async Task<MusicData> GetMusicData(string songid)
         {
             return await Task.Run(() =>
             {
@@ -484,7 +493,7 @@ namespace TewiMP.Helpers.MetingService
             });
         }
 
-        public override async Task<string> GetPicFromMusicData(MusicData id)
+        public async Task<string> GetPicFromMusicData(MusicData id)
         {
             return await Task.Run(() =>
             {
