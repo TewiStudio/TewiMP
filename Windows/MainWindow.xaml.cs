@@ -180,7 +180,7 @@ namespace TewiMP
         static bool isShowClosingDialog = false;
         public void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
         {
-            Debug.WriteLine("mainwindow closing");
+            Debug.WriteLine("[MainWindow]: Closing...");
             App.SaveSettings();
             SaveNowPlaying();
 

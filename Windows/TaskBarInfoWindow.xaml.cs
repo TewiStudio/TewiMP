@@ -88,7 +88,7 @@ namespace TewiMP.Windowed
             //TryTransparentWindow();
         }
 
-        public async void InitTaskbarInfo()
+        public void InitTaskbarInfo()
         {
             Title = App.AppName;
             AppWindow.Hide();
@@ -126,10 +126,10 @@ namespace TewiMP.Windowed
             Helpers.SDKs.TaskbarProgress.THUMBBUTTON[] changer;
             if (playbackState == NAudio.Wave.PlaybackState.Playing)
             {
-                changer = new[]
-                {
+                changer =
+                [
                     new Helpers.SDKs.TaskbarProgress.THUMBBUTTON() { iId = 2, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = pauseIconHandle, szTip = "播放" }
-                };
+                ];
 
                 // 这个 api 调用似乎会慢一拍，所以这里调用两次
                 Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetOverlayIcon(Handle, playIconHandle, null);
@@ -137,10 +137,10 @@ namespace TewiMP.Windowed
             }
             else
             {
-                changer = new[]
-                {
+                changer =
+                [
                     new Helpers.SDKs.TaskbarProgress.THUMBBUTTON() { iId = 2, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = playIconHandle, szTip = "播放" }
-                };
+                ];
                 Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetOverlayIcon(Handle, pauseIconHandle, null);
                 Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetOverlayIcon(Handle, pauseIconHandle, null);
             }
@@ -174,6 +174,7 @@ namespace TewiMP.Windowed
 
         public async void SetTaskbarImage(string filePath)
         {
+            Debug.WriteLine($"[TaskBarInfoWindow]: TaskBar thumbnail update to \"{filePath}\".");
             if (string.IsNullOrEmpty(filePath))
             {
                 filePath = Path.Combine(localPath, "icon.png");
@@ -199,7 +200,7 @@ namespace TewiMP.Windowed
                     }
                     else
                     {
-                        Debug.WriteLine($"[TaskBarInfoWindow]: TaskBar Image {size}x{size} completed.");
+                        Debug.WriteLine($"[TaskBarInfoWindow]: TaskBar thumbnail {size}x{size} completed.");
                         IconPathUsing = filePath;
                         canBreak = true;
                     }

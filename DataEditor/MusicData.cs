@@ -121,6 +121,22 @@ namespace TewiMP.DataEditor
         public MusicFrom From { get; set; }
         public List<Artist> Artists { get; set; }
         public MusicListData Songs { get; set; }
+
+        private string _artistName;
+        [JsonIgnore]
+        public string ArtistName
+        {
+            get
+            {
+                if (Artists.Any())
+                {
+                    if (_artistName is null)
+                        SetArtistsName();
+                }
+                return string.IsNullOrEmpty(_artistName) ? "未知" : _artistName;
+            }
+        }
+
         public Album(string title = null, string ID = null, string picturePath = null, string describee = null, MusicListData songs = null)
         {
             Title = string.IsNullOrEmpty(title) ? "未知" : title;
@@ -133,6 +149,14 @@ namespace TewiMP.DataEditor
         public bool IsNull()
         {
             return Title == "未知" && string.IsNullOrEmpty(ID);
+        }
+
+        private void SetArtistsName()
+        {
+            for (int i = 0; i < Artists.Count; i++)
+            {
+                _artistName += $"{Artists[i].ToString()}{(i < (Artists.Count - 1) ? (i < Artists.Count - 2 ? ", " : " & ") : "")}";
+            }
         }
 
         public override string GetMD5()

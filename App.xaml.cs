@@ -173,8 +173,7 @@ namespace TewiMP
                 Current.Resources["SystemAccentColorLight2"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
                 Current.Resources["SystemAccentColorDark1"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);*/
 
-
-                Debug.WriteLine(Current.Resources["SystemAccentColorLight2"].GetType());
+                //Debug.WriteLine(Current.Resources["SystemAccentColorLight2"].GetType());
             }
 
             // WinUI Bug: 获取不到启动参数
@@ -234,6 +233,7 @@ namespace TewiMP
             SMTC.DisplayUpdater.Update();
             audioPlayer.DisposeAll();
             hotKeyManager.UnregisterHotKeys([.. hotKeyManager.RegistedHotKeys]);
+            Debug.WriteLine("[App]: 正在退出程序...");
             App.Current.Exit();
         }
 
@@ -252,6 +252,7 @@ namespace TewiMP
         static int retryCount = 0;
         public static void LoadSettings(JObject data)
         {
+            Debug.WriteLine("[App]: 正在读取设置...");
             try
             {
                 JObject b = data;
@@ -327,11 +328,13 @@ namespace TewiMP
                 DataFolderBase.JSettingData = DataFolderBase.SettingDefault;
                 LoadSettings(DataFolderBase.JSettingData);
             }
+            Debug.WriteLine("[App]: 读取设置完成！");
         }
 
         public static Windows.UI.Color AccentColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
         public static void SaveSettings()
         {
+            Debug.WriteLine("[App]: 正在保存设置...");
             var a = DataFolderBase.JSettingData;
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.Volume, audioPlayer.Volume == 0 ? MainWindow.NoVolumeValue : audioPlayer.Volume);
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.DownloadFolderPath, DataFolderBase.DownloadFolder);
@@ -395,9 +398,7 @@ namespace TewiMP
             string b = string.Join(",", c.ToArray());
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.EqualizerCustomData, b);
             DataFolderBase.JSettingData = a;
-#if DEBUG
-            Debug.WriteLine("[SaveSettingData]: 设置配置已存储！");
-#endif
+            Debug.WriteLine("[App]: 设置配置已存储！");
         }
 
         public static bool LoadLastExitPlayingSongAndSongList = true;

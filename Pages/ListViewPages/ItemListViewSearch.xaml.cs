@@ -132,6 +132,7 @@ namespace TewiMP.Pages
 
                 var dpi = CodeHelper.GetScaleAdjustment(App.WindowLocal);
 
+                var count = 0;
                 switch (NowSearchMode)
                 {
                     case SearchDataType.歌曲:
@@ -139,7 +140,7 @@ namespace TewiMP.Pages
                         Children.ItemTemplate = this.Resources["SongItemTemplate"] as DataTemplate;
 
                         MusicData[] array = (searchDatas as MusicListData).Songs.ToArray();
-                        int count = pageNumber * pageSize - pageSize;
+                        count = pageNumber * pageSize - pageSize;
                         foreach (var i in array)
                         {
                             count++;
@@ -155,10 +156,25 @@ namespace TewiMP.Pages
                         {
                             foreach (var i in searchDatas as List<Artist>)
                             {
+                                count++;
                                 SearchList.Add(new()
                                 {
                                     DataType = SearchBindDataType.Artist,
                                     Artist = i,
+                                    Count = count
+                                });
+                            }
+                        }
+                        else if (NowSearchMode == SearchDataType.专辑)
+                        {
+                            foreach (var i in searchDatas as List<Album>)
+                            {
+                                count++;
+                                SearchList.Add(new()
+                                {
+                                    DataType = SearchBindDataType.Album,
+                                    Album = i,
+                                    Count = count
                                 });
                             }
                         }
@@ -166,11 +182,13 @@ namespace TewiMP.Pages
                         {
                             foreach (var i in searchDatas as List<object[]>)
                             {
+                                count++;
                                 SearchList.Add(new()
                                 {
                                     DataType = SearchBindDataType.PlayList,
                                     PlayList = i[0] as MusicListData,
-                                    PlayList_Count = (int)i[1]
+                                    PlayList_Count = (int)i[1],
+                                    Count = count
                                 });
                             }
                         }

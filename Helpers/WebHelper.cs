@@ -161,7 +161,7 @@ namespace TewiMP.Helpers
                         return null;
                 }
             }
-            catch(Exception err) { System.Diagnostics.Debug.WriteLine($"获取歌曲链接时出现错误！{err.Message}"); }
+            catch(Exception err) { System.Diagnostics.Debug.WriteLine($"[WebHelper]: 获取歌曲链接时出现错误！{err.Message}"); }
             return returns;
         }
 

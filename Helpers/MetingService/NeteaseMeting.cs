@@ -16,6 +16,119 @@ namespace TewiMP.Helpers.MetingService
             Services = meting;
         }
 
+        public static Album GetAlbumFromJson(JToken json)
+        {
+            Album album = null;
+            var artist = json["artist"];
+            album = new()
+            {
+                Title = (string)json["name"],
+                Title2 = json["alias"].Any() ? (string)json["alias"].First : null,
+                ID = (string)json["id"],
+                PicturePath = (string)json["picUrl"],
+                Describee = (string)json["description"],
+                RelaseTime = (string)json["publishTime"],
+                From = MusicFrom.neteaseMusic
+            };
+            album.Artists = new()
+            {
+                new()
+                {
+                    Name = (string)artist["name"],
+                    Name2 = (string)artist["trans"],
+                    ID = (string)artist["id"],
+                    PicturePath = (string)artist["picUrl"],
+                    From = MusicFrom.neteaseMusic
+                }
+            };
+            album.Songs = new()
+            {
+                ListFrom = MusicFrom.neteaseMusic,
+                ListDataType = DataType.专辑
+            };
+            return album;
+        }
+
+        public static Artist GetArtistFromJson(JObject json)
+        {
+            Artist artist = new();
+            artist.Name = (string)json["name"];
+            artist.Name2 = json.ContainsKey("trans") ? (string)json["trans"] : null;
+            artist.ID = (string)json["id"];
+            artist.PicturePath = (string)json["img1v1Url"];
+            artist.Describee = (string)json["briefDesc"];
+            artist.From = MusicFrom.neteaseMusic;
+            return artist;
+        }
+
+        public static MusicListData GetMusicListDataFromJson(JToken playlistJson)
+        {
+            MusicListData musicListData = new();
+
+            musicListData.ListShowName = (string)playlistJson["name"];
+            musicListData.ID = (string)playlistJson["id"];
+            musicListData.PicturePath = (string)playlistJson["coverImgUrl"];
+            musicListData.ListFrom = MusicFrom.neteaseMusic;
+            musicListData.ListDataType = DataType.歌单;
+
+            var plt = playlistJson["tracks"];
+            musicListData.Songs = UnpackMusicData(plt);
+            musicListData.ListName = $"{musicListData.ListFrom}{musicListData.ListDataType}{musicListData.ID}";
+
+            return musicListData;
+        }
+
+        public static List<MusicData> UnpackMusicData(JToken token)
+        {
+            if (token is null) return null;
+            var datas = new List<MusicData>();
+            foreach (JObject md in token)
+            {
+                List<Artist> artists = new();
+                foreach (var artist in md["ar"])
+                {
+                    artists.Add(new(
+                        (string)artist["name"],
+                        (string)artist["id"], null
+                        ));
+                }
+
+                string pic = null;
+                if ((md["al"] as JObject).ContainsKey("picUrl"))
+                {
+                    pic = (string)md["al"]["picUrl"];
+                }
+                else
+                {
+                    pic = null;
+                }
+
+                Album album = new(
+                    (string)md["al"]["name"], (string)md["al"]["id"], pic)
+                { From = MusicFrom.neteaseMusic };
+
+                DateTime? dateTime = null;
+                bool dateTickComplete = long.TryParse((string)md["publishTime"], out var dateTick);
+                if (dateTick != 0)
+                {
+                    DateTime? resultDateTime = dateTickComplete ? CodeHelper.UnixGetTime(dateTick, true) : null;
+                    dateTime =
+                        md.ContainsKey("publishTime") ? resultDateTime : null;
+                }
+
+                MusicData data = new(
+                    (string)md["name"],
+                    (string)md["id"],
+                    artists, album, dateTime,
+                    MusicFrom.neteaseMusic);
+
+                if (md.ContainsKey("tns"))
+                    data.Title2 = (string)md["tns"].First();
+                datas.Add(data);
+            }
+            return datas;
+        }
+
         public async Task<string> GetUrl(string id, int br)
         {
             return await Task.Run(() =>
@@ -23,7 +136,6 @@ namespace TewiMP.Helpers.MetingService
                 var getAddressAction = string () =>
                 {
                     string address = Services.FormatMethod().Url(id, br);
-                    System.Diagnostics.Debug.WriteLine(address);
 
                     if (address != null)
                     {
@@ -169,25 +281,25 @@ namespace TewiMP.Helpers.MetingService
                                 }
                                 return list;
                             }
+                            else if (dataType == SearchDataType.专辑)
+                            {
+                                List<Album> list = new();
+                                foreach (var albumjson in a["result"]["albums"])
+                                {
+                                    list.Add(GetAlbumFromJson(albumjson));
+                                }
+                                return list;
+                            }
                             else if (dataType == SearchDataType.艺术家)
                             {
                                 List<Artist> artists = new();
                                 foreach (var artist in a["result"]["artists"])
                                 {
-                                    artists.Add(new()
-                                    {
-                                        ID = (string)artist["id"],
-                                        Name = (string)artist["name"],
-                                        PicturePath = (string)artist["img1v1Url"]
-                                    });
+                                    artists.Add(GetArtistFromJson((JObject)artist));
                                 }
                                 return artists;
                             }
                             else if (dataType == SearchDataType.用户)
-                            {
-
-                            }
-                            else if (dataType == SearchDataType.专辑)
                             {
 
                             }
@@ -208,74 +320,6 @@ namespace TewiMP.Helpers.MetingService
 
                 return null;
             });
-        }
-
-        public static MusicListData GetMusicListDataFromJson(JToken playlistJson)
-        {
-            MusicListData musicListData = new();
-
-            musicListData.ListShowName = (string)playlistJson["name"];
-            musicListData.ID = (string)playlistJson["id"];
-            musicListData.PicturePath = (string)playlistJson["coverImgUrl"];
-            musicListData.ListFrom = MusicFrom.neteaseMusic;
-            musicListData.ListDataType = DataType.歌单;
-
-            var plt = playlistJson["tracks"];
-            musicListData.Songs = UnpackMusicData(plt);
-            musicListData.ListName = $"{musicListData.ListFrom}{musicListData.ListDataType}{musicListData.ID}";
-
-            return musicListData;
-        }
-
-        public static List<MusicData> UnpackMusicData(JToken token)
-        {
-            if (token is null) return null;
-            var datas = new List<MusicData>();
-            foreach (JObject md in token)
-            {
-                List<Artist> artists = new();
-                foreach (var artist in md["ar"])
-                {
-                    artists.Add(new(
-                        (string)artist["name"],
-                        (string)artist["id"], null
-                        ));
-                }
-
-                string pic = null;
-                if ((md["al"] as JObject).ContainsKey("picUrl"))
-                {
-                    pic = (string)md["al"]["picUrl"];
-                }
-                else
-                {
-                    pic = null;
-                }
-
-                Album album = new(
-                    (string)md["al"]["name"], (string)md["al"]["id"], pic)
-                { From = MusicFrom.neteaseMusic };
-
-                DateTime? dateTime = null;
-                bool dateTickComplete = long.TryParse((string)md["publishTime"], out var dateTick);
-                if (dateTick != 0)
-                {
-                    DateTime? resultDateTime = dateTickComplete ? CodeHelper.UnixGetTime(dateTick, true) : null;
-                    dateTime =
-                        md.ContainsKey("publishTime") ? resultDateTime : null;
-                }
-
-                MusicData data = new(
-                    (string)md["name"],
-                    (string)md["id"],
-                    artists, album, dateTime,
-                    MusicFrom.neteaseMusic);
-
-                if (md.ContainsKey("tns"))
-                    data.Title2 = (string)md["tns"].First();
-                datas.Add(data);
-            }
-            return datas;
         }
 
         private List<string> PlayListLoadingList = new();
@@ -336,12 +380,7 @@ namespace TewiMP.Helpers.MetingService
                     if (data["code"].ToString() == "200")
                     {
                         JObject art = (JObject)data["artist"];
-                        artist.Name = (string)art["name"];
-                        artist.Name2 = art.ContainsKey("trans") ? (string)art["trans"] : null;
-                        artist.ID = (string)art["id"];
-                        artist.PicturePath = (string)art["img1v1Url"];
-                        artist.Describee = (string)art["briefDesc"];
-
+                        artist = GetArtistFromJson(art);
                         artist.HotSongs = new()
                         {
                             ListFrom = MusicFrom.neteaseMusic,
@@ -382,43 +421,18 @@ namespace TewiMP.Helpers.MetingService
             {
                 var getAlbumAction = Album () =>
                 {
-                    var data = JObject.Parse(Services.FormatMethod(false).Album(id));
-                    
+                    string jsonStr = Services.FormatMethod(false).Album(id);
+                    var data = JObject.Parse(jsonStr);
+
+                    Album album = null;
                     //System.Diagnostics.Debug.WriteLine(data);
-                    Album Album = null;
                     try
                     {
                         if (data["code"].ToString() == "200")
                         {
-                            JObject album = (JObject)data["album"];
-                            var artist = album["artist"];
-                            Album = new()
-                            {
-                                Title = (string)album["name"],
-                                Title2 = album["alias"].Any() ? (string)album["alias"].First : null,
-                                ID = id,
-                                PicturePath = (string)album["picUrl"],
-                                Describee = (string)album["description"],
-                                RelaseTime = (string)album["publishTime"],
-                                From = MusicFrom.neteaseMusic
-                            };
-                            Album.Artists = new()
-                            {
-                                new()
-                                {
-                                    Name = (string)artist["name"],
-                                    Name2 = (string)artist["trans"],
-                                    ID = (string)artist["id"],
-                                    PicturePath = (string)artist["picUrl"],
-                                    From = MusicFrom.neteaseMusic
-                                }
-                            };
-                            Album.Songs = new()
-                            {
-                                ListFrom = MusicFrom.neteaseMusic,
-                                ListDataType = DataType.专辑
-                            };
-                            Album.Songs.Songs = UnpackMusicData(data["songs"]);
+                            JObject json = (JObject)data["album"];
+                            album = GetAlbumFromJson(json);
+                            album.Songs.Songs = UnpackMusicData(data["songs"]);
                         }
                     }
                     catch(Exception err)
@@ -426,7 +440,7 @@ namespace TewiMP.Helpers.MetingService
                         System.Diagnostics.Debug.WriteLine(err);
                     }
 
-                    return Album;
+                    return album;
                 };
 
                 for (int i = 0; i <= App.metingServices.RetryCount; i++)

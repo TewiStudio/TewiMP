@@ -26,6 +26,7 @@ namespace TewiMP.Controls
         {
             if (DataContext is null) return;
 
+            InfoText.Text = $"{DataContext.Count}. ";
             switch (DataContext.DataType)
             {
                 case SearchBindDataType.Artist:
@@ -34,6 +35,15 @@ namespace TewiMP.Controls
                         Img.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(DataContext.Artist.PicturePath));
                         Title.Text = DataContext.Artist.Name;
                         SubTitle.Text = DataContext.Artist.Name2;
+                    }
+                    break;
+                case SearchBindDataType.Album:
+                    if (DataContext.Album != null)
+                    {
+                        Img.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(DataContext.Album.PicturePath));
+                        Title.Text = $"{DataContext.Album.Title}";
+                        Title2.Text = $" {DataContext.Album.Title2}";
+                        SubTitle.Text = $"{DataContext.Album.ArtistName}";
                     }
                     break;
                 case SearchBindDataType.PlayList:
@@ -98,12 +108,14 @@ namespace TewiMP.Controls
                         PageType = DataContext.DataType switch
                         {
                             SearchBindDataType.Artist => PageType.Artist,
+                            SearchBindDataType.Album => PageType.Album,
                             SearchBindDataType.PlayList => PageType.PlayList,
                             _ => PageType.PlayList
                         },
                         Param = DataContext.DataType switch
                         {
                             SearchBindDataType.Artist => DataContext.Artist,
+                            SearchBindDataType.Album => DataContext.Album,
                             SearchBindDataType.PlayList => DataContext.PlayList,
                             _ => null
                         }

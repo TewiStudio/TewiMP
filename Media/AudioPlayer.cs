@@ -636,7 +636,9 @@ namespace TewiMP.Media
         public async Task SetSourceAsync(MusicData musicData)
         {
             isInSetSource = true;
+            Debug.WriteLine($"[AudioPlayer]: 正在加载：\"{musicData}\"");
             await SetSource(musicData);
+            Debug.WriteLine($"[AudioPlayer]: 加载完成：\"{musicData}\"");
             isInSetSource = false;
         }
 
@@ -721,7 +723,6 @@ namespace TewiMP.Media
         {
             //if (MusicData != pointMusicData) return;
             MusicData musicData = pointMusicData;
-            Debug.WriteLine($"\n\ncall {musicData.Title}");
             if (localFileIniting) return;
             if (filePath != _filePath) return;
             if (FileReader != null)
@@ -873,7 +874,6 @@ namespace TewiMP.Media
 
             SourceChanged?.Invoke(this);
             localFileIniting = false;
-            Debug.WriteLine($"called {musicData.Title}\n\n");
         }
 
         private void AudioPlayer_TimingChanged(AudioPlayer audioPlayer)
