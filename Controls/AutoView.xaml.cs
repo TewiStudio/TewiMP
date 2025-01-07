@@ -74,7 +74,7 @@ namespace TewiMP.Controls
         bool pauseChanged = false;
         private async void RepeatChangeView()
         {
-            //Debug.WriteLine("Repeating.");
+            //App.logManager.Log("Repeating.");
             if (Content is null) return;
             if (Visibility == Visibility.Collapsed) return;
             if (isAddedVelocity) return;
@@ -92,7 +92,6 @@ namespace TewiMP.Controls
             GetSizeResult();
             if (!isHorizontalContentOutOfBounds && !isVerticalContentOutOfBounds) return;
 
-            Debug.WriteLine("[AutoView]: Repeated.");
             if (HorizontalOffset == 0 ? false : true)
             {
                 ScrollTo(0, 0, new(ScrollingAnimationMode.Enabled));
@@ -134,14 +133,14 @@ namespace TewiMP.Controls
                 (Content as FrameworkElement).Unloaded += AutoScrollViewer_Unloaded;
                 ScrollTo(0, 0, new(ScrollingAnimationMode.Disabled, ScrollingSnapPointsMode.Ignore));
                 Pause = false;
-                //Debug.WriteLine("Content Changed.");
+                //App.logManager.Log("Content Changed.");
             }
         }
 
         private void AutoScrollViewer_Unloaded(object sender, RoutedEventArgs e)
         {
             Pause = true;
-            //Debug.WriteLine("Content Unloaded.");
+            //App.logManager.Log("Content Unloaded.");
             (sender as FrameworkElement).Unloaded -= AutoScrollViewer_Unloaded;
         }
     }

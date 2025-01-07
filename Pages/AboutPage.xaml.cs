@@ -82,7 +82,7 @@ namespace TewiMP.Pages
 */
             return;
             //App.audioPlayerBass.LoadAudio();
-            //System.Diagnostics.Debug.WriteLine(a[0].ListName);
+            //System.Diagnostics.App.logManager.Log(a[0].ListName);
             //MainWindow.SetBackdrop(MainWindow.BackdropType.DesktopAcrylic);
             //await App.audioPlayer.Reload();
             /*

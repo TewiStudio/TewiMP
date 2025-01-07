@@ -66,9 +66,6 @@ namespace TewiMP.Pages.DialogPages
                     }
                     catch
                     {
-#if DEBUG
-                        Debug.WriteLine("error");
-#endif
                     }
                 }
 

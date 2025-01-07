@@ -337,7 +337,7 @@ namespace TewiMP.Helpers.MetingService
                     try
                     {
                         JObject pls = JObject.Parse(Services.FormatMethod(false).Playlist(id));
-                        //System.Diagnostics.Debug.WriteLine(pls);
+                        //System.Diagnostics.App.logManager.Log(pls);
 
                         if (pls["code"].ToString() == "200")
                         {
@@ -346,10 +346,10 @@ namespace TewiMP.Helpers.MetingService
                         }
                         else
                         {
-                            //System.Diagnostics.Debug.WriteLine(pls["message"]);
+                            //System.Diagnostics.App.logManager.Log(pls["message"]);
                         }
                     }
-                    catch(Exception err) { System.Diagnostics.Debug.WriteLine(err); }
+                    catch(Exception err) { App.logManager.Log("NeteaseMeting", $"GetPlayList Error: {err}", Background.LogLevel.Error); }
                     return null;
                 };
 
@@ -375,7 +375,7 @@ namespace TewiMP.Helpers.MetingService
                 var getArtistAction = Artist () =>
                 {
                     var data = JObject.Parse(Services.FormatMethod(false).Artist(id));
-                    //System.Diagnostics.Debug.WriteLine(data);
+                    //System.Diagnostics.App.logManager.Log(data);
                     Artist artist = new();
                     if (data["code"].ToString() == "200")
                     {
@@ -425,7 +425,7 @@ namespace TewiMP.Helpers.MetingService
                     var data = JObject.Parse(jsonStr);
 
                     Album album = null;
-                    //System.Diagnostics.Debug.WriteLine(data);
+                    //System.Diagnostics.App.logManager.Log(data);
                     try
                     {
                         if (data["code"].ToString() == "200")
@@ -437,7 +437,7 @@ namespace TewiMP.Helpers.MetingService
                     }
                     catch(Exception err)
                     {
-                        System.Diagnostics.Debug.WriteLine(err);
+                        App.logManager.Log("NeteaseMeting", $"GetAlbum Error: {err}", Background.LogLevel.Error);
                     }
 
                     return album;
@@ -471,18 +471,18 @@ namespace TewiMP.Helpers.MetingService
                 {
                     var data = JObject.Parse(Services.FormatMethod(false).Song(songid));
 
-                    //System.Diagnostics.Debug.WriteLine(data);
+                    //System.Diagnostics.App.logManager.Log(data);
                     MusicData musicData = null;
                     try
                     {
                         if (data["code"].ToString() == "200")
                         {
-                            System.Diagnostics.Debug.WriteLine(data);
+                            //System.Diagnostics.App.logManager.Log(data);
                         }
                     }
                     catch(Exception err)
                     {
-                        System.Diagnostics.Debug.WriteLine(err);
+                        //System.Diagnostics.App.logManager.Log(err);
                     }
 
                     return musicData;
@@ -515,7 +515,7 @@ namespace TewiMP.Helpers.MetingService
                 {
                     var data = JObject.Parse(Services.FormatMethod(false).Song(id.ID));
 
-                    //System.Diagnostics.Debug.WriteLine(data);
+                    //System.Diagnostics.App.logManager.Log(data);
                     string result = null;
                     try
                     {
@@ -526,7 +526,7 @@ namespace TewiMP.Helpers.MetingService
                     }
                     catch(Exception err)
                     {
-                        System.Diagnostics.Debug.WriteLine(err);
+                        App.logManager.Log("NeteaseMeting", $"GetPicFromMusicData Error: {err}", Background.LogLevel.Error);
                     }
 
                     return result;

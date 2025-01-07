@@ -139,8 +139,8 @@ namespace NAudio.Flac
 
                 _streamInfo = streamInfo;
                 _waveFormat = CreateWaveFormat(streamInfo);
-                Debug.WriteLine("Flac StreamInfo found -> WaveFormat: " + _waveFormat);
-                Debug.WriteLine("Flac-File-Metadata read.");
+                TewiMP.App.logManager.Log("FlacReader", "Flac StreamInfo found -> WaveFormat: " + _waveFormat);
+                TewiMP.App.logManager.Log("FlacReader", "Flac-File-Metadata read.");
             }
             else
                 throw new FlacException("Invalid Flac-File. \"fLaC\" Sync not found.", FlacLayer.OutSideOfFrame);

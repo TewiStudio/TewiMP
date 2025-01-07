@@ -82,7 +82,6 @@ namespace TewiMP.Pages
             NavToObj = null;
 
             UnloadObject(this);
-            Debug.WriteLine($"[ItemListViewAlbum] 清理完成。{SongItem.StaticSongItems.Count}");
         }
 
         private void MainWindow_MainViewStateChanged(bool isView)
@@ -157,7 +156,7 @@ namespace TewiMP.Pages
                 }
             }
             LoadingTipControl.UnShowLoading();
-            Debug.WriteLine("[ItemListViewAlbum] 加载完成");
+            App.logManager.Log("ItemListViewAlbum", "加载完成");
             await Task.Delay(1000);
             UpdateShyHeader();
         }
@@ -182,7 +181,7 @@ namespace TewiMP.Pages
             AlbumLogo.Source = Album_Image.Source;
             AlbumLogo.SaveName = NavToObj.Title;
             AlbumLogo.BorderThickness = new(1);
-            Debug.WriteLine("[ItemListViewAlbum] 图片加载完成");
+            App.logManager.Log("ItemListViewAlbum", "图片加载完成");
             UpdateShyHeader();
             await Task.Delay(10);
             UpdateShyHeader();

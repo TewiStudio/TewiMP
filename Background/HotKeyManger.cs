@@ -290,7 +290,7 @@ namespace TewiMP.Background.HotKeys
             Windows.Win32.Foundation.WPARAM wParam,
             Windows.Win32.Foundation.LPARAM lParam)
         {
-            //System.Diagnostics.Debug.WriteLine($"System Message: {uMsg}");
+            //System.Diagnostics.App.logManager.Log($"System Message: {uMsg}");
             if (uMsg == WM_HOTKEY)
             {
                 nuint id = wParam.Value;

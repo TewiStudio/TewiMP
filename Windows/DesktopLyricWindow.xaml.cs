@@ -156,7 +156,7 @@ namespace TewiMP.Windowed
 
         public void AddEvents()
         {
-            System.Diagnostics.Debug.WriteLine("[DesktopLyricWindow]: Add Events.");
+            App.logManager.Log("DesktopLyricWindow", "Add Events.");
             App.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
             App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
             App.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
@@ -168,7 +168,7 @@ namespace TewiMP.Windowed
 
         public void RemoveEvents()
         {
-            System.Diagnostics.Debug.WriteLine("[DesktopLyricWindow]: Removed Events.");
+            App.logManager.Log("DesktopLyricWindow", "Removed Events.");
             App.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
             App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
             App.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;

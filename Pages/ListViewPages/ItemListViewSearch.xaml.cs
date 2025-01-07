@@ -200,7 +200,6 @@ namespace TewiMP.Pages
                 MainWindow.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);
             }
 
-            System.Diagnostics.Debug.WriteLine("加载完成。");
             LoadingTipControl.UnShowLoading();
             UpdateShyHeader();
         }

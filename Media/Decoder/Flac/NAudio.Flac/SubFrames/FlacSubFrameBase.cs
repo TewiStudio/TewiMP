@@ -13,7 +13,7 @@ namespace NAudio.Flac.SubFrames
 
             if ((firstByte & 0x80) != 0) //Zero bit padding, to prevent sync-fooling string of 1s
             {
-                Debug.WriteLine("Flacdecoder subframe-header got no zero-bit padding.");
+                TewiMP.App.logManager.Log("FlacReader", "Flacdecoder subframe-header got no zero-bit padding.");
                 return null;
             }
 
@@ -49,7 +49,7 @@ namespace NAudio.Flac.SubFrames
             }
             else
             {
-                Debug.WriteLine(string.Format("Invalid Flac-SubframeType. SubframeType: 0x{0:x}.", subframeType));
+                TewiMP.App.logManager.Log("FlacReader", string.Format("Invalid Flac-SubframeType. SubframeType: 0x{0:x}.", subframeType));
                 return null;
             }
 

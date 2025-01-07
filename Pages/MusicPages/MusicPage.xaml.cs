@@ -96,7 +96,7 @@ namespace TewiMP.Pages.MusicPages
             SelectedChangedDo(true);
             isCodeChangedLrcItem = false;
             App.audioPlayer.ReCallTiming();
-            //Debug.WriteLine("MusicPage Updateed Events.");
+            //App.logManager.Log("MusicPage Updateed Events.");
         }
 
         bool isAddEvents = false;
@@ -119,7 +119,7 @@ namespace TewiMP.Pages.MusicPages
             App.lyricManager.PlayingLyricSelectedChange += LyricManager_PlayingLyricSelectedChange1;
             isAddEvents = true;
             UpdateWhenDataLated();
-            //Debug.WriteLine("MusicPage Added Events.");
+            //App.logManager.Log("MusicPage Added Events.");
         }
 
         private void RemoveEvents()
@@ -139,7 +139,7 @@ namespace TewiMP.Pages.MusicPages
             App.lyricManager.PlayingLyricSourceChange -= LyricManager_PlayingLyricSourceChange;
             App.lyricManager.PlayingLyricSelectedChange -= LyricManager_PlayingLyricSelectedChange1;
             isAddEvents = false;
-            //Debug.WriteLine("MusicPage Removed Events.");
+            //App.logManager.Log("MusicPage Removed Events.");
         }
 
         public MusicPageViewState ViewState = MusicPageViewState.Hidden;
@@ -177,9 +177,7 @@ namespace TewiMP.Pages.MusicPages
                 RemoveEvents();
                 RemoveLyricListItemSourceAsync();
             }
-#if DEBUG
-            Debug.WriteLine($"[MusicPage]: ViewState 已被设置为 {musicPageViewState}.");
-#endif
+            App.logManager.Log("MusicPage", $"ViewState 已被设置为 {musicPageViewState}.");
         }
 
         private async void RemoveLyricListItemSourceAsync()
@@ -188,9 +186,7 @@ namespace TewiMP.Pages.MusicPages
             if (ViewState == MusicPageViewState.Hidden)
             {
                 LrcBaseListView.ItemsSource = null;
-#if DEBUG
-                Debug.WriteLine($"[MusicPage]: LrcBaseListView.ItemSource 已被设置为 null.");
-#endif
+                App.logManager.Log("MusicPage", $"LrcBaseListView.ItemSource 已被设置为 null.");
             }
         }
 
@@ -221,9 +217,7 @@ namespace TewiMP.Pages.MusicPages
             AlbumImageBase.Source = imageSource;
             AlbumImageBase.SaveName = $"{MusicData.Title} · {MusicData.Album.Title}";
             //BackgroundFillBase.Opacity = 1;
-#if DEBUG
-            Debug.WriteLine($"[MusicPage]: 图片已被更改.");
-#endif
+            App.logManager.Log("MusicPage", $"图片已被更改.");
         }
 
         private void BackgroundBaseImage_Loaded(object sender, RoutedEventArgs e)
@@ -314,6 +308,7 @@ namespace TewiMP.Pages.MusicPages
 
         public async void SelectedChangedDo(bool disableAnimation = false)
         {
+            if (App.lyricManager is null) return; // ?
             if (App.lyricManager.NowLyricsData is null) return;
 
             isCodeChangedLrcItem = true;
@@ -367,7 +362,7 @@ namespace TewiMP.Pages.MusicPages
                 }
             }
 #if DEBUG
-            //Debug.WriteLine($"MusicPage: 选中歌词已被更改为: {App.lyricManager.NowLyricsData?.Lyric[0]}");
+            //App.logManager.Log($"MusicPage: 选中歌词已被更改为: {App.lyricManager.NowLyricsData?.Lyric[0]}");
 #endif
         }
 
@@ -553,7 +548,7 @@ namespace TewiMP.Pages.MusicPages
 
         private void Recognizer_ManipulationUpdated(GestureRecognizer sender, ManipulationUpdatedEventArgs args)
         {
-            System.Diagnostics.Debug.WriteLine("U");
+            //System.Diagnostics.App.logManager.Log("U");
             /*double destY = (PlaybackDetailFrame.RenderTransform as CompositeTransform).TranslateY + args.Delta.Translation.Y;
             if (destY <= 0) destY = 0;
             if (destY >= ActualHeight) destY = ActualHeight;
@@ -562,7 +557,7 @@ namespace TewiMP.Pages.MusicPages
 
         private void Recognizer_ManipulationCompleted(GestureRecognizer sender, ManipulationCompletedEventArgs args)
         {
-            System.Diagnostics.Debug.WriteLine("C");
+            //System.Diagnostics.App.logManager.Log("C");
             /*
             double destY = (PlaybackDetailFrame.RenderTransform as CompositeTransform).TranslateY;
             SetPlaybackDetailFrameVisibility(destY <= ActualHeight * 0.4);*/
@@ -586,7 +581,7 @@ namespace TewiMP.Pages.MusicPages
                 // 加1ms，否则会短时间判定到上一句歌词
                 App.audioPlayer.CurrentTime = lrcItem.LyricTimeSpan + TimeSpan.FromMilliseconds(App.audioPlayer.Latency + 1);
 #if DEBUG
-                Debug.WriteLine("[MusicPage]: Audio player time setted.");
+                App.logManager.Log("MusicPage", "Changed AudioPlayer current time.");
 #endif
             }
         }

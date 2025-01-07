@@ -83,7 +83,6 @@ namespace TewiMP.DataEditor
             {
                 if (ml.Songs[mc] == musicData)
                 {
-                    System.Diagnostics.Debug.WriteLine(musicData.ID);
                     ml.Songs.RemoveAt(mc);
                     break;
                 }

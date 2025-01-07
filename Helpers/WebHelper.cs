@@ -91,7 +91,7 @@ namespace TewiMP.Helpers
         {
             while (loadingImages.Count > 1)
             {
-                //System.Diagnostics.Debug.WriteLine(musicData.Title);
+                //System.Diagnostics.App.logManager.Log(musicData.Title);
                 await Task.Delay(400);
             }
             loadingImages.Add(musicData);
@@ -106,7 +106,7 @@ namespace TewiMP.Helpers
                         if (musicData.Album.ID is null)
                         {
                             addressResult = await App.metingServices.NeteaseServices.GetPicFromMusicData(musicData);
-                            //System.Diagnostics.Debug.WriteLine(addressResult);
+                            //System.Diagnostics.App.logManager.Log(addressResult);
                             /*string address = $"http://music.163.com/api/song/detail/?id={musicData.ID}&ids=%5B{musicData.ID}%5D";
                             var res = JObject.Parse(await GetStringAsync(address));*/
 
@@ -161,7 +161,7 @@ namespace TewiMP.Helpers
                         return null;
                 }
             }
-            catch(Exception err) { System.Diagnostics.Debug.WriteLine($"[WebHelper]: 获取歌曲链接时出现错误！{err.Message}"); }
+            catch(Exception err) { App.logManager.Log("WebHelper", $"获取歌曲链接时出现错误！{err.Message}", Background.LogLevel.Error); }
             return returns;
         }
 

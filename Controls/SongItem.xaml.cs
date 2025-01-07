@@ -163,7 +163,7 @@ namespace TewiMP.Controls
 /*
         ~SongItem()
         {
-            //System.Diagnostics.Debug.WriteLine($"[SongItem] Disposed by Finalizer.");
+            //System.Diagnostics.App.logManager.Log($"[SongItem] Disposed by Finalizer.");
             Dispose();
         }
 */
@@ -359,13 +359,10 @@ namespace TewiMP.Controls
                 DisposeVisualsAnimation();
                 UnloadObject(this);
                 isDisposed = true;
-                //System.Diagnostics.Debug.WriteLine($"[SongItem] Disposed: {StaticSongItems.Count}");
+                //System.Diagnostics.App.logManager.Log($"[SongItem] Disposed: {StaticSongItems.Count}");
             }
-            catch (Exception err)
+            catch
             {
-#if DEBUG
-                System.Diagnostics.Debug.WriteLine(err.ToString());
-#endif
             }
         }
 

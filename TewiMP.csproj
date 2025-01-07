@@ -135,6 +135,10 @@
 		<Page Update="Controls\AudioFilter\PassFilterCard.xaml">
 		  <SubType>Designer</SubType>
 		</Page>
+		<Page Update="Controls\LogItem.xaml">
+		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 		<Page Update="Controls\MusicDataItem.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>
@@ -302,6 +306,9 @@
 		<Page Update="Windows\ImageViewerWindow.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Windows\LogWindow.xaml">
+		  <SubType>Designer</SubType>
 		</Page>
 		<Page Update="Windows\TaskBarInfoWindow.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

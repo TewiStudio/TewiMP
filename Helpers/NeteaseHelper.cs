@@ -16,11 +16,8 @@ namespace TewiMP.Helpers
         public static async void Exec(int id, int br)
         {
             var postData = NeteaseAESCBC(id, br);
-            Debug.WriteLine(postData);
             postData = $"params=4Bd6cR0b%2F0wgb4Y3i%2FilHR0eyJLZpNsb8uJHKzYU%2BUljLqtGWEVWkmE4ZWVT7S097hM4Jw%2BJtLC%2FeVTqMRXopTPbthdS3LAB1%2FDPMAYzUIIGCea6FpLtl7XR40lN0GdcIUHsyN%2B4HW54digvwR0W9A%3D%3D&encSecKey=c595c184334dda21728d8b6bf9886d71659c1266ede962cb88c801a4d533fceec4f411bbc5eed98768f3563b8a29a301ecdf2d5803f6b03f27ec8547924948ed4dd0d79f28ecac74926746ff24215221dcc46cafc64ef8ac4ded43d79b30b65f586d8c00472eeaa6c3961306953a32beb3ddae5254ba3965069d54ac790345c3";
-            Debug.WriteLine(postData);
             var downloadData = await Post(NETEASE_AUDIO_URL, postData);
-            Debug.WriteLine(downloadData);
         }
 
         private const string NETEASE_AUDIO_URL = "https://music.163.com/weapi/song/enhance/player/url/v1?csrf_token=";//"http://music.163.com/api/song/enhance/player/url";
@@ -31,7 +28,6 @@ namespace TewiMP.Helpers
         public static string NeteaseAESCBC(int id, int br)
         {
             string skey = GetRandomHex(16);
-            Debug.WriteLine(skey);
 
             string data =
                 new JObject()
@@ -39,13 +35,10 @@ namespace TewiMP.Helpers
                     { "ids", "replaceToDo"},
                     { "br", br * 1000 }
                 }.ToString(Newtonsoft.Json.Formatting.None).Replace("\"replaceToDo\"", $"[{id}]");
-            Debug.WriteLine(data);
 
             // 两次加密
             var aesData = AesEncrypt(data, NONCE, VI);
-            Debug.WriteLine(aesData);
             var body = AesEncrypt(aesData, skey, VI);
-            Debug.WriteLine(body);
 
             skey = skey.ToReverse();
             skey = Bchexdec(Str2hex(skey));
@@ -58,7 +51,7 @@ namespace TewiMP.Helpers
 
             skey = Bcdechex(skey);
             skey.PadLeft(256, '0');
-            //Debug.WriteLine(skey);
+            //App.logManager.Log(skey);
 
             return $"params={body}&encSecKey={skey}";
         }
@@ -110,7 +103,7 @@ namespace TewiMP.Helpers
                 var a2 = BigInteger.Parse(BigInteger.Pow(16, len - i).ToString());
                 var a3 = a1 * a2;
                 dec += a3;
-                //Debug.WriteLine($"[{a1} / {a2} / {a3} / {dec}]");
+                //App.logManager.Log($"[{a1} / {a2} / {a3} / {dec}]");
             }
 
             return dec.ToString();

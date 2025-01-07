@@ -272,7 +272,6 @@ namespace TewiMP.Windowed
 
         private void Window_Closed(object sender, WindowEventArgs args)
         {
-            System.Diagnostics.Debug.WriteLine("Closed");
             MPE.MediaPlayer.Source = null;
         }
     }

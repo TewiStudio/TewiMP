@@ -126,7 +126,7 @@ namespace TewiMP.Background
         MusicData lastMusicData = null;
         private async void AudioPlayer_SourceChanged(AudioPlayer audioPlayer)
         {
-            //System.Diagnostics.Debug.WriteLine(NowPlayingImageLoaded.GetInvocationList().Length);
+            //System.Diagnostics.App.logManager.Log(NowPlayingImageLoaded.GetInvocationList().Length);
             if (audioPlayer.FileReader.isMidi ||
                 audioPlayer.MusicData is null)
             {
@@ -162,13 +162,13 @@ namespace TewiMP.Background
             NowPlayingImage = a;
             NowPlayingImagePath = path;
             NowPlayingImageLoaded?.Invoke(NowPlayingImage, path);
-            //System.Diagnostics.Debug.WriteLine(NowPlayingImageLoaded.GetInvocationList().Length);
+            //System.Diagnostics.App.logManager.Log(NowPlayingImageLoaded.GetInvocationList().Length);
         }
         public string NowPlayingImagePath = null;
 
         public void Add(MusicData musicData, bool invoke = true, bool insert = false)
         {
-            Debug.WriteLine($"[PlayingList]: 播放列表已添加：\"{musicData.Title}\"");
+            App.logManager.Log("PlayingList", $"播放列表已添加：\"{musicData.Title}\"");
             bool isFind = Find(musicData);
             if (!isFind)
             {
@@ -204,7 +204,7 @@ namespace TewiMP.Background
         {
             Add(musicData, true, true);
 
-            Debug.WriteLine($"[PlayingList]: 正在设置播放：\"{musicData.Title}\"");
+            App.logManager.Log("PlayingList", $"正在设置播放：\"{musicData.Title}\"");
             NAudio.Wave.PlaybackState playState;
             if (PauseWhenPreviousPause)
             {
@@ -224,13 +224,13 @@ namespace TewiMP.Background
             }
 
             var a = true;
-            //System.Diagnostics.Debug.WriteLine(musicData.Title);
+            //System.Diagnostics.App.logManager.Log(musicData.Title);
             try
             {
                 await App.audioPlayer.SetSourceAsync(musicData);
                 if (playState == NAudio.Wave.PlaybackState.Playing)
                     App.audioPlayer.SetPlay(false);
-                Debug.WriteLine($"[PlayingList]: 设置播放完成：\"{musicData.Title}\"");
+                App.logManager.Log("PlayingList", $"设置播放完成：\"{musicData.Title}\"");
             }
             catch (DivideByZeroException)
             {
@@ -250,15 +250,18 @@ namespace TewiMP.Background
             catch (NotEnoughBytesException err)
             {
                 LogHelper.WriteLog("PlayingList Play Midi Error", err.ToString(), false);
+                App.logManager.Log("PlayingList", $"播放Midi音频时出现错误，似乎不支持此Midi音频文件。\n错误信息：{err.Message}", LogLevel.Error);
                 MainWindow.AddNotify("播放Midi音频时出现错误", $"似乎不支持此Midi音频文件。\n错误信息：{err.Message}", NotifySeverity.Error);
             }
             catch (MmException err)
             {
+                App.logManager.Log("PlayingList", $"无法初始化音频输出。请尝试重新播放音频，如果仍然无法初始化，请检查是否有其它应用程序独占此音频设备。\n错误信息：{err.Message}", LogLevel.Error);
                 MainWindow.AddNotify("无法初始化音频输出", $"请尝试重新播放音频，如果仍然无法初始化，请检查是否有其它应用程序独占此音频设备。\n错误信息：{err.Message}", NotifySeverity.Error);
             }
             catch (Exception e)
             {
                 LogHelper.WriteLog("PlayingList Play Error", e.ToString(), false);
+                App.logManager.Log("PlayingList", $"播放音频时出现错误。\n错误信息：{e.Message}", LogLevel.Error);
                 a = false;
 
 #if DEBUG

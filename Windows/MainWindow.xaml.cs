@@ -180,7 +180,7 @@ namespace TewiMP
         static bool isShowClosingDialog = false;
         public void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
         {
-            Debug.WriteLine("[MainWindow]: Closing...");
+            App.logManager.Log("MainWindow", "Closing...");
             App.SaveSettings();
             SaveNowPlaying();
 
@@ -382,7 +382,7 @@ namespace TewiMP
             });
             if (jObject is null) return;
             await System.IO.File.WriteAllTextAsync(path, jObject.ToString());
-            Debug.WriteLine("[SavePlayingList]: 正在播放列表已保存！");
+            App.logManager.Log("SaveNowPlaying", "正在播放列表已保存！");
         }
 
         public static async void LoadLastPlaying()
@@ -448,7 +448,7 @@ namespace TewiMP
             PlayingList_PlayingListItemChange(App.playingList.NowPlayingList);
             UpdataDownloadPageButtonInfoBadgeText();
             App.audioPlayer.ReCallTiming();
-            Debug.WriteLine("[MainWindow]: Data Updated.");
+            App.logManager.Log("MainWindow", "Data Updated.");
         }
 
         bool isAddEvents = false;
@@ -476,7 +476,7 @@ namespace TewiMP
             isAddEvents = true;
             UpdateWhenDataLated();
             MainViewStateChanged?.Invoke(true);
-            Debug.WriteLine("[MainWindow]: Added Events.");
+            App.logManager.Log("MainWindow", "Added Events.");
         }
 
         private void RemoveEvents()
@@ -502,7 +502,7 @@ namespace TewiMP
 
             isAddEvents = false;
             MainViewStateChanged?.Invoke(false);
-            Debug.WriteLine("[MainWindow]: Removed Events.");
+            App.logManager.Log("MainWindow", "Removed Events.");
         }
 
         static ApplicationTheme applicationTheme = App.Current.RequestedTheme;
@@ -908,13 +908,14 @@ namespace TewiMP
             }
             catch (Exception err)
             {
-                Debug.WriteLine("[MainWindow]: zn1-----" + err.Message);
+                App.logManager.Log("MainWindow", "LyricManager_PlayingLyricSelectedChange: " + err.Message);
             }
         }
 
         public static void Invoke(Action action)
         {
-            SWindowGridBase.DispatcherQueue.TryEnqueue(() => action());
+            if (SWindowGridBase is not null) SWindowGridBase.DispatcherQueue.TryEnqueue(() => action());
+            else action();
         }
 
         private void SMTC_ButtonPressed(Windows.Media.SystemMediaTransportControls sender, Windows.Media.SystemMediaTransportControlsButtonPressedEventArgs args)
@@ -1454,7 +1455,7 @@ namespace TewiMP
                 // TOFIX: 快速切换到 PlayList 页面会导致 SelectedItem 为 null
                 if (sender.SelectedItem is null)
                 {
-                    Debug.WriteLine("[MainWindow][NavigationSelectionChanged] SelectedItem 为 null");
+                    App.logManager.Log("MainWindow", "NavigationSelectionChanged: SelectedItem 为 null");
                 }
                 else if ((sender.SelectedItem as NavigationViewItem)?.Tag.GetType() == typeof(MusicListData))
                 {
@@ -1734,7 +1735,7 @@ namespace TewiMP
                 InOpenMusicPage = false;
                 isHiddenMusicPageAnimationNotCompleted = true;
 
-                Debug.WriteLine("[MainWindow]: 主界面被显示。");
+                App.logManager.Log("MainWindow", "主界面被显示。");
                 SWindowGridBase.Visibility = Visibility.Visible;
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualClosingAnimation);
                 musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
@@ -1791,7 +1792,7 @@ namespace TewiMP
                     {
                         SWindowGridBase.Visibility = Visibility.Collapsed;
 #if DEBUG
-                        Debug.WriteLine("[MainWindow]: 主界面被隐藏。");
+                        App.logManager.Log("MainWindow", "主界面被隐藏。");
 #endif
                     }
                 };
@@ -1806,7 +1807,7 @@ namespace TewiMP
             if (visibility)
             {
                 SWindowGridBase.Visibility = Visibility.Visible;
-                Debug.WriteLine("[MainWindow]: 主界面被显示。");
+                App.logManager.Log("MainWindow", "主界面被显示。");
                 await Task.Delay(220);
                 if (!InOpenMusicPage)
                     SMusicPageBaseFrame.Visibility = Visibility.Collapsed;
@@ -1818,7 +1819,7 @@ namespace TewiMP
                 if (InOpenMusicPage)
                 {
                     SWindowGridBase.Visibility = Visibility.Collapsed;
-                    Debug.WriteLine("[MainWindow]: 主界面被隐藏。");
+                    App.logManager.Log("MainWindow", "主界面被隐藏。");
                 }
             }
         }

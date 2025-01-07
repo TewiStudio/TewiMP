@@ -136,7 +136,7 @@ namespace TewiMP.Helpers
 
         public static async Task<ImageSource> GetImageSource(string filePath, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
         {
-            //System.Diagnostics.Debug.WriteLine(filePath);
+            //System.Diagnostics.App.logManager.Log(filePath);
             if (string.IsNullOrEmpty(filePath))
             {
                 filePath = @"ms-appx:///Images/icon.png";

@@ -45,7 +45,7 @@ namespace NAudio.Flac
             TotalLength = totalLength;
             TotalSamples = totalsamples;
 
-            Debug.WriteLineIf(TotalSamples == streamInfo.TotalSamples, "Flac prescan successful. Calculated total_samples value matching the streaminfo-metadata.");
+            TewiMP.App.logManager.LogIf(TotalSamples == streamInfo.TotalSamples, "FlacDecoder", "Flac prescan successful. Calculated total_samples value matching the streaminfo-metadata.");
         }
 
         private void StartScan(FlacMetadataStreamInfo streamInfo, FlacPreScanMode mode)
@@ -80,7 +80,7 @@ namespace NAudio.Flac
 
 #if FLAC_DEBUG
             watch.Stop();
-            Debug.WriteLine(String.Format("FlacPreScan finished: {0} Bytes processed in {1} ms.",
+            App.logManager.Log(String.Format("FlacPreScan finished: {0} Bytes processed in {1} ms.",
                 _stream.Length, watch.ElapsedMilliseconds));
 #endif
             RaiseScanFinished(result);

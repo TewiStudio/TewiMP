@@ -22,8 +22,6 @@ namespace TewiMP.Pages.DialogPages
         Windows.System.VirtualKey normalKey = Windows.System.VirtualKey.A;
         private void HotKeyEditor_KeyDown(object sender, KeyRoutedEventArgs e)
         {
-            System.Diagnostics.Debug.WriteLine(e.Key);
-
             switch (e.Key)
             {
                 case Windows.System.VirtualKey.LeftWindows:

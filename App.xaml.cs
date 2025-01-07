@@ -37,6 +37,7 @@ namespace TewiMP
         public static PlayListReader playListReader { get; private set; } = null;
         public static LocalMusicManager localMusicManager { get; private set; } = null;
         public static HotKeyManager hotKeyManager { get; private set; } = null;
+        public static LogManager logManager { get; private set; } = null;
         public static App AppStatic { get; private set; } = null;
         public static string AppName { get; } = "TewiMP";
         public static string AppVersion { get; } = "0.4.7 Preview";
@@ -61,7 +62,7 @@ namespace TewiMP
                 {
                     LogHelper.WriteLog("UnobservedTaskError", excArgs.Exception.ToString(), false);
     #if DEBUG
-                    Debug.WriteLine("UnobservedTaskError: " + excArgs.Exception.ToString());
+                    App.logManager.Log("App", "UnobservedTaskError: " + excArgs.Exception.ToString(), LogLevel.Error);
     #endif
                 };
         }
@@ -71,7 +72,7 @@ namespace TewiMP
             e.Handled = true;
             LogHelper.WriteLog("UnhandledError", e.Exception.ToString(), false);
 #if DEBUG
-            Debug.WriteLine("UnhandledError: " + e.ToString());
+            App.logManager.Log("App", "UnhandledError: " + e.ToString(), LogLevel.Error);
 #endif
         }
 
@@ -85,6 +86,7 @@ namespace TewiMP
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             base.OnLaunched(args);
+            logManager = new();
             DataFolderBase.InitFiles();
             metingServices = new();
             cacheManager = new();
@@ -173,7 +175,7 @@ namespace TewiMP
                 Current.Resources["SystemAccentColorLight2"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
                 Current.Resources["SystemAccentColorDark1"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);*/
 
-                //Debug.WriteLine(Current.Resources["SystemAccentColorLight2"].GetType());
+                //App.logManager.Log(Current.Resources["SystemAccentColorLight2"].GetType());
             }
 
             // WinUI Bug: 获取不到启动参数
@@ -233,8 +235,8 @@ namespace TewiMP
             SMTC.DisplayUpdater.Update();
             audioPlayer.DisposeAll();
             hotKeyManager.UnregisterHotKeys([.. hotKeyManager.RegistedHotKeys]);
-            Debug.WriteLine("[App]: 正在退出程序...");
-            App.Current.Exit();
+            logManager.Log("App", "正在退出程序...");
+            Current.Exit();
         }
 
         public static async void ShowErrorDialog()
@@ -245,14 +247,14 @@ namespace TewiMP
             var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(WindowLocal);
             WinRT.Interop.InitializeWithWindow.Initialize(messageDialog, hwnd);
             await messageDialog.ShowAsync();
-            App.Current.Exit();
+            Current.Exit();
         }
 
         static bool loadFailed = false;
         static int retryCount = 0;
         public static void LoadSettings(JObject data)
         {
-            Debug.WriteLine("[App]: 正在读取设置...");
+            logManager.Log("App", "正在读取设置...");
             try
             {
                 JObject b = data;
@@ -328,13 +330,13 @@ namespace TewiMP
                 DataFolderBase.JSettingData = DataFolderBase.SettingDefault;
                 LoadSettings(DataFolderBase.JSettingData);
             }
-            Debug.WriteLine("[App]: 读取设置完成！");
+            logManager.Log("App", "读取设置完成！");
         }
 
         public static Windows.UI.Color AccentColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
         public static void SaveSettings()
         {
-            Debug.WriteLine("[App]: 正在保存设置...");
+            logManager.Log("App", "正在保存设置...");
             var a = DataFolderBase.JSettingData;
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.Volume, audioPlayer.Volume == 0 ? MainWindow.NoVolumeValue : audioPlayer.Volume);
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.DownloadFolderPath, DataFolderBase.DownloadFolder);
@@ -398,7 +400,7 @@ namespace TewiMP
             string b = string.Join(",", c.ToArray());
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.EqualizerCustomData, b);
             DataFolderBase.JSettingData = a;
-            Debug.WriteLine("[App]: 设置配置已存储！");
+            logManager.Log("App", "设置配置已存储！");
         }
 
         public static bool LoadLastExitPlayingSongAndSongList = true;

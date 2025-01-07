@@ -53,7 +53,7 @@ namespace TewiMP.Pages.DialogPages
                 TimingEndEvent = (TimingEndEvent)TimingEndEventComboBox.SelectedIndex;
                 LeftTime = TimingTimePicker.Time;
                 //LeftTime = TimeSpan.FromSeconds(2);
-                //System.Diagnostics.Debug.WriteLine(LeftTime);
+                //System.Diagnostics.App.logManager.Log(LeftTime);
                 TimingTimer = new()
                 {
                     Interval = TimeSpan.FromSeconds(1)

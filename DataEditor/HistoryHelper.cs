@@ -62,7 +62,7 @@ namespace TewiMP.DataEditor
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"SongHistoryHelper: {ex.Message}");
+                App.logManager.Log("DataFolderBase", ex.Message, Background.LogLevel.Error);
             }
         }
         

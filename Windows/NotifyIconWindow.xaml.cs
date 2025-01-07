@@ -133,7 +133,7 @@ namespace TewiMP.Windowed
                 TitleTBBase.Pause = true;
                 ArtistTBBase.Pause = true;
                 AlbumTBBase.Pause = true;
-                System.Diagnostics.Debug.WriteLine("[NotifyIconWindow]: Removed Events");
+                App.logManager.Log("NotifyIconWindow", "Removed Events");
             }
             else
             {
@@ -150,7 +150,7 @@ namespace TewiMP.Windowed
                 ArtistTBBase.Pause = false;
                 AlbumTBBase.Pause = false;
                 UpdateDatas();
-                System.Diagnostics.Debug.WriteLine("[NotifyIconWindow]: Added Events");
+                App.logManager.Log("NotifyIconWindow", "Added Events");
             }
         }
 

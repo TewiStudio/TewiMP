@@ -455,13 +455,11 @@ namespace TewiMP.Controls
             //if (isMouseEventClosed) return;
             //OnMouseIn();
             //Info_Buttons_StackPanel.Focus(FocusState.Keyboard);
-            System.Diagnostics.Debug.WriteLine("Focus");
         }
 
         private void UserControl_LostFocus(object sender, RoutedEventArgs e)
         {
             //OnMouseLeave();
-            System.Diagnostics.Debug.WriteLine("Lost Focus");
         }
     }
 }

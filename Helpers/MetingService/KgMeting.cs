@@ -33,7 +33,6 @@ namespace TewiMP.Helpers.MetingService
                 {
                     string data = Services.FormatMethod(false).Search(keyword, new Meting4Net.Core.Models.Standard.Options() { page = pageNumber, limit = pageSize, type = type});
 
-                    System.Diagnostics.Debug.WriteLine(data.ToString());
                     if (data != null)
                     {
                          var a = JObject.Parse(data);
@@ -55,7 +54,6 @@ namespace TewiMP.Helpers.MetingService
                                 }
                                 return ld;
                             }
-                            System.Diagnostics.Debug.WriteLine(data);
                         }
                     }
 
@@ -82,7 +80,6 @@ namespace TewiMP.Helpers.MetingService
                 var getAddressAction = string () =>
                 {
                     string address = Services.FormatMethod().Url(id);
-                    System.Diagnostics.Debug.WriteLine(address);
 
                     if (address != null)
                     {
@@ -264,7 +261,6 @@ namespace TewiMP.Helpers.MetingService
                     var a = Services.FormatMethod(false).Album(id);
                     var data = JObject.Parse(a);
 
-                    System.Diagnostics.Debug.WriteLine(a);
                     Album Album = null;
                     try
                     {/*
@@ -301,7 +297,7 @@ namespace TewiMP.Helpers.MetingService
                     }
                     catch (Exception err)
                     {
-                        System.Diagnostics.Debug.WriteLine(err);
+                        //App.logManager.Log(err);
                     }
 
                     return Album;

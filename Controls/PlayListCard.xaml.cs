@@ -107,7 +107,7 @@ namespace TewiMP.Controls
 
         private async void UILoaded(object sender, RoutedEventArgs e)
         {
-            //System.Diagnostics.Debug.WriteLine(MusicListData.PicturePath);
+            //System.Diagnostics.App.logManager.Log(MusicListData.PicturePath);
         }
 
         private void UIUnloaded(object sender, RoutedEventArgs e)
@@ -124,7 +124,7 @@ namespace TewiMP.Controls
             MusicListData = null;
             DataContext = null;
             //PlayListImage = null;
-            //System.Diagnostics.Debug.WriteLine("[PlayListCard]: Disposed.");
+            //System.Diagnostics.App.logManager.Log("[PlayListCard]: Disposed.");
         }
 
         private void Grid_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)

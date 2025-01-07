@@ -87,7 +87,7 @@ namespace TewiMP.Media.Decoder.FFmpeg
             error = ffmpeg.avformat_open_input(&tempFormat, path, null, null);
             if (error < 0)
             {
-                Debug.WriteLine("打开媒体文件失败");
+                App.logManager.Log("打开媒体文件失败");
                 return;
             }
             //嗅探媒体信息
@@ -97,7 +97,7 @@ namespace TewiMP.Media.Decoder.FFmpeg
             audioStreamIndex = ffmpeg.av_find_best_stream(format, AVMediaType.AVMEDIA_TYPE_AUDIO, -1, -1, &codec, 0);
             if (audioStreamIndex < 0)
             {
-                Debug.WriteLine("没有找到音频流");
+                App.logManager.Log("没有找到音频流");
                 return;
             }
             //获取音频流
@@ -108,7 +108,7 @@ namespace TewiMP.Media.Decoder.FFmpeg
             error = ffmpeg.avcodec_parameters_to_context(codecContext, audioStream->codecpar);
             if (error < 0)
             {
-                Debug.WriteLine("设置解码器参数失败");
+                App.logManager.Log("设置解码器参数失败");
             }
             error = ffmpeg.avcodec_open2(codecContext, codec, null);
             //媒体时长

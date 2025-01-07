@@ -78,7 +78,7 @@ namespace NAudio.Flac.SubFrames
                     break;
 
                 default:
-                    Debug.WriteLine("Invalid FlacFixedSubFrame predictororder.");
+                    TewiMP.App.logManager.Log("FlacReader", "Invalid FlacFixedSubFrame predictororder.");
                     return;
             }
         }

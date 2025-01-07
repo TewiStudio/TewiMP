@@ -461,6 +461,11 @@
                 <FontIcon Glyph="&#xEBE8;"/>
             </cc:SettingsExpander.HeaderIcon>
             <cc:SettingsExpander.Items>
+                <cc:SettingsCard Header="Log窗口"
+                                 Description="打开Log窗口以查看Log"
+                                 IsClickEnabled="True"
+                                 Click="SettingsCard_Click_2">
+                </cc:SettingsCard>
                 <cc:SettingsCard Header="渲染倍数">
                     <NumberBox Maximum="4" Minimum="0.1" PlaceholderText="1" SpinButtonPlacementMode="Compact"
                                ValueChanged="NumberBox_ValueChanged_1"/>

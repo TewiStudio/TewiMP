@@ -96,8 +96,8 @@ namespace CUETools.Codecs.FLAKE
 		{
 			get
 			{/*
-				System.Diagnostics.Debug.WriteLine(_sampleOffset);
-				System.Diagnostics.Debug.WriteLine(_samplesInBuffer);*/
+				System.Diagnostics.App.logManager.Log(_sampleOffset);
+				System.Diagnostics.App.logManager.Log(_samplesInBuffer);*/
 				return _sampleOffset - _samplesInBuffer;
 			}
 			set
@@ -224,12 +224,12 @@ namespace CUETools.Codecs.FLAKE
 				_framesBufferLength -= bytesDecoded;
 				_framesBufferOffset += bytesDecoded;
 
-                //System.Diagnostics.Debug.WriteLine(_sampleOffset);
-                //System.Diagnostics.Debug.WriteLine(_samplesInBuffer);
+                //System.Diagnostics.App.logManager.Log(_sampleOffset);
+                //System.Diagnostics.App.logManager.Log(_samplesInBuffer);
                 _samplesInBuffer -= _samplesBufferOffset; // can be set by Seek, otherwise zero
                 _sampleOffset += _samplesInBuffer;
-                //System.Diagnostics.Debug.WriteLine("   " + _sampleOffset);
-                //System.Diagnostics.Debug.WriteLine(_samplesInBuffer);
+                //System.Diagnostics.App.logManager.Log("   " + _sampleOffset);
+                //System.Diagnostics.App.logManager.Log(_samplesInBuffer);
             }
 
 			Interlace(buff, offset, sampleCount);

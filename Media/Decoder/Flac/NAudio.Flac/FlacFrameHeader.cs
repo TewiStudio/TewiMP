@@ -417,7 +417,7 @@ namespace NAudio.Flac
         internal void Error(string msg, string location)
         {
             if (PrintErrors)
-                Debug.WriteLine(location + msg);
+                TewiMP.App.logManager.Log("FlacDecoder", location + msg, TewiMP.Background.LogLevel.Error);
         }
 
         /// <summary>

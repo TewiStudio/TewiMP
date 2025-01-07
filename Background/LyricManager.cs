@@ -44,7 +44,7 @@ namespace TewiMP.Background
         private void InovkeLyricChangeEvent(LyricData lyricData)
         {
             PlayingLyricSelectedChange?.Invoke(lyricData);
-            Debug.WriteLine($"[LyricManager]: 当前歌词已设置为：\"{lyricData?.Lyric?.FirstOrDefault()}\"");
+            App.logManager.Log("LyricManager", $"当前歌词已设置为：\"{lyricData?.Lyric?.FirstOrDefault()}\"");
         }
 
         public LyricManager()
@@ -67,7 +67,7 @@ namespace TewiMP.Background
 
         public async Task InitLyricList(MusicData musicData)
         {
-            Debug.WriteLine($"[LyricManager]: 初始化歌词：\"{musicData.Title}\"");
+            App.logManager.Log("LyricManager", $"初始化歌词：\"{musicData.Title}\"");
             if (musicData is null) return;
             NowPlayingLyrics.Clear();
 
@@ -77,7 +77,7 @@ namespace TewiMP.Background
             if (cachePath != null)
             {
                 resultPath = cachePath;
-                Debug.WriteLine($"[LyricManager]: 找到歌词缓存：\"{cachePath}\"");
+                App.logManager.Log("LyricManager", $"找到歌词缓存：\"{cachePath}\"");
             }
             else
             {
@@ -100,7 +100,7 @@ namespace TewiMP.Background
                     return;
                 }
 
-                Debug.WriteLine($"[LyricManager]: 从网络中下载歌词");
+                App.logManager.Log("LyricManager", "从网络中下载歌词");
                 Tuple<string, string> lyricTuple;
                 if (musicData.From == MusicFrom.neteaseMusic)
                 {
@@ -127,17 +127,17 @@ namespace TewiMP.Background
                         System.IO.File.WriteAllText(path, $"{lyricTuple.Item1}\n{lyricTuple.Item2}");
                     });
                     resultPath = path;
-                    Debug.WriteLine($"[LyricManager]: 下载网络歌词完成");
+                    App.logManager.Log("LyricManager", "下载网络歌词完成");
                 }
             }
 
             await InitLyricList(resultPath);
-            Debug.WriteLine($"[LyricManager]: 初始化歌词成功： \"{musicData.Title}\"");
+            App.logManager.Log("LyricManager", $"初始化歌词成功： \"{musicData.Title}\"");
         }
 
         public async Task InitLyricList(TagLib.File file)
         {
-            Debug.WriteLine($"[LyricManager]: 从 IDv3 标签中获取歌词");
+            App.logManager.Log("LyricManager", "从 IDv3 标签中获取歌词");
             if (file is null)
             {
                 await InitLyricList("");
@@ -157,11 +157,11 @@ namespace TewiMP.Background
             {
                 NowPlayingLyrics.Clear();
                 NowLyricsData = null;
-                Debug.WriteLine($"[LyricManager]: 无法获取有效歌词。");
+                App.logManager.Log("LyricManager", "无法获取有效歌词。", LogLevel.Waring);
                 return;
             }
 
-            Debug.WriteLine($"[LyricManager]: 读取歌词文件：\"{lyricPath}\"");
+            App.logManager.Log("LyricManager", $"读取歌词文件：\"{lyricPath}\"");
             string f = null;
             var lrcEncode = FileHelper.GetEncodeingType(lyricPath);
             if (lrcEncode == Encoding.Default)
@@ -178,7 +178,7 @@ namespace TewiMP.Background
             {
                 NowPlayingLyrics.Clear();
                 NowLyricsData = null;
-                Debug.WriteLine($"[LyricManager]: 歌词文件大小未超过 10 字节，不会使用此歌词文件");
+                App.logManager.Log("LyricManager", "歌词文件大小未超过 10 字节，不会使用此歌词文件", LogLevel.Waring);
                 //System.IO.File.Delete(lyricPath);
                 return;
             }
@@ -200,13 +200,13 @@ namespace TewiMP.Background
 
         public void StartTimer()
         {
-            //Debug.WriteLine($"[LyricManager]: 歌词循环已开始");
+            //App.logManager.Log($"[LyricManager]: 歌词循环已开始");
             ReCallUpdate();
         }
         
         private void StopTimer()
         {
-            //Debug.WriteLine($"[LyricManager]: 歌词循环已停止");
+            //App.logManager.Log($"[LyricManager]: 歌词循环已停止");
             timer.Stop();
         }
 

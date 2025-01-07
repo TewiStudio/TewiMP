@@ -244,7 +244,7 @@ namespace TewiMP.Helpers
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine(ex.Message);
+                        System.Diagnostics.App.logManager.Log(ex.Message);
                     }
 
                     return image;
@@ -362,7 +362,7 @@ namespace TewiMP.Helpers
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    App.logManager.Log("ImageFromBytes", ex.Message, Background.LogLevel.Error);
                 }
             });
             await image.SetSourceAsync(stream);
@@ -626,7 +626,7 @@ namespace TewiMP.Helpers
                     case 1: timeMillsStr += "00"; break;
                     case 2: timeMillsStr += "0"; break;
                     case 3: break;
-                    default: Debug.WriteLine("Warning：歌词精度可能会降低。"); break;
+                    default: App.logManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Waring); break;
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
                 return timesb + timeMills;
@@ -649,7 +649,7 @@ namespace TewiMP.Helpers
                         case 1: timeMillsStr += "00"; break;
                         case 2: timeMillsStr += "0"; break;
                         case 3: break;
-                        default: Debug.WriteLine("Warning：歌词精度可能会降低。"); break;
+                        default: App.logManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Waring); break;
                     }
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));

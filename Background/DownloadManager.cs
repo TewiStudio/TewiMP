@@ -89,7 +89,7 @@ namespace TewiMP.Background
                     dm.ErrorMessage = err.Message;
                     OnDownloadError?.Invoke(dm);
 #if DEBUG
-                    System.Diagnostics.Debug.WriteLine(err.Message);
+                    App.logManager.Log("DownloadManager", err.Message, LogLevel.Error);
 #endif
                 }
             }
@@ -105,14 +105,14 @@ namespace TewiMP.Background
                 try
                 {
 #if DEBUG
-                    System.Diagnostics.Debug.WriteLine($"[DownloadManager] 下载中：{dm.MusicData.Title}");
+                    App.logManager.Log("DownloadManager", $"下载中：{dm.MusicData.Title}");
 #endif
                     StartDownload(dm);
                 }
                 catch (Exception err)
                 {
 #if DEBUG
-                    System.Diagnostics.Debug.WriteLine(err.Message);
+                    App.logManager.Log("DownloadManager", err.Message);
 #endif
                     DownloadingData.Remove(dm);
                     DownloadErrorData.Add(dm);
@@ -207,7 +207,7 @@ namespace TewiMP.Background
                 dm.DownloadedSize = e.BytesReceived;
                 dm.DownloadState = DownloadStates.Downloading;
                 OnDownloading?.Invoke(dm);
-                //System.Diagnostics.Debug.WriteLine(e.ProgressPercentage);
+                //System.Diagnostics.App.logManager.Log(e.ProgressPercentage);
                 //Set1(e.ProgressPercentage, (Convert.ToDouble(e.BytesReceived) / Convert.ToDouble(e.TotalBytesToReceive) * 100).ToString("0.0") + "%", zilongcn.Others.GetAutoSizeString(e.BytesReceived, 2) + "/" + zilongcn.Others.GetAutoSizeString(e.TotalBytesToReceive, 2));
             };
             TheDownloader.DownloadFileCompleted += (s, e) =>
@@ -240,7 +240,7 @@ namespace TewiMP.Background
                 }
                 catch (Exception err)
                 {
-                    System.Diagnostics.Debug.WriteLine(err.ToString());
+                    App.logManager.Log("DownloadManager", err.ToString(), LogLevel.Error);
                 }
                 if (IDv3WriteArtistImage)
                 {
@@ -260,7 +260,7 @@ namespace TewiMP.Background
                     }
                     catch (Exception err)
                     {
-                        System.Diagnostics.Debug.WriteLine(err.ToString());
+                        App.logManager.Log("DownloadManager", err.ToString(), LogLevel.Error);
                     }
                 }
             }
@@ -351,7 +351,7 @@ namespace TewiMP.Background
             DownloadingData.Remove(dm);
             DownloadedData.Add(dm);
             OnDownloaded?.Invoke(dm);
-            System.Diagnostics.Debug.WriteLine($"[DownloadManager] 下载完成：{dm.MusicData.Title}");
+            App.logManager.Log("DownloadManager", $"下载完成：{dm.MusicData.Title}");
         }
 
         public void CallOnDownloadingEvent(DownloadData dm)

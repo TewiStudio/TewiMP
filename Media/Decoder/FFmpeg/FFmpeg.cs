@@ -33,7 +33,7 @@ namespace TewiMP.Media.Decoder.FFmpeg
                 var ffmpegBinaryPath = Path.Combine(current, probe);
                 if (Directory.Exists(ffmpegBinaryPath))
                 {
-                    Debug.WriteLine($"FFmpeg binaries found in: {ffmpegBinaryPath}");
+                    App.logManager.Log("FFmpeg", $"FFmpeg binaries found in: {ffmpegBinaryPath}");
                     ffmpeg.RootPath = ffmpegBinaryPath;
                     ffmpeg.avdevice_register_all();
                     return;

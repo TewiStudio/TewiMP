@@ -91,7 +91,7 @@ namespace TewiMP.Pages
             LyricCachePath = DataFolderBase.LyricCacheFolder;
             DownloadPath = DataFolderBase.DownloadFolder;
 
-            //System.Diagnostics.Debug.WriteLine(App.downloadManager.br);
+            //System.Diagnostics.App.logManager.Log(App.downloadManager.br);
             /*
             switch (App.downloadManager.br)
             {
@@ -889,6 +889,11 @@ namespace TewiMP.Pages
             TimeEventPage.TimingTimer.Tick -= TimingTimer_Tick;
             TimeEventPage.TimingTimer.Tick += TimingTimer_Tick;
             TimingTimer_Tick(null, null);
+        }
+
+        private void SettingsCard_Click_2(object sender, RoutedEventArgs e)
+        {
+            LogWindow.ShowWindow();
         }
     }
 }

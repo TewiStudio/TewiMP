@@ -79,7 +79,7 @@ namespace TewiMP.Pages
             DataContext = null;
             LeavingPageDo();
             //GC.SuppressFinalize(this);
-            //System.Diagnostics.Debug.WriteLine("Clear");
+            //System.Diagnostics.App.logManager.Log("Clear");
         }
 
         private void LeavingPageDo()
@@ -113,11 +113,10 @@ namespace TewiMP.Pages
 
             NavToObj = null;
             UnloadObject(this);
-            System.Diagnostics.Debug.WriteLine($"[ItemListViewPlayList] 清理完成。");
         }
 
         private void DisposeAllVisual()
-        {/* crash program
+        {/* //will crash program
             scrollerPropertySet?.Dispose();
             headerVisual?.Dispose();
             backgroundVisual?.Dispose();
@@ -195,7 +194,7 @@ namespace TewiMP.Pages
             isLoading = true;
 
             if (IsNavigatedOutFromPage) return;
-            System.Diagnostics.Debug.WriteLine($"[ItemListViewPlayList] 开始初始化。");
+            App.logManager.Log("ItemListViewPlayList", $"开始初始化。");
 
             #region Collecter
             SelectorSeparator.Visibility = Visibility.Collapsed;
@@ -291,12 +290,12 @@ namespace TewiMP.Pages
                     MusicDataList.Add(new() { MusicData = i, MusicListData = NavToObj, ImageScaleDPI = dpi });
                 }
                 array = null;
-                System.Diagnostics.Debug.WriteLine($"[ItemListViewPlayList] 列表加载完成。");
+                App.logManager.Log("ItemListViewPlayList", $"列表加载完成。");
             }
             isLoading = false;
             LoadingTipControl.UnShowLoading();
             UpdateShyHeader();
-            System.Diagnostics.Debug.WriteLine($"[ItemListViewPlayList] 加载完成。");
+            App.logManager.Log("ItemListViewPlayList", $"加载完成。");
         }
 
         private void PlayListReader_Updated()
@@ -343,7 +342,7 @@ namespace TewiMP.Pages
             }
             PlayList_Image.SaveName = NavToObj?.ListShowName;
             PlayList_Image.BorderThickness = new(1);
-            System.Diagnostics.Debug.WriteLine($"[ItemListViewPlayList] 图片加载完成。");
+            App.logManager.Log("ItemListViewPlayList", $"图片加载完成。");
             await Task.Delay(100);
             UpdateShyHeader();
             UpdateInfoWidth();
@@ -578,8 +577,8 @@ namespace TewiMP.Pages
                 //PlayList_ImageBaseBorder.Width = 280;
                 PlayList_ImageBaseBorder.Height = 280;
             }/*
-            System.Diagnostics.Debug.WriteLine(ActualWidth);
-            System.Diagnostics.Debug.WriteLine(ActualHeight);*/
+            System.Diagnostics.App.logManager.Log(ActualWidth);
+            System.Diagnostics.App.logManager.Log(ActualHeight);*/
             await Task.Delay(1);
             UpdateShyHeader();
             UpdateInfoWidth();
@@ -953,7 +952,7 @@ namespace TewiMP.Pages
 
         private void Children_DropCompleted(UIElement sender, DropCompletedEventArgs args)
         {
-            System.Diagnostics.Debug.WriteLine("droped");
+
         }
 
         private async void MoveItemButton_Click(object sender, RoutedEventArgs e)

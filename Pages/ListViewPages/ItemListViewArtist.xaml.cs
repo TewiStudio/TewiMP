@@ -135,7 +135,6 @@ namespace TewiMP.Pages
             {
                 var art = NavToObj;
                 Artist_Image.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(art.PicturePath));
-                System.Diagnostics.Debug.WriteLine(art.PicturePath);
             }
             Artist_Image1.Source = Artist_Image.Source;
             Artist_Image1.SaveName = NavToObj.Name;

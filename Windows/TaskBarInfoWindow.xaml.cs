@@ -61,7 +61,7 @@ namespace TewiMP.Windowed
             };
             AppWindow.Changed += (_, __) =>
             {
-                //Debug.WriteLine(__?.DidPresenterChange);
+                //App.logManager.Log(__?.DidPresenterChange);
                 // WinUI Bug：设置了窗口不能最大化结果还是能 >:(
                 /*if (__?.DidPresenterChange == true)
                     overlappedPresenter.Minimize();*/
@@ -174,7 +174,7 @@ namespace TewiMP.Windowed
 
         public async void SetTaskbarImage(string filePath)
         {
-            Debug.WriteLine($"[TaskBarInfoWindow]: TaskBar thumbnail update to \"{filePath}\".");
+            App.logManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail update to \"{filePath}\".");
             if (string.IsNullOrEmpty(filePath))
             {
                 filePath = Path.Combine(localPath, "icon.png");
@@ -194,13 +194,13 @@ namespace TewiMP.Windowed
                     var a = await Task.Run(() => NativeMethods.DwmSetIconicThumbnail(Handle, hBitmapNint, NativeMethods.DWM_SIT.None));
                     if (a != 0)
                     {
-                        //Debug.WriteLine($"{size}x{size} failed.");
+                        //App.logManager.Log($"{size}x{size} failed.");
                         size -= 2;
                         canBreak = false;
                     }
                     else
                     {
-                        Debug.WriteLine($"[TaskBarInfoWindow]: TaskBar thumbnail {size}x{size} completed.");
+                        App.logManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail {size}x{size} completed.");
                         IconPathUsing = filePath;
                         canBreak = true;
                     }
@@ -228,7 +228,7 @@ namespace TewiMP.Windowed
             Windows.Win32.Foundation.WPARAM wParam,
             Windows.Win32.Foundation.LPARAM lParam)
         {
-            //Debug.WriteLine($"Get system message: {uMsg}\n    {wParam.Value}");
+            //App.logManager.Log($"Get system message: {uMsg}\n    {wParam.Value}");
             if (uMsg == 806)
             {
                 // 到了屏幕外面就看不见了 :-)
