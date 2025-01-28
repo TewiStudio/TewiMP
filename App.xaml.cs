@@ -18,6 +18,7 @@ using Newtonsoft.Json.Linq;
 using TewiMP.Pages;
 using Microsoft.UI.Windowing;
 using static Vanara.PInvoke.User32;
+using Windows.System;
 
 namespace TewiMP
 {
@@ -41,6 +42,7 @@ namespace TewiMP
         public static App AppStatic { get; private set; } = null;
         public static string AppName { get; } = "TewiMP";
         public static string AppVersion { get; } = "0.4.7 Preview";
+        public static float AppVersionF { get; } = 47.0f;
 
         public static Window WindowLocal;
         public static NotifyIconWindow NotifyIconWindow;
@@ -408,6 +410,28 @@ namespace TewiMP
         public static void SetFramePerSecondViewer(bool visible = false)
         {
             AppStatic.DebugSettings.EnableFrameRateCounter = visible;
+        }
+
+        public static async void CheckUpdate()
+        {
+            var data = await WebHelper.GetStringAsync("https://zilongcn23.github.io/datas/TewiMP/update.json");
+            if (string.IsNullOrEmpty(data)) return;
+            var json = JObject.Parse(data);
+            var version = (string)json["version"];
+            var versionF = (float)json["versionF"];
+            var updateUrl = (string)json["url"];
+            var extendMessage = (string)json["ExtendMessage"];
+            if (string.IsNullOrEmpty(updateUrl)) return;
+
+            if (versionF <= AppVersionF) return;
+            MainWindow.AddNotify(
+                "有新版本！",
+                $"可更新到版本 {version}，当前版本为 {AppVersion}。" + (string.IsNullOrEmpty(extendMessage) ? "" : $"\n{extendMessage}"),
+                NotifySeverity.Warning, TimeSpan.FromMilliseconds(10000),
+                "前往下载页面 ⨠", async () =>
+                {
+                    var success = await Launcher.LaunchUriAsync(new(updateUrl));
+                });
         }
 
         private Window m_window;

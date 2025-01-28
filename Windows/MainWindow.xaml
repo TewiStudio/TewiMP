@@ -641,7 +641,6 @@
         <Grid
             x:Name="NotifyArea"
             Opacity="1"
-            IsHitTestVisible="False"
             Loaded="NotifyArea_Loaded">
             <!--
             <ListView x:Name="NotifyListView"
@@ -684,8 +683,6 @@
                 x:Name="NotifyStackPanel"
                 HorizontalAlignment="Stretch"
                 VerticalAlignment="Bottom"
-                Background="Transparent"
-                IsHitTestVisible="False"
                 Margin="0,0,0,96"
                 Spacing="4">
                 <StackPanel.Transitions>

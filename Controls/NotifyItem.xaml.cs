@@ -1,6 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
+using System;
 
 namespace TewiMP.Controls
 {
@@ -23,9 +24,14 @@ namespace TewiMP.Controls
         {
             this.notifyItemData = notifyItemData;
             if (notifyItemData is null) return;
-            if (string.IsNullOrEmpty(notifyItemData.Message))
-                MessageTextBlock.Visibility = Visibility.Collapsed;
-            else MessageTextBlock.Visibility = Visibility.Visible;
+
+            MessageTextBlock.Visibility = string.IsNullOrEmpty(notifyItemData.Message) ?
+                Visibility.Collapsed : Visibility.Visible;
+            ClickableButton.Visibility = string.IsNullOrEmpty(notifyItemData.ButtonMessage) ?
+                Visibility.Collapsed : Visibility.Visible;
+
+            ClickableButton.Content = notifyItemData.ButtonMessage;
+
             foreach (FrameworkElement element in BackgroundColorControl.Children)
             {
                 element.Visibility = Visibility.Collapsed;
@@ -81,9 +87,9 @@ namespace TewiMP.Controls
             MessageTextBlock.Text = notifyItemData.Message;
         }
 
-        public void SetNotifyItemData(string title, string message, NotifySeverity severity = NotifySeverity.Info)
+        public void SetNotifyItemData(string title, string message, NotifySeverity severity = NotifySeverity.Info, string buttonMessage = null, Action buttonAction = null)
         {
-            SetNotifyItemData(new(title, message, severity));
+            SetNotifyItemData(new(title, message, severity, null, buttonMessage, buttonAction));
         }
 
         public NotifyItemData GetNotifyItemData()
@@ -116,6 +122,11 @@ namespace TewiMP.Controls
         private void Grid_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
 
+        }
+
+        private void ClickableButton_Click(object sender, RoutedEventArgs e)
+        {
+            notifyItemData.ButtonAction.Invoke();
         }
     }
 }

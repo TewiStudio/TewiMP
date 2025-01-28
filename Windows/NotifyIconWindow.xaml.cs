@@ -19,6 +19,7 @@ using NAudio.Wave;
 using TewiMP.Pages;
 using TewiMP.Background;
 using System.Linq;
+using Vanara.PInvoke;
 
 namespace TewiMP.Windowed
 {
@@ -280,6 +281,22 @@ namespace TewiMP.Windowed
                 displayArea.WorkArea.Width - width - (int)(12 * dpi),
                 displayArea.WorkArea.Height - height - (int)(12 * dpi),
                 width, height));
+            //AnimateWindowPosition();
+        }
+
+        private async void AnimateWindowPosition()
+        {
+            await Task.Run(async () =>
+            {
+                for (byte i = 0; i < 255; i++)
+                {
+                    User32.SetLayeredWindowAttributes(
+                        hwnd,
+                        (uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(i, 255, 255, 255)), i,
+                        User32.LayeredWindowAttributes.LWA_COLORKEY);
+                    await Task.Delay(100);
+                }
+            });
         }
 
         private void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)

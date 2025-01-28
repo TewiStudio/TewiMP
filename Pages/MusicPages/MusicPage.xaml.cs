@@ -770,7 +770,7 @@ namespace TewiMP.Pages.MusicPages
         {
             AlbumFlyout.Items.Clear();
             var a = new MenuFlyoutItem() { Text = "复制" };
-            var a1 = new MenuFlyoutItem() { Text = "打开" };
+            var a1 = new MenuFlyoutItem() { Text = "打开专辑详情页" };
             a.Click += A_Click;
             a1.Click += A_Click;
             AlbumFlyout.Items.Add(a);

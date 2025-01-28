@@ -7,9 +7,16 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" SizeChanged="sizeChanged" Loaded="Grid_Loaded" Unloaded="unloaded"
     DataContextChanged="Grid_DataContextChanged" HorizontalAlignment="Center"
-    Background="{ThemeResource AcrylicNormal}" BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-    BorderThickness="1" CornerRadius="4" Margin="24,0" MaxWidth="1800">
-    <Grid x:Name="BackgroundColorControl" CornerRadius="4">
+    Margin="24,0" MaxWidth="1800">
+    <Rectangle x:Name="AcrylicBackgroundFill" IsHitTestVisible="False"
+               Fill="{ThemeResource AcrylicNormal}"
+               RadiusX="4" RadiusY="4">
+    </Rectangle>
+    <Grid x:Name="BackgroundColorControl"
+          BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+          BorderThickness="1"
+          CornerRadius="4"
+          IsHitTestVisible="False">
         <Rectangle Fill="{ThemeResource SystemFillColorSuccessBackgroundBrush}"/>
         <Rectangle Fill="{ThemeResource SystemFillColorCautionBackgroundBrush}"/>
         <Rectangle Fill="{ThemeResource SystemFillColorCriticalBackgroundBrush}"/>
@@ -18,22 +25,25 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <Grid VerticalAlignment="Center" Grid.Row="0"
-              Margin="0,0,12,0">
+              Margin="0,0,12,0" IsHitTestVisible="False">
             <FontIcon x:Name="IconControlBackground" Glyph="&#xF136;" FontSize="20"
                       Foreground="{ThemeResource SystemAccentColorDark1}"/>
             <FontIcon x:Name="IconControl" Glyph="&#xF13E;" FontSize="20"/>
             <ProgressRing x:Name="IconLoading" Visibility="Collapsed"
                           Width="20" Height="20"/>
         </Grid>
-        <TextBlock x:Name="TitleTextBlox" Text="Title" FontSize="14" Grid.Row="0" Grid.Column="1" FontWeight="Black"
+        <TextBlock IsHitTestVisible="False" x:Name="TitleTextBlox" Text="Title" FontSize="14" Grid.Row="0" Grid.Column="1" FontWeight="Black"
                    TextWrapping="Wrap" HorizontalAlignment="Stretch"/>
-        <TextBlock x:Name="MessageTextBlock" Text="Message" Grid.Row="1" Grid.Column="1" Margin="0,2,0,0"
+        <TextBlock IsHitTestVisible="False" x:Name="MessageTextBlock" Text="Message" Grid.Row="1" Grid.Column="1" Margin="0,2,0,0"
                    TextWrapping="Wrap" HorizontalAlignment="Stretch"/>
+        <Button x:Name="ClickableButton" Grid.Row="1" Grid.Column="2" Click="ClickableButton_Click" VerticalAlignment="Top">
+        </Button>
     </Grid>
 </Grid>

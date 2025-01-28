@@ -451,9 +451,16 @@ namespace TewiMP
             App.logManager.Log("MainWindow", "Data Updated.");
         }
 
+        bool isFirstWindowActivity = true;
         bool isAddEvents = false;
         private void AddEvents()
         {
+            //isFirstWindowActivity = true;
+            if (isFirstWindowActivity)
+            {
+                isFirstWindowActivity = false;
+                App.CheckUpdate();
+            }
             if (isAddEvents) return;
             //AutoScrollViewerFirst.Pause = false;
             //AutoScrollViewerSecond.Pause = false;
@@ -801,9 +808,9 @@ namespace TewiMP
             AsyncDialog.Hide();
         }
 
-        public static NotifyItem AddNotify(string title, string message, NotifySeverity severity = NotifySeverity.Info, TimeSpan? residenceTime = null)
+        public static NotifyItem AddNotify(string title, string message, NotifySeverity severity = NotifySeverity.Info, TimeSpan? residenceTime = null, string buttonMessage = null, Action buttonAction = null)
         {
-            return AddNotify(new(title, message, severity, residenceTime));
+            return AddNotify(new(title, message, severity, residenceTime, buttonMessage, buttonAction));
         }
 
         public static NotifyItem AddNotify(NotifyItemData notifyItemData)
@@ -2334,6 +2341,14 @@ namespace TewiMP
         /// </summary>
         public string Message { get; set; }
         /// <summary>
+        /// 按钮信息
+        /// </summary>
+        public string ButtonMessage { get; set; }
+        /// <summary>
+        /// 按钮按下后触发
+        /// </summary>
+        public Action ButtonAction { get; set; }
+        /// <summary>
         /// 通知类型
         /// </summary>
         public NotifySeverity Severity { get; set; }
@@ -2346,12 +2361,16 @@ namespace TewiMP
             string title,
             string message,
             NotifySeverity severity = NotifySeverity.Info,
-            TimeSpan? residenceTime = null)
+            TimeSpan? residenceTime = null,
+            string buttonMessage = null,
+            Action buttonAction = null)
         {
             Title = title;
             Message = message;
             Severity = severity;
             ResidenceTime = residenceTime is null ? TimeSpan.FromSeconds(5) : (TimeSpan)residenceTime;
+            ButtonMessage = buttonMessage;
+            ButtonAction = buttonAction;
         }
     }
 }

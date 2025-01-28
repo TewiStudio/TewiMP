@@ -727,8 +727,8 @@ namespace TewiMP.Windowed
             {
                 exStyle |= (int)User32.WindowStylesEx.WS_EX_LAYERED;
                 exStyle |= (int)User32.WindowStylesEx.WS_EX_TRANSPARENT;
-                User32.SetWindowLong(windowHandle, User32.WindowLongFlags.GWL_EXSTYLE, exStyle);
                 User32.SetWindowLong(windowHandle, User32.WindowLongFlags.GWL_STYLE, wStyle);
+                User32.SetWindowLong(windowHandle, User32.WindowLongFlags.GWL_EXSTYLE, exStyle);
                 User32.SetLayeredWindowAttributes(
                     windowHandle,
                     (uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(255, 99, 99, 99)), 255,
