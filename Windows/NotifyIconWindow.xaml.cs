@@ -648,25 +648,7 @@ namespace TewiMP.Windowed
 
         private void SetPlayModeIconAndName(PlayBehavior playBehavior)
         {
-            switch (playBehavior)
-            {
-                case PlayBehavior.循环播放:
-                    TB_PlayModeSelector_Icon.Glyph = "\uE895";
-                    break;
-                case PlayBehavior.单曲循环:
-                    TB_PlayModeSelector_Icon.Glyph = "\uE777";
-                    break;
-                case PlayBehavior.随机播放:
-                    TB_PlayModeSelector_Icon.Glyph = "\uE8B1";
-                    break;
-                case PlayBehavior.顺序播放:
-                    TB_PlayModeSelector_Icon.Glyph = "\uE8AB";
-                    break;
-                case PlayBehavior.播放完成后停止:
-                    TB_PlayModeSelector_Icon.Glyph = "\uE71A";
-                    break;
-            }
-
+            TB_PlayModeSelector_Icon.Glyph = playBehavior.GetIcon();
             TB_PlayModeSelector_Name.Text = playBehavior.ToString();
         }
 
@@ -678,7 +660,21 @@ namespace TewiMP.Windowed
             {
                 var b = new MenuFlyoutItem() { Text = p, Tag = pList.IndexOf(p) };
                 b.Click += B_Click;
+                b.Unloaded += B_Unloaded;
+                b.Icon = new FontIcon()
+                {
+                    Glyph = ((PlayBehavior)b.Tag).GetIcon()
+                };
                 PlayModeFlyout.Items.Add(b);
+            }
+        }
+
+        private void B_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem item)
+            {
+                item.Click -= B_Click;
+                item.Unloaded -= B_Unloaded;
             }
         }
 

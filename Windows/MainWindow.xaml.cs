@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -33,17 +32,12 @@ using WinRT;
 using NAudio.Wave;
 using Newtonsoft.Json.Linq;
 using CommunityToolkit.WinUI;
-using static Vanara.PInvoke.User32;
-using TewiMP.Media;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace TewiMP
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
     public sealed partial class MainWindow : Window
     {
         public static bool RunInBackground = false;
@@ -69,6 +63,7 @@ namespace TewiMP
         public static Grid SVolumeBaseGrid;
         public static Grid SMusicPageBaseGrid;
         public static ListView SPlayingListBaseView;
+        public static ScrollViewer SPlayingListBaseViewScrollViewer;
         public static Grid SPlayingListBaseGrid;
         public static Frame SMusicPageBaseFrame;
         public static Frame SPlayContent;
@@ -77,6 +72,10 @@ namespace TewiMP
         public static StackPanel SNotifyStackPanel;
         public static ListView SNotifyListView;
         public static ScrollViewer SNotifyListViewScrollViewer;
+        public static ScrollFootButton SPlayingListScrollControl;
+        public static DropDownButton SPlayModeSelector;
+        public static FontIcon SPlayModeSelector_Icon;
+        public static TextBlock SPlayModeSelector_Name;
         public static ContentDialog AsyncDialog { get; set; } = null;
 
         public static double NowDPI { get; set; } = 1.0;
@@ -130,8 +129,13 @@ namespace TewiMP
             SPlayingListBaseView = PlayingListBaseView;
             SMusicPageBaseFrame = MusicPageBaseFrame;
             teachingTipPlayingList = PlayingListBasePopup;
+            SPlayingListScrollControl = PlayingListScrollControl;
             teachingTipVolume = VolumeBasePopup;
             SPlayContent = PlayContent;
+            SPlayModeSelector = PlayModeSelector;
+            SPlayModeSelector_Icon = PlayModeSelector_Icon;
+            SPlayModeSelector_Name = PlayModeSelector_Name;
+
             SNotifyStackPanel = NotifyStackPanel;
             //SNotifyListView = NotifyListView;
             InitDialog();
@@ -155,6 +159,26 @@ namespace TewiMP
             App.playListReader.Updated += () => UpdatePlayListButtonUI();
             App.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
             MusicPageViewStateChanged += MainWindow_MusicPageViewStateChanged;
+            PlayingListScrollControl.PositionToNowPlaying_Button.Click += async (_, __) =>
+            {
+                if (SPlayingListBaseView.Items.Contains(App.audioPlayer.MusicData))
+                {
+                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
+                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
+                }
+            };
+            PlayingListScrollControl.PositionToTop_Button.Click += (_, __) =>
+            {
+                if (SPlayingListBaseViewScrollViewer is null)
+                    SPlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
+                SPlayingListBaseViewScrollViewer.ChangeView(null, 0, null);
+            };
+            PlayingListScrollControl.PositionToBottom_Button.Click += (_, __) =>
+            {
+                if (SPlayingListBaseViewScrollViewer is null)
+                    SPlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
+                SPlayingListBaseViewScrollViewer.ChangeView(null, SPlayingListBaseViewScrollViewer.ScrollableHeight, null);
+            };
 
             AppWindow.Closing += AppWindow_Closing;
 
@@ -1686,6 +1710,7 @@ namespace TewiMP
             Thickness placementMargin = default)
         {
             UpdatePlayListFlyoutHeight();
+            AddPlayingListPopupEvents();
             STopControlsBaseGrid.HorizontalAlignment = horizontalAlignment;
             STopControlsBaseGrid.VerticalAlignment = verticalAlignment;
             STopControlsBaseGrid.Margin = placementMargin == default ? new(4, 0, 12, 96) : placementMargin;
@@ -1694,12 +1719,75 @@ namespace TewiMP
             teachingTipPlayingList.ShowAt(STopControlsBaseGrid);
             try
             {
-                await Task.Delay(300);
                 await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
                 await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
                 SPlayingListBaseView.SelectedItem = App.audioPlayer.MusicData;
             }
             catch { }
+        }
+
+        private static void AddPlayingListPopupEvents()
+        {
+            teachingTipPlayingList.Opened -= TeachingTipPlayingList_Opened;
+            teachingTipPlayingList.Closed -= TeachingTipPlayingList_Closed;
+            teachingTipPlayingList.Opened += TeachingTipPlayingList_Opened;
+            teachingTipPlayingList.Closed += TeachingTipPlayingList_Closed;
+        }
+
+        private static void TeachingTipPlayingList_Opened(object sender, object e)
+        {
+            ToolTipService.SetToolTip(SPlayModeSelector, $"当前播放模式：{App.playingList.PlayBehavior}");
+            SetPlayModeIconAndName(App.playingList.PlayBehavior);
+            SPlayingListScrollControl.Translation = new(
+                -16,
+                (float)(SPlayingListBaseView.ActualHeight - SPlayingListScrollControl.ActualHeight - 20 - 8),
+                0);
+        }
+
+        private static void TeachingTipPlayingList_Closed(object sender, object e)
+        {
+            teachingTipPlayingList.Opened -= TeachingTipPlayingList_Opened;
+            teachingTipPlayingList.Closed -= TeachingTipPlayingList_Closed;
+        }
+
+        private static void SetPlayModeIconAndName(PlayBehavior playBehavior)
+        {
+            SPlayModeSelector_Icon.Glyph = playBehavior.GetIcon();
+            SPlayModeSelector_Name.Text = playBehavior.ToString();
+        }
+
+        private void PlayModeSelector_Click(object sender, RoutedEventArgs e)
+        {
+            var pList = Enum.GetNames(typeof(PlayBehavior)).ToList();
+            PlayModeFlyout.Items.Clear();
+            foreach (var p in pList)
+            {
+                var b = new MenuFlyoutItem() { Text = p, Tag = pList.IndexOf(p) };
+                b.Click += B_Click;
+                b.Unloaded += B_Unloaded;
+                b.Icon = new FontIcon()
+                {
+                    Glyph = ((PlayBehavior)b.Tag).GetIcon()
+                };
+                PlayModeFlyout.Items.Add(b);
+            }
+        }
+
+        private void B_Click(object sender, RoutedEventArgs e)
+        {
+            var a = (PlayBehavior)(sender as MenuFlyoutItem).Tag;
+            App.playingList.PlayBehavior = a;
+            SetPlayModeIconAndName(App.playingList.PlayBehavior);
+            ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{a}");
+        }
+
+        private void B_Unloaded(object sender, RoutedEventArgs e)
+        {
+            if (sender is MenuFlyoutItem item)
+            {
+                item.Click -= B_Click;
+                item.Unloaded -= B_Unloaded;
+            }
         }
 
         static Visual musicPageVisual;
@@ -2019,20 +2107,26 @@ namespace TewiMP
             inSelectionChange = false;*/
         }
 
-        private async void Button_Click_5(object sender, RoutedEventArgs e)
+        private void Button_Click_5(object sender, RoutedEventArgs e)
         {
-            var btn = sender as Button;
+            App.playingList.ClearAll();
+        }
 
-            if (btn.Content as string == "定位")
+        private async void AppBarButton_Click(object sender, RoutedEventArgs e)
+        {
+            var name = $"{DateTime.Now} 时的播放列表";
+            var musicPlayList = new MusicListData(
+                name, name, "", MusicFrom.localMusic, null, [.. App.playingList.NowPlayingList], DataType.本地歌单);
+            await PlayListHelper.AddPlayList(musicPlayList);
+            await App.playListReader.Refresh();
+            AddNotify("播放列表已添加！", $"播放列表 \"{name}\" 已添加。", buttonMessage: "打开播放列表", buttonAction: () =>
             {
-                if (SPlayingListBaseView.Items.Contains(App.audioPlayer.MusicData))
+                Pages.ListViewPages.ListViewPage.SetPageToListViewPage(new()
                 {
-                    await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
-                    await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
-                }
-            }
-            else
-                App.playingList.ClearAll();
+                    PageType = Pages.ListViewPages.PageType.PlayList,
+                    Param = musicPlayList
+                });
+            });
         }
 
         public void UpdatePlayingListShyHeader()
@@ -2327,6 +2421,20 @@ namespace TewiMP
     }
 
     public enum NotifySeverity { Info, Error, Warning, Complete, Loading }
+    public static class NotifySeverityStatic
+    {
+        public static LogLevel? ToLogLevel(this NotifySeverity severity)
+        {
+            return severity switch
+            {
+                NotifySeverity.Warning => LogLevel.Waring,
+                NotifySeverity.Error => LogLevel.Error,
+                NotifySeverity.Info => LogLevel.Information,
+                _ => null,
+            };
+        }
+    }
+
     /// <summary>
     /// 显示通知的数据类型
     /// </summary>

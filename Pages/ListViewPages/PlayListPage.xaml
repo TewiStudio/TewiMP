@@ -152,6 +152,7 @@
                                         Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                         BorderThickness="0,0,0,1"
                                         Label="全部播放（Alt+Q）"
+                                        AccessKey="Q"
                                         ToolTipService.ToolTip="播放歌单内的所有歌曲"
                                         Click="AppBarButton_Click" Tag="playAll">
                                         <AppBarButton.Icon>
@@ -160,6 +161,7 @@
                                     </AppBarButton>
                                     <AppBarButton
                                         Label="刷新"
+                                        AccessKey="R"
                                         ToolTipService.ToolTip="刷新"
                                         Click="AppBarButton_Click" Tag="refresh">
                                         <AppBarButton.Icon>
@@ -169,6 +171,7 @@
                                     <AppBarToggleButton
                                         Click="AppBarToggleButton_Click"
                                         Label="多选" Tag="multiSelect"
+                                        AccessKey="S"
                                         ToolTipService.ToolTip="多选">
                                         <AppBarToggleButton.Icon>
                                             <FontIcon Glyph="&#xE762;"/>
@@ -177,6 +180,7 @@
                                     <AppBarToggleButton
                                         Click="AppBarToggleButton_Click"
                                         Label="排序" Tag="move" x:Name="moveButton"
+                                        AccessKey="D"
                                         ToolTipService.ToolTip="拖动音乐控件以重新排序">
                                         <AppBarToggleButton.Icon>
                                             <FontIcon Glyph="&#xEA37;"/>
@@ -184,6 +188,7 @@
                                     </AppBarToggleButton>
                                     <AppBarButton
                                         Label="添加本地文件"
+                                        AccessKey="A"
                                         ToolTipService.ToolTip="添加本地文件"
                                         Click="AppBarButton_Click" Tag="addLocal">
                                         <AppBarButton.Icon>
@@ -192,6 +197,7 @@
                                     </AppBarButton>
                                     <AppBarButton
                                         Label="搜索"
+                                        AccessKey="F"
                                         ToolTipService.ToolTip="搜索播放列表中的歌曲"
                                         Click="AppBarButton_Click" Tag="search">
                                         <AppBarButton.Icon>

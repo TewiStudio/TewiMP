@@ -41,8 +41,8 @@ namespace TewiMP
         public static LogManager logManager { get; private set; } = null;
         public static App AppStatic { get; private set; } = null;
         public static string AppName { get; } = "TewiMP";
-        public static string AppVersion { get; } = "0.4.7 Preview";
-        public static float AppVersionF { get; } = 47.0f;
+        public static string AppVersion { get; } = "0.4.8 Preview";
+        public static float AppVersionF { get; } = 48.0f;
 
         public static Window WindowLocal;
         public static NotifyIconWindow NotifyIconWindow;

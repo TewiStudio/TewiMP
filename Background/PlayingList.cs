@@ -13,6 +13,23 @@ namespace TewiMP.Background
 {
     public enum PlayBehavior { 循环播放, 顺序播放, 单曲循环, 随机播放, 播放完成后停止 }
     public enum SetPlayInfo { Normal, Next, Previous }
+
+    public static class PlayBehaviorStatic
+    {
+        public static string GetIcon(this PlayBehavior playBehavior)
+        {
+            return playBehavior switch
+            {
+                PlayBehavior.循环播放 => "\uE895",
+                PlayBehavior.顺序播放 => "\uE8AB",
+                PlayBehavior.单曲循环 => "\uE777",
+                PlayBehavior.随机播放 => "\uE8B1",
+                PlayBehavior.播放完成后停止 => "\uE71A",
+                _ => ""
+            };
+        }
+    }
+
     public class PlayingList
     {
         public delegate void PlayingListItemChangeDelegate(ObservableCollection<MusicData> nowPlayingList);

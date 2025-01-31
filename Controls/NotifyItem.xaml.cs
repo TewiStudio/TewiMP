@@ -1,7 +1,8 @@
+using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
-using System;
+using TewiMP.Background;
 
 namespace TewiMP.Controls
 {
@@ -24,6 +25,11 @@ namespace TewiMP.Controls
         {
             this.notifyItemData = notifyItemData;
             if (notifyItemData is null) return;
+            var logLevel = notifyItemData.Severity.ToLogLevel();
+            if (logLevel is not null)
+            {
+                App.logManager.Log(notifyItemData.Title, notifyItemData.Message, (LogLevel)logLevel);
+            }
 
             MessageTextBlock.Visibility = string.IsNullOrEmpty(notifyItemData.Message) ?
                 Visibility.Collapsed : Visibility.Visible;

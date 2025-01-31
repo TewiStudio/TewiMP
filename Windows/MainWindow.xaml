@@ -490,57 +490,86 @@
                         <Grid>
                             <ListView
                                 x:Name="PlayingListBaseView"
+                                Padding="0,0,0,48"
                                 SelectionChanged="PlayingListBaseView_SelectionChanged"
                                 SelectionMode="None"
                                 Background="Transparent"
                                 AllowDrop="True"
                                 CanReorderItems="True">
                                 <ListView.Header>
-                                    <Grid
-                                        x:Name="PlayingListHeader"
-                                        Background="{ThemeResource AcrylicNormal}"
-                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                        BorderThickness="0,0,0,1" Margin="0,0,0,6">
+                                    <Grid x:Name="PlayingListHeader">
                                         <interactivity:Interaction.Behaviors>
                                             <behaviors:StickyHeaderBehavior/>
                                         </interactivity:Interaction.Behaviors>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition/>
-                                            <ColumnDefinition Width="auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock
-                                            Text="当前播放列表"
-                                            Style="{ThemeResource SubTBHeader}"
-                                            Margin="12"/>
-                                        <StackPanel
-                                            VerticalAlignment="Center"
+                                        <Grid 
+                                            Background="{ThemeResource AcrylicNormal}"
+                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderThickness="0,0,0,1" Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock
+                                                Text="当前播放列表"
+                                                Style="{ThemeResource SubTBHeader}"
+                                                Margin="12"/>
+                                            <CommandBar
+                                                Grid.Column="1"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Center"
+                                                DefaultLabelPosition="Right"
+                                                Margin="0,0,8,0">
+                                                <CommandBar.Resources>
+                                                    <Style TargetType="AppBarButton" BasedOn="{StaticResource DefaultAppBarButtonStyle}">
+                                                        <Setter Property="Background" Value="{ThemeResource CardBackgroundFillColorDefaultBrush}"/>
+                                                        <Setter Property="BorderBrush" Value="{ThemeResource ControlElevationBorderBrush}"/>
+                                                        <Setter Property="BorderThickness" Value="1"/>
+                                                        <Setter Property="Margin" Value="2,0,0,0"/>
+                                                    </Style>
+                                                </CommandBar.Resources>
+                                                <AppBarButton
+                                                    Label="保存列表"
+                                                    LabelPosition="Collapsed"
+                                                    ToolTipService.ToolTip="将此列表保存为播放列表"
+                                                    Click="AppBarButton_Click">
+                                                    <AppBarButton.Icon>
+                                                        <FontIcon Glyph="&#xE74E;"/>
+                                                    </AppBarButton.Icon>
+                                                </AppBarButton>
+                                                <AppBarElementContainer 
+                                                    AllowFocusOnInteraction="True"
+                                                    x:Name="PlaySortComboBoxParent"
+                                                    Margin="2,0,0,0"
+                                                    VerticalAlignment="Center">
+                                                    <DropDownButton x:Name="PlayModeSelector" Click="PlayModeSelector_Click" Height="36">
+                                                        <DropDownButton.Flyout>
+                                                            <MenuFlyout x:Name="PlayModeFlyout"/>
+                                                        </DropDownButton.Flyout>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="auto"/>
+                                                                <ColumnDefinition Width="auto"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <FontIcon x:Name="PlayModeSelector_Icon" Glyph="&#xE8AB;" FontSize="16"/>
+                                                            <TextBlock x:Name="PlayModeSelector_Name" Text="顺序播放" Grid.Column="1" Visibility="Collapsed"/>
+                                                        </Grid>
+                                                    </DropDownButton>
+                                                </AppBarElementContainer>
+                                                <AppBarButton
+                                                    Click="Button_Click_5"
+                                                    ToolTipService.ToolTip="清空列表"
+                                                    Label="{Binding ElementName=PlayingListBaseView,Path=ItemsSource.Count}">
+                                                    <AppBarButton.Icon>
+                                                        <FontIcon Glyph="&#xE711;" FontSize="14" VerticalAlignment="Center"/>
+                                                    </AppBarButton.Icon>
+                                                </AppBarButton>
+                                            </CommandBar>
+                                        </Grid>
+                                        <controls:ScrollFootButton
+                                            x:Name="PlayingListScrollControl"
                                             HorizontalAlignment="Right"
-                                            Orientation="Horizontal"
-                                            Grid.Column="1"
-                                            Spacing="4"
-                                            Margin="0,0,16,0">
-                                            <Button
-                                                Content="定位"
-                                                ToolTipService.ToolTip="定位到当前播放的歌曲"
-                                                AccessKey="V"
-                                                Click="Button_Click_5"/>
-                                            <Button
-                                                Width="52"
-                                                Height="32"
-                                                Padding="0"
-                                                Click="Button_Click_5"
-                                                AccessKey="C"
-                                                ToolTipService.ToolTip="清除所有"
-                                                Visibility="Visible">
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock
-                                                        Text="{Binding ElementName=PlayingListBaseView,Path=ItemsSource.Count}"
-                                                        FontSize="12" Margin="0,0,4,0"
-                                                        VerticalAlignment="Center"/>
-                                                    <FontIcon Glyph="&#xE711;" FontSize="14" VerticalAlignment="Center"/>
-                                                </StackPanel>
-                                            </Button>
-                                        </StackPanel>
+                                            VerticalAlignment="Bottom">
+                                        </controls:ScrollFootButton>
                                     </Grid>
                                 </ListView.Header>
                                 <ListView.Footer>
