@@ -37,7 +37,7 @@
                     <SolidColorBrush x:Key="ItemBorderBackground" Color="#11000000"/>
                     <SolidColorBrush x:Key="BottomBackground" Color="White"/>
                     <SolidColorBrush x:Key="HeaderLowForeground" Color="#FF424242"/>
-                    <SolidColorBrush x:Key="BorderNormal" Color="#15000000"/>
+                    <SolidColorBrush x:Key="BorderNormal" Color="#10000000"/>
                     <SolidColorBrush x:Key="MusicPageLrcForeground" Color="#4F000000"/>
                     <StaticResource x:Key="AcrylicNormal" ResourceKey="AcrylicBackgroundFillColorBaseBrush"/>
                     <Color x:Key="MusicPageImageBlurFallbackColor">#CADDDDDD</Color>

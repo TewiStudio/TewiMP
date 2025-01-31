@@ -490,7 +490,7 @@
                         <Grid>
                             <ListView
                                 x:Name="PlayingListBaseView"
-                                Padding="0,0,0,48"
+                                Padding="0,0,0,56"
                                 SelectionChanged="PlayingListBaseView_SelectionChanged"
                                 SelectionMode="None"
                                 Background="Transparent"

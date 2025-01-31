@@ -1740,7 +1740,7 @@ namespace TewiMP
             SetPlayModeIconAndName(App.playingList.PlayBehavior);
             SPlayingListScrollControl.Translation = new(
                 -16,
-                (float)(SPlayingListBaseView.ActualHeight - SPlayingListScrollControl.ActualHeight - 20 - 8),
+                (float)(SPlayingListBaseView.ActualHeight - SPlayingListScrollControl.ActualHeight - 20 - 16),
                 0);
         }
 
