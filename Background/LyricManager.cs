@@ -157,7 +157,7 @@ namespace TewiMP.Background
             {
                 NowPlayingLyrics.Clear();
                 NowLyricsData = null;
-                App.logManager.Log("LyricManager", "无法获取有效歌词。", LogLevel.Waring);
+                App.logManager.Log("LyricManager", "无法获取有效歌词。", LogLevel.Warning);
                 return;
             }
 
@@ -178,7 +178,7 @@ namespace TewiMP.Background
             {
                 NowPlayingLyrics.Clear();
                 NowLyricsData = null;
-                App.logManager.Log("LyricManager", "歌词文件大小未超过 10 字节，不会使用此歌词文件", LogLevel.Waring);
+                App.logManager.Log("LyricManager", "歌词文件大小未超过 10 字节，不会使用此歌词文件", LogLevel.Warning);
                 //System.IO.File.Delete(lyricPath);
                 return;
             }

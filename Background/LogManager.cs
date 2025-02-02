@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace TewiMP.Background
 {
-    public enum LogLevel { Information, Waring, Error }
+    public enum LogLevel { Information, Warning, Error }
     public class LogData
     {
         public DateTime LogTime { get; set; }

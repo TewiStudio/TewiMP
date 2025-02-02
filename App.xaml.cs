@@ -41,8 +41,47 @@ namespace TewiMP
         public static LogManager logManager { get; private set; } = null;
         public static App AppStatic { get; private set; } = null;
         public static string AppName { get; } = "TewiMP";
-        public static string AppVersion { get; } = "0.4.8 Preview";
-        public static float AppVersionF { get; } = 48.0f;
+        public static VersionData StableVersion { get; } = new()
+        {
+            Available = false,
+            ReleaseType = ReleaseType.Stable,
+            Version = "0",
+            VersionF = 0f,
+            ReleaseTime = DateTime.MinValue,
+            ExtendMessage = null
+        };
+        public static VersionData PreviewVersion { get; } = new()
+        {
+            Available = false,
+            ReleaseType = ReleaseType.Preview,
+            Version = "0",
+            VersionF = 0f,
+            ReleaseTime = DateTime.MinValue,
+            ExtendMessage = null
+        };
+        public static VersionData AlphaVersion { get; } = new()
+        {
+            Available = false,
+            ReleaseType = ReleaseType.Alpha,
+            Version = "0",
+            VersionF = 0f,
+            ReleaseTime = DateTime.MinValue,
+            ExtendMessage = null
+        };
+        public static VersionData Version { get; set; } = new()
+        {
+            Available = true,
+            ReleaseType = ReleaseType.Preview,
+            Version = "0.4.8",
+            VersionF = 48.0f,
+            ReleaseTime = 1738281600L.ToDateTime(),
+            ExtendMessage = null
+        };
+        public static string AppVersion => Version.Version;
+        public static float AppVersionF => Version.VersionF;
+        public static DateTime AppVersionReleaseDate => Version.ReleaseTime;
+
+
 
         public static Window WindowLocal;
         public static NotifyIconWindow NotifyIconWindow;
@@ -414,24 +453,67 @@ namespace TewiMP
 
         public static async void CheckUpdate()
         {
-            var data = await WebHelper.GetStringAsync("https://zilongcn23.github.io/datas/TewiMP/update.json");
+            var data = await WebHelper.GetStringAsync("https://data.tewi.top/datas/TewiMP/update.json");
             if (string.IsNullOrEmpty(data)) return;
             var json = JObject.Parse(data);
-            var version = (string)json["version"];
-            var versionF = (float)json["versionF"];
-            var updateUrl = (string)json["url"];
-            var extendMessage = (string)json["ExtendMessage"];
-            if (string.IsNullOrEmpty(updateUrl)) return;
 
-            if (versionF <= AppVersionF) return;
+            var stable = json["stable"];
+            var preview = json["preview"];
+            var alpha = json["alpha"];
+
+            StableVersion.Available =     (bool)  stable["available"];
+            StableVersion.Version =       (string)stable["version"];
+            StableVersion.VersionF =      (float) stable["versionF"];
+            StableVersion.ReleaseTime =   ((long) stable["releaseDate"]).ToDateTime();
+            StableVersion.Url =           (string)stable["url"];
+            StableVersion.ExtendMessage = (string)stable["extendMessage"];
+            
+            PreviewVersion.Available =     (bool)  preview["available"];
+            PreviewVersion.Version =       (string)preview["version"];
+            PreviewVersion.VersionF =      (float) preview["versionF"];
+            PreviewVersion.ReleaseTime =   ((long) preview["releaseDate"]).ToDateTime();
+            PreviewVersion.Url =           (string)preview["url"];
+            PreviewVersion.ExtendMessage = (string)preview["extendMessage"];
+            
+            AlphaVersion.Available =     (bool)  alpha["available"];
+            AlphaVersion.Version =       (string)alpha["version"];
+            AlphaVersion.VersionF =      (float) alpha["versionF"];
+            AlphaVersion.ReleaseTime =   ((long) alpha["releaseDate"]).ToDateTime();
+            AlphaVersion.Url =           (string)alpha["url"];
+            AlphaVersion.ExtendMessage = (string)alpha["extendMessage"];
+
+            if (AppVersionIsNewest()) return;
+            var newestVersion = GetNewVersionByReleaseData(Version.ReleaseType);
+
             MainWindow.AddNotify(
                 "有新版本！",
-                $"可更新到版本 {version}，当前版本为 {AppVersion}。" + (string.IsNullOrEmpty(extendMessage) ? "" : $"\n{extendMessage}"),
+                $"可更新到版本 {newestVersion.Version} {newestVersion.ReleaseType}，当前版本为 {Version.Version} {Version.ReleaseType}。" + 
+                    (string.IsNullOrEmpty(newestVersion.ExtendMessage) ? "" : $"\n{newestVersion.ExtendMessage}"),
                 NotifySeverity.Warning, TimeSpan.FromMilliseconds(10000),
                 "前往下载页面 ⨠", async () =>
                 {
-                    var success = await Launcher.LaunchUriAsync(new(updateUrl));
+                    var success = await Launcher.LaunchUriAsync(new(newestVersion.Url));
                 });
+        }
+
+        /// <summary>
+        /// 传入版本类型 <see cref="ReleaseType"/>，返回此版本类型的最新版本 <see cref="VersionData"/>。需要访问服务器才能正常判断。
+        /// </summary>
+        /// <param name="releaseType"></param>
+        /// <returns>此版本类型的最新版本 <see cref="VersionData"/></returns>
+        public static VersionData GetNewVersionByReleaseData(ReleaseType releaseType) => releaseType switch
+        {
+            ReleaseType.Stable => StableVersion,
+            ReleaseType.Preview => PreviewVersion,
+            ReleaseType.Alpha => AlphaVersion,
+            _ => Version
+        };
+
+        public static bool AppVersionIsNewest()
+        {
+            var newestVersion = GetNewVersionByReleaseData(Version.ReleaseType);
+            if (!newestVersion.Available) return false;
+            return newestVersion.VersionF <= Version.VersionF;
         }
 
         private Window m_window;
@@ -451,5 +533,36 @@ namespace TewiMP
             // other
             ".wav", ".ogg", ".flac", ".aiff", ".aif", ".mid", ".cue", ".dts"
         };
+    }
+
+    public enum ReleaseType { Stable, Preview, Alpha }
+
+    public class VersionData
+    {
+        public ReleaseType ReleaseType { get; set; }
+        public bool Available { get; set; }
+        public string Version { get; set; }
+        public float VersionF { get; set; }
+        public string Url { get; set; }
+        public DateTime ReleaseTime { get; set; }
+        public string ExtendMessage { get; set; }
+    }
+
+    public static class DateConverter
+    {
+        public static long ToTimestamp(this DateTime time)
+        {
+            DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
+            TimeSpan ts = time - startTime;
+            var timestamp = Convert.ToInt64(ts.TotalSeconds);
+            return timestamp;
+        }
+
+        public static DateTime ToDateTime(this long unix)
+        {
+            DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
+            var time = startTime.AddSeconds(unix);
+            return time;
+        }
     }
 }

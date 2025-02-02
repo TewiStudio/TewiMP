@@ -626,7 +626,7 @@ namespace TewiMP.Helpers
                     case 1: timeMillsStr += "00"; break;
                     case 2: timeMillsStr += "0"; break;
                     case 3: break;
-                    default: App.logManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Waring); break;
+                    default: App.logManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Warning); break;
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
                 return timesb + timeMills;
@@ -649,7 +649,7 @@ namespace TewiMP.Helpers
                         case 1: timeMillsStr += "00"; break;
                         case 2: timeMillsStr += "0"; break;
                         case 3: break;
-                        default: App.logManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Waring); break;
+                        default: App.logManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Warning); break;
                     }
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));

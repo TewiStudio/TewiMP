@@ -135,7 +135,7 @@
                             <Setter Property="Height" Value="68"/>
                         </Style>
                     </GridView.ItemContainerStyle>
-                    <Slider x:Name="aSlider" Header="变调：1x" AccessKey="C"
+                    <Slider x:Name="aSlider" Header="音高：1x" AccessKey="C"
                             Width="140" Minimum="1" Maximum="25" HorizontalAlignment="Left"
                             Value="{Binding Pitch,Mode=TwoWay}"
                             TickFrequency="1.14" TickPlacement="Outside"
@@ -145,7 +145,7 @@
                             Value="{Binding Tempo,Mode=TwoWay}"
                             TickFrequency="1.14" TickPlacement="Outside"
                             IsThumbToolTipEnabled="False"/>
-                    <Slider x:Name="cSlider" Header="速度比：1x" AccessKey="N"
+                    <Slider x:Name="cSlider" Header="比率：1x" AccessKey="N"
                             Width="140" Minimum="1" Maximum="25"
                             Value="{Binding Rate,Mode=TwoWay}"
                             TickFrequency="1.14" TickPlacement="Outside"

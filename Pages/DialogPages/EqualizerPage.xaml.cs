@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 
@@ -45,7 +46,7 @@ namespace TewiMP.Pages.DialogPages
             set
             {
                 AudioPlayer.Pitch = value / 10;
-                aSlider.Header = $"变调：{value / 10}x";
+                aSlider.Header = $"音高：{value / 10}x";
             }
         }
 
@@ -65,22 +66,21 @@ namespace TewiMP.Pages.DialogPages
             set
             {
                 AudioPlayer.Rate = value / 10;
-                cSlider.Header = $"速度比：{value / 10}x";
+                cSlider.Header = $"比率：{value / 10}x";
             }
         }
 
         public EqualizerPage()
         {
             InitializeComponent();
+            DataContext = this;
             Loaded += EqualizerPage_Loaded;
             Unloaded += EqualizerPage_Unloaded;
         }
 
         private void EqualizerPage_Loaded(object sender, RoutedEventArgs e)
         {
-            if (IsLoaded) return;
-            DataContext = this;
-            foreach (StackPanel slider in SliderStackBase.Children)
+            foreach (StackPanel slider in SliderStackBase.Children.Cast<StackPanel>())
             {
                 var a = slider.Children[0] as Slider;
                 EqSliders.Add(a);
@@ -90,12 +90,25 @@ namespace TewiMP.Pages.DialogPages
             AudioPlayer.EqEnableChanged += AudioPlayer_EqEnableChanged;
             AudioPlayer.EqBandChanged += AudioPlayer_EqualizerBandChanged;
             AudioPlayer.PreviewSourceChanged += AudioPlayer_PreviewSourceChanged;
+            AudioPlayer_SourceChanged(AudioPlayer);
             AudioPlayer_EqEnableChanged(AudioPlayer);
+            AudioPlayer_EqualizerBandChanged(AudioPlayer);
+            AudioPlayer_PreviewSourceChanged(AudioPlayer);
+            aSlider.Header = $"音高：{Pitch / 10}x";
+            bSlider.Header = $"速度：{Tempo / 10}x";
+            cSlider.Header = $"比率：{Rate / 10}x";
         }
 
         private void EqualizerPage_Unloaded(object sender, RoutedEventArgs e)
         {
-            if (!IsLoaded || AudioPlayer is null) return;
+            //if (!IsLoaded || AudioPlayer is null) return;
+            foreach (StackPanel slider in SliderStackBase.Children.Cast<StackPanel>())
+            {
+                var a = slider.Children[0] as Slider;
+                a.ValueChanged -= A_ValueChanged;
+            }
+            EqSliders.Clear();
+
             DataContext = null;
             AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
             AudioPlayer.EqEnableChanged -= AudioPlayer_EqEnableChanged;

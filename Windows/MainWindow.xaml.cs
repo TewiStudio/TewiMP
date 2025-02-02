@@ -739,7 +739,7 @@ namespace TewiMP
                 XamlRoot = SContent.XamlRoot,
                 CloseButtonCommand = null
             };
-            //await ShowDialog("Loading Dialog", "");
+            //ShowDialog("Initing Dialog...", "");
             HideDialog();
         }
 
@@ -798,10 +798,10 @@ namespace TewiMP
             }
         }
 
-        static Pages.DialogPages.EqualizerPage equalizerPage;
+        static Pages.DialogPages.EqualizerPage equalizerPage { get; set; }
         public static async Task ShowEqualizerDialog()
         {
-            await ShowDialog("音频设置", equalizerPage);
+            await ShowDialog("音频设置", new Pages.DialogPages.EqualizerPage());
         }
 
         static StackPanel loadingst = new();
@@ -1720,7 +1720,7 @@ namespace TewiMP
             try
             {
                 await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
-                await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
+                //await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
                 SPlayingListBaseView.SelectedItem = App.audioPlayer.MusicData;
             }
             catch { }
@@ -2427,7 +2427,7 @@ namespace TewiMP
         {
             return severity switch
             {
-                NotifySeverity.Warning => LogLevel.Waring,
+                NotifySeverity.Warning => LogLevel.Warning,
                 NotifySeverity.Error => LogLevel.Error,
                 NotifySeverity.Info => LogLevel.Information,
                 _ => null,

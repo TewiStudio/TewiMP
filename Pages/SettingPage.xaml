@@ -103,7 +103,7 @@
                     </StackPanel>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="歌词缓存路径"
-                                   Description="{Binding LyricCachePath}">
+                                 Description="{Binding LyricCachePath}">
                     <cc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8E4;"/>
                     </cc:SettingsCard.HeaderIcon>
@@ -121,23 +121,23 @@
                     </StackPanel>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="清理音频缓存文件"
-                                   Description="{Binding AudioCachePlaceSize}">
+                                 Description="{Binding AudioCachePlaceSize}">
                     <Button Content="清理" Tag="0" Click="Button_Click_4"/>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="清理图片缓存文件"
-                                   Description="{Binding ImageCachePlaceSize}">
+                                 Description="{Binding ImageCachePlaceSize}">
                     <Button Content="清理" Tag="1" Click="Button_Click_4"/>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="清理歌词缓存文件"
-                                   Description="{Binding LyricCachePlaceSize}">
+                                 Description="{Binding LyricCachePlaceSize}">
                     <Button Content="清理" Tag="2" Click="Button_Click_4"/>
                 </cc:SettingsCard>
             </cc:SettingsExpander.Items>
         </cc:SettingsExpander>
 
         <cc:SettingsExpander Header="下载"
-                                   Description="下载路径、质量、文件命名方式"
-                                   x:Name="DownloadEpd">
+                             Description="下载路径、质量、文件命名方式"
+                             x:Name="DownloadEpd">
             <cc:SettingsExpander.TranslationTransition>
                 <Vector3Transition/>
             </cc:SettingsExpander.TranslationTransition>
@@ -146,7 +146,7 @@
             </cc:SettingsExpander.HeaderIcon>
             <cc:SettingsExpander.Items>
                 <cc:SettingsCard Header="音频下载路径"
-                                       Description="{Binding DownloadPath}">
+                                 Description="{Binding DownloadPath}">
                     <cc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8B7;"/>
                     </cc:SettingsCard.HeaderIcon>

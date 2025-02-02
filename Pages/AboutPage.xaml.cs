@@ -17,7 +17,7 @@ namespace TewiMP.Pages
         public AboutPage()
         {
             InitializeComponent();
-            VersionRun.Text = $"v{App.AppVersion}";
+            VersionRun.Text = $"v{App.AppVersion} {App.Version.ReleaseType}";
             waveOut = new WaveOut();
             bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat());
             waveOut.Init(bufferedWaveProvider);
@@ -127,6 +127,32 @@ namespace TewiMP.Pages
         private async void Hyperlink_Click_2(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
             await Launcher.LaunchUriAsync(new Uri($"https://www.pixiv.net/artworks/117179092"));
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            var newestVersion = App.GetNewVersionByReleaseData(App.Version.ReleaseType);
+            if (App.AppVersionIsNewest())
+            {
+                UpdateExpander.Description = "当前版本是最新版本";
+                NewestVersion.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                UpdateExpander.Description = "发现新版本";
+                NewestVersion.Visibility = Visibility.Visible;
+            }
+
+            NewestVersionRun.Text = $"{newestVersion.Version} {newestVersion.ReleaseType}";
+            NewestVersion.Description = $"时间：{newestVersion.ReleaseTime}";
+
+            NowVersionRun.Text = $"{App.AppVersion} {App.Version.ReleaseType}";
+            NowVersion.Description = $"时间：{App.AppVersionReleaseDate}";
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            App.CheckUpdate();
         }
     }
 }

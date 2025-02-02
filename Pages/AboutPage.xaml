@@ -8,7 +8,7 @@
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:control="using:TewiMP.Controls"
-    mc:Ignorable="d">
+    mc:Ignorable="d" Loaded="Page_Loaded">
     <Grid>
         <ScrollView ScrollViewer.CanContentRenderOutsideBounds="True" ScrollViewer.ZoomMode="Enabled">
             <StackPanel HorizontalAlignment="Stretch"
@@ -55,6 +55,47 @@
                         </StackPanel>
                     </Grid>
                 </cc:WrapPanel>
+                <cc:SettingsExpander Header="更新"
+                                     Description="检查新版本"
+                                     IsExpanded="True"
+                                     x:Name="UpdateExpander">
+                    <cc:SettingsExpander.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </cc:SettingsExpander.Transitions>
+                    <cc:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE895;"/>
+                    </cc:SettingsExpander.HeaderIcon>
+                    <cc:SettingsExpander.Items>
+                        <cc:SettingsCard x:Name="NowVersion">
+                            <cc:SettingsCard.Header>
+                                <TextBlock>
+                                    <Run x:Name="NowVersionRun"></Run>
+                                    <Run
+                                        FontSize="12" 
+                                        Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}">
+                                        （当前版本）
+                                    </Run>
+                                </TextBlock>
+                            </cc:SettingsCard.Header>
+                        </cc:SettingsCard>
+                        <cc:SettingsCard x:Name="NewestVersion">
+                            <cc:SettingsCard.Header>
+                                <TextBlock>
+                                    <Run x:Name="NewestVersionRun"></Run>
+                                    <Run
+                                        FontSize="12" 
+                                        Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}">
+                                        （最新版本）
+                                    </Run>
+                                </TextBlock>
+                            </cc:SettingsCard.Header>
+                            <Button Content="打开下载页面"></Button>
+                        </cc:SettingsCard>
+                    </cc:SettingsExpander.Items>
+                    <Button Content="检查更新" Click="Button_Click_1"/>
+                </cc:SettingsExpander>
                 <cc:SettingsExpander Header="使用的开放源代码库"
                                      HorizontalAlignment="Stretch"
                                      Margin="0,0,0,0">
