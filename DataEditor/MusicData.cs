@@ -74,6 +74,8 @@ namespace TewiMP.DataEditor
         public string Key { get; set; }
         public MusicFrom From { get; set; }
         public SearchDataType SearchDataType { get; set; }
+        public int PageNumber { get; set; } = 1;
+        public int PageSize { get; set; } = 30;
         public override string GetMD5()
         {
             return $"{Key}{From}{SearchDataType}";

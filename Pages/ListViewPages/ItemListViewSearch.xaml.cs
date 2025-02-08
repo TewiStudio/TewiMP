@@ -33,15 +33,18 @@ namespace TewiMP.Pages
             DataContext = this;
         }
 
+        SearchData searchData { get; set; }
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             //PlayAllButton.Foreground = new SolidColorBrush(CodeHelper.IsAccentColorDark() ? Colors.White : Colors.Black);
             base.OnNavigatedTo(e);
             IsNavigatedOutFromPage = false;
-            var a =  ((PageData)e.Parameter).Param as SearchData;
-            NavToObj = a.Key;
-            NowMusicFrom = a.From;
-            NowSearchMode = a.SearchDataType;
+            searchData =  ((PageData)e.Parameter).Param as SearchData;
+            pageNumber = searchData.PageNumber;
+            pageSize = searchData.PageSize;
+            NavToObj = searchData.Key;
+            NowMusicFrom = searchData.From;
+            NowSearchMode = searchData.SearchDataType;
             musicListData = new() { ListDataType = DataType.歌曲 };
             UpdateShyHeader();
             InitData();
@@ -51,6 +54,11 @@ namespace TewiMP.Pages
         {
             base.OnNavigatedFrom(e);
             IsNavigatedOutFromPage = true;
+
+            searchData.PageNumber = pageNumber;
+            searchData.PageSize = pageSize;
+            searchData = null;
+
             await Task.Delay(500);
             scrollViewer?.ScrollToVerticalOffset(0);
             MusicDataList.Clear();
@@ -86,41 +94,34 @@ namespace TewiMP.Pages
             SearchPageSelectorCustom.Visibility = Visibility.Visible;
             SearchHomeButton.Visibility = Visibility.Visible;
             var searchData = NavToObj as string;
-            Result_Search_Header.Text = $"\"{searchData}\"的搜索结果";
+            Result_Search_Header.Text = $"\"{searchData}\" {NowSearchMode}名的搜索结果";
             NowPage.Text = pageNumber.ToString();
 
             MusicDataList.Clear();
+            SearchList.Clear();
 
-            bool isComplete = false;
-            while (!isComplete)
+            try
             {
-                try
+                searchDatas = await WebHelper.SearchData(searchData, pageNumber, pageSize, NowMusicFrom, NowSearchMode);
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                MainWindow.AddNotify("不支持的平台", "当前不支持此平台搜索。", NotifySeverity.Error);
+                searchDatas = null;
+            }
+            catch (NullReferenceException)
+            {
+                MainWindow.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);
+                searchDatas = null;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WriteLog("SearchError", ex.ToString(), false);
+                string errString = $"搜索时出现错误：\n{ex.Message}";
+                var d = await MainWindow.ShowDialog("搜索失败", errString, "重试", "确定", defaultButton: ContentDialogButton.Primary);
+                if (d == ContentDialogResult.Primary)
                 {
-                    searchDatas = await WebHelper.SearchData(searchData, pageNumber, pageSize, NowMusicFrom, NowSearchMode);
-                    isComplete = true;
-                }
-                catch (ArgumentOutOfRangeException)
-                {
-                    MainWindow.AddNotify("不支持的平台", "当前不支持此平台搜索。", NotifySeverity.Error);
                     searchDatas = null;
-                    break;
-                }
-                catch (NullReferenceException)
-                {
-                    MainWindow.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);
-                    searchDatas = null;
-                    break;
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.WriteLog("SearchError", ex.ToString(), false);
-                    string errString = $"搜索时出现错误：\n{ex.Message}";
-                    var d = await MainWindow.ShowDialog("搜索失败", errString, "重试", "确定", defaultButton: ContentDialogButton.Primary);
-                    if (d == ContentDialogResult.Primary)
-                    {
-                        searchDatas = null;
-                        break;
-                    }
                 }
             }
 
@@ -129,10 +130,11 @@ namespace TewiMP.Pages
             if (searchDatas != null)
             {
                 MusicDataList.Clear();
+                SearchList.Clear();
 
                 var dpi = CodeHelper.GetScaleAdjustment(App.WindowLocal);
 
-                var count = 0;
+                var count = pageNumber * pageSize - pageSize;
                 switch (NowSearchMode)
                 {
                     case SearchDataType.歌曲:
@@ -140,7 +142,6 @@ namespace TewiMP.Pages
                         Children.ItemTemplate = this.Resources["SongItemTemplate"] as DataTemplate;
 
                         MusicData[] array = (searchDatas as MusicListData).Songs.ToArray();
-                        count = pageNumber * pageSize - pageSize;
                         foreach (var i in array)
                         {
                             count++;

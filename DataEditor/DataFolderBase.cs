@@ -14,7 +14,7 @@ namespace TewiMP.DataEditor
         /// <summary>
         /// 程序数据文件夹路径
         /// </summary>
-        public static string BaseFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), $"{App.AppName}");
+        public static string BaseFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), App.AppName);
 
         /// <summary>
         /// 数据文件夹路径
@@ -70,6 +70,21 @@ namespace TewiMP.DataEditor
         /// 下载文件夹路径
         /// </summary>
         public static string DownloadFolder { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
+        
+        /// <summary>
+        /// 更新程序路径
+        /// </summary>
+        public static string UpdateFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.AppName);
+        
+        /// <summary>
+        /// 开机启动路径
+        /// </summary>
+        public static string StartupFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "Startup");
+
+        /// <summary>
+        /// 开机启动快捷方式
+        /// </summary>
+        public static string StartupShortcutPath { get; set; } = Path.Combine(StartupFolder, $"{App.AppName}.lnk");
 
         /// <summary>
         /// 默认播放列表数据
@@ -105,18 +120,21 @@ namespace TewiMP.DataEditor
             { SettingParams.ThemeBackdropEffect.ToString(), (int)MainWindow.BackdropType.DesktopAcrylic },
             { SettingParams.ThemeBackdropImagePath.ToString(), null },
             { SettingParams.ThemeBackdropImageMassOpacity.ToString(), 0.5 },
-            { SettingParams.DesktopLyricOptions.ToString(),
+            { 
+                SettingParams.DesktopLyricOptions.ToString(),
                 new JArray() {
                     true, false, false, true
                 }
             },
-            { SettingParams.DesktopLyricText.ToString(),
+            { 
+                SettingParams.DesktopLyricText.ToString(),
                 new JArray() {
                     (int)LyricTextBehavior.Exchange,
                     (int)LyricTextPosition.Default
                 }
             },
-            { SettingParams.DesktopLyricTranslateText.ToString(),
+            { 
+                SettingParams.DesktopLyricTranslateText.ToString(),
                 new JArray() {
                     (int)LyricTranslateTextBehavior.MainLyric,
                     (int)LyricTranslateTextPosition.Center
@@ -130,6 +148,7 @@ namespace TewiMP.DataEditor
             { SettingParams.TopNavigationStyle.ToString(), false },
             { SettingParams.LocalMusicPageItemSortBy.ToString(), 0 },
             { SettingParams.HotKeySettings.ToString(), JArray.FromObject(HotKeyManager.DefaultRegisterHotKeysList) },
+            { SettingParams.StartupWithWindows.ToString(), false },
         };
         
         /// <summary>
@@ -194,6 +213,7 @@ namespace TewiMP.DataEditor
             TopNavigationStyle,
             LocalMusicPageItemSortBy,
             HotKeySettings,
+            StartupWithWindows
         }
 
         public enum LocalMusicDataType { LocalMusicFolderPath, AnalyzedDatas }
@@ -210,6 +230,7 @@ namespace TewiMP.DataEditor
             Directory.CreateDirectory(AudioCacheFolder);
             Directory.CreateDirectory(ImageCacheFolder);
             Directory.CreateDirectory(LyricCacheFolder);
+            Directory.CreateDirectory(UpdateFolder);
 
             if (!File.Exists(PlayListDataPath))
             {
@@ -245,12 +266,14 @@ namespace TewiMP.DataEditor
             {
                 File.Create(LogDataPath).Close();
             }
+            
+            Directory.CreateDirectory(StartupFolder);
             App.logManager.Log("DataFolderBase", "初始化文件目录完成。");
         }
 
         /// <summary>
         /// <list type="table">
-        ///     <item>数据文件的抽象。</item>
+        ///     <item>数据文件的实例。</item>
         ///     <item>使用时会读取设置文件，设置时会写入数据文件</item>
         /// </list>
         /// </summary>

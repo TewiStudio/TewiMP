@@ -1,24 +1,22 @@
 ﻿using System;
 using System.Linq;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Windows.System;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.UI.Popups;
+using Newtonsoft.Json.Linq;
+using TewiMP.Pages;
 using TewiMP.Media;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
 using TewiMP.Windowed;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using Windows.UI.Popups;
-using Newtonsoft.Json.Linq;
-using TewiMP.Pages;
-using Microsoft.UI.Windowing;
-using static Vanara.PInvoke.User32;
-using Windows.System;
+using System.IO;
 
 namespace TewiMP
 {
@@ -72,8 +70,8 @@ namespace TewiMP
         {
             Available = true,
             ReleaseType = ReleaseType.Preview,
-            Version = "0.4.8",
-            VersionF = 48.0f,
+            Version = "0.4.9",
+            VersionF = 49.0f,
             ReleaseTime = 1738281600L.ToDateTime(),
             ExtendMessage = null
         };
@@ -451,7 +449,7 @@ namespace TewiMP
             AppStatic.DebugSettings.EnableFrameRateCounter = visible;
         }
 
-        public static async void CheckUpdate()
+        public static async Task CheckUpdate()
         {
             var data = await WebHelper.GetStringAsync("https://data.tewi.top/datas/TewiMP/update.json");
             if (string.IsNullOrEmpty(data)) return;
@@ -514,6 +512,24 @@ namespace TewiMP
             var newestVersion = GetNewVersionByReleaseData(Version.ReleaseType);
             if (!newestVersion.Available) return false;
             return newestVersion.VersionF <= Version.VersionF;
+        }
+
+        public static async void SetStartupWithWindows(bool startup)
+        {
+            await Task.Run(() =>
+            {
+                if (startup)
+                {
+                    var location = System.Reflection.Assembly.GetEntryAssembly().Location;
+                    location = location.Replace($"{AppName}.dll", $"{AppName}.exe");
+                    if (File.Exists(location)) return;
+                    FileHelper.CreateShortcut(DataFolderBase.StartupShortcutPath, location, "-OpenWithWindows");
+                }
+                else
+                {
+                    File.Delete(DataFolderBase.StartupShortcutPath);
+                }
+            });
         }
 
         private Window m_window;

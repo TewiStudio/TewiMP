@@ -361,5 +361,17 @@ namespace TewiMP.Helpers
             fs.Close();
             return r;
         }
+
+        public static void CreateShortcut(string lnkFilePath, string filePath, string args = null)
+        {
+            var shellType = Type.GetTypeFromProgID("WScript.Shell");
+            dynamic shell = Activator.CreateInstance(shellType);
+            var shortcut = shell.CreateShortcut(lnkFilePath);
+            shortcut.TargetPath = filePath;
+            shortcut.Arguments = args;
+            shortcut.WorkingDirectory = AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+            shortcut.Save();
+        }
+
     }
 }

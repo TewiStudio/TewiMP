@@ -408,8 +408,13 @@
                         <FontIcon Glyph="&#xf210;"/>
                     </cc:SettingsCard.HeaderIcon>
                 </cc:SettingsCard>
+                <cc:SettingsCard Header="开机自启"
+                                 Description="当 Windows 启动时自动启动此程序">
+                    <ToggleSwitch Loaded="ToggleSwitch_Loaded" Tag="3"
+                                  Toggled="ToggleSwitch_Toggled_2"/>
+                </cc:SettingsCard>
                 <cc:SettingsCard Header="显示托盘图标"
-                                 Description="在 Windows 任务栏托盘中显示此程序的图标">
+                                 Description="在任务栏托盘中显示此程序的图标">
                     <cc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xECAA;"/>
                     </cc:SettingsCard.HeaderIcon>

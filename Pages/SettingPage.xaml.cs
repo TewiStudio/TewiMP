@@ -758,6 +758,9 @@ namespace TewiMP.Pages
                 case "2":
                     toggleSwitch.IsOn = MainWindow.RunInBackground;
                     break;
+                case "3":
+                    toggleSwitch.IsOn = MainWindow.RunInBackground;
+                    break;
             }
         }
 
@@ -774,6 +777,9 @@ namespace TewiMP.Pages
                     break;
                 case "2":
                     MainWindow.RunInBackground = toggleSwitch.IsOn;
+                    break;
+                case "3":
+                    App.SetStartupWithWindows(toggleSwitch.IsOn);
                     break;
             }
         }

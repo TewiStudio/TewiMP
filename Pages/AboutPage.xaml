@@ -80,7 +80,7 @@
                                 </TextBlock>
                             </cc:SettingsCard.Header>
                         </cc:SettingsCard>
-                        <cc:SettingsCard x:Name="NewestVersion">
+                        <cc:SettingsCard x:Name="NewestVersion" IsClickEnabled="True" Click="Button_Click_2">
                             <cc:SettingsCard.Header>
                                 <TextBlock>
                                     <Run x:Name="NewestVersionRun"></Run>
@@ -91,7 +91,7 @@
                                     </Run>
                                 </TextBlock>
                             </cc:SettingsCard.Header>
-                            <Button Content="打开下载页面"></Button>
+                            打开下载页面
                         </cc:SettingsCard>
                     </cc:SettingsExpander.Items>
                     <Button Content="检查更新" Click="Button_Click_1"/>

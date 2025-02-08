@@ -29,15 +29,15 @@ namespace TewiMP.Pages.ListViewPages
         MusicListData musicListData { get; set; } = null;
         ObservableCollection<SongItemBindBase> musicListBind { get; set; } = new();
         ScrollViewer scrollViewer;
-        PageData pageData;
+        PageData PageData { get; set; }
         public string md5;
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            pageData = e.Parameter as PageData;
-            if (pageData.Param is string m)
+            PageData = e.Parameter as PageData;
+            if (PageData.Param is string m)
                 md5 = m;
-            else if (pageData.Param is MusicListData data)
+            else if (PageData.Param is MusicListData data)
             {
                 md5 = null;
                 musicListData = data;
@@ -47,7 +47,10 @@ namespace TewiMP.Pages.ListViewPages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            //(e.Parameter as PageData).VerticalOffset = scrollViewer.VerticalOffset;
+
+            PageData.VerticalOffset = scrollViewer.VerticalOffset;
+            PageData = null;
+
             musicListData = null;
             MainWindow.WindowDpiChanged -= MainWindow_WindowDpiChanged;
         }
@@ -535,6 +538,9 @@ namespace TewiMP.Pages.ListViewPages
             SortComboBox.SelectedIndex = (int)musicListData.PlaySort;
             LoadingTipControl.UnShowLoading();
             isInInitBindings = false;
+
+            await Task.Delay(10);
+            scrollViewer.ScrollToVerticalOffset(PageData.VerticalOffset);
         }
 
         void InitInfo()
@@ -635,7 +641,6 @@ namespace TewiMP.Pages.ListViewPages
             Init();
             ItemsList.ItemsSource = musicListBind;
             ItemList_Header_Search_Control.SongItemBinds = musicListBind;
-            scrollViewer.ChangeView(null, pageData.VerticalOffset, null);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

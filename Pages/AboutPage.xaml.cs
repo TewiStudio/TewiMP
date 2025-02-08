@@ -150,9 +150,15 @@ namespace TewiMP.Pages
             NowVersion.Description = $"时间：{App.AppVersionReleaseDate}";
         }
 
-        private void Button_Click_1(object sender, RoutedEventArgs e)
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            App.CheckUpdate();
+            await App.CheckUpdate();
+        }
+
+        private async void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            var newestVersion = App.GetNewVersionByReleaseData(App.Version.ReleaseType);
+            await Launcher.LaunchUriAsync(new Uri($"{newestVersion.Url}"));
         }
     }
 }

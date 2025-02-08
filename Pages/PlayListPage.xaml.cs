@@ -9,11 +9,13 @@ using Microsoft.UI.Composition;
 using TewiMP.DataEditor;
 using TewiMP.Controls;
 using System.Collections;
+using TewiMP.Pages.ListViewPages;
 
 namespace TewiMP.Pages
 {
     public partial class PlayListPage : Page
     {
+        private static double verticalOffset = 0;
         ArrayList arrayList;
         public PlayListPage()
         {
@@ -29,6 +31,7 @@ namespace TewiMP.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
+            verticalOffset = scrollViewer.VerticalOffset;
         }
 
         ObservableCollection<MusicListData> playListCards = new();
@@ -39,15 +42,16 @@ namespace TewiMP.Pages
             UpdatePlayList();
             await Task.Delay(10);
             InitShyHeader();
+            scrollViewer.ScrollToVerticalOffset(verticalOffset);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            RemoveEvent();
-            DisposeVisuals();
             playListCards.Clear();
             ItemsViewer.ItemsSource = null;
             BaseGridView.Items.Clear();
+            RemoveEvent();
+            DisposeVisuals();
         }
 
         private void MainWindow_MainViewStateChanged(bool isView)
