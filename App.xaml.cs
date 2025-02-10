@@ -522,7 +522,7 @@ namespace TewiMP
                 {
                     var location = System.Reflection.Assembly.GetEntryAssembly().Location;
                     location = location.Replace($"{AppName}.dll", $"{AppName}.exe");
-                    if (File.Exists(location)) return;
+                    if (File.Exists(DataFolderBase.StartupShortcutPath)) return;
                     FileHelper.CreateShortcut(DataFolderBase.StartupShortcutPath, location, "-OpenWithWindows");
                 }
                 else
