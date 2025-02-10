@@ -17,7 +17,7 @@ namespace TewiMP.Pages
         public AboutPage()
         {
             InitializeComponent();
-            VersionRun.Text = $"v{App.AppVersion} {App.Version.ReleaseType}";
+            VersionRun.Text = $"v{App.AppVersion} {App.Version.SuffixType}";
             waveOut = new WaveOut();
             bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat());
             waveOut.Init(bufferedWaveProvider);
@@ -128,10 +128,25 @@ namespace TewiMP.Pages
         {
             await Launcher.LaunchUriAsync(new Uri($"https://www.pixiv.net/artworks/117179092"));
         }
+        
+        private async void Hyperlink_Click_3(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
+        {
+            await Launcher.LaunchUriAsync(new Uri($"https://github.com/zilongcn23/TewiMP-Release/issues"));
+        }
+
+        private async void Hyperlink_Click_4(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
+        {
+            await Launcher.LaunchUriAsync(new Uri($"https://music.163.com/#/user/home?id=7916651285"));
+        }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            var newestVersion = App.GetNewVersionByReleaseData(App.Version.ReleaseType);
+            CheckUpdate();
+        }
+
+        private void CheckUpdate()
+        {
+            var newestVersion = App.GetNewVersionByReleaseData(App.Version.SuffixType);
             if (App.AppVersionIsNewest())
             {
                 UpdateExpander.Description = "当前版本是最新版本";
@@ -143,22 +158,29 @@ namespace TewiMP.Pages
                 NewestVersion.Visibility = Visibility.Visible;
             }
 
-            NewestVersionRun.Text = $"{newestVersion.Version} {newestVersion.ReleaseType}";
+            NewestVersionRun.Text = $"{newestVersion.Version} {newestVersion.SuffixType}";
             NewestVersion.Description = $"时间：{newestVersion.ReleaseTime}";
 
-            NowVersionRun.Text = $"{App.AppVersion} {App.Version.ReleaseType}";
+            NowVersionRun.Text = $"{App.AppVersion} {App.Version.SuffixType}";
             NowVersion.Description = $"时间：{App.AppVersionReleaseDate}";
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            await App.CheckUpdate();
+            UpdateExpander.Description = "检查更新中......";
+            await App.CheckUpdate(false);
+            CheckUpdate();
         }
 
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            var newestVersion = App.GetNewVersionByReleaseData(App.Version.ReleaseType);
+            var newestVersion = App.GetNewVersionByReleaseData(App.Version.SuffixType);
             await Launcher.LaunchUriAsync(new Uri($"{newestVersion.Url}"));
+        }
+
+        private async void Button_Click_3(object sender, RoutedEventArgs e)
+        {
+            await Launcher.LaunchUriAsync(new Uri($"https://github.com/TewiStudio/TewiMP-Release/issues"));
         }
     }
 }

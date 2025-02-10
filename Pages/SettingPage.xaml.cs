@@ -68,6 +68,7 @@ namespace TewiMP.Pages
             LyricCachePlaceSizeBusy = false;
         }
 
+        public string UserDataPath { get; set; } = null;
         public string CachePath { get; set; } = null;
         public string AudioCachePath { get; set; } = null;
         public string ImageCachePath { get; set; } = null;
@@ -85,6 +86,7 @@ namespace TewiMP.Pages
             ToAudioCachePlaceSize();
             ToImageCachePlaceSize();
             ToLyricCachePlaceSize();
+            UserDataPath = DataFolderBase.UserDataFolder;
             CachePath = DataFolderBase.CacheFolder;
             AudioCachePath = DataFolderBase.AudioCacheFolder;
             ImageCachePath = DataFolderBase.ImageCacheFolder;
@@ -225,6 +227,9 @@ namespace TewiMP.Pages
                 case "4":
                     folderPath = DataFolderBase.DownloadFolder;
                     break;
+                case "5":
+                    folderPath = DataFolderBase.UserDataFolder;
+                    break;
             }
 
             await FileHelper.OpenFilePath(folderPath);
@@ -260,6 +265,26 @@ namespace TewiMP.Pages
             (VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(button)))) as CommunityToolkit.WinUI.Controls.SettingsCard).Description = folderPath;
         }
 
+        private void Button_Click_5(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button)
+            {
+                string defaultSetting = null;
+                switch ((string)button.Tag)
+                {
+                    case "0":
+                        DataFolderBase.CacheFolder = null; // 自定义属性已检查路径是否为空，如果是则设置为默认值
+                        defaultSetting = DataFolderBase.CacheFolder;
+                        break;
+                    case "1":
+                        defaultSetting = SettingEditHelper.GetSetting<string>(DataFolderBase.SettingDefault, DataFolderBase.SettingParams.DownloadFolderPath);
+                        DataFolderBase.DownloadFolder = defaultSetting;
+                        break;
+                }
+                (VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(button)))) as CommunityToolkit.WinUI.Controls.SettingsCard).Description = defaultSetting;
+            }
+        }
+
         private async void Button_Click_4(object sender, RoutedEventArgs e)
         {
             if (sender is Button button)
@@ -289,11 +314,18 @@ namespace TewiMP.Pages
                     var files = Directory.EnumerateFiles(folderPath);
                     foreach (var file in files)
                     {
-                        File.Delete(file);
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch
+                        {
+
+                        }
                     }
                 });
 
-                (VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(button))) as CommunityToolkit.WinUI.Controls.SettingsCard).Description = "当前占用：0B";
+                (VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(button))) as CommunityToolkit.WinUI.Controls.SettingsCard).Description = "当前占用：" + CodeHelper.GetAutoSizeString(await CodeHelper.GetDirctoryLength(folderPath), 2);
             }
         }
         #endregion

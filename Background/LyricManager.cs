@@ -31,20 +31,20 @@ namespace TewiMP.Background
                 if (value is null)
                 {
                     _nowLyricsData = value;
-                    InovkeLyricChangeEvent(value);
+                    InvokeLyricChangeEvent(value);
                 }
                 else if (_nowLyricsData != value)
                 {
                     _nowLyricsData = value;
-                    InovkeLyricChangeEvent(value);
+                    InvokeLyricChangeEvent(value);
                 }
             }
         }
 
-        private void InovkeLyricChangeEvent(LyricData lyricData)
+        private void InvokeLyricChangeEvent(LyricData lyricData)
         {
             PlayingLyricSelectedChange?.Invoke(lyricData);
-            App.logManager.Log("LyricManager", $"当前歌词已设置为：\"{lyricData?.Lyric?.FirstOrDefault()}\"");
+            //App.logManager.Log("LyricManager", $"当前歌词已设置为：\"{lyricData?.Lyric?.FirstOrDefault()}\"");
         }
 
         public LyricManager()

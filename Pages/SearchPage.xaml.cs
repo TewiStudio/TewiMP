@@ -20,13 +20,12 @@ namespace TewiMP.Pages
         public SearchPage()
         {
             InitializeComponent();
-            var a = Enum.GetNames(typeof(DataEditor.MusicFrom)).ToList();
-            a.RemoveAt(6);
-            a.RemoveAt(5);
+            var a = Enum.GetNames(typeof(MusicFrom)).ToList();
             SearchSourceComboBox.ItemsSource = a;
             SearchSourceComboBox.SelectedIndex = 3;
 
             var b = Enum.GetNames(typeof(SearchDataType)).ToList();
+            b.RemoveAt(b.IndexOf(b.Last()));
             SearchTypeComboBox.ItemsSource = b;
             SearchTypeComboBox.SelectedIndex = 0;
         }

@@ -17,6 +17,7 @@ using TewiMP.Windowed;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
 using System.IO;
+using TewiMP.Helpers.MetingService;
 
 namespace TewiMP
 {
@@ -42,7 +43,7 @@ namespace TewiMP
         public static VersionData StableVersion { get; } = new()
         {
             Available = false,
-            ReleaseType = ReleaseType.Stable,
+            SuffixType = SuffixType.Stable,
             Version = "0",
             VersionF = 0f,
             ReleaseTime = DateTime.MinValue,
@@ -51,7 +52,7 @@ namespace TewiMP
         public static VersionData PreviewVersion { get; } = new()
         {
             Available = false,
-            ReleaseType = ReleaseType.Preview,
+            SuffixType = SuffixType.Preview,
             Version = "0",
             VersionF = 0f,
             ReleaseTime = DateTime.MinValue,
@@ -60,7 +61,7 @@ namespace TewiMP
         public static VersionData AlphaVersion { get; } = new()
         {
             Available = false,
-            ReleaseType = ReleaseType.Alpha,
+            SuffixType = SuffixType.Alpha,
             Version = "0",
             VersionF = 0f,
             ReleaseTime = DateTime.MinValue,
@@ -69,10 +70,10 @@ namespace TewiMP
         public static VersionData Version { get; set; } = new()
         {
             Available = true,
-            ReleaseType = ReleaseType.Preview,
+            SuffixType = SuffixType.Preview,
             Version = "0.4.9",
             VersionF = 49.0f,
-            ReleaseTime = 1738281600L.ToDateTime(),
+            ReleaseTime = 1739195225L.ToDateTime(),
             ExtendMessage = null
         };
         public static string AppVersion => Version.Version;
@@ -125,6 +126,7 @@ namespace TewiMP
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             base.OnLaunched(args);
+            LogManager.InitNowLog();
             logManager = new();
             DataFolderBase.InitFiles();
             metingServices = new();
@@ -275,6 +277,7 @@ namespace TewiMP
             audioPlayer.DisposeAll();
             hotKeyManager.UnregisterHotKeys([.. hotKeyManager.RegistedHotKeys]);
             logManager.Log("App", "正在退出程序...");
+            LogManager.DisposeNowLogStream();
             Current.Exit();
         }
 
@@ -297,10 +300,19 @@ namespace TewiMP
             try
             {
                 JObject b = data;
+
+                var cd = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.CacheFolderPath);
+                if (!string.IsNullOrEmpty(cd))
+                {
+                    if (Path.Exists(cd))
+                    {
+                        DataFolderBase.CacheFolder = cd;
+                    }
+                }
                 DataFolderBase.DownloadFolder = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.DownloadFolderPath);
-                DataFolderBase.AudioCacheFolder = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.AudioCacheFolderPath);
-                DataFolderBase.ImageCacheFolder = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.ImageCacheFolderPath);
-                DataFolderBase.LyricCacheFolder = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.LyricCacheFolderPath);
+                //DataFolderBase.AudioCacheFolder = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.AudioCacheFolderPath);
+                //DataFolderBase.ImageCacheFolder = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.ImageCacheFolderPath);
+                //DataFolderBase.LyricCacheFolder = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.LyricCacheFolderPath);
 
                 var bData = SettingEditHelper.GetSetting<string>(b, DataFolderBase.SettingParams.EqualizerCustomData).Split(',');
                 for (int i = 0; i < 10; i++)
@@ -376,7 +388,12 @@ namespace TewiMP
         public static void SaveSettings()
         {
             logManager.Log("App", "正在保存设置...");
+            metingServices.InitMeting();
             var a = DataFolderBase.JSettingData;
+            if (DataFolderBase.CacheFolder != DataFolderBase.DefaultCacheFolder)
+            {
+                SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.CacheFolderPath, DataFolderBase.CacheFolder);
+            }
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.Volume, audioPlayer.Volume == 0 ? MainWindow.NoVolumeValue : audioPlayer.Volume);
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.DownloadFolderPath, DataFolderBase.DownloadFolder);
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.AudioCacheFolderPath, DataFolderBase.AudioCacheFolder);
@@ -449,7 +466,7 @@ namespace TewiMP
             AppStatic.DebugSettings.EnableFrameRateCounter = visible;
         }
 
-        public static async Task CheckUpdate()
+        public static async Task CheckUpdate(bool addNotify = true)
         {
             var data = await WebHelper.GetStringAsync("https://data.tewi.top/datas/TewiMP/update.json");
             if (string.IsNullOrEmpty(data)) return;
@@ -481,35 +498,38 @@ namespace TewiMP
             AlphaVersion.ExtendMessage = (string)alpha["extendMessage"];
 
             if (AppVersionIsNewest()) return;
-            var newestVersion = GetNewVersionByReleaseData(Version.ReleaseType);
+            var newestVersion = GetNewVersionByReleaseData(Version.SuffixType);
 
-            MainWindow.AddNotify(
-                "有新版本！",
-                $"可更新到版本 {newestVersion.Version} {newestVersion.ReleaseType}，当前版本为 {Version.Version} {Version.ReleaseType}。" + 
-                    (string.IsNullOrEmpty(newestVersion.ExtendMessage) ? "" : $"\n{newestVersion.ExtendMessage}"),
-                NotifySeverity.Warning, TimeSpan.FromMilliseconds(10000),
-                "前往下载页面 ⨠", async () =>
-                {
-                    var success = await Launcher.LaunchUriAsync(new(newestVersion.Url));
-                });
+            if (addNotify)
+            {
+                MainWindow.AddNotify(
+                    "有新版本！",
+                    $"可更新到版本 {newestVersion.Version} {newestVersion.SuffixType}，当前版本为 {Version.Version} {Version.SuffixType}。" +
+                        (string.IsNullOrEmpty(newestVersion.ExtendMessage) ? "" : $"\n{newestVersion.ExtendMessage}"),
+                    NotifySeverity.Warning, TimeSpan.FromMilliseconds(10000),
+                    "前往下载页面 ⨠", async () =>
+                    {
+                        var success = await Launcher.LaunchUriAsync(new(newestVersion.Url));
+                    });
+            }
         }
 
         /// <summary>
-        /// 传入版本类型 <see cref="ReleaseType"/>，返回此版本类型的最新版本 <see cref="VersionData"/>。需要访问服务器才能正常判断。
+        /// 传入版本类型 <see cref="SuffixType"/>，返回此版本类型的最新版本 <see cref="VersionData"/>。需要访问服务器才能正常判断。
         /// </summary>
         /// <param name="releaseType"></param>
         /// <returns>此版本类型的最新版本 <see cref="VersionData"/></returns>
-        public static VersionData GetNewVersionByReleaseData(ReleaseType releaseType) => releaseType switch
+        public static VersionData GetNewVersionByReleaseData(SuffixType releaseType) => releaseType switch
         {
-            ReleaseType.Stable => StableVersion,
-            ReleaseType.Preview => PreviewVersion,
-            ReleaseType.Alpha => AlphaVersion,
+            SuffixType.Stable => StableVersion,
+            SuffixType.Preview => PreviewVersion,
+            SuffixType.Alpha => AlphaVersion,
             _ => Version
         };
 
         public static bool AppVersionIsNewest()
         {
-            var newestVersion = GetNewVersionByReleaseData(Version.ReleaseType);
+            var newestVersion = GetNewVersionByReleaseData(Version.SuffixType);
             if (!newestVersion.Available) return false;
             return newestVersion.VersionF <= Version.VersionF;
         }
@@ -551,17 +571,22 @@ namespace TewiMP
         };
     }
 
-    public enum ReleaseType { Stable, Preview, Alpha }
+    public enum SuffixType { Stable, Preview, Alpha }
 
     public class VersionData
     {
-        public ReleaseType ReleaseType { get; set; }
+        public SuffixType SuffixType { get; set; }
         public bool Available { get; set; }
         public string Version { get; set; }
         public float VersionF { get; set; }
         public string Url { get; set; }
         public DateTime ReleaseTime { get; set; }
         public string ExtendMessage { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Version} {SuffixType}";
+        }
     }
 
     public static class DateConverter

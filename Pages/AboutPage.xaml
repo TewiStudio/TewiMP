@@ -51,7 +51,9 @@
                             <TextBlock TextWrapping="Wrap">
                                 Powered by <Hyperlink Click="Hyperlink_Click">.NET 8</Hyperlink> &#x0026; <Hyperlink Click="Hyperlink_Click_1">Windows App SDK 1.6</Hyperlink>
                             </TextBlock>
-                            <TextBlock TextWrapping="Wrap" Text="© 2020-2025 zilongww. All Rights Reserved." Margin="0,4,0,0"/>
+                            <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">
+                                © 2020-2025 TewiStudio. All Rights Reserved.
+                            </TextBlock>
                         </StackPanel>
                     </Grid>
                 </cc:WrapPanel>
@@ -217,53 +219,59 @@
                         </TransitionCollection>
                     </TextBlock.Transitions>
                     图标中的图片来自 <Hyperlink Click="Hyperlink_Click_2">なま</Hyperlink>
+                    <LineBreak/>编码：<Hyperlink Click="Hyperlink_Click_4">zilong</Hyperlink>
                 </TextBlock>
-                <Button Background="Pink">
-                    <Button.Resources>
-                        <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="LightPink"/>
-                        <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="PaleVioletRed"/>
-                    </Button.Resources>
-                    <Button.Transitions>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <StackPanel.Transitions>
                         <TransitionCollection>
                             <RepositionThemeTransition/>
                         </TransitionCollection>
-                    </Button.Transitions>
-                    <Button.Flyout>
-                        <Flyout>
-                            <StackPanel
-                                Orientation="Horizontal"
-                                Spacing="12">
-                                <StackPanel.Resources>
-                                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                                        <Setter Property="Padding" Value="12"/>
-                                    </Style>
-                                </StackPanel.Resources>
-                                <Button>
-                                    <TextBlock
-                                        Text="一瓶可乐"/>
-                                </Button>
-                                <Button>
-                                    <TextBlock
-                                        Text="一杯咖啡"/>
-                                </Button>
-                                <Button>
-                                    <TextBlock
-                                        Text="一杯奶茶"/>
-                                </Button>
-                            </StackPanel>
-                        </Flyout>
-                    </Button.Flyout>
-                    <StackPanel
-                        Orientation="Horizontal"
-                        Spacing="4"
-                        RequestedTheme="Light">
-                        <FontIcon
-                            Glyph="&#xEB51;"
-                            FontSize="14"/>
-                        <TextBlock
-                            Text="捐赠"/>
-                    </StackPanel>
-                </Button>
+                    </StackPanel.Transitions>
+                    <Button Background="Pink">
+                        <Button.Resources>
+                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="LightPink"/>
+                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="PaleVioletRed"/>
+                        </Button.Resources>
+                        <Button.Flyout>
+                            <Flyout>
+                                <StackPanel
+                                    Orientation="Horizontal"
+                                    Spacing="12">
+                                    <StackPanel.Resources>
+                                        <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                                            <Setter Property="Padding" Value="12"/>
+                                        </Style>
+                                    </StackPanel.Resources>
+                                    <Button>
+                                        <TextBlock
+                                            Text="一瓶可乐"/>
+                                    </Button>
+                                    <Button>
+                                        <TextBlock
+                                            Text="一杯咖啡"/>
+                                    </Button>
+                                    <Button>
+                                        <TextBlock
+                                            Text="一杯奶茶"/>
+                                    </Button>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Spacing="4"
+                            RequestedTheme="Light">
+                            <FontIcon
+                                Glyph="&#xEB51;"
+                                FontSize="14"/>
+                            <TextBlock
+                                Text="捐赠"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Click="Button_Click_3">
+                        反馈
+                    </Button>
+                </StackPanel>
             </StackPanel>
         </ScrollView>
     </Grid>

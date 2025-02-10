@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
+using System.Threading.Tasks;
+using TewiMP.DataEditor;
 
 namespace TewiMP.Background
 {
@@ -23,12 +26,53 @@ namespace TewiMP.Background
             {
                 LogDatas.Add(new LogData { LogTime = DateTime.Now, LogName = name, LogContent = content, LogLevel = logLevel });
             });
-            Debug.WriteLine($"[{DateTime.Now}][{logLevel}][{name}]: {content}");
+            var str = $"[{DateTime.Now}][{logLevel}][{name}]: {content}";
+            Debug.WriteLine(str);
+            WriteToLogStream(str);
         }
 
         public void LogIf(bool b, string name, string content, LogLevel logLevel = LogLevel.Information)
         {
             if (b) Log(name, content, logLevel);
+        }
+
+        private static FileStream NowLog;
+        private static StreamWriter NowLogWriter;
+        private static object locker = new();
+        public static void InitNowLog()
+        {
+            NowLog = new FileStream(Path.Combine(DataFolderBase.RunLogFolder, DateTime.Now.ToFileTime().ToString()), FileMode.CreateNew, FileAccess.Write);
+            NowLogWriter = new StreamWriter(NowLog);
+            WriteToLogStream($"{App.AppName} Started {DateTime.Now}");
+            WriteToLogStream($"Version: {App.Version}, built time: {App.Version.ReleaseTime}\n");
+        }
+
+        public static void WriteToLogStream(string text)
+        {
+            if (NowLog is null || NowLogWriter is null) return;
+            lock (locker)
+            {
+                NowLogWriter.Write($"{text}\n");
+                NowLogWriter.Flush();
+                NowLog.Flush();
+            }
+        }
+
+        public static async Task FlushStream()
+        {
+            await NowLogWriter.FlushAsync();
+            await NowLog.FlushAsync();
+        }
+
+        public static void DisposeNowLogStream()
+        {
+            WriteToLogStream($"\nTewiMP Stopped at {DateTime.Now}");
+            NowLogWriter.Close();
+            NowLogWriter?.Dispose();
+            NowLog?.Close();
+            NowLog?.Dispose();
+            NowLogWriter = null;
+            NowLog = null;
         }
     }
 }

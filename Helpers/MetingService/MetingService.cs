@@ -34,7 +34,7 @@ namespace TewiMP.Helpers
             KgServices = new KgMeting(KgMeting);
         }
 
-        public async void InitMeting()
+        public void InitMeting()
         {
             NeteaseMeting.Cookie("os=pc; " + NeteaseCookie);
         }

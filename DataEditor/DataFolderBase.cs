@@ -12,9 +12,14 @@ namespace TewiMP.DataEditor
     public static class DataFolderBase
     {
         /// <summary>
-        /// 程序数据文件夹路径
+        /// 程序数据文件夹路径（Roaming）
         /// </summary>
         public static string BaseFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), App.AppName);
+
+        /// <summary>
+        /// 程序缓存数据文件夹路径（Local）
+        /// </summary>
+        public static string BaseLocalFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.AppName);
 
         /// <summary>
         /// 数据文件夹路径
@@ -45,11 +50,37 @@ namespace TewiMP.DataEditor
         /// 日志文件路径
         /// </summary>
         public static string LogDataPath { get; } = Path.Combine(UserDataFolder, "Log");
+        
+        /// <summary>
+        /// 运行日志文件夹路径
+        /// </summary>
+        public static string RunLogFolder { get; } = Path.Combine(BaseLocalFolder, "Log");
 
+        /// <summary>
+        /// 更新程序路径
+        /// </summary>
+        public static string UpdateFolder { get; set; } = Path.Combine(BaseLocalFolder, "Update");
+
+        public static string DefaultCacheFolder = Path.Combine(BaseLocalFolder, "Cache");
+        private static string _cacheFolder = DefaultCacheFolder;
         /// <summary>
         /// 缓存文件夹路径
         /// </summary>
-        public static string CacheFolder { get; set; } = Path.Combine(BaseFolder, "Cache");
+        public static string CacheFolder
+        {
+            get => _cacheFolder;
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    if (Path.Exists(value))
+                    {
+                        _cacheFolder = value;
+                        InitCacheFolder();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// 歌曲缓存文件夹路径
@@ -72,11 +103,6 @@ namespace TewiMP.DataEditor
         public static string DownloadFolder { get; set; } = Environment.GetFolderPath(Environment.SpecialFolder.MyMusic);
         
         /// <summary>
-        /// 更新程序路径
-        /// </summary>
-        public static string UpdateFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.AppName);
-        
-        /// <summary>
         /// 开机启动路径
         /// </summary>
         public static string StartupFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.StartMenu), "Programs", "Startup");
@@ -97,6 +123,7 @@ namespace TewiMP.DataEditor
         public static JObject SettingDefault = new JObject()
         {
             { SettingParams.Volume.ToString(), 50f },
+            { SettingParams.CacheFolderPath.ToString(), null},
             { SettingParams.DownloadFolderPath.ToString(), DownloadFolder },
             { SettingParams.AudioCacheFolderPath.ToString(), AudioCacheFolder },
             { SettingParams.ImageCacheFolderPath.ToString(), ImageCacheFolder },
@@ -179,6 +206,7 @@ namespace TewiMP.DataEditor
         /// </summary>
         public enum SettingParams { 
             Volume,
+            CacheFolderPath,
             AudioCacheFolderPath,
             DownloadFolderPath,
             ImageCacheFolderPath,
@@ -225,11 +253,10 @@ namespace TewiMP.DataEditor
         {
             App.logManager.Log("DataFolderBase", "初始化文件目录中...");
             Directory.CreateDirectory(BaseFolder);
+            Directory.CreateDirectory(BaseLocalFolder);
             Directory.CreateDirectory(UserDataFolder);
-            Directory.CreateDirectory(CacheFolder);
-            Directory.CreateDirectory(AudioCacheFolder);
-            Directory.CreateDirectory(ImageCacheFolder);
-            Directory.CreateDirectory(LyricCacheFolder);
+            Directory.CreateDirectory(RunLogFolder);
+            InitCacheFolder();
             Directory.CreateDirectory(UpdateFolder);
 
             if (!File.Exists(PlayListDataPath))
@@ -269,6 +296,17 @@ namespace TewiMP.DataEditor
             
             Directory.CreateDirectory(StartupFolder);
             App.logManager.Log("DataFolderBase", "初始化文件目录完成。");
+        }
+
+        public static void InitCacheFolder()
+        {
+            Directory.CreateDirectory(CacheFolder);
+            AudioCacheFolder = Path.Combine(CacheFolder, "Audio");
+            ImageCacheFolder = Path.Combine(CacheFolder, "Image");
+            LyricCacheFolder = Path.Combine(CacheFolder, "Lyric");
+            Directory.CreateDirectory(AudioCacheFolder);
+            Directory.CreateDirectory(ImageCacheFolder);
+            Directory.CreateDirectory(LyricCacheFolder);
         }
 
         /// <summary>

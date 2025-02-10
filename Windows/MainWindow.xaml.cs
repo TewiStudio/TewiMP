@@ -945,7 +945,11 @@ namespace TewiMP
 
         public static void Invoke(Action action)
         {
-            if (SWindowGridBase is not null) SWindowGridBase.DispatcherQueue.TryEnqueue(() => action());
+            if (SWindowGridBase is not null)
+            {
+                if (SWindowGridBase.DispatcherQueue is not null) SWindowGridBase.DispatcherQueue?.TryEnqueue(() => action());
+                else action();
+            }
             else action();
         }
 
