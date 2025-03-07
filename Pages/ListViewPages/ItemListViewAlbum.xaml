@@ -28,7 +28,7 @@
         <ListView x:Name="Children"
                   Background="Transparent"
                   ScrollViewer.CanContentRenderOutsideBounds="True"
-                  Padding="0,0,0,54"
+                  Padding="0,0,0,58"
                   ItemsSource="{x:Bind MusicDataList}"
                   SelectionMode="None">
             <ListView.ItemTemplate>

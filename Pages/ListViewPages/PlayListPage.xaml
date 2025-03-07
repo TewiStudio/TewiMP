@@ -17,7 +17,7 @@
         <ListView
             SelectionMode="None"
             x:Name="ItemsList"
-            Padding="0">
+            Padding="0,0,0,58">
             <ListView.Resources>
                 <Style TargetType="ListViewItem">
                     <Setter Property="Template">
@@ -301,7 +301,7 @@
             <ListView.Footer>
                 <Grid>
                     <TextBlock
-                        Text="到底了~"
+                        Text="到底了~" Visibility="Collapsed"
                         HorizontalAlignment="Center"
                         VerticalAlignment="Bottom"
                         Margin="4,4,4,50" x:Name="AtListBottomTb"

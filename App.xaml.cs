@@ -71,9 +71,9 @@ namespace TewiMP
         {
             Available = true,
             SuffixType = SuffixType.Preview,
-            Version = "0.4.9",
-            VersionF = 49.0f,
-            ReleaseTime = 1739195225L.ToDateTime(),
+            Version = "0.5.0",
+            VersionF = 50.0f,
+            ReleaseTime = 1741325331L.ToDateTime(),
             ExtendMessage = null
         };
         public static string AppVersion => Version.Version;

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using TewiMP.DataEditor;
+using TewiMP.Helpers;
 
 namespace TewiMP.Background
 {
@@ -36,15 +37,18 @@ namespace TewiMP.Background
             if (b) Log(name, content, logLevel);
         }
 
+        public static DateTime StartTime;
         private static FileStream NowLog;
         private static StreamWriter NowLogWriter;
         private static object locker = new();
         public static void InitNowLog()
         {
+            StartTime = DateTime.Now;
             NowLog = new FileStream(Path.Combine(DataFolderBase.RunLogFolder, DateTime.Now.ToFileTime().ToString()), FileMode.CreateNew, FileAccess.Write);
             NowLogWriter = new StreamWriter(NowLog);
-            WriteToLogStream($"{App.AppName} Started {DateTime.Now}");
-            WriteToLogStream($"Version: {App.Version}, built time: {App.Version.ReleaseTime}\n");
+            WriteToLogStream($"{App.AppName} launched on {StartTime}");
+            WriteToLogStream($"Version: {App.Version}, built time: {App.Version.ReleaseTime}");
+            WriteToLogStream($"System: {Environment.OSVersion}\n");
         }
 
         public static void WriteToLogStream(string text)
@@ -66,7 +70,7 @@ namespace TewiMP.Background
 
         public static void DisposeNowLogStream()
         {
-            WriteToLogStream($"\nTewiMP Stopped at {DateTime.Now}");
+            WriteToLogStream($"\nTewiMP stopped at {DateTime.Now}, running time: {DateTime.Now - StartTime}");
             NowLogWriter.Close();
             NowLogWriter?.Dispose();
             NowLog?.Close();

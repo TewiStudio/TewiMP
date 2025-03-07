@@ -174,7 +174,7 @@ namespace TewiMP.Windowed
 
         public async void SetTaskbarImage(string filePath)
         {
-            App.logManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail update to \"{filePath}\".");
+            App.logManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail updated to \"{filePath}\".");
             if (string.IsNullOrEmpty(filePath))
             {
                 filePath = Path.Combine(localPath, "icon.png");
