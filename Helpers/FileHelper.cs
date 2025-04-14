@@ -405,5 +405,15 @@ namespace TewiMP.Helpers
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(openPath);
             await Launcher.LaunchFolderAsync(folder);
         }
+
+        public static async Task<bool> OpenInOtherSoftware(Uri uri, LauncherOptions launcherOptions)
+        {
+            return await Launcher.LaunchUriAsync(uri, launcherOptions);
+        }
+
+        public static async Task<bool> OpenInOtherSoftware(string path, LauncherOptions launcherOptions)
+        {
+            return await OpenInOtherSoftware(new Uri(path), launcherOptions);
+        }
     }
 }

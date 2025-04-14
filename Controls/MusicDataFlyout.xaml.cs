@@ -146,20 +146,20 @@ namespace TewiMP.Controls
                     MainWindow.SetNavViewContent(typeof(SearchPage), songItemBind.MusicData.Title);
                     break;
                 case "search_websiteSearch":
-                    await Launcher.LaunchUriAsync(new Uri($"https://www.bing.com/search?q={songItemBind.MusicData.Title}-{songItemBind.MusicData.Album}"));
+                    await CodeHelper.OpenInBrowser($"https://www.bing.com/search?q={songItemBind.MusicData.Title}-{songItemBind.MusicData.Album}");
                     break;
                 case "search_website":
-                    Uri uri = null;
+                    string url = null;
                     switch (songItemBind.MusicData.From)
                     {
                         case MusicFrom.neteaseMusic:
-                            uri = new($"https://music.163.com/#/song?id={songItemBind.MusicData.ID}");
+                            url = $"https://music.163.com/#/song?id={songItemBind.MusicData.ID}";
                             break;
                     }
 
-                    if (uri != null)
+                    if (url != null)
                     {
-                        var success = await Launcher.LaunchUriAsync(uri);
+                        var success = await CodeHelper.OpenInBrowser(url);
                     }
                     break;
                 case "search_copy":
@@ -177,7 +177,7 @@ namespace TewiMP.Controls
                     await FileHelper.ExploreFile(songItemBind.MusicData.InLocal);
                     break;
                 case "openWithOtherSoftware":
-                    await Launcher.LaunchUriAsync(new Uri(songItemBind.MusicData.InLocal), new() { DisplayApplicationPicker = true });
+                    await FileHelper.OpenInOtherSoftware(new Uri(songItemBind.MusicData.InLocal), new() { DisplayApplicationPicker = true });
                     break;
                 case "cache":
                     if (await App.cacheManager.GetCachePath(songItemBind.MusicData) is not null)

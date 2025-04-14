@@ -7,6 +7,7 @@ using CommunityToolkit.WinUI.Controls;
 using Windows.System;
 using NAudio.Wave;
 using TewiMP.Media;
+using TewiMP.Helpers;
 
 namespace TewiMP.Pages
 {
@@ -110,33 +111,33 @@ namespace TewiMP.Pages
 
         private async void Hyperlink_Click(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
-            await Launcher.LaunchUriAsync(new Uri($"https://github.com/dotnet/sdk"));
+            await CodeHelper.OpenInBrowser(new Uri($"https://github.com/dotnet/sdk"));
         }
 
         private async void Hyperlink_Click_1(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
-            await Launcher.LaunchUriAsync(new Uri($"https://github.com/microsoft/WindowsAppSDK"));
+            await CodeHelper.OpenInBrowser(new Uri($"https://github.com/microsoft/WindowsAppSDK"));
         }
 
         private async void SettingsCard_Click(object sender, RoutedEventArgs e)
         {
 
-            await Launcher.LaunchUriAsync(new Uri((sender as SettingsCard).Tag as string));
+            await CodeHelper.OpenInBrowser(new Uri((sender as SettingsCard).Tag as string));
         }
 
         private async void Hyperlink_Click_2(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
-            await Launcher.LaunchUriAsync(new Uri($"https://www.pixiv.net/artworks/117179092"));
+            await CodeHelper.OpenInBrowser(new Uri($"https://www.pixiv.net/artworks/117179092"));
         }
         
         private async void Hyperlink_Click_3(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
-            await Launcher.LaunchUriAsync(new Uri($"https://github.com/zilongcn23/TewiMP-Release/issues"));
+            await CodeHelper.OpenInBrowser(new Uri($"https://github.com/zilongcn23/TewiMP-Release/issues"));
         }
 
         private async void Hyperlink_Click_4(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
         {
-            await Launcher.LaunchUriAsync(new Uri($"https://music.163.com/#/user/home?id=7916651285"));
+            await CodeHelper.OpenInBrowser(new Uri($"https://music.163.com/#/user/home?id=7916651285"));
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
@@ -175,12 +176,12 @@ namespace TewiMP.Pages
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
             var newestVersion = App.GetNewVersionByReleaseData(App.Version.SuffixType);
-            await Launcher.LaunchUriAsync(new Uri($"{newestVersion.Url}"));
+            await CodeHelper.OpenInBrowser(new Uri($"{newestVersion.Url}"));
         }
 
         private async void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            await Launcher.LaunchUriAsync(new Uri($"https://github.com/TewiStudio/TewiMP-Release/issues"));
+            await CodeHelper.OpenInBrowser(new Uri($"https://github.com/TewiStudio/TewiMP-Release/issues"));
         }
     }
 }

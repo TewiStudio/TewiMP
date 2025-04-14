@@ -144,7 +144,7 @@ namespace TewiMP.DataEditor
             { SettingParams.ThemeColorMode.ToString(), (int)ElementTheme.Default },
             { SettingParams.ThemeMusicPageColorMode.ToString(), (int)ElementTheme.Default },
             { SettingParams.ThemeAccentColor.ToString(), null },
-            { SettingParams.ThemeBackdropEffect.ToString(), (int)MainWindow.BackdropType.DesktopAcrylic },
+            { SettingParams.ThemeBackdropEffect.ToString(), (int)MainWindow.BackdropType.Mica },
             { SettingParams.ThemeBackdropImagePath.ToString(), null },
             { SettingParams.ThemeBackdropImageMassOpacity.ToString(), 0.5 },
             { 

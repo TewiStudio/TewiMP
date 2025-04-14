@@ -606,6 +606,7 @@ namespace TewiMP
 
         public static void UpdateWindowBackdropTheme()
         {
+            if (m_configurationSource is null) return;
             switch (SWindowGridBaseTop.RequestedTheme)
             {
                 case ElementTheme.Light:

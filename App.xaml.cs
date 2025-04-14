@@ -509,7 +509,7 @@ namespace TewiMP
                     NotifySeverity.Warning, TimeSpan.FromMilliseconds(10000),
                     "前往下载页面 ⨠", async () =>
                     {
-                        var success = await Launcher.LaunchUriAsync(new(newestVersion.Url));
+                        var success = await CodeHelper.OpenInBrowser(newestVersion.Url);
                     });
             }
         }

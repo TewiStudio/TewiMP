@@ -704,7 +704,7 @@ namespace TewiMP.Controls
                     MainWindow.SetNavViewContent(typeof(SearchPage), MusicData.Title);
                     break;
                 case "1":
-                    await Launcher.LaunchUriAsync(new Uri($"https://www.bing.com/search?q={MusicData.Title}-{MusicData.Album}"));
+                    await CodeHelper.OpenInBrowser(new Uri($"https://www.bing.com/search?q={MusicData.Title}-{MusicData.Album}"));
                     break;
                 case "2":
                     Uri uri = null;
@@ -717,7 +717,7 @@ namespace TewiMP.Controls
 
                     if (uri != null)
                     {
-                        var success = await Launcher.LaunchUriAsync(uri);
+                        var success = await CodeHelper.OpenInBrowser(uri);
                     }
                     break;
                 case "3":

@@ -15,6 +15,7 @@ using TewiMP.DataEditor;
 using NAudio.Wave;
 using Windows.System;
 using CommunityToolkit.WinUI;
+using TewiMP.Helpers;
 
 namespace TewiMP.Pages.MusicPages
 {
@@ -721,17 +722,17 @@ namespace TewiMP.Pages.MusicPages
 
         private async void OtherRunButton_Click(object sender, RoutedEventArgs e)
         {
-            Uri uri = null;
+            string url = null;
             switch (MusicData.From)
             {
                 case MusicFrom.neteaseMusic:
-                    uri = new($"https://music.163.com/#/song?id={MusicData.ID}");
+                    url = $"https://music.163.com/#/song?id={MusicData.ID}";
                     break;
             }
 
-            if (uri != null)
+            if (url != null)
             {
-                var success = await Launcher.LaunchUriAsync(uri);
+                var success = await CodeHelper.OpenInBrowser(url);
             }
         }
 

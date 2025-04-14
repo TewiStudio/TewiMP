@@ -732,6 +732,12 @@ namespace TewiMP.Pages
 
         private async void Button_Click_7(object sender, RoutedEventArgs e)
         {
+            var result = await MainWindow.ShowDialog(
+                "恢复默认设置",
+                "确定恢复默认设置吗？此操作会使你的设置数据全部恢复到程序初始设置，但不会影响歌单数据、历史记录等数据。",
+                "取消", "恢复",
+                defaultButton: ContentDialogButton.Primary);
+            if (result != ContentDialogResult.Primary) return;
             DataFolderBase.JSettingData = DataFolderBase.SettingDefault;
             App.LoadSettings(DataFolderBase.JSettingData);
             MainWindow.AddNotify("恢复成功", "已将设置恢复到默认。", NotifySeverity.Complete);
