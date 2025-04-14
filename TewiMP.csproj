@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<Title>TewiMP</Title>
-		<Version>0.4.9</Version>
+		<Version>0.0.1</Version>
 		<VersionPrefix>0.0.4.9</VersionPrefix>
 		<VersionSuffix>preview</VersionSuffix>
 		<Authors>Tewi Studio</Authors>
@@ -27,6 +27,8 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
+		<Copyright>© 2025 TewiStudio. All Rights Reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/TewiStudio/TewiMP</PackageProjectUrl>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
 	  <DebugType>portable</DebugType>

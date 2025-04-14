@@ -57,10 +57,10 @@ namespace TewiMP
             ReleaseTime = DateTime.MinValue,
             ExtendMessage = null
         };
-        public static VersionData AlphaVersion { get; } = new()
+        public static VersionData BetaVersion { get; } = new()
         {
             Available = false,
-            SuffixType = SuffixType.Alpha,
+            SuffixType = SuffixType.Beta,
             Version = "0",
             VersionF = 0f,
             ReleaseTime = DateTime.MinValue,
@@ -69,10 +69,10 @@ namespace TewiMP
         public static VersionData Version { get; set; } = new()
         {
             Available = true,
-            SuffixType = SuffixType.Preview,
-            Version = "0.5.0",
-            VersionF = 50.0f,
-            ReleaseTime = 1741325331L.ToDateTime(),
+            SuffixType = SuffixType.Beta,
+            Version = "0.0.1",
+            VersionF = 1f,
+            ReleaseTime = 1744627462L.ToDateTime(),
             ExtendMessage = null
         };
         public static string AppVersion => Version.Version;
@@ -474,7 +474,7 @@ namespace TewiMP
 
             var stable = json["stable"];
             var preview = json["preview"];
-            var alpha = json["alpha"];
+            var beta = json["beta"];
 
             StableVersion.Available =     (bool)  stable["available"];
             StableVersion.Version =       (string)stable["version"];
@@ -490,12 +490,12 @@ namespace TewiMP
             PreviewVersion.Url =           (string)preview["url"];
             PreviewVersion.ExtendMessage = (string)preview["extendMessage"];
             
-            AlphaVersion.Available =     (bool)  alpha["available"];
-            AlphaVersion.Version =       (string)alpha["version"];
-            AlphaVersion.VersionF =      (float) alpha["versionF"];
-            AlphaVersion.ReleaseTime =   ((long) alpha["releaseDate"]).ToDateTime();
-            AlphaVersion.Url =           (string)alpha["url"];
-            AlphaVersion.ExtendMessage = (string)alpha["extendMessage"];
+            BetaVersion.Available =     (bool)  beta["available"];
+            BetaVersion.Version =       (string)beta["version"];
+            BetaVersion.VersionF =      (float) beta["versionF"];
+            BetaVersion.ReleaseTime =   ((long) beta["releaseDate"]).ToDateTime();
+            BetaVersion.Url =           (string)beta["url"];
+            BetaVersion.ExtendMessage = (string)beta["extendMessage"];
 
             if (AppVersionIsNewest()) return;
             var newestVersion = GetNewVersionByReleaseData(Version.SuffixType);
@@ -523,7 +523,7 @@ namespace TewiMP
         {
             SuffixType.Stable => StableVersion,
             SuffixType.Preview => PreviewVersion,
-            SuffixType.Alpha => AlphaVersion,
+            SuffixType.Beta => BetaVersion,
             _ => Version
         };
 
@@ -571,7 +571,7 @@ namespace TewiMP
         };
     }
 
-    public enum SuffixType { Stable, Preview, Alpha }
+    public enum SuffixType { Stable, Preview, Beta }
 
     public class VersionData
     {
