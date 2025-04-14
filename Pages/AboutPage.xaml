@@ -52,7 +52,7 @@
                                 Powered by <Hyperlink Click="Hyperlink_Click">.NET 8</Hyperlink> &#x0026; <Hyperlink Click="Hyperlink_Click_1">Windows App SDK 1.6</Hyperlink>
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">
-                                © 2020-2025 TewiStudio. All Rights Reserved.
+                                © 2025 TewiStudio. All Rights Reserved.
                             </TextBlock>
                         </StackPanel>
                     </Grid>
@@ -220,6 +220,7 @@
                     </TextBlock.Transitions>
                     图标中的图片来自 <Hyperlink Click="Hyperlink_Click_2">なま</Hyperlink>
                     <LineBreak/>编码：<Hyperlink Click="Hyperlink_Click_4">zilong</Hyperlink>
+                    <LineBreak/>源代码：<Hyperlink Click="Hyperlink_Click_5">github</Hyperlink>
                 </TextBlock>
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <StackPanel.Transitions>
@@ -227,12 +228,12 @@
                             <RepositionThemeTransition/>
                         </TransitionCollection>
                     </StackPanel.Transitions>
-                    <Button Background="Pink">
+                    <Button Background="Pink" Click="Button_Click_4">
                         <Button.Resources>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="LightPink"/>
                             <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="PaleVioletRed"/>
                         </Button.Resources>
-                        <Button.Flyout>
+                        <!--<Button.Flyout>
                             <Flyout>
                                 <StackPanel
                                     Orientation="Horizontal"
@@ -256,7 +257,7 @@
                                     </Button>
                                 </StackPanel>
                             </Flyout>
-                        </Button.Flyout>
+                        </Button.Flyout>-->
                         <StackPanel
                             Orientation="Horizontal"
                             Spacing="4"
