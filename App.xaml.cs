@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -16,8 +17,6 @@ using TewiMP.DataEditor;
 using TewiMP.Windowed;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
-using System.IO;
-using TewiMP.Helpers.MetingService;
 
 namespace TewiMP
 {
@@ -381,7 +380,7 @@ namespace TewiMP
                 DataFolderBase.JSettingData = DataFolderBase.SettingDefault;
                 LoadSettings(DataFolderBase.JSettingData);
             }
-            logManager.Log("App", "读取设置完成！");
+            logManager.Log("App", "读取设置完成。");
         }
 
         public static Windows.UI.Color AccentColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
@@ -456,7 +455,7 @@ namespace TewiMP
             string b = string.Join(",", c.ToArray());
             SettingEditHelper.EditSetting(a, DataFolderBase.SettingParams.EqualizerCustomData, b);
             DataFolderBase.JSettingData = a;
-            logManager.Log("App", "设置配置已存储！");
+            logManager.Log("App", "设置配置已存储。");
         }
 
         public static bool LoadLastExitPlayingSongAndSongList = true;
@@ -470,6 +469,7 @@ namespace TewiMP
         {
             var data = await WebHelper.GetStringAsync("https://data.tewi.top/datas/TewiMP/update.json");
             if (string.IsNullOrEmpty(data)) return;
+            logManager.Log("App", $"Update datas: {data}");
             var json = JObject.Parse(data);
 
             var stable = json["stable"];

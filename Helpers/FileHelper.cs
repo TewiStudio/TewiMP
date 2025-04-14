@@ -17,7 +17,7 @@ namespace TewiMP.Helpers
     public static class FileHelper
     {
         /// <summary>
-        /// 查询或获取音频缓存文件路径
+        /// 查询或获取音频缓存文件路径。
         /// </summary>
         /// <param name="musicData"></param>
         /// <returns>
@@ -43,7 +43,7 @@ namespace TewiMP.Helpers
         }
         
         /// <summary>
-        /// 查询或获取图片缓存文件路径
+        /// 查询或获取图片缓存文件路径。
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns>
@@ -68,7 +68,7 @@ namespace TewiMP.Helpers
         }
         
         /// <summary>
-        /// 查询或获取图片缓存文件路径
+        /// 查询或获取图片缓存文件路径。
         /// </summary>
         /// <param name="musicData"></param>
         /// <returns>
@@ -84,7 +84,7 @@ namespace TewiMP.Helpers
         }
         
         /// <summary>
-        /// 查询或获取图片缓存文件路径
+        /// 查询或获取图片缓存文件路径。
         /// </summary>
         /// <param name="musicListData"></param>
         /// <returns>
@@ -101,7 +101,7 @@ namespace TewiMP.Helpers
         }
         
         /// <summary>
-        /// 查询或获取歌词缓存文件路径
+        /// 查询或获取歌词缓存文件路径。
         /// </summary>
         /// <param name="musicData"></param>
         /// <returns>
@@ -225,6 +225,15 @@ namespace TewiMP.Helpers
             return folder;
         }
 
+        /// <summary>
+        /// 打开 文件资源管理器保存文件窗口。
+        /// </summary>
+        /// <param name="suggestedFileName">建议文件名。</param>
+        /// <param name="suggestedStartLocation">建议开始路径。</param>
+        /// <param name="fileTypeFilter">文件后缀过滤器。</param>
+        /// <param name="fileTypeFilterKey">文件类型关键字。</param>
+        /// <param name="windowHandle">调用窗口的句柄。默认为主窗口。</param>
+        /// <returns></returns>
         public static async Task<StorageFile> UserSaveFile(
             string suggestedFileName = "SaveFile",
             PickerLocationId suggestedStartLocation = default,
@@ -242,24 +251,18 @@ namespace TewiMP.Helpers
             return sFile;
         }
 
-        public static async Task OpenFilePath(string openPath)
-        {
-            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(openPath);
-            await Launcher.LaunchFolderAsync(folder);
-        }
-
         public static async Task<string> FileTypeGetAsync(string name)
         {
-            return await Task.Run(async () =>
+            return await Task.Run(() =>
             {
-                FileStream fs = new FileStream(@name, FileMode.Open, FileAccess.Read);
-                byte[] imagebytes = new byte[fs.Length];
+                FileStream fs = new(@name, FileMode.Open, FileAccess.Read);
+                byte[] imageBytes = new byte[fs.Length];
                 BinaryReader br = new BinaryReader(fs);
-                imagebytes = br.ReadBytes(2);
+                imageBytes = br.ReadBytes(2);
                 string ss = "";
-                for (int i = 0; i < imagebytes.Length; i++)
+                for (int i = 0; i < imageBytes.Length; i++)
                 {
-                    ss += imagebytes[i];
+                    ss += imageBytes[i];
                 }
                 fs.Close();
                 fs.Dispose();
@@ -276,13 +279,13 @@ namespace TewiMP.Helpers
 
         public static string FileTypeGet(FileStream fs)
         {
-            byte[] imagebytes = new byte[fs.Length];
-            BinaryReader br = new BinaryReader(fs);
-            imagebytes = br.ReadBytes(2);
+            byte[] imageBytes = new byte[fs.Length];
+            BinaryReader br = new(fs);
+            imageBytes = br.ReadBytes(2);
             string ss = "";
-            for (int i = 0; i < imagebytes.Length; i++)
+            for (int i = 0; i < imageBytes.Length; i++)
             {
-                ss += imagebytes[i];
+                ss += imageBytes[i];
             }
             return ss;
         }
@@ -322,19 +325,19 @@ namespace TewiMP.Helpers
             }
             if (charByteCounter > 1)
             {
-                throw new Exception("非预期的byte格式");
+                throw new Exception("非预期的 byte 格式");
             }
             return true;
         }
 
-        public static Encoding GetEncodeingType(FileStream fs)
+        public static Encoding GetEncodingType(FileStream fs)
         {
-            byte[] Unicode = new byte[] { 0xFF, 0xFE, 0x41 };
-            byte[] UnicodeBIG = new byte[] { 0xFE, 0xFF, 0x00 };
-            byte[] UTF8 = new byte[] { 0xEF, 0xBB, 0xBF }; //带BOM 
+            byte[] Unicode = [0xFF, 0xFE, 0x41];
+            byte[] UnicodeBIG = [0xFE, 0xFF, 0x00];
+            byte[] UTF8 = [0xEF, 0xBB, 0xBF]; //带BOM 
             Encoding reVal = Encoding.Default;
 
-            BinaryReader r = new BinaryReader(fs, System.Text.Encoding.Default);
+            BinaryReader r = new(fs, System.Text.Encoding.Default);
             int i;
             int.TryParse(fs.Length.ToString(), out i);
             byte[] ss = r.ReadBytes(i);
@@ -354,14 +357,20 @@ namespace TewiMP.Helpers
             return reVal;
         }
 
-        public static Encoding GetEncodeingType(string FILE_NAME)
+        public static Encoding GetEncodingType(string FILE_NAME)
         {
-            FileStream fs = new FileStream(FILE_NAME, FileMode.Open, FileAccess.Read);
-            Encoding r = GetEncodeingType(fs);
+            FileStream fs = new(FILE_NAME, FileMode.Open, FileAccess.Read);
+            Encoding r = GetEncodingType(fs);
             fs.Close();
             return r;
         }
 
+        /// <summary>
+        /// 创建快捷方式。
+        /// </summary>
+        /// <param name="lnkFilePath">创建快捷方式的路径。</param>
+        /// <param name="filePath">目标文件路径。</param>
+        /// <param name="args">快捷方式参数。</param>
         public static void CreateShortcut(string lnkFilePath, string filePath, string args = null)
         {
             var shellType = Type.GetTypeFromProgID("WScript.Shell");
@@ -373,5 +382,28 @@ namespace TewiMP.Helpers
             shortcut.Save();
         }
 
+        /// <summary>
+        /// 使用文件资源管理器浏览文件。
+        /// </summary>
+        /// <param name="filePath">文件路径。</param>
+        /// <returns></returns>
+        public static async Task ExploreFile(string filePath)
+        {
+
+            var selectFile = new FolderLauncherOptions();
+            selectFile.ItemsToSelect.Add(await StorageFile.GetFileFromPathAsync(filePath));
+            await Launcher.LaunchFolderPathAsync(new FileInfo(filePath).DirectoryName, selectFile);
+        }
+
+        /// <summary>
+        /// 使用文件资源管理器浏览文件夹。
+        /// </summary>
+        /// <param name="openPath"></param>
+        /// <returns></returns>
+        public static async Task ExploreFolder(string openPath)
+        {
+            StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(openPath);
+            await Launcher.LaunchFolderAsync(folder);
+        }
     }
 }

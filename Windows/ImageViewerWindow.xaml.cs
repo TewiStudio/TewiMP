@@ -95,7 +95,7 @@ namespace TewiMP.Windowed
 
             if (ImageControl.Source.GetType() == typeof(WriteableBitmap))
             {
-                f = await FileHelper.UserSaveFile(SaveName is null ? "一张图片" : SaveName, Windows.Storage.Pickers.PickerLocationId.PicturesLibrary, new[] { ".png" }, "图片",
+                f = await FileHelper.UserSaveFile(SaveName is null ? "一张图片" : SaveName, Windows.Storage.Pickers.PickerLocationId.PicturesLibrary, [".png"], "图片",
                     windowHandle: WindowNative.GetWindowHandle(this)
                     );
             }

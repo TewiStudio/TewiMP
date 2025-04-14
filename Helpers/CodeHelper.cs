@@ -22,6 +22,8 @@ using Windows.Graphics.Imaging;
 using Windows.UI.ViewManagement;
 using TewiMP.DataEditor;
 using WinRT.Interop;
+using Windows.System;
+using Windows.Storage;
 
 namespace TewiMP.Helpers
 {
@@ -493,8 +495,8 @@ namespace TewiMP.Helpers
         {
             using MD5 md5 = MD5.Create();
             byte[] bytes = Encoding.Default.GetBytes(strs);//将要加密的字符串转换为字节数组
-            byte[] encryptdata = md5.ComputeHash(bytes);//将字符串加密后也转换为字符数组
-            return Convert.ToBase64String(encryptdata);//将加密后的字节数组转换为加密字符串
+            byte[] encryptData = md5.ComputeHash(bytes);//将字符串加密后也转换为字符数组
+            return Convert.ToBase64String(encryptData);//将加密后的字节数组转换为加密字符串
         }
 
         public static bool IsAccentColorDark()

@@ -8,6 +8,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Controls;
+using TewiMP.Helpers;
+using TewiMP.Background;
 
 namespace TewiMP.Windowed
 {
@@ -76,6 +78,11 @@ namespace TewiMP.Windowed
             canScrollAuto = false;
             await Task.Delay(300);
             canScrollAuto = true;
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            await FileHelper.ExploreFile(LogManager.NowLogFilePath);
         }
     }
 }

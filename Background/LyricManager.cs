@@ -163,7 +163,7 @@ namespace TewiMP.Background
 
             App.logManager.Log("LyricManager", $"读取歌词文件：\"{lyricPath}\"");
             string f = null;
-            var lrcEncode = FileHelper.GetEncodeingType(lyricPath);
+            var lrcEncode = FileHelper.GetEncodingType(lyricPath);
             if (lrcEncode == Encoding.Default)
             {
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);

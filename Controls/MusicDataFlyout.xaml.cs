@@ -174,9 +174,7 @@ namespace TewiMP.Controls
                     await MainWindow.ShowDialog("获取到的链接是：", link);
                     break;
                 case "exploreLocalFile":
-                    var seletFile = new FolderLauncherOptions();
-                    seletFile.ItemsToSelect.Add(await StorageFile.GetFileFromPathAsync(songItemBind.MusicData.InLocal));
-                    await Launcher.LaunchFolderPathAsync(new FileInfo(songItemBind.MusicData.InLocal).DirectoryName, seletFile);
+                    await FileHelper.ExploreFile(songItemBind.MusicData.InLocal);
                     break;
                 case "openWithOtherSoftware":
                     await Launcher.LaunchUriAsync(new Uri(songItemBind.MusicData.InLocal), new() { DisplayApplicationPicker = true });

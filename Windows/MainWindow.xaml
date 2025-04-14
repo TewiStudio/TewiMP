@@ -642,7 +642,9 @@
                             <StackPanel Orientation="Horizontal"
                                         Margin="8,0,10,0">
                                 <TextBlock Text="{Binding ElementName=VolumeSlider,Path=Value}"
-                                           VerticalAlignment="Center"/>
+                                           TextAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           MinWidth="24"/>
                                 <Slider x:Name="VolumeSlider"
                                         Orientation="Horizontal"
                                         AccessKey="V"

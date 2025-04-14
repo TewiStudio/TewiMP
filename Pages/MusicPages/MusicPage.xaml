@@ -389,5 +389,10 @@
                 </AnimatedIcon.Source>
             </AnimatedIcon>
         </Button>
+        <TextBlock
+            x:Name="Debug_NowPlayingDurationText"
+            IsHitTestVisible="False"
+            HorizontalAlignment="Center"
+            Margin="8"/>
     </Grid>
 </Page>

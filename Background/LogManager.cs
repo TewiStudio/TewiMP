@@ -37,6 +37,7 @@ namespace TewiMP.Background
             if (b) Log(name, content, logLevel);
         }
 
+        public static string NowLogFilePath { get; private set; }
         public static DateTime StartTime;
         private static FileStream NowLog;
         private static StreamWriter NowLogWriter;
@@ -44,7 +45,8 @@ namespace TewiMP.Background
         public static void InitNowLog()
         {
             StartTime = DateTime.Now;
-            NowLog = new FileStream(Path.Combine(DataFolderBase.RunLogFolder, DateTime.Now.ToFileTime().ToString()), FileMode.CreateNew, FileAccess.Write);
+            NowLogFilePath = Path.Combine(DataFolderBase.RunLogFolder, DateTime.Now.ToFileTime().ToString());
+            NowLog = new FileStream(NowLogFilePath, FileMode.CreateNew, FileAccess.Write);
             NowLogWriter = new StreamWriter(NowLog);
             WriteToLogStream($"{App.AppName} launched on {StartTime}");
             WriteToLogStream($"Version: {App.Version}, built time: {App.Version.ReleaseTime}");

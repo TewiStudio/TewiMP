@@ -232,7 +232,7 @@ namespace TewiMP.Pages
                     break;
             }
 
-            await FileHelper.OpenFilePath(folderPath);
+            await FileHelper.ExploreFolder(folderPath);
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)

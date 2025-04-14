@@ -79,7 +79,7 @@ namespace TewiMP.Media
         /// <summary>
         /// 获取可以播放的音频输出设备列表
         /// </summary>
-        /// <returns>OutDevice集合</returns>
+        /// <returns><see cref="List{OutDevice}"/>OutDevice集合</returns>
         public static async Task<List<OutDevice>> GetOutDevicesAsync()
         {
             List<OutDevice> outDevices = new List<OutDevice>();
@@ -201,31 +201,31 @@ namespace TewiMP.Media
             defaultDeviceChangedCounter--;
             if (defaultDeviceChangedCounter != 0) return;
 
-            App.logManager.Log("DeviceManage", $"系统默认设备已变更为：\"{defaultDeviceId}\"");
+            App.logManager.Log("DeviceManager", $"系统默认设备已变更为：\"{defaultDeviceId}\"");
             OnDefaultDeviceChangedEvent?.Invoke(dataFlow, deviceRole, defaultDeviceId);
         }
 
         public void OnDeviceAdded(string deviceId)
         {
-            App.logManager.Log("DeviceManage", $"新增设备：\"{deviceId}\"");
+            App.logManager.Log("DeviceManager", $"新增设备：\"{deviceId}\"");
             OnDeviceAddedEvent?.Invoke(deviceId);
         }
 
         public void OnDeviceRemoved(string deviceId)
         {
-            App.logManager.Log("DeviceManage", $"已移除设备：\"{deviceId}\"");
+            App.logManager.Log("DeviceManager", $"已移除设备：\"{deviceId}\"");
             OnDeviceRemovedEvent?.Invoke(deviceId);
         }
 
         public void OnDeviceStateChanged(string deviceId, DeviceState newState)
         {
-            App.logManager.Log("DeviceManage", $"设备状态已更新。deviceId:{deviceId} / newState:{newState}");
+            App.logManager.Log("DeviceManager", $"设备状态已更新。deviceId:{deviceId} / newState:{newState}");
             OnDeviceStateChangedEvent?.Invoke(deviceId, newState);
         }
 
         public void OnPropertyValueChanged(string deviceId, PropertyKey propertyKey)
         {
-            App.logManager.Log("DeviceManage", $"设备属性已更新。deviceId: {deviceId} / propertyKey:{propertyKey.formatId.ToString()}");
+            App.logManager.Log("DeviceManager", $"设备属性已更新。deviceId: {deviceId} / propertyKey:{propertyKey.formatId.ToString()}");
             OnPropertyValueChangedEvent?.Invoke(deviceId, propertyKey);
         }
 
@@ -543,7 +543,7 @@ namespace TewiMP.Media
         public AudioPlayer()
         {
             timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(250) };
-            timer.Tick += (_, __) => { ReCallTiming(); };
+            timer.Tick += (_, __) => ReCallTiming();
 
             App.cacheManager.AddingCacheMusicData += CacheManager_AddingCacheMusicData;
             App.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
@@ -629,7 +629,7 @@ namespace TewiMP.Media
 
         private void NotificationClient_OnDeviceRemovedEvent(string deviceId)
         {
-            App.logManager.Log("DeviceManage", "Device Removed.");
+            App.logManager.Log("DeviceManager", "Device Removed.");
         }
 
         bool isInSetSource = false;

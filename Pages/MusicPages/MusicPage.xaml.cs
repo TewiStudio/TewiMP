@@ -462,18 +462,20 @@ namespace TewiMP.Pages.MusicPages
 
         private void AudioPlayer_TimingChanged(Media.AudioPlayer audioPlayer)
         {
-            if (audioPlayer.FileReader != null)
-            {
-                isCodeChangedSliderValue = true;
-                PlaySlider.Minimum = 0;
-                PlaySlider.Maximum = audioPlayer.TotalTime.Ticks;
-                PlaySlider.Value = audioPlayer.CurrentTime.Ticks;
-                isCodeChangedSliderValue = false;
-                NowPlayTimeTb.Text =
-                    $"{audioPlayer.CurrentTime:mm\\:ss}/{audioPlayer.TotalTime.ToString(@"mm\:ss")}";
-                NowAtherTimeTb.Text =
-                    (audioPlayer.TotalTime - audioPlayer.CurrentTime).ToString(@"mm\:ss");
-            }
+            if (audioPlayer.FileReader is null) return;
+#if DEBUG
+            Debug_NowPlayingDurationText.Text = audioPlayer.CurrentTime.ToString();
+#endif
+
+            isCodeChangedSliderValue = true;
+            PlaySlider.Minimum = 0;
+            PlaySlider.Maximum = audioPlayer.TotalTime.Ticks;
+            PlaySlider.Value = audioPlayer.CurrentTime.Ticks;
+            isCodeChangedSliderValue = false;
+            NowPlayTimeTb.Text =
+                $"{audioPlayer.CurrentTime:mm\\:ss}/{audioPlayer.TotalTime.ToString(@"mm\:ss")}";
+            NowAtherTimeTb.Text =
+                (audioPlayer.TotalTime - audioPlayer.CurrentTime).ToString(@"mm\:ss");
         }
 
         private void AudioPlayer_PlayEnd(Media.AudioPlayer audioPlayer)
