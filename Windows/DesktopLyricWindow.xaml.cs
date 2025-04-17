@@ -252,7 +252,6 @@ namespace TewiMP.Windowed
             T21.Text = null;
             LyricRomajiPopup_tb.Text = null;
 
-            // nice coding
             if (nowLyricsData is null)
             {
                 if (App.audioPlayer.MusicData != null)
@@ -308,6 +307,7 @@ namespace TewiMP.Windowed
                 animationTextVisual(2);
                 return;
             }
+
             if (nowLyricsData.Lyric.First() == LyricHelper.NoneLyricString)
             {
                 if (App.lyricManager.NowPlayingLyrics.Any())
@@ -319,17 +319,19 @@ namespace TewiMP.Windowed
                 return;
             }
 
-            if (nowLyricsData?.Lyric.Count > 1)
+            var doubleLyricLineMode = LyricTranslateTextBehavior == LyricTranslateTextBehavior.MainLyric || LyricTranslateTextBehavior == LyricTranslateTextBehavior.TranslateLyric;
+
+            if (nowLyricsData?.Lyric.Count > 1 && doubleLyricLineMode)
             {
                 IsT1Focus = true;
 
-                int tcount = 1;
+                int tCount = 1;
                 int num = App.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
                 try
                 {
-                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num + tcount]?.Lyric?.FirstOrDefault())
+                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num + tCount]?.Lyric?.FirstOrDefault())
                     {
-                        tcount++;
+                        tCount++;
                     }
                 }
                 catch { }
@@ -369,32 +371,32 @@ namespace TewiMP.Windowed
                 }
                 if (LyricTranslateTextBehavior == LyricTranslateTextBehavior.MainLyric)
                 {
-                    if (tcount == 1) T11.Text = null;
-                    else T11.Text = $"x{tcount}";
+                    if (tCount == 1) T11.Text = null;
+                    else T11.Text = $"x{tCount}";
 
                     T1.Text = t1text;
                     T2.Text = nowLyricsData?.Lyric[1];
                 }
                 else if (LyricTranslateTextBehavior == LyricTranslateTextBehavior.TranslateLyric)
                 {
-                    if (tcount == 1) T21.Text = null;
-                    else T21.Text = $"x{tcount}";
+                    if (tCount == 1) T21.Text = null;
+                    else T21.Text = $"x{tCount}";
 
                     T1.Text = nowLyricsData?.Lyric[1];
                     T2.Text = t1text;
                 }
                 else if (LyricTranslateTextBehavior == LyricTranslateTextBehavior.OnlyMainLyric)
                 {
-                    if (tcount == 1) T11.Text = null;
-                    else T11.Text = $"x{tcount}";
+                    if (tCount == 1) T11.Text = null;
+                    else T11.Text = $"x{tCount}";
 
                     T1.Text = t1text;
                     T2.Text = null;
                 }
                 else
                 {
-                    if (tcount == 1) T11.Text = null;
-                    else T11.Text = $"x{tcount}";
+                    if (tCount == 1) T11.Text = null;
+                    else T11.Text = $"x{tCount}";
 
                     T1.Text = nowLyricsData?.Lyric[1];
                     T2.Text = null;
@@ -464,18 +466,20 @@ namespace TewiMP.Windowed
                 }
                 catch { }
 
-                int tcount = 1;
+                int tCount = 1;
                 int num1 = App.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
                 try
                 {
-                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num1 + tcount]?.Lyric?.FirstOrDefault())
+                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num1 + tCount]?.Lyric?.FirstOrDefault())
                     {
-                        tcount++;
+                        tCount++;
                     }
                 }
                 catch { }
-                string t1text = nowLyricsData?.Lyric?.FirstOrDefault();
-                string t2text = nextData?.Lyric?.FirstOrDefault();
+
+                bool onlyTranslation = nowLyricsData?.Lyric.Count > 1 && LyricTranslateTextBehavior == LyricTranslateTextBehavior.OnlyTranslate;
+                string t1text = onlyTranslation ? nowLyricsData?.Lyric[1] : nowLyricsData?.Lyric?.FirstOrDefault();
+                string t2text = onlyTranslation ? nextData?.Lyric[1] : nextData?.Lyric?.FirstOrDefault();
 
                 if (LyricTextBehavior == LyricTextBehavior.Exchange)
                 {
