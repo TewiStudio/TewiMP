@@ -42,6 +42,11 @@ namespace TewiMP.DataEditor
         public static string SettingDataPath { get; } = Path.Combine(UserDataFolder, "Setting");
 
         /// <summary>
+        /// 参数均衡器设置数据文件路径
+        /// </summary>
+        public static string AudioEffectDataPath { get; } = Path.Combine(UserDataFolder, "AudioEffect");
+
+        /// <summary>
         /// 历史记录数据文件路径
         /// </summary>
         public static string HistoryDataPath { get; } = Path.Combine(UserDataFolder, "History");
@@ -120,7 +125,7 @@ namespace TewiMP.DataEditor
         /// <summary>
         /// 默认设置数据
         /// </summary>
-        public static JObject SettingDefault = new JObject()
+        public static JObject SettingDefault = new()
         {
             { SettingParams.Volume.ToString(), 50f },
             { SettingParams.CacheFolderPath.ToString(), null},
@@ -181,10 +186,25 @@ namespace TewiMP.DataEditor
         /// <summary>
         /// 默认历史记录数据
         /// </summary>
-        public static JObject HistoryDefault = new JObject()
+        public static JObject HistoryDefault = new()
         {
             { "Songs", new JObject() },
             { "Search", new JObject() }
+        };
+
+        public static JObject AudioEffectDefault = new()
+        {
+            { AudioEffectFlag.GraphicEqEnable.ToString(), false },
+            { AudioEffectFlag.ParametricEqEnable.ToString(), false },
+            { AudioEffectFlag.PassFilterEqEnable.ToString(), false },
+            { AudioEffectFlag.EffectEnable.ToString(), false },
+            { AudioEffectFlag.WasapiOnlyEnable.ToString(), false },
+            { AudioEffectFlag.Latency.ToString(), 200 },
+            { AudioEffectFlag.AudioEffectDatas.ToString(), new JArray() { 1.0, 1.0, 1.0 } },
+            { AudioEffectFlag.GraphicEqString.ToString(), nameof(Media.AudioEqualizerBands.CustomBands) },
+            { AudioEffectFlag.GraphicEqDatas.ToString(), "0,0,0,0,0,0,0,0,0,0" },
+            { AudioEffectFlag.ParametricEqDatas.ToString(), new JArray() },
+            { AudioEffectFlag.PassFilterEqDatas.ToString(), new JArray() },
         };
 
         public enum DownloadNamedMethod
@@ -244,6 +264,21 @@ namespace TewiMP.DataEditor
             StartupWithWindows
         }
 
+        public enum AudioEffectFlag
+        {
+            GraphicEqEnable,
+            ParametricEqEnable,
+            PassFilterEqEnable,
+            EffectEnable,
+            WasapiOnlyEnable,
+            Latency,
+            AudioEffectDatas,
+            GraphicEqString,
+            GraphicEqDatas,
+            ParametricEqDatas, 
+            PassFilterEqDatas,
+        }
+
         public enum LocalMusicDataType { LocalMusicFolderPath, AnalyzedDatas }
 
         /// <summary>
@@ -281,6 +316,12 @@ namespace TewiMP.DataEditor
             {
                 File.Create(SettingDataPath).Close();
                 File.WriteAllText(SettingDataPath, SettingDefault.ToString());
+            }
+            
+            if (!File.Exists(AudioEffectDataPath))
+            {
+                File.Create(AudioEffectDataPath).Close();
+                File.WriteAllText(AudioEffectDataPath, AudioEffectDefault.ToString());
             }
             
             if (!File.Exists(HistoryDataPath))
@@ -321,6 +362,21 @@ namespace TewiMP.DataEditor
             set
             {
                 File.WriteAllText(SettingDataPath, value.ToString());
+            }
+        }
+
+        /// <summary>
+        /// <list type="table">
+        ///     <item>音效数据文件的实例。</item>
+        ///     <item>使用时会读取设置文件，设置时会写入数据文件</item>
+        /// </list>
+        /// </summary>
+        public static JObject JAudioEffectData
+        {
+            get => JObject.Parse(File.ReadAllText(AudioEffectDataPath));
+            set
+            {
+                File.WriteAllText(AudioEffectDataPath, value.ToString());
             }
         }
     }

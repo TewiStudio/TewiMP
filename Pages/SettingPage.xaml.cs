@@ -739,7 +739,7 @@ namespace TewiMP.Pages
                 defaultButton: ContentDialogButton.Primary);
             if (result != ContentDialogResult.Primary) return;
             DataFolderBase.JSettingData = DataFolderBase.SettingDefault;
-            App.LoadSettings(DataFolderBase.JSettingData);
+            App.LoadSettings();
             MainWindow.AddNotify("恢复成功", "已将设置恢复到默认。", NotifySeverity.Complete);
             MainWindow.SetNavViewContent(typeof(SearchPage));
         }
@@ -870,7 +870,7 @@ namespace TewiMP.Pages
 
         private async void Button_Click_10(object sender, RoutedEventArgs e)
         {
-            App.LoadSettings(DataEditor.DataFolderBase.JSettingData);
+            App.LoadSettings();
             MainWindow.AddNotify("读取设置成功", "已从设置文件中读取设置。", NotifySeverity.Complete);
             MainWindow.SetNavViewContent(typeof(SearchPage));
         }
@@ -891,7 +891,7 @@ namespace TewiMP.Pages
             MainWindow.SetNavViewContent(typeof(SettingHotKeyPage));
         }
 
-        private async void SettingsCard_Click(object sender, RoutedEventArgs e)
+        private void SettingsCard_Click(object sender, RoutedEventArgs e)
         {
             //await MainWindow.ShowEqualizerDialog();
             MainWindow.SetNavViewContent(typeof(SettingEqPage));

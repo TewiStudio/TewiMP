@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+    xmlns:community="using:CommunityToolkit.WinUI.Controls"
     mc:Ignorable="d" Loaded="Page_Loaded">
     <Page.Resources>
         <local:ThumbToolTipValueConverter x:Key="thumbToolTipValueC"/>
@@ -171,6 +172,11 @@
                                   Fill="{ThemeResource ButtonForegroundThemeBrush}"
                                   Width="14"/>
                         </Button>
+                    </StackPanel>
+                    <StackPanel Background="Transparent"
+                                ToolTipService.ToolTip="">
+                        <TextBlock Text="更多设置" Margin="{StaticResource HubSectionHeaderThemeMargin}"/>
+                        <Button Click="Button_Click" Content="前往音效界面"/>
                     </StackPanel>
                 </GridView>
             </StackPanel>

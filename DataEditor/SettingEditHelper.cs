@@ -6,7 +6,7 @@ namespace TewiMP.DataEditor
 {
     public static class SettingEditHelper
     {
-        public static void EditSetting(JObject eData, DataFolderBase.SettingParams settingParams, object data)
+        public static void EditSetting(JObject eData, Enum settingParams, object data)
         {
             if (data is null)
             {
@@ -26,7 +26,7 @@ namespace TewiMP.DataEditor
             });
         }
 
-        public static T GetSetting<T>(JObject eData, DataFolderBase.SettingParams settingParams)
+        public static T GetSetting<T>(JObject eData, Enum settingParams)
         {
             try
             {

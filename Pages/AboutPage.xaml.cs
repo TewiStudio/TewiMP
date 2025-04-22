@@ -186,7 +186,7 @@ namespace TewiMP.Pages
 
         private async void Button_Click_3(object sender, RoutedEventArgs e)
         {
-            await CodeHelper.OpenInBrowser("https://github.com/TewiStudio/TewiMP-Release/issues");
+            await CodeHelper.OpenInBrowser("https://github.com/TewiStudio/TewiMP/issues");
         }
 
         private async void Button_Click_4(object sender, RoutedEventArgs e)

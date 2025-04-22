@@ -238,8 +238,8 @@
                 <FontIcon Glyph="&#xE768;"/>
             </cc:SettingsExpander.HeaderIcon>
             <cc:SettingsExpander.Items>
-                <cc:SettingsCard Header="均衡器"
-                                 Description="调整混音设置"
+                <cc:SettingsCard Header="音效"
+                                 Description="调整音效设置"
                                  IsClickEnabled="True"
                                  Click="SettingsCard_Click">
                     <cc:SettingsCard.HeaderIcon>

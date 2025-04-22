@@ -11,7 +11,10 @@
     Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
     BorderThickness="1"
-    Holding="Grid_Holding" RightTapped="Grid_RightTapped">
+    PointerEntered="Grid_PointerEntered" PointerExited="Grid_PointerExited"
+    Holding="Grid_Holding" RightTapped="Grid_RightTapped"
+    Loaded="EQCard_Loaded" Unloaded="EQCard_Unloaded"
+    DataContextChanged="SongHistoryCard_DataContextChanged">
 
     <Grid.Resources>
         <SolidColorBrush x:Key="ButtonDisabledBackgroundThemeBrush" Color="Transparent"/>
@@ -30,6 +33,7 @@
                     <TextBlock Text="颜色:" Margin="{StaticResource HubSectionHeaderThemeMargin}"/>
                     <community:ColorPickerButton
                         SelectedColor="{Binding Color,Mode=TwoWay}"
+                        LayoutUpdated="ColorPickerPanel_LayoutUpdated"
                         x:Name="ColorPickerPanel"/>
                 </StackPanel>
                 <MenuFlyoutSeparator/>
@@ -68,6 +72,7 @@
             <Grid>
                 <Grid.Resources>
                     <local:GainThumbToolTipValueConverter x:Key="gainValueC"/>
+                    <local:QValueConverter x:Key="qValueC"/>
                     <local:ThumbToolTipValueConverter x:Key="doubleValueC"/>
                     <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Setter Property="Padding" Value="0"/>
@@ -82,7 +87,7 @@
                     </Style>
                     <Style TargetType="Slider" BasedOn="{StaticResource DefaultSliderStyle}">
                         <Setter Property="Orientation" Value="Vertical"/>
-                        <Setter Property="Height" Value="160"/>
+                        <Setter Property="Height" Value="120"/>
                         <Setter Property="TickPlacement" Value="Outside"/>
                         <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource gainValueC}"/>
                     </Style>
@@ -98,7 +103,6 @@
                     <Slider
                         x:Name="gainSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Value="{Binding Decibels,Mode=TwoWay}"
                         ValueChanged="Silder_ValueChanged"
                         Minimum="-120"
                         Maximum="120"
@@ -106,13 +110,13 @@
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Click="Button_Click_1" Tag="dbGain">
+                        Click="Button_Click_1" Tag="Gain">
                         <StackPanel>
                             <TextBlock
                                 Text="{Binding ElementName=gainSilder,Path=Value,Converter={StaticResource gainValueC}}"
                                 TextAlignment="Center"/>
                             <TextBlock
-                            Text="增益"
+                                Text="增益"
                                 FontWeight="Bold"
                                 TextAlignment="Center"/>
                         </StackPanel>
@@ -121,22 +125,23 @@
                 <StackPanel
                     Spacing="16"
                     Grid.Column="1"
+                    Margin="4,0,0,0"
                     HorizontalAlignment="Center">
                     <Slider
                         x:Name="QSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Value="{Binding Q,Mode=TwoWay}"
+                        ThumbToolTipValueConverter="{StaticResource qValueC}"
                         ValueChanged="Silder_ValueChanged"
-                        TickFrequency="29.7"
-                        Minimum="1"
-                        Maximum="120"
+                        TickFrequency="41"
+                        Minimum="33"
+                        Maximum="3333"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Click="Button_Click_1" Tag="Q">
+                        Click="Button_Click_1" Tag="Quality">
                         <StackPanel>
                             <TextBlock
-                                Text="{Binding ElementName=QSilder,Path=Value,Converter={StaticResource gainValueC}}"
+                                Text="{Binding ElementName=QSilder,Path=Value,Converter={StaticResource qValueC}}"
                                 TextAlignment="Center"/>
                             <TextBlock
                                 Text="Q"
@@ -147,11 +152,11 @@
                 </StackPanel>
                 <StackPanel
                     Spacing="16"
-                    Grid.Column="2">
+                    Grid.Column="2"
+                    Margin="4,0,0,0">
                     <Slider
                         x:Name="FreSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Value="{Binding CentreFrequency,Mode=TwoWay}"
                         ThumbToolTipValueConverter="{StaticResource doubleValueC}"
                         ValueChanged="Silder_ValueChanged"
                         TickFrequency="3990"
@@ -220,4 +225,9 @@
         BorderThickness="0,1,0,0">
     </Grid>-->
     </Grid>
+    <FontIcon x:Name="MoveIcon" Glyph="&#xE7C2;" Margin="4" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Top" Opacity="0">
+        <FontIcon.OpacityTransition>
+            <ScalarTransition/>
+        </FontIcon.OpacityTransition>
+    </FontIcon>
 </Grid>

@@ -8,7 +8,7 @@ namespace TewiMP.Media
 {
     public enum Channel { Left, Dual, Right };
     public enum PassFilterType { LowPass, HighPass, AllPass, BandPassPeak, BandPassSkirt, Notch, LowShelf, HighShelf };
-    public enum PassFilterZHType { 低通, 高通, 全通, 带通峰值, 带通抖动, 陷波, 低切, 高切 };
+    public enum PassFilterZHType { 低通, 高通, 全通, 带通峰值, 带通抖动, 陷波, 低架, 高架 };
 
     public class EQData
     {
@@ -34,13 +34,13 @@ namespace TewiMP.Media
             }
         }
 
-        private float decibels;
-        public float Decibels
+        private float gain;
+        public float Gain
         {
-            get => decibels;
+            get => gain;
             set
             {
-                decibels = value;
+                gain = value;
                 App.audioPlayer.UpdateEqualizer();
             }
         }
@@ -83,13 +83,13 @@ namespace TewiMP.Media
             }
         }
         
-        private float frequency;
-        public float Frequency
+        private float centreFrequency;
+        public float CentreFrequency
         {
-            get => frequency;
+            get => centreFrequency;
             set
             {
-                frequency = value;
+                centreFrequency = value;
                 App.audioPlayer.UpdateEqualizer();
             }
         }
@@ -106,13 +106,13 @@ namespace TewiMP.Media
         }
 
 
-        private float decibels;
-        public float Decibels
+        private float gain;
+        public float Gain
         {
-            get => decibels;
+            get => gain;
             set
             {
-                decibels = value;
+                gain = value;
                 App.audioPlayer.UpdateEqualizer();
             }
         }
@@ -144,43 +144,28 @@ namespace TewiMP.Media
     
     public static class AudioFilterStatic
     {
-        public static bool EqEnabled
-        {
-            get
-            {
-                if (App.audioPlayer != null)
-                {
-                    return App.audioPlayer.EqEnabled;
-                }
-                else
-                {
-                    return (bool)DataEditor.DataFolderBase.JSettingData[DataEditor.DataFolderBase.SettingParams.EqualizerEnable.ToString()];
-                }
-            }
-            set
-            {
-                App.audioPlayer.EqEnabled = value;
-            }
-        }
-
-        public static ObservableCollection<EQData> EQDatas = [];
-        public static ObservableCollection<PassFilterData> PassFilterDatas = [];
+        public static bool GraphicEqEnable { get; set; } = false;
+        public static bool ParametricEqEnable { get; set; } = false;
+        public static bool PassFilterEqEnable { get; set; } = false;
+        public static bool EffectEnable { get; set; } = false;
+        public static ObservableCollection<EQData> ParametricEqDatas { get; set; } = [];
+        public static ObservableCollection<PassFilterData> PassFilterDatas { get; set; } = [];
     }
 
     public static class AudioEqualizerBands
     {
-        public static Tuple<string, string>[] BandNames = new Tuple<string, string>[]
-        {
-            new Tuple<string, string>(nameof(CustomBands), "自定义"),
-            new Tuple<string, string>(nameof(HighBands), "高音增强"),
-            new Tuple<string, string>(nameof(LowBands), "低音增强"),
-            new Tuple<string, string>(nameof(HeadsetBands), "头戴式耳机"),
-            new Tuple<string, string>(nameof(LaptopBands), "笔记本电脑"),
-            new Tuple<string, string>(nameof(PortableBands), "便携式扬声器"),
-            new Tuple<string, string>(nameof(StereoBands), "家庭立体声"),
-            new Tuple<string, string>(nameof(TVBands), "电视"),
-            new Tuple<string, string>(nameof(CarBands), "汽车")
-        };
+        public static Tuple<string, string>[] BandNames =
+        [
+            new(nameof(CustomBands), "自定义"),
+            new(nameof(HighBands), "高音增强"),
+            new(nameof(LowBands), "低音增强"),
+            new(nameof(HeadsetBands), "头戴式耳机"),
+            new(nameof(LaptopBands), "笔记本电脑"),
+            new(nameof(PortableBands), "便携式扬声器"),
+            new(nameof(StereoBands), "家庭立体声"),
+            new(nameof(TVBands), "电视"),
+            new(nameof(CarBands), "汽车")
+        ];
 
         public static List<float[]> GetBandFromString(string name)
         {

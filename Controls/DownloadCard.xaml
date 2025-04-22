@@ -48,7 +48,6 @@
                 </StackPanel>
             </Grid>
             <Grid>
-
                 <Grid.Resources>
                     <Style TargetType="ProgressRing">
                         <Setter Property="Foreground" Value="{ThemeResource ApplicationForegroundThemeBrush}"/>
@@ -76,7 +75,7 @@
                         <ColumnDefinition/>
                         <ColumnDefinition Width="auto"/>
                     </Grid.ColumnDefinitions>
-                    <StackPanel Padding="12,6">
+                    <StackPanel Padding="12,6" VerticalAlignment="Center">
                         <TextBlock x:Name="TitleTb1" Text="{Binding ElementName=TitleTb,Path=Text}" FontSize="16"/>
                         <TextBlock x:Name="ButtonNameTb1" Text="{Binding ElementName=ButtonNameTb,Path=Text}" FontSize="13"/>
                     </StackPanel>
@@ -86,13 +85,29 @@
                                 Grid.Column="1">
                         <TextBlock Text="{Binding ElementName=MessageTb,Path=Text}" x:Name="MessageTb1"
                                    VerticalAlignment="Center"/>
-                        <Grid>
+                        <Grid Visibility="{Binding ElementName=MessageTb1,Path=Visibility}">
                             <ProgressRing x:Name="DownloadProgress"
                                           IsIndeterminate="{Binding ElementName=DownloadProgress,Path=IsIndeterminate}"
                                           Value="{Binding ElementName=DownloadProgress,Path=Value}"
                                           Width="12" Height="12"/>
                             <FontIcon x:Name="FontIconBase" FontSize="8"/>
                         </Grid>
+                        <Button x:Name="MouseEnterButton"
+                                Content="浏览文件..."
+                                Style="{ThemeResource LeftButtonStyle}"
+                                Tag="0"
+                                Click="MouseEnterButton_Click"
+                                Visibility="Collapsed"/>
+                        <Button Padding="8,0"
+                                Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                Style="{ThemeResource RightButtonStyle}"
+                                MinHeight="32"
+                                Visibility="{Binding ElementName=MouseEnterButton,Path=Visibility}"
+                                Margin="-12,0,0,0"
+                                Tag="1"
+                                Click="MouseEnterButton_Click">
+                            <FontIcon Glyph="&#xE74D;" FontSize="16"/>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Grid>

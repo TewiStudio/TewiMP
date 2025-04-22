@@ -263,6 +263,13 @@ namespace TewiMP.Pages.DialogPages
         {
             AudioPlayer.EqEnabled = EqEnableTS.IsOn;
         }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.HideDialog();
+            if (MainWindow.InOpenMusicPage) MainWindow.OpenOrCloseMusicPage();
+            MainWindow.SetNavViewContent(typeof(SettingEqPage));
+        }
     }
 
     public partial class ThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter

@@ -354,7 +354,7 @@
                                               Fill="{ThemeResource ButtonForegroundThemeBrush}"
                                               Stretch="UniformToFill" Margin="2"/>
                                     </Button>
-                                    <Button x:Name="VloumeButton" AccessKey="V" Click="VloumeButton_Click" ToolTipService.ToolTip="音频">
+                                    <Button x:Name="VolumeButton" AccessKey="V" Click="VolumeButton_Click" ToolTipService.ToolTip="音频">
                                         <Grid>
                                             <FontIcon Glyph="&#xE995;" Opacity="{ThemeResource VolumeOpacity}"/>
                                             <FontIcon x:Name="VolumeIcon" Glyph="&#xE995;"/>
@@ -389,10 +389,20 @@
                 </AnimatedIcon.Source>
             </AnimatedIcon>
         </Button>
-        <TextBlock
-            x:Name="Debug_NowPlayingDurationText"
-            IsHitTestVisible="False"
+        <Grid
+            x:Name="Debug_Root"
             HorizontalAlignment="Center"
-            Margin="8"/>
+            VerticalAlignment="Top"
+            Margin="8">
+            <Rectangle
+                x:Name="Debug_NowTimingChangeEventLight"
+                RadiusX="4" RadiusY="4"
+                Fill="{ThemeResource AccentFillColorDefaultBrush}"/>
+            <TextBlock
+                x:Name="Debug_NowPlayingDurationText"
+                IsHitTestVisible="False" Margin="8,4"
+                Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                HorizontalAlignment="Center" Text="asdasda"/>
+        </Grid>
     </Grid>
 </Page>

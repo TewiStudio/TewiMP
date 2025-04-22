@@ -786,7 +786,7 @@
             IsHitTestVisible="False"
             Visibility="Collapsed"
             Opacity="0"
-            Margin="0">
+            Margin="64">
             <Grid.OpacityTransition>
                 <ScalarTransition/>
             </Grid.OpacityTransition>
@@ -795,7 +795,7 @@
                 HorizontalAlignment="Stretch"
                 Fill="{ThemeResource AcrylicNormal}"
                 Stroke="{ThemeResource ControlElevationBorderBrush}"
-                StrokeThickness="0"
+                StrokeThickness="1"
                 RadiusX="8"
                 RadiusY="8">
             </Rectangle>

@@ -387,12 +387,12 @@ namespace TewiMP.Helpers
         /// </summary>
         /// <param name="filePath">文件路径。</param>
         /// <returns></returns>
-        public static async Task ExploreFile(string filePath)
+        public static async Task<bool> ExploreFile(string filePath)
         {
 
             var selectFile = new FolderLauncherOptions();
             selectFile.ItemsToSelect.Add(await StorageFile.GetFileFromPathAsync(filePath));
-            await Launcher.LaunchFolderPathAsync(new FileInfo(filePath).DirectoryName, selectFile);
+            return await Launcher.LaunchFolderPathAsync(new FileInfo(filePath).DirectoryName, selectFile);
         }
 
         /// <summary>
@@ -400,10 +400,10 @@ namespace TewiMP.Helpers
         /// </summary>
         /// <param name="openPath"></param>
         /// <returns></returns>
-        public static async Task ExploreFolder(string openPath)
+        public static async Task<bool> ExploreFolder(string openPath)
         {
             StorageFolder folder = await StorageFolder.GetFolderFromPathAsync(openPath);
-            await Launcher.LaunchFolderAsync(folder);
+            return await Launcher.LaunchFolderAsync(folder);
         }
 
         public static async Task<bool> OpenInOtherSoftware(Uri uri, LauncherOptions launcherOptions)

@@ -55,13 +55,13 @@ namespace Ude.Core
         // If this flag is set to true, detection is done and conclusion has been made
         protected bool done;
 
-        // The number of characters whose frequency order is less than 512
+        // The number of characters whose centreFrequency order is less than 512
         protected int freqChars;
 
         // Total character encounted.
         protected int totalChars;
         
-        // Mapping table to get frequency order from char order (get from GetOrder())
+        // Mapping table to get centreFrequency order from char order (get from GetOrder())
         protected int[] charToFreqOrder;
 
         // This constant value varies from language to language. It is used in calculating confidence. 
@@ -81,7 +81,7 @@ namespace Ude.Core
         /// <summary>
         /// we do not handle character base on its original encoding string, but 
         /// convert this encoding string to a number, here called order.
-        /// This allow multiple encoding of a language to share one frequency table
+        /// This allow multiple encoding of a language to share one centreFrequency table
         /// </summary>
         /// <param name="buf">A <see cref="System.Byte"/></param>
         /// <param name="offset"></param>
@@ -616,7 +616,7 @@ namespace Ude.Core
     
     public class EUCTWDistributionAnalyser : CharDistributionAnalyser
     {
-        // EUCTW frequency table
+        // EUCTW centreFrequency table
         // Converted from big5 work 
         // by Taiwan's Mandarin Promotion Council 
         // <http://www.edu.tw:81/mandr/>
@@ -1634,7 +1634,7 @@ namespace Ude.Core
     
     public class BIG5DistributionAnalyser : CharDistributionAnalyser
     {
-        // Big5 frequency table
+        // Big5 centreFrequency table
         // by Taiwan's Mandarin Promotion Council 
         // <http://www.edu.tw:81/mandr/>
         /******************************************************************************
@@ -2562,7 +2562,7 @@ namespace Ude.Core
     public class SJISDistributionAnalyser : CharDistributionAnalyser
     {
         // Sampling from about 20M text materials include literature and computer technology
-        // Japanese frequency table, applied to both S-JIS and EUC-JP
+        // Japanese centreFrequency table, applied to both S-JIS and EUC-JP
 		// They are sorted in order. 
 
         /******************************************************************************

@@ -493,7 +493,7 @@ namespace TewiMP.Media
         }
 
         /// <summary>
-        /// 声调
+        /// 音高
         /// </summary>
         private double _pitch = 1f;
         public double Pitch
@@ -517,7 +517,7 @@ namespace TewiMP.Media
             {
                 _tempo = value;
                 if (FileProvider != null) FileProvider.Tempo = value;
-                if (FileReader.isMidi)
+                if (FileReader?.isMidi == true)
                 {
                     MidiPlayback.Speed = value;
                 }
@@ -525,7 +525,7 @@ namespace TewiMP.Media
         }
         
         /// <summary>
-        /// 流百分比
+        /// 比率
         /// </summary>
         private double _rate = 1f;
         public double Rate
@@ -542,7 +542,7 @@ namespace TewiMP.Media
 
         public AudioPlayer()
         {
-            timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(250) };
+            timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(200) };
             timer.Tick += (_, __) => ReCallTiming();
 
             App.cacheManager.AddingCacheMusicData += CacheManager_AddingCacheMusicData;

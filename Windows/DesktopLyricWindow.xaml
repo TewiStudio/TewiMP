@@ -51,7 +51,7 @@
                             </TransitionCollection>
                         </Grid.Transitions>
                         <Border x:Name="T2ShadowTarget"/>
-                        <TextBlock x:Name="T2Base">
+                        <TextBlock x:Name="T2Base" Grid.Column="1">
                             <ui:Effects.Shadow>
                                 <ui:AttachedDropShadow Opacity="1" BlurRadius="10" Color="#88333333" Offset="0,0.2" CastTo="{x:Bind T2ShadowTarget}"/>
                             </ui:Effects.Shadow>
@@ -150,6 +150,32 @@
                     <ui:AttachedDropShadow Opacity="1" BlurRadius="3" Color="#AA000000" Offset="0,0.5" CastTo="{x:Bind TRShadowTarget}"/>
                 </ui:Effects.Shadow>
             </TextBlock>
+
+            <StackPanel
+                x:Name="LyricIntervalRoot"
+                RequestedTheme="Dark"
+                Visibility="Visible"
+                Orientation="Horizontal"
+                Spacing="2" Margin="0,0,0,4"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Center">
+                <StackPanel.Resources>
+                    <Style TargetType="Rectangle">
+                        <Setter Property="Width" Value="15"/>
+                        <Setter Property="Height" Value="15"/>
+                        <Setter Property="Fill" Value="{ThemeResource AccentAAFillColorDefaultBrush}"/>
+                        <Setter Property="Stroke" Value="{ThemeResource AccentControlElevationBorderBrush}"/>
+                        <Setter Property="StrokeThickness" Value="1"/>
+                        <Setter Property="RadiusX" Value="7.5"/>
+                        <Setter Property="RadiusY" Value="7.5"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Rectangle x:Name="LyricIntervalCircle1"/>
+                <Rectangle x:Name="LyricIntervalCircle2"/>
+                <Rectangle x:Name="LyricIntervalCircle3"/>
+                <Rectangle x:Name="LyricIntervalCircle4"/>
+                <Rectangle x:Name="LyricIntervalCircle5"/>
+            </StackPanel>
         </Grid>
         <Popup x:Name="MusicControlPopup" ShouldConstrainToRootBounds="False"
                VerticalOffset="-40" Opened="MusicControlPopup_Opened" Closed="MusicControlPopup_Closed">

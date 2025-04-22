@@ -17,40 +17,49 @@ namespace TewiMP.Controls
         public PassFilterCard()
         {
             InitializeComponent();
-            Loaded += EQCard_Loaded;
-            Unloaded += EQCard_Unloaded;
-            DataContextChanged += SongHistoryCard_DataContextChanged;
         }
 
+        private void UpdateData()
+        {
+            if (DataContext is null) return;
+            inChange = true;
+            QSilder.Value = DataContext.Q * 100;
+            FreSilder.Value = DataContext.CentreFrequency;
+            gainSilder.Value = DataContext.Gain * 10;
+            TypeCombo.SelectedIndex = (int)DataContext.PassFilterType;
+            inChange = false;
+        }
+
+        bool inChange = false;
         private void EQCard_Loaded(object sender, RoutedEventArgs e)
         {
             ColorPickerPanel.SelectedColor = DataContext.Color;
-            ColorPickerPanel.LayoutUpdated += ColorPickerPanel_LayoutUpdated;
+            UpdateData();
         }
 
         private void EQCard_Unloaded(object sender, RoutedEventArgs e)
         {
-            ColorPickerPanel.LayoutUpdated -= ColorPickerPanel_LayoutUpdated;
-            Loaded -= EQCard_Loaded;
-            Unloaded -= EQCard_Unloaded;
-            DataContextChanged -= SongHistoryCard_DataContextChanged;
+
         }
 
         private void ColorPickerPanel_LayoutUpdated(object sender, object e)
         {
-            if (DataContext is null) return;
+            if (DataContext is null || !IsLoaded) return;
             DataContext.Color = ColorPickerPanel.SelectedColor;
             (ColoredBackground.Fill as SolidColorBrush).Color = ColorPickerPanel.SelectedColor;
         }
 
         private void SongHistoryCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
-            if (DataContext is null) return;
-            TypeCombo.SelectedIndex = (int)DataContext.PassFilterType;
+            UpdateData();
         }
 
         private void Silder_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
+            if (inChange || DataContext is null) return;
+            DataContext.Q = (float)QSilder.Value / 100f;
+            DataContext.CentreFrequency = (float)FreSilder.Value;
+            DataContext.Gain = (float)gainSilder.Value / 10f;
         }
 
         private void Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -85,11 +94,13 @@ namespace TewiMP.Controls
         private void TypeCombo_Loaded(object sender, RoutedEventArgs e)
         {
             TypeCombo.ItemsSource = Enum.GetValues(typeof(PassFilterZHType));
+            TypeCombo.SelectedIndex = (int)DataContext.PassFilterType;
         }
 
         private void TypeCombo_Unloaded(object sender, RoutedEventArgs e)
         {
-            TypeCombo.ItemsSource = null;
+            // 会导致第二时间加载时不显示内容
+            //TypeCombo.ItemsSource = null;
         }
 
         private void TypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -114,31 +125,48 @@ namespace TewiMP.Controls
                 {
                     Value = btn.Tag switch
                     {
-                        "Q" => DataContext.Q / 100f,
-                        "Frequency" => DataContext.Frequency,
-                        "dbGain" => DataContext.Decibels / 10f
+                        "Quality" => DataContext.Q,
+                        "Frequency" => DataContext.CentreFrequency,
+                        "Gain" => DataContext.Gain,
+                        _ => -1
                     },
                     SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline,
                 };
-                var result = await MainWindow.ShowDialog($"设置 \"{btn.Tag}\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
+                string chineseName = btn.Tag switch
+                {
+                    "Quality" => "质量",
+                    "Frequency" => "中心频率",
+                    "Gain" => "增益",
+                    _ => "未知"
+                };
+                var result = await MainWindow.ShowDialog($"设置 \"{chineseName}（{btn.Tag}）\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
                 if (result != ContentDialogResult.Primary) return;
                 switch (btn.Tag)
                 {
-                    case "Q":
-                        DataContext.Q = (float)numberBox.Value * 100f;
+                    case "Quality":
+                        DataContext.Q = (float)numberBox.Value;
+                        QSilder.Value = DataContext.Q * 100f;
                         break;
                     case "Frequency":
-                        DataContext.Frequency = (float)numberBox.Value;
+                        DataContext.CentreFrequency = (float)numberBox.Value;
+                        FreSilder.Value = DataContext.CentreFrequency;
                         break;
-                    case "dbGain":
-                        DataContext.Decibels = (float)numberBox.Value * 10f;
+                    case "Gain":
+                        DataContext.Gain = (float)numberBox.Value;
+                        gainSilder.Value = DataContext.Gain * 10f;
                         break;
                 }
-                var dataContextTemp = DataContext;
-                DataContext = null;
-                DataContext = dataContextTemp;
-                dataContextTemp = null;
             }
+        }
+
+        private void Grid_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            MoveIcon.Opacity = .6;
+        }
+
+        private void Grid_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            MoveIcon.Opacity = 0;
         }
     }
 

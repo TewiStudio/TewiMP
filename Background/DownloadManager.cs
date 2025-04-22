@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using TewiMP.Pages;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
 
@@ -12,6 +13,8 @@ namespace TewiMP.Background
     public enum DownloadStates { Waiting, Downloading, DownloadedSaving, DownloadedPreview, Downloaded, Error }
     public class DownloadData
     {
+        public string Path = null;
+        public string LrcPath = null;
         public MusicData MusicData;
         public long FileSize;
         public long DownloadedSize;
@@ -22,11 +25,13 @@ namespace TewiMP.Background
 
     public class DownloadManager
     {
-        public List<DownloadData> AllDownloadData { get; set; } = new();
-        public List<DownloadData> WaitingDownloadData { get; set; } = new();
-        public List<DownloadData> DownloadingData { get; set; } = new();
-        public List<DownloadData> DownloadedData { get; set; } = new();
-        public List<DownloadData> DownloadErrorData { get; set; } = new();
+        public DownloadPage NowDownloadPage { get; set; }
+
+        public List<DownloadData> AllDownloadData { get; set; } = [];
+        public List<DownloadData> WaitingDownloadData { get; set; } = [];
+        public List<DownloadData> DownloadingData { get; set; } = [];
+        public List<DownloadData> DownloadedData { get; set; } = [];
+        public List<DownloadData> DownloadErrorData { get; set; } = [];
 
         public delegate void DownloadHandler(DownloadData data);
         public event DownloadHandler AddDownload;
@@ -196,6 +201,8 @@ namespace TewiMP.Background
             string lastName = Path.GetExtension(addressPath.Split("?").First());
             string downloadPath = downloadPath1 + lastName;
             string lyricPath = downloadPath1 + ".lrc";
+            dm.Path = downloadPath;
+            dm.LrcPath = lyricPath;
             //await WebHelper.DownloadFileAsync(addressPath, downloadPath);
 
             System.Net.WebClient TheDownloader = new System.Net.WebClient();

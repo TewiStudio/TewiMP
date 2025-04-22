@@ -23,19 +23,19 @@
             <Setter Property="IsHitTestVisible" Value="False"/>
         </Style>
     </Page.Resources>
-    
+
     <ListView
         x:Name="ListViewBase"
         HorizontalContentAlignment="Center"
-        SelectionMode="None">
-
+        SelectionMode="None"
+        Padding="0,0,0,14">
         <ListView.Resources>
             <Style TargetType="ListViewItem">
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="ListViewItem">
                             <ListViewItemPresenter
-                                Margin="16,4"
+                                Margin="16,2"
                                 ContentTransitions="{TemplateBinding ContentTransitions}"
                                 Control.IsTemplateFocusTarget="True"
                                 FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
@@ -100,360 +100,320 @@
             </Grid>
         </ListView.Header>
 
-        <Grid
-            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16"
-            HorizontalAlignment="Left">
+        <controlsPrimitives:SettingsCard
+            Header="音效总开关">
             <ToggleSwitch
                 x:Name="EqEnableSwitcher"
-                Header="总开关"
                 IsEnabled="True"
                 Toggled="EqEnableSwitcher_Toggled"/>
-        </Grid>
-
+        </controlsPrimitives:SettingsCard>
+        
         <!--图形均衡器-->
-        <StackPanel
-            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16"
-            Spacing="12"
-            HorizontalAlignment="Left">
-            <Button
-                Style="{ThemeResource CardHeader}"
-                IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}">
-                <Button.Resources>
-                    <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="ControlFillColorTransparentBrush" />
-                </Button.Resources>
-                <TextBlock Text="图形均衡器" Style="{ThemeResource SubTBHeader}"/>
-            </Button>
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto"/>
-                    <RowDefinition Height="auto"/>
-                </Grid.RowDefinitions>
-                <!--<TextBlock Text="分贝" FlowDirection="RightToLeft" HorizontalAlignment="Left"/>-->
-                <Grid Width="30" HorizontalAlignment="Left" Margin="0,0,0,0" Grid.Row="1">
-                    <Grid.Resources>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="FlowDirection" Value="RightToLeft"/>
-                            <Setter Property="FontSize" Value="13"/>
-                            <Setter Property="Opacity"
-                                    Value="{Binding ElementName=GraphicEqToggleButton,Path=IsChecked,Converter={StaticResource eqIconOpacityValueC}}"/>
-                        </Style>
-                    </Grid.Resources>
-                    <TextBlock x:Name="EqFirstTextBlock" Text="12+" Margin="0,10,0,0" Opacity="{Binding ElementName=GraphicEqToggleButton,Path=IsChecked,Converter={StaticResource eqIconOpacityValueC}}"/>
-                    <TextBlock Text="6+" Margin="0,38,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                    <TextBlock Text="0" Margin="0,70,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                    <TextBlock Text="6-" Margin="0,100,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                    <TextBlock Text="12-" Margin="0,132,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                    <TextBlock Text="Hz" Margin="0,158,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                </Grid>
-                <ScrollViewer 
-                    Padding="0,0,0,12" Margin="38,0,0,0" Grid.Row="1"
-                    VerticalScrollBarVisibility="Hidden" VerticalScrollMode="Disabled"
-                    HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
-                    <Grid Padding="0,2,0,2">
-                        <StackPanel x:Name="SliderStackBase" Orientation="Horizontal" Margin="0,8,0,0">
-                            <StackPanel.Resources>
-                                <Style TargetType="StackPanel">
-                                    <Setter Property="Margin" Value="0,0,10,0"/>
-                                </Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="FontSize" Value="13"/>
-                                    <Setter Property="VerticalAlignment" Value="Bottom"/>
-                                    <Setter Property="TextAlignment" Value="Center"/>
-                                    <Setter Property="Margin" Value="0,8,0,0"/>
-                                </Style>
-                                <Style TargetType="Slider" BasedOn="{StaticResource DefaultSliderStyle}">
-                                    <Setter Property="Orientation" Value="Vertical"/>
-                                    <Setter Property="Height" Value="140"/>
-                                    <Setter Property="TickPlacement" Value="Outside"/>
-                                    <Setter Property="TickFrequency" Value="30"/>
-                                    <Setter Property="Maximum" Value="120"/>
-                                    <Setter Property="Minimum" Value="-120"/>
-                                    <Setter Property="Value" Value="0"/>
-                                    <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource thumbToolTipValueC}"/>
-                                </Style>
-                            </StackPanel.Resources>
-                            <StackPanel>
-                                <Slider x:Name="Eq0" AccessKey="1" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="31" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq1" AccessKey="2" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="62" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq2" AccessKey="3" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="125" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq3" AccessKey="4" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="250" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq4" AccessKey="5" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="500" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq5" AccessKey="6" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="1k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq6" AccessKey="7" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="2k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq7" AccessKey="8" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="4k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq8" AccessKey="9" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="8k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                            <StackPanel>
-                                <Slider x:Name="Eq9" AccessKey="0" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}" ValueChanged="GraphicEQSlider_ValueChanged"/>
-                                <TextBlock Text="16k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
-                            </StackPanel>
-                        </StackPanel>
-                    </Grid>
-                </ScrollViewer>
-            </Grid>
-            <StackPanel
-                Grid.Column="0"
-                Orientation="Horizontal"
-                HorizontalAlignment="Left"
-                Spacing="8">
-                <ToggleButton
-                    x:Name="GraphicEqToggleButton"
-                    HorizontalAlignment="Left"
-                    Height="32" Width="32" Padding="0">
-                    <FontIcon Glyph="&#xe7e8;" FontSize="16"/>
-                </ToggleButton>
-                <AppBarSeparator/>
-                <ComboBox
-                    x:Name="GraphicEqComboBox"
-                    SelectionChanged="GraphicEqComboBox_SelectionChanged"
-                    Loaded="GraphicEqComboBox_Loaded"
-                    IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}">
-                    <x:String>自定义</x:String>
-                    <x:String>高音增强</x:String>
-                    <x:String>低音增强</x:String>
-                    <x:String>头戴式耳机</x:String>
-                    <x:String>笔记本电脑</x:String>
-                    <x:String>便携式扬声器</x:String>
-                    <x:String>家庭立体声</x:String>
-                    <x:String>电视</x:String>
-                    <x:String>汽车</x:String>
-                </ComboBox>
-                <Button
-                    x:Name="GraphicResetButton"
-                    Content="重置"
-                    Visibility="Visible"
-                    IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsChecked}"
-                    Click="GraphicResetButton_Click"/>
-            </StackPanel>
-        </StackPanel>
+        <controlsPrimitives:SettingsExpander
+            Header="图形均衡器"
+            Description="使用图形均衡器设置">
+            <ToggleSwitch
+                x:Name="GraphicEqToggleButton"
+                Toggled="GraphicEqToggleButton_Toggled"/>
+            <controlsPrimitives:SettingsExpander.Items>
+                <controlsPrimitives:SettingsCard
+                    Header="预设">
+                    <StackPanel
+                        Grid.Column="0"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        Spacing="8">
+                        <Button
+                            x:Name="GraphicResetButton"
+                            Content="重置"
+                            Visibility="Visible"
+                            IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}"
+                            Click="GraphicResetButton_Click"/>
+                        <ComboBox
+                            x:Name="GraphicEqComboBox"
+                            SelectionChanged="GraphicEqComboBox_SelectionChanged"
+                            Loaded="GraphicEqComboBox_Loaded"
+                            IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}">
+                            <x:String>自定义</x:String>
+                            <x:String>高音增强</x:String>
+                            <x:String>低音增强</x:String>
+                            <x:String>头戴式耳机</x:String>
+                            <x:String>笔记本电脑</x:String>
+                            <x:String>便携式扬声器</x:String>
+                            <x:String>家庭立体声</x:String>
+                            <x:String>电视</x:String>
+                            <x:String>汽车</x:String>
+                        </ComboBox>
+                    </StackPanel>
+                </controlsPrimitives:SettingsCard>
+                <controlsPrimitives:SettingsCard
+                    Padding="12">
+                    <controlsPrimitives:SettingsCard.Description>
+                        <Grid HorizontalAlignment="Left">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto"/>
+                                <RowDefinition Height="auto"/>
+                            </Grid.RowDefinitions>
+                            <!--<TextBlock Text="分贝" FlowDirection="RightToLeft" HorizontalAlignment="Left"/>-->
+                            <Grid Width="30" HorizontalAlignment="Left" Margin="0,0,0,0" Grid.Row="1">
+                                <Grid.Resources>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="FlowDirection" Value="RightToLeft"/>
+                                        <Setter Property="FontSize" Value="13"/>
+                                        <Setter Property="Opacity"
+                                    Value="{Binding ElementName=GraphicEqToggleButton,Path=IsOn,Converter={StaticResource eqIconOpacityValueC}}"/>
+                                    </Style>
+                                </Grid.Resources>
+                                <TextBlock x:Name="EqFirstTextBlock" Text="12+" Margin="0,10,0,0" Opacity="1"/>
+                                <TextBlock Text="6+" Margin="0,38,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                <TextBlock Text="0" Margin="0,70,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                <TextBlock Text="6-" Margin="0,100,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                <TextBlock Text="12-" Margin="0,132,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                <TextBlock Text="Hz" Margin="0,158,0,0" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                            </Grid>
+                            <ScrollViewer 
+                                Padding="0,0,0,12" Margin="38,0,0,0" Grid.Row="1"
+                                VerticalScrollBarVisibility="Hidden" VerticalScrollMode="Disabled"
+                                HorizontalScrollBarVisibility="Auto" HorizontalScrollMode="Enabled">
+                                <Grid Padding="0,2,0,2">
+                                    <StackPanel x:Name="SliderStackBase" Orientation="Horizontal" Margin="0,8,0,0">
+                                        <StackPanel.Resources>
+                                            <Style TargetType="StackPanel">
+                                                <Setter Property="Margin" Value="0,0,10,0"/>
+                                            </Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="FontSize" Value="13"/>
+                                                <Setter Property="VerticalAlignment" Value="Bottom"/>
+                                                <Setter Property="TextAlignment" Value="Center"/>
+                                                <Setter Property="Margin" Value="0,8,0,0"/>
+                                            </Style>
+                                            <Style TargetType="Slider" BasedOn="{StaticResource DefaultSliderStyle}">
+                                                <Setter Property="Orientation" Value="Vertical"/>
+                                                <Setter Property="Height" Value="140"/>
+                                                <Setter Property="TickPlacement" Value="Outside"/>
+                                                <Setter Property="TickFrequency" Value="30"/>
+                                                <Setter Property="Maximum" Value="120"/>
+                                                <Setter Property="Minimum" Value="-120"/>
+                                                <Setter Property="Value" Value="0"/>
+                                                <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource thumbToolTipValueC}"/>
+                                            </Style>
+                                        </StackPanel.Resources>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq0" AccessKey="1" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="31" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq1" AccessKey="2" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="62" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq2" AccessKey="3" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="125" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq3" AccessKey="4" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="250" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq4" AccessKey="5" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="500" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq5" AccessKey="6" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="1k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq6" AccessKey="7" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="2k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq7" AccessKey="8" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="4k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq8" AccessKey="9" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="8k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                        <StackPanel>
+                                            <Slider x:Name="Eq9" AccessKey="0" IsEnabled="{Binding ElementName=GraphicEqToggleButton, Path=IsOn}" ValueChanged="GraphicEQSlider_ValueChanged"/>
+                                            <TextBlock Text="16k" Opacity="{Binding ElementName=EqFirstTextBlock,Path=Opacity}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </ScrollViewer>
+                        </Grid>
+                    </controlsPrimitives:SettingsCard.Description>
+                </controlsPrimitives:SettingsCard>
+            </controlsPrimitives:SettingsExpander.Items>
+        </controlsPrimitives:SettingsExpander>
 
         <!--参数均衡器-->
-        <StackPanel
-            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16"
-            Spacing="12"
-            HorizontalAlignment="Left">
-            <Button
-                Style="{ThemeResource CardHeader}"
-                IsEnabled="{Binding ElementName=EqToggleButton, Path=IsChecked}">
-                <Button.Resources>
-                    <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="ControlFillColorTransparentBrush" />
-                </Button.Resources>
-                <TextBlock Text="参数均衡器" Style="{ThemeResource SubTBHeader}"/>
-            </Button>
-            <ScrollViewer
-                Padding="0,0,0,0"
-                HorizontalScrollMode="Enabled"
-                HorizontalScrollBarVisibility="Auto"
-                VerticalScrollMode="Disabled"
-                VerticalScrollBarVisibility="Disabled">
-                <StackPanel
-                   Orientation="Horizontal">
-                    <GridView
-                        x:Name="EQList"
-                        IsEnabled="{Binding ElementName=EqToggleButton, Path=IsChecked}"
-                        SelectionMode="None"
-                        ScrollViewer.VerticalScrollMode="Disabled"
-                        ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                        <GridView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </GridView.ItemsPanel>
-                        <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="datas:EQData">
-                                <controls:EQCard Margin="0,0,0,0"/>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                    </GridView>
-                    <Button
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        IsEnabled="{Binding ElementName=EqToggleButton, Path=IsChecked}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Width="120" Height="120"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center"
-                        Click="Button_Click">
-                        <Button.Transitions>
-                            <TransitionCollection>
-                                <RepositionThemeTransition/>
-                            </TransitionCollection>
-                        </Button.Transitions>
-                        <StackPanel>
-                            <Grid>
-                                <Path
-                                    Data="{ThemeResource 音波}"
-                                    Width="30"
-                                    Height="30"
-                                    Stretch="Uniform"
-                                    Fill="{ThemeResource ButtonForegroundThemeBrush}"
-                                    Opacity="{Binding ElementName=EqToggleButton,Path=IsChecked,Converter={StaticResource eqIconOpacityValueC}}"/>
-                                <TextBlock
-                                    x:Name="EqAddFreTextBlock"
-                                    Text="+"
-                                    Margin="4,14,0,0"
-                                    FontSize="24"
-                                    HorizontalAlignment="Left"
-                                    VerticalAlignment="Bottom"/>
-                            </Grid>
-                            <TextBlock
-                                Text="添加频段"
-                                TextAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </ScrollViewer>
-            <StackPanel
-                Orientation="Horizontal"
-                HorizontalAlignment="Left"
-                Spacing="8"
-                Margin="0,0,16,0">
-                <ToggleButton
-                    x:Name="EqToggleButton"
-                    HorizontalAlignment="Right" Grid.Column="1"
-                    Height="32" Width="32" Padding="0">
-                    <FontIcon Glyph="&#xe7e8;" FontSize="16"/>
-                </ToggleButton>
-                <AppBarSeparator/>
-                <ComboBox
-                    x:Name="EqComboBox"
-                    SelectionChanged="EqComboBox_SelectionChanged"
-                    Loaded="EqComboBox_Loaded"
-                    IsEnabled="{Binding ElementName=EqToggleButton, Path=IsChecked}">
-                    <x:String>自定义</x:String>
-                    <x:String>高音增强</x:String>
-                    <x:String>低音增强</x:String>
-                    <x:String>头戴式耳机</x:String>
-                    <x:String>笔记本电脑</x:String>
-                    <x:String>便携式扬声器</x:String>
-                    <x:String>家庭立体声</x:String>
-                    <x:String>电视</x:String>
-                    <x:String>汽车</x:String>
-                </ComboBox>
-                <Button
-                    x:Name="ResetEButton"
-                    Content="重置"
-                    Visibility="Visible"
-                    IsEnabled="{Binding ElementName=EqToggleButton, Path=IsChecked}"
-                    Click="ResetEButton_Click"/>
-            </StackPanel>
-        </StackPanel>
+        <controlsPrimitives:SettingsExpander
+            Header="参数均衡器"
+            Description="使用参数均衡器设置">
+            <ToggleSwitch
+                x:Name="ParametricToggleButton"
+                Toggled="ParametricToggleButton_Toggled"/>
+            <controlsPrimitives:SettingsExpander.Items>
+                <controlsPrimitives:SettingsCard Padding="12">
+                    <controlsPrimitives:SettingsCard.Description>
+                        <ScrollViewer
+                            HorizontalScrollMode="Auto"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalScrollMode="Disabled"
+                            VerticalScrollBarVisibility="Disabled">
+                            <StackPanel
+                                Orientation="Horizontal">
+                                <GridView
+                                    x:Name="EQList"
+                                    IsEnabled="{Binding ElementName=ParametricToggleButton, Path=IsOn}"
+                                    CanDragItems="True" AllowDrop="True"
+                                    CanReorderItems="True" SelectionMode="None"
+                                    ScrollViewer.VerticalScrollMode="Disabled"
+                                    ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                    <GridView.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </GridView.ItemsPanel>
+                                    <GridView.ItemTemplate>
+                                        <DataTemplate x:DataType="datas:EQData">
+                                            <controls:EQCard Margin="0,0,0,0"/>
+                                        </DataTemplate>
+                                    </GridView.ItemTemplate>
+                                </GridView>
+                                <Button
+                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    IsEnabled="{Binding ElementName=ParametricToggleButton, Path=IsOn}"
+                                    CornerRadius="8"
+                                    Padding="16" Margin="12,0"
+                                    Width="120" Height="120"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    Click="Button_Click">
+                                    <Button.Transitions>
+                                        <TransitionCollection>
+                                            <RepositionThemeTransition/>
+                                        </TransitionCollection>
+                                    </Button.Transitions>
+                                    <StackPanel>
+                                        <Grid>
+                                            <Path
+                                                Data="{ThemeResource 音波}"
+                                                Width="30"
+                                                Height="30"
+                                                Stretch="Uniform"
+                                                Fill="{ThemeResource ButtonForegroundThemeBrush}"
+                                                Opacity="{Binding ElementName=ParametricToggleButton,Path=IsOn,Converter={StaticResource eqIconOpacityValueC}}"/>
+                                            <TextBlock
+                                                x:Name="EqAddFreTextBlock"
+                                                Text="+"
+                                                Margin="4,14,0,0"
+                                                FontSize="24"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"/>
+                                        </Grid>
+                                        <TextBlock
+                                            Text="添加频段"
+                                            TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </controlsPrimitives:SettingsCard.Description>
+                </controlsPrimitives:SettingsCard>
+            </controlsPrimitives:SettingsExpander.Items>
+        </controlsPrimitives:SettingsExpander>
 
         <!--滤波器-->
-        <StackPanel
-            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            BorderThickness="1"
-            CornerRadius="8"
-            Padding="16"
-            Spacing="12"
-            HorizontalAlignment="Left">
-            <Button
-                Style="{ThemeResource CardHeader}"
-                IsEnabled="{Binding ElementName=PassFilterToggleButton, Path=IsChecked}">
-                <Button.Resources>
-                    <StaticResource x:Key="ButtonBackgroundDisabled" ResourceKey="ControlFillColorTransparentBrush" />
-                </Button.Resources>
-                <TextBlock Text="滤波器" Style="{ThemeResource SubTBHeader}"/>
-            </Button>
-            <ScrollViewer
-                HorizontalScrollMode="Enabled"
-                HorizontalScrollBarVisibility="Auto"
-                VerticalScrollMode="Disabled"
-                VerticalScrollBarVisibility="Disabled">
-                <StackPanel
-                    Orientation="Horizontal">
-                    <GridView
-                        x:Name="PassFilterList"
-                        IsEnabled="{Binding ElementName=PassFilterToggleButton, Path=IsChecked}"
-                        SelectionMode="None"
-                        ScrollViewer.VerticalScrollMode="Disabled"
-                        ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                        <GridView.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </GridView.ItemsPanel>
-                        <GridView.ItemTemplate>
-                            <DataTemplate x:DataType="datas:PassFilterData">
-                                <controls:PassFilterCard Margin="0,0,0,0"/>
-                            </DataTemplate>
-                        </GridView.ItemTemplate>
-                    </GridView>
-                    <Button
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        IsEnabled="{Binding ElementName=PassFilterToggleButton, Path=IsChecked}"
-                        CornerRadius="8"
-                        Padding="16"
-                        Width="120" Height="120"
-                        HorizontalAlignment="Stretch"
-                        VerticalAlignment="Center"
-                        Click="Button_Click_1">
-                        <Button.Transitions>
-                            <TransitionCollection>
-                                <RepositionThemeTransition/>
-                            </TransitionCollection>
-                        </Button.Transitions>
-                        <StackPanel>
-                            <TextBlock
-                                Text="+"
-                                FontSize="38"
-                                TextAlignment="Center"/>
-                            <TextBlock
-                                Text="添加滤波器"
-                                TextAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-            </ScrollViewer>
-            <StackPanel>
-                <ToggleButton
-                    x:Name="PassFilterToggleButton"
-                    HorizontalAlignment="Left" Grid.Column="1"
-                    Height="32" Width="32" Padding="0">
-                    <FontIcon Glyph="&#xe7e8;" FontSize="16"/>
-                </ToggleButton>
-            </StackPanel>
-        </StackPanel>
+        <controlsPrimitives:SettingsExpander
+            Header="滤波器"
+            Description="使用滤波器设置">
+            <ToggleSwitch
+                x:Name="PassFilterToggleButton"
+                Toggled="PassFilterToggleButton_Toggled"/>
+            <controlsPrimitives:SettingsExpander.Items>
+                <controlsPrimitives:SettingsCard Padding="12">
+                    <controlsPrimitives:SettingsCard.Description>
+                        <ScrollViewer
+                            HorizontalScrollMode="Enabled"
+                            HorizontalScrollBarVisibility="Auto"
+                            VerticalScrollMode="Disabled"
+                            VerticalScrollBarVisibility="Disabled">
+                            <StackPanel
+                                Orientation="Horizontal">
+                                <GridView
+                                    x:Name="PassFilterList"
+                                    IsEnabled="{Binding ElementName=PassFilterToggleButton, Path=IsOn}"
+                                    CanDragItems="True" AllowDrop="True"
+                                    CanReorderItems="True" SelectionMode="None"
+                                    ScrollViewer.VerticalScrollMode="Disabled"
+                                    ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                    <GridView.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </GridView.ItemsPanel>
+                                    <GridView.ItemTemplate>
+                                        <DataTemplate x:DataType="datas:PassFilterData">
+                                            <controls:PassFilterCard Margin="0,0,0,0"/>
+                                        </DataTemplate>
+                                    </GridView.ItemTemplate>
+                                </GridView>
+                                <Button
+                                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    IsEnabled="{Binding ElementName=PassFilterToggleButton, Path=IsOn}"
+                                    CornerRadius="8"
+                                    Padding="16" Margin="12,0"
+                                    Width="120" Height="120"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Center"
+                                    Click="Button_Click_1">
+                                    <Button.Transitions>
+                                        <TransitionCollection>
+                                            <RepositionThemeTransition/>
+                                        </TransitionCollection>
+                                    </Button.Transitions>
+                                    <StackPanel>
+                                        <TextBlock
+                                            Text="+"
+                                            FontSize="38"
+                                            TextAlignment="Center"/>
+                                        <TextBlock
+                                            Text="添加滤波器"
+                                            TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </controlsPrimitives:SettingsCard.Description>
+                </controlsPrimitives:SettingsCard>
+            </controlsPrimitives:SettingsExpander.Items>
+        </controlsPrimitives:SettingsExpander>
 
+        <!--预设-->
+        <controlsPrimitives:SettingsExpander
+            Header="参数均衡器 &amp; 滤波器 预设"
+            Description="管理 参数均衡器 &amp; 滤波器 的设置预设">
+            <ComboBox
+                x:Name="ParamEQComboBox"
+                SelectedIndex="0">
+                <x:String>默认</x:String>
+            </ComboBox>
+            <controlsPrimitives:SettingsExpander.Items>
+                <controlsPrimitives:SettingsCard
+                    Header="保存当前设置为预设">
+                    <Button Content="保存"/>
+                </controlsPrimitives:SettingsCard>
+                <controlsPrimitives:SettingsCard
+                    Header="AutoEq"
+                    Description="搜索 AutoEq 预设">
+                    <Button Content="搜索"/>
+                </controlsPrimitives:SettingsCard>
+            </controlsPrimitives:SettingsExpander.Items>
+            
+        </controlsPrimitives:SettingsExpander>
     </ListView>
 </Page>

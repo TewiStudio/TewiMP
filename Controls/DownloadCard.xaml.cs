@@ -1,9 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.IO;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
 using TewiMP.Background;
+using TewiMP.DataEditor;
 
 namespace TewiMP.Controls
 {
@@ -180,6 +182,8 @@ namespace TewiMP.Controls
         {
             if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
             {
+                MessageTb1.Visibility = Visibility.Collapsed;
+                MouseEnterButton.Visibility = Visibility.Visible;
             }
         }
 
@@ -187,6 +191,8 @@ namespace TewiMP.Controls
         {
             if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
             {
+                MessageTb1.Visibility = Visibility.Visible;
+                MouseEnterButton.Visibility = Visibility.Collapsed;
             }
         }
 
@@ -227,6 +233,31 @@ namespace TewiMP.Controls
                 default:
                     SetWaiting();
                     break;
+            }
+        }
+
+        private async void MouseEnterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button button)
+            {
+                if (button.Tag as string == "0")
+                {
+                    await FileHelper.ExploreFile(string.IsNullOrEmpty(downloadData.Path) ? DataFolderBase.DownloadFolder : downloadData.Path);
+                }
+                else
+                {
+                    if (downloadData.DownloadState == DownloadStates.Downloaded)
+                    {
+                        await Task.Run(() =>
+                        {
+                            if (File.Exists(downloadData.Path)) File.Delete(downloadData.Path);
+                            if (File.Exists(downloadData.LrcPath)) File.Delete(downloadData.LrcPath);
+                        });
+                        App.downloadManager.WaitingDownloadData.Remove(downloadData);
+                        App.downloadManager.DownloadedData.Remove(downloadData);
+                        App.downloadManager.NowDownloadPage.DownloadDatas.Remove(downloadData);
+                    }
+                }
             }
         }
     }

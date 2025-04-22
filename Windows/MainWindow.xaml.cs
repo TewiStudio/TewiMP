@@ -185,7 +185,7 @@ namespace TewiMP
             loadingst.Children.Add(loadingprogress);
             loadingst.Children.Add(loadingtextBlock);
 
-            App.LoadSettings(App.StartingSettings);
+            App.LoadSettings();
             SetBackdrop(m_currentBackdrop);
 
             NavView.SelectedItem = NavView.MenuItems[1];
@@ -522,7 +522,7 @@ namespace TewiMP
             App.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
             App.playingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
             App.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-            App.lyricManager.PlayingLyricSelectedChange -= LyricManager_PlayingLyricSelectedChange;
+            App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
             App.playingList.PlayingListItemChange -= PlayingList_PlayingListItemChange;
 
             App.downloadManager.AddDownload -= DownloadManager_AddDownload;
@@ -1123,13 +1123,13 @@ namespace TewiMP
             if (audioPlayer.PlaybackState == PlaybackState.Playing)
             {
                 PlayRing.Foreground = App.Current.Resources["AccentAAFillColorDefaultBrush"] as SolidColorBrush;
-                App.lyricManager.PlayingLyricSelectedChange += LyricManager_PlayingLyricSelectedChange;
+                App.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
                 App.lyricManager.StartTimer();
             }
             else
             {
                 PlayRing.Foreground = App.Current.Resources["SystemFillColorCautionBrush"] as SolidColorBrush;
-                App.lyricManager.PlayingLyricSelectedChange -= LyricManager_PlayingLyricSelectedChange;
+                App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
             }
 
             MediaPlayStateViewer.PlaybackState = audioPlayer.PlaybackState;
@@ -2381,6 +2381,7 @@ namespace TewiMP
         private void WindowGridBase_DragOver(object sender, DragEventArgs e)
         {
             if (!AllowDragEvents) return;
+            if (!e.DataView.AvailableFormats.Contains("FileDrop")) return; // 当拖动的是应用程序自身的控件时返回
             ShowDropInfo_Root();
             e.AcceptedOperation = DataPackageOperation.Link;
             e.DragUIOverride.Caption = "打开";

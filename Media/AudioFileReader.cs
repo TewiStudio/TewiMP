@@ -179,64 +179,73 @@ namespace TewiMP.Media
         {
             _filters.Clear();
 
-            foreach (float[] floats in AudioEqualizerBands.NormalBands)
+            if (AudioFilterStatic.GraphicEqEnable)
             {
-                var filter = new BiQuadFilter[WaveFormat.Channels];
-                for (int n = 0; n < WaveFormat.Channels; n++)
+                foreach (float[] floats in AudioEqualizerBands.NormalBands)
                 {
-                    filter[n] = BiQuadFilterPeak(floats[0], floats[1], floats[2]);
+                    var filter = new BiQuadFilter[WaveFormat.Channels];
+                    for (int n = 0; n < WaveFormat.Channels; n++)
+                    {
+                        filter[n] = BiQuadFilterPeak(floats[0], floats[1], floats[2]);
+                    }
+                    _filters.Add(filter);
                 }
-                _filters.Add(filter);
             }
 
-            foreach (var eqData in AudioFilterStatic.EQDatas)
+            if (AudioFilterStatic.ParametricEqEnable)
             {
-                if (!eqData.IsEnable) continue;
-                var filter = new BiQuadFilter[WaveFormat.Channels];
-                switch (eqData.Channel)
+                foreach (var eqData in AudioFilterStatic.ParametricEqDatas)
                 {
-                    case 0:
-                        filter[0] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q / 10f, eqData.Decibels / 10f);
-                        break;
-                    case 1:
-                        for (int n = 0; n < WaveFormat.Channels; n++)
-                        {
-                            filter[n] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q / 10f, eqData.Decibels / 10f);
-                        }
-                        break;
-                    case 2:
-                        if (filter.Length >= 2)
-                        {
-                            filter[1] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q / 10f, eqData.Decibels / 10f);
-                        }
-                        break;
+                    if (!eqData.IsEnable) continue;
+                    var filter = new BiQuadFilter[WaveFormat.Channels];
+                    switch (eqData.Channel)
+                    {
+                        case 0:
+                            filter[0] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q, eqData.Gain);
+                            break;
+                        case 1:
+                            for (int n = 0; n < WaveFormat.Channels; n++)
+                            {
+                                filter[n] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q, eqData.Gain);
+                            }
+                            break;
+                        case 2:
+                            if (filter.Length >= 2)
+                            {
+                                filter[1] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q, eqData.Gain);
+                            }
+                            break;
+                    }
+                    _filters.Add(filter);
                 }
-                _filters.Add(filter);
             }
 
-            foreach (var passFilterData in AudioFilterStatic.PassFilterDatas)
+            if (AudioFilterStatic.PassFilterEqEnable)
             {
-                if (!passFilterData.IsEnable) continue;
-                var filter = new BiQuadFilter[WaveFormat.Channels];
-                switch (passFilterData.Channel)
+                foreach (var passFilterData in AudioFilterStatic.PassFilterDatas)
                 {
-                    case 0:
-                        filter[0] = GetPassFilter(passFilterData);
-                        break;
-                    case 1:
-                        for (int n = 0; n < WaveFormat.Channels; n++)
-                        {
-                            filter[n] = GetPassFilter(passFilterData);
-                        }
-                        break;
-                    case 2:
-                        if (filter.Length >= 2)
-                        {
-                            filter[1] = GetPassFilter(passFilterData);
-                        }
-                        break;
+                    if (!passFilterData.IsEnable) continue;
+                    var filter = new BiQuadFilter[WaveFormat.Channels];
+                    switch (passFilterData.Channel)
+                    {
+                        case 0:
+                            filter[0] = GetPassFilter(passFilterData);
+                            break;
+                        case 1:
+                            for (int n = 0; n < WaveFormat.Channels; n++)
+                            {
+                                filter[n] = GetPassFilter(passFilterData);
+                            }
+                            break;
+                        case 2:
+                            if (filter.Length >= 2)
+                            {
+                                filter[1] = GetPassFilter(passFilterData);
+                            }
+                            break;
+                    }
+                    _filters.Add(filter);
                 }
-                _filters.Add(filter);
             }
         }
 
@@ -253,28 +262,28 @@ namespace TewiMP.Media
             switch (filterData.PassFilterType)
             {
                 case PassFilterType.LowPass:
-                    filter = BiQuadFilter.LowPassFilter(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    filter = BiQuadFilter.LowPassFilter(WaveFormat.SampleRate, filterData.CentreFrequency, filterData.Q);
                     break;
                 case PassFilterType.HighPass:
-                    filter = BiQuadFilter.HighPassFilter(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    filter = BiQuadFilter.HighPassFilter(WaveFormat.SampleRate, filterData.CentreFrequency, filterData.Q);
                     break;
                 case PassFilterType.AllPass:
-                    filter = BiQuadFilter.AllPassFilter(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    filter = BiQuadFilter.AllPassFilter(WaveFormat.SampleRate, filterData.CentreFrequency, filterData.Q);
                     break;
                 case PassFilterType.BandPassPeak:
-                    filter = BiQuadFilter.BandPassFilterConstantPeakGain(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    filter = BiQuadFilter.BandPassFilterConstantPeakGain(WaveFormat.SampleRate, filterData.CentreFrequency, filterData.Q);
                     break;
                 case PassFilterType.BandPassSkirt:
-                    filter = BiQuadFilter.BandPassFilterConstantSkirtGain(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    filter = BiQuadFilter.BandPassFilterConstantSkirtGain(WaveFormat.SampleRate, filterData.CentreFrequency, filterData.Q);
                     break;
                 case PassFilterType.LowShelf:
-                    filter = BiQuadFilter.LowShelf(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f, filterData.Decibels / 10f);
+                    filter = BiQuadFilter.LowShelf(WaveFormat.SampleRate, filterData.CentreFrequency, filterData.Q, filterData.Gain);
                     break;
                 case PassFilterType.HighShelf:
-                    filter = BiQuadFilter.HighShelf(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f, filterData.Decibels / 10f);
+                    filter = BiQuadFilter.HighShelf(WaveFormat.SampleRate, filterData.CentreFrequency, filterData.Q, filterData.Gain);
                     break;
                 case PassFilterType.Notch:
-                    filter = BiQuadFilter.NotchFilter(WaveFormat.SampleRate, filterData.Frequency, filterData.Q / 100f);
+                    filter = BiQuadFilter.NotchFilter(WaveFormat.SampleRate, filterData.CentreFrequency, filterData.Q);
                     break;
             }
             return filter;

@@ -14,12 +14,24 @@ namespace TewiMP.Background
     {
         public delegate void PlayingLyricDelegate(ObservableCollection<LyricData> nowPlayingLyrics);
         public delegate void PlayingLyricData(LyricData nowLyricsData);
-        public event PlayingLyricDelegate PlayingLyricSourceChange;
-        public event PlayingLyricData PlayingLyricSelectedChange;
+        public event PlayingLyricDelegate PlayingLyricSourceChanged;
+        public event PlayingLyricData PlayingLyricSelectedChanged;
+        public event PlayingLyricData LyricTimingChanged;
         MusicData MusicData;
         DispatcherTimer timer;
 
         public ObservableCollection<LyricData> NowPlayingLyrics = new();
+
+        public bool FastUpdateMode = false;
+        public double DefaultUpdateInterval = 100;
+        public double FastUpdateInterval = 100;
+        public double UpdateInterval
+        { 
+            get
+            {
+                return FastUpdateMode ? FastUpdateInterval : DefaultUpdateInterval;
+            }
+        }
         private LyricData _nowLyricsData = null;
         public LyricData NowLyricsData
         {
@@ -43,18 +55,23 @@ namespace TewiMP.Background
 
         private void InvokeLyricChangeEvent(LyricData lyricData)
         {
-            PlayingLyricSelectedChange?.Invoke(lyricData);
+            PlayingLyricSelectedChanged?.Invoke(lyricData);
             //App.logManager.Log("LyricManager", $"当前歌词已设置为：\"{lyricData?.Lyric?.FirstOrDefault()}\"");
         }
 
         public LyricManager()
         {
-            timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(100) };
-            timer.Tick += (_, __) => ReCallUpdate();
+            timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(UpdateInterval) };
+            timer.Tick += (_, __) =>
+            {
+                ReCallUpdate();
+                LyricTimingChanged?.Invoke(NowLyricsData);
+            };
 
             //MainWindow.WindowViewStateChanged += MainWindow_WindowViewStateChanged;
             App.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
             App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+            App.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
         }
 
         private void AudioPlayer_PlayStateChanged(Media.AudioPlayer audioPlayer)
@@ -63,6 +80,16 @@ namespace TewiMP.Background
             {
                 StartTimer();
             }
+            else
+            {
+                StopTimer();
+            }
+        }
+
+        private void AudioPlayer_TimingChanged(Media.AudioPlayer audioPlayer)
+        {
+            // 使暂停时更改播放进度可以改变歌词
+            if (audioPlayer.PlaybackState != NAudio.Wave.PlaybackState.Playing) ReCallUpdate();
         }
 
         public async Task InitLyricList(MusicData musicData)
@@ -145,6 +172,7 @@ namespace TewiMP.Background
             }
             if (string.IsNullOrEmpty(file.Tag.Lyrics))
             {
+                App.logManager.Log("LyricManager", "IDv3 标签中找不到歌词。", LogLevel.Warning);
                 await InitLyricList("");
                 return;
             }
@@ -194,8 +222,12 @@ namespace TewiMP.Background
                 {
                     NowPlayingLyrics.Add(i);
                 }
+                //NowLyricsData = lyricDatas[0];
             }
-            NowLyricsData = null;
+            else
+            {
+                NowLyricsData = null;
+            }
         }
 
         public void StartTimer()
@@ -213,10 +245,12 @@ namespace TewiMP.Background
         LyricData lastLyricData = null;
         public void ReCallUpdate()
         {
+            timer.Interval = TimeSpan.FromMilliseconds(UpdateInterval);
             timer.Start();
-            if (PlayingLyricSelectedChange is null) StopTimer();
+            if (PlayingLyricSelectedChanged is null) StopTimer();
             if (!NowPlayingLyrics.Any()) StopTimer();
             if (NowPlayingLyrics.Count <= 3) StopTimer();
+            if (App.audioPlayer.PlaybackState != NAudio.Wave.PlaybackState.Playing) StopTimer();
 
             foreach (var data in NowPlayingLyrics)
             {
@@ -239,7 +273,7 @@ namespace TewiMP.Background
             {
                 MusicData = audioPlayer.MusicData;
                 await InitLyricList(audioPlayer.MusicData);
-                PlayingLyricSourceChange?.Invoke(NowPlayingLyrics);
+                PlayingLyricSourceChanged?.Invoke(NowPlayingLyrics);
 
                 //if (audioPlayer.NowOutDevice.DeviceType == Media.AudioPlayer.OutApi.Wasapi) timer.Interval = TimeSpan.FromMilliseconds(audioPlayer.Latency);
                 //else timer.Interval = TimeSpan.FromMilliseconds(100);

@@ -12,7 +12,7 @@ namespace TewiMP.Pages
 {
     public partial class DownloadPage : Page
     {
-        ObservableCollection<DownloadData> downloadDatas = new();
+        public ObservableCollection<DownloadData> DownloadDatas = new();
         public DownloadPage()
         {
             InitializeComponent();
@@ -22,13 +22,14 @@ namespace TewiMP.Pages
 
         private void UpdateTextTB()
         {
-            PausePlayBtn.Visibility = downloadDatas.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+            PausePlayBtn.Visibility = DownloadDatas.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
             HeaderBaseTextBlock.Text = $"下载（{App.downloadManager.DownloadedData.Count}/{App.downloadManager.AllDownloadData.Count} - {App.downloadManager.DownloadingData.Count} 下载中，{App.downloadManager.DownloadErrorData.Count} 错误）";
         }
         private void DownloadPage_Loaded(object sender, RoutedEventArgs e)
         {
+            App.downloadManager.NowDownloadPage = this;
             UpdateTextTB();
-            ListViewBase.ItemsSource = downloadDatas;
+            ListViewBase.ItemsSource = DownloadDatas;
 
             App.downloadManager.AddDownload += DownloadManager_AddDownload;
             App.downloadManager.OnDownloading += DownloadManager_OnDownloading;
@@ -40,7 +41,7 @@ namespace TewiMP.Pages
             // 当第一次初始化时加载
             foreach (var dm in App.downloadManager.AllDownloadData)
             {
-                downloadDatas.Add(dm);
+                DownloadDatas.Add(dm);
             }
             foreach (var dm in App.downloadManager.DownloadingData)
             {
@@ -55,7 +56,7 @@ namespace TewiMP.Pages
                 App.downloadManager.CallOnDownloadErrorEvent(dm);
             }
 
-            if (!downloadDatas.Any())
+            if (!DownloadDatas.Any())
             {
                 ListEmptyPopup.Visibility = Visibility.Visible;
                 AtListBottomTb.Visibility = Visibility.Collapsed;
@@ -79,7 +80,7 @@ namespace TewiMP.Pages
 
         private void DownloadManager_AddDownload(DownloadData data)
         {
-            downloadDatas.Add(data);
+            DownloadDatas.Add(data);
             UpdateTextTB();
         }
 

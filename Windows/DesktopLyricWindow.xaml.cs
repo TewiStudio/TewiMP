@@ -16,7 +16,7 @@ using WinRT;
 using Windows.Graphics;
 using NAudio.Wave;
 using Vanara.PInvoke;
-using Microsoft.UI.Xaml.Hosting;
+using System.Diagnostics;
 
 namespace TewiMP.Windowed
 {
@@ -161,6 +161,7 @@ namespace TewiMP.Windowed
             App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
             App.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
             App.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+            App.lyricManager.LyricTimingChanged += LyricManager_LyricTimingChanged;
             AudioPlayer_PlayStateChanged(App.audioPlayer);
             App.audioPlayer.ReCallTiming();
             SetLyricOpacity(LyricOpacity);
@@ -173,6 +174,7 @@ namespace TewiMP.Windowed
             App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
             App.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
             App.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+            App.lyricManager.LyricTimingChanged -= LyricManager_LyricTimingChanged;
         }
 
         public void SetLyricOpacity(double value)
@@ -180,9 +182,83 @@ namespace TewiMP.Windowed
             root.Opacity = value;
         }
 
+        private void SetLyricIntervalControlProgress(double value)
+        {
+            if (value >= .8)
+            {
+                LyricIntervalCircle1.Visibility = Visibility.Visible;
+                LyricIntervalCircle2.Visibility = Visibility.Visible;
+                LyricIntervalCircle3.Visibility = Visibility.Visible;
+                LyricIntervalCircle4.Visibility = Visibility.Visible;
+                LyricIntervalCircle5.Visibility = Visibility.Visible;
+            }
+            else if (value >= .6)
+            {
+                LyricIntervalCircle1.Visibility = Visibility.Visible;
+                LyricIntervalCircle2.Visibility = Visibility.Visible;
+                LyricIntervalCircle3.Visibility = Visibility.Visible;
+                LyricIntervalCircle4.Visibility = Visibility.Visible;
+                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+            }
+            else if (value >= .4)
+            {
+                LyricIntervalCircle1.Visibility = Visibility.Visible;
+                LyricIntervalCircle2.Visibility = Visibility.Visible;
+                LyricIntervalCircle3.Visibility = Visibility.Visible;
+                LyricIntervalCircle4.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+            }
+            else if (value >= .2)
+            {
+                LyricIntervalCircle1.Visibility = Visibility.Visible;
+                LyricIntervalCircle2.Visibility = Visibility.Visible;
+                LyricIntervalCircle3.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle4.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+            }
+            else if (value > 0)
+            {
+                LyricIntervalCircle1.Visibility = Visibility.Visible;
+                LyricIntervalCircle2.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle3.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle4.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                LyricIntervalCircle1.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle2.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle3.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle4.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+            }
+
+        }
+
+        TimeSpan lyricIntervalStart = TimeSpan.Zero;
+        TimeSpan lyricIntervalEnd = TimeSpan.MinValue;
+        private void LyricManager_LyricTimingChanged(LyricData nowLyricsData)
+        {
+            if (lyricIntervalEnd != TimeSpan.MinValue)
+            {
+                App.lyricManager.FastUpdateMode = true;
+                var c1 = App.audioPlayer.CurrentTime - lyricIntervalStart;
+                var c2 = lyricIntervalEnd - lyricIntervalStart;
+                var c3 = c1 / c2;
+                double result = double.Clamp(c3, 0, 1);
+                LyricIntervalRoot.Visibility = Visibility.Visible;
+                SetLyricIntervalControlProgress(1 - result);
+                if (result >= 1) lyricIntervalEnd = TimeSpan.MinValue;
+            }
+            else
+            {
+                LyricIntervalRoot.Visibility = Visibility.Collapsed;
+            }
+        }
+
         int showBorderCount = 0;
         bool isAddedEvent = false;
-        private async void AudioPlayer_PlayStateChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_PlayStateChanged(Media.AudioPlayer audioPlayer)
         {
             PlayStateElement.PlaybackState = audioPlayer.PlaybackState;
             if (audioPlayer.PlaybackState == PlaybackState.Playing)
@@ -192,8 +268,8 @@ namespace TewiMP.Windowed
                 if (!isAddedEvent)
                 {
                     isAddedEvent = true;
-                    App.lyricManager.PlayingLyricSourceChange += LyricManager_PlayingLyricSourceChange;
-                    App.lyricManager.PlayingLyricSelectedChange += LyricManager_PlayingLyricSelectedChange;
+                    App.lyricManager.PlayingLyricSourceChanged += LyricManager_PlayingLyricSourceChange;
+                    App.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
                     App.lyricManager.StartTimer();
                     LyricManager_PlayingLyricSelectedChange(App.lyricManager.NowLyricsData);
                 }
@@ -202,8 +278,8 @@ namespace TewiMP.Windowed
             {
                 if (PauseButtonVisible) InfoBorder.Opacity = 1;
                 isAddedEvent = false;
-                App.lyricManager.PlayingLyricSourceChange -= LyricManager_PlayingLyricSourceChange;
-                App.lyricManager.PlayingLyricSelectedChange -= LyricManager_PlayingLyricSelectedChange;
+                App.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
+                App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
             }
         }
 
@@ -251,6 +327,8 @@ namespace TewiMP.Windowed
             T11.Text = null;
             T21.Text = null;
             LyricRomajiPopup_tb.Text = null;
+            lyricIntervalEnd = TimeSpan.MinValue;
+            App.lyricManager.FastUpdateMode = false;
 
             if (nowLyricsData is null)
             {
@@ -307,7 +385,6 @@ namespace TewiMP.Windowed
                 animationTextVisual(2);
                 return;
             }
-
             if (nowLyricsData.Lyric.First() == LyricHelper.NoneLyricString)
             {
                 if (App.lyricManager.NowPlayingLyrics.Any())
@@ -319,6 +396,16 @@ namespace TewiMP.Windowed
                 return;
             }
 
+            int nowLyricNum = App.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
+            LyricData nextLyric = null;
+            LyricData beforeLyric = null;
+            if (nowLyricNum != -1)
+            {
+                nextLyric = App.lyricManager.NowPlayingLyrics[nowLyricNum + 1];
+                if (nowLyricNum > 0)
+                    beforeLyric = App.lyricManager.NowPlayingLyrics[nowLyricNum - 1];
+            }
+
             var doubleLyricLineMode = LyricTranslateTextBehavior == LyricTranslateTextBehavior.MainLyric || LyricTranslateTextBehavior == LyricTranslateTextBehavior.TranslateLyric;
 
             if (nowLyricsData?.Lyric.Count > 1 && doubleLyricLineMode)
@@ -326,13 +413,17 @@ namespace TewiMP.Windowed
                 IsT1Focus = true;
 
                 int tCount = 1;
-                int num = App.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
                 try
                 {
+                    if (nowLyricsData?.Lyric?.FirstOrDefault() == nextLyric?.Lyric?.FirstOrDefault())
+                    {
+                        lyricIntervalStart = nowLyricsData.LyricTimeSpan;
+                        lyricIntervalEnd = nextLyric.LyricTimeSpan;
+                    }/*
                     while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num + tCount]?.Lyric?.FirstOrDefault())
                     {
                         tCount++;
-                    }
+                    }*/
                 }
                 catch { }
 
@@ -409,6 +500,11 @@ namespace TewiMP.Windowed
                 }
                 else
                 {
+                    if (nowLyricsData.LyricTimeSpan - beforeLyric.LyricTimeSpan >= TimeSpan.FromSeconds(5))
+                    {
+                        lyricIntervalStart = beforeLyric.LyricTimeSpan;
+                        lyricIntervalEnd = nowLyricsData.LyricTimeSpan;
+                    }
                     T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                     T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                 }
@@ -456,21 +552,21 @@ namespace TewiMP.Windowed
                 LyricData nextData = new(null, null, TimeSpan.Zero);
                 try
                 {
-                    int num = App.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
+                    int num1 = App.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
                     do
                     {
-                        num++;
-                        nextData = App.lyricManager.NowPlayingLyrics[num];
+                        num1++;
+                        nextData = App.lyricManager.NowPlayingLyrics[num1];
                     }
                     while (nextData?.Lyric?.FirstOrDefault() == LyricHelper.NoneLyricString);
                 }
                 catch { }
 
                 int tCount = 1;
-                int num1 = App.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
+                int num2 = App.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
                 try
                 {
-                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num1 + tCount]?.Lyric?.FirstOrDefault())
+                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num2 + tCount]?.Lyric?.FirstOrDefault())
                     {
                         tCount++;
                     }
@@ -585,9 +681,9 @@ namespace TewiMP.Windowed
         }
 
         private void LyricManager_PlayingLyricSourceChange(ObservableCollection<LyricData> nowPlayingLyrics)
-        {
+        {/*
             if (nowPlayingLyrics.Any())
-                LyricManager_PlayingLyricSelectedChange(nowPlayingLyrics[0]);
+                LyricManager_PlayingLyricSelectedChange(nowPlayingLyrics[0]);*/
         }
 
         bool IsT1Focus = true;
@@ -655,14 +751,14 @@ namespace TewiMP.Windowed
             RectInt32[] rectInt32s = default;
             if (IsLock)
             {
-                rectInt32s = new RectInt32[] { new(0, 0, windowWidth, windowHeight) };
+                rectInt32s = [new(0, 0, windowWidth, windowHeight)];
             }
             else
             {
-                rectInt32s = new RectInt32[] {
+                rectInt32s = [
                     new(toolBarWidth, 0, windowWidth - toolBarWidth, windowHeight),
                     new(0, toolBarHeight, toolBarWidth, windowHeight - toolBarHeight)
-                };
+                ];
             }
             
             AppWindow.TitleBar.SetDragRectangles(rectInt32s);
@@ -702,8 +798,8 @@ namespace TewiMP.Windowed
             lastWindowPosition = AppWindow.Position;
             lastWindowSize = AppWindow.Size;
             DisposeAcrylicBackdrop();
-            App.lyricManager.PlayingLyricSourceChange -= LyricManager_PlayingLyricSourceChange;
-            App.lyricManager.PlayingLyricSelectedChange -= LyricManager_PlayingLyricSelectedChange;
+            App.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
+            App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
         }
 
         private void DisposeAcrylicBackdrop()

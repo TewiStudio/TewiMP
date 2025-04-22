@@ -118,11 +118,18 @@ namespace TewiMP.Pages
             }
         }
 
+        bool isInLoaded = false;
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            isInLoaded = true;
+            GraphicEqToggleButton.IsOn = AudioFilterStatic.GraphicEqEnable;
+            ParametricToggleButton.IsOn = AudioFilterStatic.ParametricEqEnable;
+            PassFilterToggleButton.IsOn = AudioFilterStatic.PassFilterEqEnable;
+            isInLoaded = false;
+
             AudioPlayer.EqEnableChanged += AudioPlayer_EqEnableChanged;
             AudioPlayer.EqBandChanged += AudioPlayer_EqualizerBandChanged;
-            EQList.ItemsSource = AudioFilterStatic.EQDatas;
+            EQList.ItemsSource = AudioFilterStatic.ParametricEqDatas;
             PassFilterList.ItemsSource = AudioFilterStatic.PassFilterDatas;
 
             AddOutDeviceToFlyOut();
@@ -136,6 +143,7 @@ namespace TewiMP.Pages
             AudioPlayer.EqBandChanged -= AudioPlayer_EqualizerBandChanged;
             EQList.ItemsSource = null;
             PassFilterList.ItemsSource = null;
+            App.SaveSettings();
         }
 
         private void C_Click(object sender, RoutedEventArgs e)
@@ -168,11 +176,11 @@ namespace TewiMP.Pages
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             Random r = new();
-            AudioFilterStatic.EQDatas.Add(new()
+            AudioFilterStatic.ParametricEqDatas.Add(new()
             {
                 CentreFrequency = 31,
-                Q = 15,
-                Decibels = 0,
+                Q = 1,
+                Gain = 0,
                 Channel = 1,
                 IsEnable = true,
                 Color = Color.FromArgb(255, (byte)r.Next(0, 255), (byte)r.Next(0, 255), (byte)r.Next(0, 255))
@@ -184,8 +192,8 @@ namespace TewiMP.Pages
             Random r = new();
             AudioFilterStatic.PassFilterDatas.Add(new()
             {
-                Frequency = 16000,
-                Q = 1f,
+                CentreFrequency = 16000,
+                Q = 1,
                 Channel = 1,
                 IsEnable = true,
                 Color = Color.FromArgb(255, (byte)r.Next(0, 255), (byte)r.Next(0, 255), (byte)r.Next(0, 255))
@@ -266,6 +274,27 @@ namespace TewiMP.Pages
         private void EqComboBox_Loaded(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void PassFilterToggleButton_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (isInLoaded) return;
+            AudioFilterStatic.PassFilterEqEnable = PassFilterToggleButton.IsOn;
+            App.audioPlayer.UpdateEqualizer();
+        }
+
+        private void GraphicEqToggleButton_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (isInLoaded) return;
+            AudioFilterStatic.GraphicEqEnable = GraphicEqToggleButton.IsOn;
+            App.audioPlayer.UpdateEqualizer();
+        }
+
+        private void ParametricToggleButton_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (isInLoaded) return;
+            AudioFilterStatic.ParametricEqEnable = ParametricToggleButton.IsOn;
+            App.audioPlayer.UpdateEqualizer();
         }
     }
 
