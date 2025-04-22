@@ -46,7 +46,7 @@ namespace Ude.Core
         protected byte[] charToOrderMap;
         
         // [SAMPLE_SIZE][SAMPLE_SIZE] table to find a 2-char sequence's 
-        // centreFrequency        
+        // frequency        
         protected byte[] precedenceMatrix;
         
         // freqSeqs / totalSeqs

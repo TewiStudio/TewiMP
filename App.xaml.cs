@@ -3,9 +3,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Windows.System;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Popups;
@@ -17,8 +17,6 @@ using TewiMP.DataEditor;
 using TewiMP.Windowed;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
-using Microsoft.VisualBasic.Devices;
-using System.Collections.ObjectModel;
 
 namespace TewiMP
 {

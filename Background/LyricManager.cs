@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Linq;
 using System.Text;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
+using Microsoft.UI.Xaml;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
-using Microsoft.UI.Xaml;
 
 namespace TewiMP.Background
 {

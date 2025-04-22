@@ -50,8 +50,8 @@ namespace Ude.Core
         protected const int MINIMUM_DATA_THRESHOLD = 4;
         protected const float DONT_KNOW = -1.0f;
 
-        // hiragana centreFrequency category table
-        // This is hiragana 2-char sequence table, the number in each cell represents its centreFrequency category
+        // hiragana frequency category table
+        // This is hiragana 2-char sequence table, the number in each cell represents its frequency category
         protected static byte[,] jp2CharContext = { 
             { 0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,},
             { 2,4,0,4,0,3,0,4,0,3,4,4,4,2,4,3,3,4,3,2,3,3,4,2,3,3,3,2,4,1,4,3,3,1,5,4,3,4,3,4,3,5,3,0,3,5,4,2,0,3,1,0,3,3,0,3,3,0,1,1,0,4,3,0,3,3,0,4,0,2,0,3,5,5,5,5,4,0,4,1,0,3,4,},

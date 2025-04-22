@@ -4,17 +4,16 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Input;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
 using CommunityToolkit.WinUI;
 using NAudio.Wave;
 using TewiMP.Helpers;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
-using Microsoft.UI.Composition;
 
 namespace TewiMP.Pages.MusicPages
 {
