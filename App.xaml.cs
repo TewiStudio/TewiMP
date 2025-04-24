@@ -139,8 +139,9 @@ namespace TewiMP
             hotKeyManager = new();
 
             BMP = Windows.Media.Playback.BackgroundMediaPlayer.Current;
-            SMTC = BMP?.SystemMediaTransportControls;
+            BMP.AudioCategory = Windows.Media.Playback.MediaPlayerAudioCategory.Media;
 
+            SMTC = BMP?.SystemMediaTransportControls;
             SMTC.IsPlayEnabled = true;
             SMTC.IsPauseEnabled = true;
             SMTC.IsNextEnabled = true;
@@ -163,13 +164,13 @@ namespace TewiMP
                 if (_.MusicData is null)
                 {
                     SMTC.DisplayUpdater.MusicProperties.Title = _.FileReader?.FileName;
-                    MainWindow.AppWindowLocal.Title = AppName;
+                    MainWindow.AppWindowInstance.Title = AppName;
                 }
                 else
                 {
                     SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData.Title;
                     SMTC.DisplayUpdater.MusicProperties.Artist = _.MusicData.ButtonName;
-                    MainWindow.AppWindowLocal.Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {AppName}";
+                    MainWindow.AppWindowInstance.Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {AppName}";
                 }
                 SMTC.DisplayUpdater.Update();
             };
@@ -220,30 +221,18 @@ namespace TewiMP
 
             // WinUI Bug: 获取不到启动参数
             //LAE = args;
-            LaunchArgs = Environment.GetCommandLineArgs().ToList();
+            LaunchArgs = [.. Environment.GetCommandLineArgs()];
             LaunchArgs.Remove(LaunchArgs.First());
 
             m_window = new MainWindow();
             WindowLocal = m_window;
             hotKeyManager.Init(WindowLocal);
-            /*
-                        List<Microsoft.WindowsAPICodePack.Taskbar.ThumbnailToolBarButton> buttons = new()
-                        {
-                            new (null, "上一首"),
-                            new(null, "播放/暂停"),
-                            new(null, "下一首")
-                        };
-                        Microsoft.WindowsAPICodePack.Taskbar.TaskbarManager.Instance.ThumbnailToolBars.AddButtons(AppWindowLocalHandle, buttons.ToArray());
-            */
-
             if (loadFailed)
             {
                 ShowErrorDialog();
                 return;
             }
 
-            //m_window.Closed += M_window_Closed;
-            //AppWindowLocal.SetPresenter(AppWindowLocalPresenter);
             DelayOpenWindows();
         }
 

@@ -192,7 +192,7 @@ namespace TewiMP.Pages
             Random r = new();
             AudioFilterStatic.PassFilterDatas.Add(new()
             {
-                CentreFrequency = 16000,
+                CentreFrequency = 2048,
                 Q = 1,
                 Channel = 1,
                 IsEnable = true,

@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
+using Microsoft.UI.Composition;
 using CommunityToolkit.WinUI;
 using NAudio.Wave;
 using TewiMP.Helpers;
@@ -687,15 +688,15 @@ namespace TewiMP.Pages.MusicPages
 
         private void FullScreenButton_Click(object sender, RoutedEventArgs e)
         {
-            if (MainWindow.AppWindowLocal.Presenter.Kind == AppWindowPresenterKind.FullScreen)
+            if (MainWindow.AppWindowInstance.Presenter.Kind == AppWindowPresenterKind.FullScreen)
             {
                 FullScreenIcon.Glyph = "\xE1D9";
-                MainWindow.AppWindowLocal.SetPresenter(AppWindowPresenterKind.Default);
+                MainWindow.AppWindowInstance.SetPresenter(AppWindowPresenterKind.Default);
             }
             else
             {
                 FullScreenIcon.Glyph = "\xE1D8";
-                MainWindow.AppWindowLocal.SetPresenter(AppWindowPresenterKind.FullScreen);
+                MainWindow.AppWindowInstance.SetPresenter(AppWindowPresenterKind.FullScreen);
             }
         }
 

@@ -331,8 +331,8 @@ namespace TewiMP.Background.HotKeys
                         App.playingList.PlayBehavior = App.playingList.PlayBehavior == Background.PlayBehavior.随机播放 ? Background.PlayBehavior.顺序播放 : Background.PlayBehavior.随机播放;
                         break;
                     case HotKeyID.OpenMainWindow:
-                        MainWindow.AppWindowLocal.Show();
-                        MainWindow.OverlappedPresenter.Restore();
+                        MainWindow.AppWindowInstance.Show();
+                        MainWindow.SOverlappedPresenter.Restore();
                         PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
                         break;
                     case HotKeyID.TryActivityLyricWindow:

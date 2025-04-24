@@ -1,4 +1,5 @@
-﻿using System;
+﻿using WinRT;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
@@ -20,6 +21,9 @@ using Windows.UI;
 using Windows.Storage;
 using Windows.Graphics;
 using Windows.ApplicationModel.DataTransfer;
+using NAudio.Wave;
+using Newtonsoft.Json.Linq;
+using CommunityToolkit.WinUI;
 using TewiMP.Pages;
 using TewiMP.Pages.MusicPages;
 using TewiMP.Helpers;
@@ -28,10 +32,6 @@ using TewiMP.Windowed;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
-using WinRT;
-using NAudio.Wave;
-using Newtonsoft.Json.Linq;
-using CommunityToolkit.WinUI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -42,9 +42,9 @@ namespace TewiMP
     {
         public static bool RunInBackground = false;
 
-        public static AppWindow AppWindowLocal;
-        public static OverlappedPresenter OverlappedPresenter;
-        public static FullScreenPresenter FullScreenPresenter;
+        public static AppWindow AppWindowInstance;
+        public static OverlappedPresenter SOverlappedPresenter;
+        public static FullScreenPresenter SFullScreenPresenter;
         public static IntPtr Handle;
 
         public static UIElement SContent;
@@ -96,17 +96,17 @@ namespace TewiMP
         public delegate void MusicPageViewStateChangedDelegate(MusicPageViewState musicPageViewState);
         public static event MusicPageViewStateChangedDelegate MusicPageViewStateChanged;
 
-        private static ObservableCollection<NotifyItemData> NotifyList = new();
-
         public MainWindow()
         {
             SWindow = this;
             InitializeComponent();
             Handle = WindowHelperzn.WindowHelper.GetWindowHandle(this);
-            OverlappedPresenter = OverlappedPresenter.Create();
-            AppWindow.SetPresenter(OverlappedPresenter);
-            AppWindowLocal = AppWindow;
-            //FullScreenPresenter = FullScreenPresenter.Create();
+            SOverlappedPresenter = OverlappedPresenter.Create();
+            AppWindow.SetPresenter(SOverlappedPresenter);
+            AppWindowInstance = AppWindow;
+            SOverlappedPresenter.PreferredMinimumHeight = 132;
+            SOverlappedPresenter.PreferredMinimumWidth = 320;
+            //SFullScreenPresenter = SFullScreenPresenter.Create();
 
             NowDPI = CodeHelper.GetScaleAdjustment(this);
             WindowGridBase.DataContext = this;
@@ -150,8 +150,6 @@ namespace TewiMP
             m_wsdqHelper = new WindowHelperzn.WindowsSystemDispatcherQueueHelper();
             m_wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
             SetDragRegionForCustomTitleBar(AppWindow);
-
-            //Windows.UI.Core.SystemNavigationManager.GetForCurrentView().BackRequested += (_, __) => { TryGoBack(); };
 
             Activated += MainWindow_Activated;
             SWindowGridBaseTop.ActualThemeChanged += WindowGridBase_ActualThemeChanged;
@@ -249,7 +247,7 @@ namespace TewiMP
             if (App.LaunchArgs != null)
             {
                 //AddNotify("Args", string.Join(" ||| ", App.LaunchArgs), NotifySeverity.Warning, TimeSpan.FromSeconds(10));
-                List<string> openFiles = new List<string>();
+                List<string> openFiles = [];
                 foreach (var str in App.LaunchArgs)
                 {
                     if (str.Contains(@":\"))
@@ -281,9 +279,9 @@ namespace TewiMP
                         list[index] = result;
                     }
                 }
-                lags = list.ToArray();
+                lags = [.. list];
 
-                List<string> unknowArg = new();
+                List<string> unknowArg = [];
                 // 处理启动参数
                 foreach (string arg in lags)
                 {
@@ -334,7 +332,7 @@ namespace TewiMP
                 screenHeight<= windowHeight)
             {
                 if (isPreparedActivate)
-                    OverlappedPresenter.Maximize();
+                    SOverlappedPresenter.Maximize();
             }
             else
             {
@@ -444,6 +442,7 @@ namespace TewiMP
         private void WindowGridBase_Loaded(object sender, RoutedEventArgs e)
         {
             PlayingListBaseView.ItemsSource = App.playingList.NowPlayingList;
+            //SystemNavigationManager.GetForCurrentView().BackRequested += (_, __) => { TryGoBack(); };
 #if DEBUG
             DebugViewPopup.XamlRoot = WindowGridBase.XamlRoot;
             DebugViewPopup.IsOpen = true;
@@ -591,7 +590,7 @@ namespace TewiMP
             {
                 AddEvents();
             }
-            SetDragRegionForCustomTitleBar(MainWindow.AppWindowLocal);
+            SetDragRegionForCustomTitleBar(MainWindow.AppWindowInstance);
         }
 
         private static void Window_Activated(object sender, WindowActivatedEventArgs args)
@@ -626,7 +625,7 @@ namespace TewiMP
 
         private async void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            SetDragRegionForCustomTitleBar(MainWindow.AppWindowLocal);
+            SetDragRegionForCustomTitleBar(MainWindow.AppWindowInstance);
 #if DEBUG
             DebugView_Detail_WindowSizeRun.Text = $"{WindowGridBase.ActualWidth}x{WindowGridBase.ActualHeight}";
             DebugViewPopup.VerticalOffset = AppWindow.Size.Height;
@@ -669,7 +668,7 @@ namespace TewiMP
         {
             if (AppWindowTitleBar.IsCustomizationSupported())
             {
-                InitializeTitleBar(AppWindowLocal.TitleBar, theme);
+                InitializeTitleBar(AppWindowInstance.TitleBar, theme);
             }
             else
             {
@@ -699,7 +698,7 @@ namespace TewiMP
 
             bool defaultLightTheme = false;
             bool defaultDarkTheme = false;
-            AppWindowLocal.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
+            AppWindowInstance.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             if (theme == ElementTheme.Default)
             {
                 defaultLightTheme = App.Current.RequestedTheme == ApplicationTheme.Light;
@@ -1406,7 +1405,7 @@ namespace TewiMP
                 dragRectR.X = (int)((NavView.DisplayMode == NavigationViewDisplayMode.Minimal ? 84 * scaleAdjustment : 44 * scaleAdjustment));
                 dragRectR.Y = 0;
                 dragRectR.Height = (int)(AppTitleBar.ActualHeight * scaleAdjustment);
-                dragRectR.Width = (int)(scaleAdjustment * AppWindowLocal.Size.Width);
+                dragRectR.Width = (int)(scaleAdjustment * AppWindowInstance.Size.Width);
                 dragRectsList.Add(dragRectR);
 
                 RectInt32[] dragRects = dragRectsList.ToArray();
@@ -1444,7 +1443,7 @@ namespace TewiMP
         {
             NavViewContentBase_RGClip.Rect = new Windows.Foundation.Rect(0, 0,
                 NavViewContentBase.ActualWidth,
-                AppWindowLocal.Size.Height - AppTitleBar.ActualHeight);
+                AppWindowInstance.Size.Height - AppTitleBar.ActualHeight);
         }
 
         public static void SetNavViewContent(Type type, object param = null, NavigationTransitionInfo navigationTransitionInfo = null)
@@ -1609,7 +1608,7 @@ namespace TewiMP
                 NavView_LocalTextItem.Margin = new(0);
                 AppTitleBar.Height = 32;
                 sender.Margin = new(0, 32, 0, 0);
-                SetDragRegionForCustomTitleBar(MainWindow.AppWindowLocal);
+                SetDragRegionForCustomTitleBar(MainWindow.AppWindowInstance);
                 return;
             }
             else
@@ -1630,7 +1629,7 @@ namespace TewiMP
                 NavigationViewMinSizeTopColorRectangle.Visibility = Visibility.Collapsed;
             }
 
-            SetDragRegionForCustomTitleBar(AppWindowLocal);
+            SetDragRegionForCustomTitleBar(AppWindowInstance);
         }
 
         private void NavViewContentBase_SizeChanged(object sender, SizeChangedEventArgs e)

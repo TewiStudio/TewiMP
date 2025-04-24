@@ -1,5 +1,7 @@
-﻿using System;
+﻿using WinRT;
+using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Microsoft.UI;
@@ -9,17 +11,15 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
+using Windows.UI;
+using NAudio.Wave;
+using Vanara.PInvoke;
+using TewiMP.Pages;
 using TewiMP.Media;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
-using static TewiMP.Windowed.RoundWindow;
-using Windows.UI;
-using WinRT;
-using NAudio.Wave;
-using TewiMP.Pages;
 using TewiMP.Background;
-using System.Linq;
-using Vanara.PInvoke;
+using static TewiMP.Windowed.RoundWindow;
 
 namespace TewiMP.Windowed
 {
@@ -65,21 +65,10 @@ namespace TewiMP.Windowed
                     RoundWindow.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE, ref preference,
                     sizeof(uint));
             }
-            presenter = OverlappedPresenter.Create();
+            
+            presenter = OverlappedPresenter.CreateForDialog();
             AppWindow.SetPresenter(presenter);
-            AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
-            AppWindow.IsShownInSwitchers = false;
-            AppWindow.Title = $"NotifyIcon Window";
-            AppWindow.SetIcon(Path.Combine("Images", "Icons", "icon_nobackground.ico"));
-
-            AppWindow.TitleBar.ButtonBackgroundColor = Color.FromArgb(0, 0, 0, 0);
-            AppWindow.TitleBar.ButtonForegroundColor = Color.FromArgb(0, 255, 255, 255);
-
-            presenter.IsMaximizable = false;
-            presenter.IsMinimizable = false;
-            presenter.IsResizable = false;
-            presenter.IsAlwaysOnTop = true;
-            presenter.SetBorderAndTitleBar(false, false);
+            UpdateWindowDisplay();
 
             AppWindow.Closing += AppWindow_Closing;
             notifyIcon.Click += NotifyIcon_Click;
@@ -94,6 +83,23 @@ namespace TewiMP.Windowed
         }
 
         #region others
+        private void UpdateWindowDisplay()
+        {
+            AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
+            AppWindow.IsShownInSwitchers = false;
+            AppWindow.Title = $"NotifyIcon Window";
+            AppWindow.SetIcon(Path.Combine("Images", "Icons", "icon_nobackground.ico"));
+
+            AppWindow.TitleBar.ButtonBackgroundColor = Color.FromArgb(0, 0, 0, 0);
+            AppWindow.TitleBar.ButtonForegroundColor = Color.FromArgb(0, 255, 255, 255);
+
+            presenter.IsMaximizable = false;
+            presenter.IsMinimizable = false;
+            presenter.IsResizable = false;
+            presenter.IsAlwaysOnTop = true;
+            presenter.SetBorderAndTitleBar(true, false);
+        }
+
         private void Root_ActualThemeChanged(FrameworkElement sender, object args)
         {
             SetBackdrop(BackdropType.DesktopAcrylic);
@@ -101,6 +107,7 @@ namespace TewiMP.Windowed
 
         public void UpdateDatas()
         {
+            UpdateWindowDisplay();
             AudioPlayer_SourceChanged(App.audioPlayer);
             AudioPlayer_PlayStateChanged(App.audioPlayer);
             AudioPlayer_TimingChanged(App.audioPlayer);
@@ -308,8 +315,8 @@ namespace TewiMP.Windowed
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            MainWindow.AppWindowLocal.Show();
-            MainWindow.OverlappedPresenter.Restore();
+            MainWindow.AppWindowInstance.Show();
+            MainWindow.SOverlappedPresenter.Restore();
             PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
         }
 
@@ -333,8 +340,8 @@ namespace TewiMP.Windowed
             }
             else
             {
-                MainWindow.AppWindowLocal.Show();
-                MainWindow.OverlappedPresenter.Restore();
+                MainWindow.AppWindowInstance.Show();
+                MainWindow.SOverlappedPresenter.Restore();
                 PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
             }
         }
@@ -507,8 +514,8 @@ namespace TewiMP.Windowed
             switch ((sender as FrameworkElement).Tag)
             {
                 case "setting":
-                    MainWindow.AppWindowLocal.Show();
-                    MainWindow.OverlappedPresenter.Restore();
+                    MainWindow.AppWindowInstance.Show();
+                    MainWindow.SOverlappedPresenter.Restore();
                     PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
                     MainWindow.SetNavViewContent(typeof(SettingPage));
                     break;
@@ -517,8 +524,8 @@ namespace TewiMP.Windowed
                     App.ExitApp();
                     break;
                 case "returnBack":
-                    MainWindow.AppWindowLocal.Show();
-                    MainWindow.OverlappedPresenter.Restore();
+                    MainWindow.AppWindowInstance.Show();
+                    MainWindow.SOverlappedPresenter.Restore();
                     PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
                     break;
             }

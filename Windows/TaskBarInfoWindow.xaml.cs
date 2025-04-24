@@ -57,7 +57,7 @@ namespace TewiMP.Windowed
             AppWindow.Closing += (_, __) =>
             {
                 __.Cancel = true;
-                MainWindow.AppWindowLocal.Hide();
+                MainWindow.AppWindowInstance.Hide();
             };
             AppWindow.Changed += (_, __) =>
             {

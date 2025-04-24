@@ -104,9 +104,9 @@
                         x:Name="gainSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         ValueChanged="Silder_ValueChanged"
-                        Minimum="-120"
-                        Maximum="120"
-                        TickFrequency="30"
+                        Minimum="-200"
+                        Maximum="200"
+                        TickFrequency="100"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
@@ -132,7 +132,7 @@
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         ThumbToolTipValueConverter="{StaticResource qValueC}"
                         ValueChanged="Silder_ValueChanged"
-                        TickFrequency="41"
+                        TickFrequency="825"
                         Minimum="33"
                         Maximum="3333"
                         HorizontalAlignment="Center"/>
@@ -159,7 +159,7 @@
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         ThumbToolTipValueConverter="{StaticResource doubleValueC}"
                         ValueChanged="Silder_ValueChanged"
-                        TickFrequency="3990"
+                        TickFrequency="3995"
                         Minimum="20"
                         Maximum="16000"
                         HorizontalAlignment="Center"/>

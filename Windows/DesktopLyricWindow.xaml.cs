@@ -79,8 +79,8 @@ namespace TewiMP.Windowed
                     if (!MainWindow.isMinSize)
                     {
                         PointInt32 pointInt32 = new(
-                            MainWindow.AppWindowLocal.Position.X + MainWindow.AppWindowLocal.Size.Width - AppWindow.Size.Width,
-                            MainWindow.AppWindowLocal.Position.Y + MainWindow.AppWindowLocal.Size.Height - AppWindow.Size.Height);
+                            MainWindow.AppWindowInstance.Position.X + MainWindow.AppWindowInstance.Size.Width - AppWindow.Size.Width,
+                            MainWindow.AppWindowInstance.Position.Y + MainWindow.AppWindowInstance.Size.Height - AppWindow.Size.Height);
                         AppWindow.Move(pointInt32);
                     }
                 }
@@ -186,66 +186,67 @@ namespace TewiMP.Windowed
         {
             if (value >= .8)
             {
-                LyricIntervalCircle1.Visibility = Visibility.Visible;
-                LyricIntervalCircle2.Visibility = Visibility.Visible;
-                LyricIntervalCircle3.Visibility = Visibility.Visible;
-                LyricIntervalCircle4.Visibility = Visibility.Visible;
-                LyricIntervalCircle5.Visibility = Visibility.Visible;
+                LyricIntervalCircle1.Opacity = 1;
+                LyricIntervalCircle2.Opacity = 1;
+                LyricIntervalCircle3.Opacity = 1;
+                LyricIntervalCircle4.Opacity = 1;
+                LyricIntervalCircle5.Opacity = 1;
             }
             else if (value >= .6)
             {
-                LyricIntervalCircle1.Visibility = Visibility.Visible;
-                LyricIntervalCircle2.Visibility = Visibility.Visible;
-                LyricIntervalCircle3.Visibility = Visibility.Visible;
-                LyricIntervalCircle4.Visibility = Visibility.Visible;
-                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle1.Opacity = 1;
+                LyricIntervalCircle2.Opacity = 1;
+                LyricIntervalCircle3.Opacity = 1;
+                LyricIntervalCircle4.Opacity = 1;
+                LyricIntervalCircle5.Opacity = 0;
             }
             else if (value >= .4)
             {
-                LyricIntervalCircle1.Visibility = Visibility.Visible;
-                LyricIntervalCircle2.Visibility = Visibility.Visible;
-                LyricIntervalCircle3.Visibility = Visibility.Visible;
-                LyricIntervalCircle4.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle1.Opacity = 1;
+                LyricIntervalCircle2.Opacity = 1;
+                LyricIntervalCircle3.Opacity = 1;
+                LyricIntervalCircle4.Opacity = 0;
+                LyricIntervalCircle5.Opacity = 0;
             }
             else if (value >= .2)
             {
-                LyricIntervalCircle1.Visibility = Visibility.Visible;
-                LyricIntervalCircle2.Visibility = Visibility.Visible;
-                LyricIntervalCircle3.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle4.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle1.Opacity = 1;
+                LyricIntervalCircle2.Opacity = 1;
+                LyricIntervalCircle3.Opacity = 0;
+                LyricIntervalCircle4.Opacity = 0;
+                LyricIntervalCircle5.Opacity = 0;
             }
             else if (value > 0)
             {
-                LyricIntervalCircle1.Visibility = Visibility.Visible;
-                LyricIntervalCircle2.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle3.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle4.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle1.Opacity = 1;
+                LyricIntervalCircle2.Opacity = 0;
+                LyricIntervalCircle3.Opacity = 0;
+                LyricIntervalCircle4.Opacity = 0;
+                LyricIntervalCircle5.Opacity = 0;
             }
             else
             {
-                LyricIntervalCircle1.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle2.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle3.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle4.Visibility = Visibility.Collapsed;
-                LyricIntervalCircle5.Visibility = Visibility.Collapsed;
+                LyricIntervalCircle1.Opacity = 0;
+                LyricIntervalCircle2.Opacity = 0;
+                LyricIntervalCircle3.Opacity = 0;
+                LyricIntervalCircle4.Opacity = 0;
+                LyricIntervalCircle5.Opacity = 0;
             }
 
         }
 
         TimeSpan lyricIntervalStart = TimeSpan.Zero;
         TimeSpan lyricIntervalEnd = TimeSpan.MinValue;
+        readonly TimeSpan fiveSecond = TimeSpan.FromSeconds(5);
         private void LyricManager_LyricTimingChanged(LyricData nowLyricsData)
         {
             if (lyricIntervalEnd != TimeSpan.MinValue)
             {
                 App.lyricManager.FastUpdateMode = true;
-                var c1 = App.audioPlayer.CurrentTime - lyricIntervalStart;
-                var c2 = lyricIntervalEnd - lyricIntervalStart;
-                var c3 = c1 / c2;
-                double result = double.Clamp(c3, 0, 1);
+
+                var c1 = App.audioPlayer.CurrentTime - (lyricIntervalEnd - fiveSecond);
+                //App.logManager.Log("DEBUG", $"{c1} | {c2} | {c3}");
+                double result = double.Clamp(c1 / fiveSecond, 0, 1);
                 LyricIntervalRoot.Visibility = Visibility.Visible;
                 SetLyricIntervalControlProgress(1 - result);
                 if (result >= 1) lyricIntervalEnd = TimeSpan.MinValue;
@@ -415,15 +416,10 @@ namespace TewiMP.Windowed
                 int tCount = 1;
                 try
                 {
-                    if (nowLyricsData?.Lyric?.FirstOrDefault() == nextLyric?.Lyric?.FirstOrDefault())
-                    {
-                        lyricIntervalStart = nowLyricsData.LyricTimeSpan;
-                        lyricIntervalEnd = nextLyric.LyricTimeSpan;
-                    }/*
-                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num + tCount]?.Lyric?.FirstOrDefault())
+                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[nowLyricNum + tCount]?.Lyric?.FirstOrDefault())
                     {
                         tCount++;
-                    }*/
+                    }
                 }
                 catch { }
 
@@ -604,6 +600,11 @@ namespace TewiMP.Windowed
                         T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                         if (isNext)
                         {
+                            if (nowLyricsData.LyricTimeSpan - beforeLyric.LyricTimeSpan >= TimeSpan.FromSeconds(5))
+                            {
+                                lyricIntervalStart = beforeLyric.LyricTimeSpan;
+                                lyricIntervalEnd = nowLyricsData.LyricTimeSpan;
+                            }
                             T1.Foreground = root.Resources["LrcSecondForeground"] as SolidColorBrush;
                             T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                         }
@@ -647,6 +648,12 @@ namespace TewiMP.Windowed
                     else
                         T1.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
                     T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                }
+
+                if (nowLyricsData.LyricTimeSpan - beforeLyric?.LyricTimeSpan >= TimeSpan.FromSeconds(5))
+                {
+                    lyricIntervalStart = beforeLyric.LyricTimeSpan;
+                    lyricIntervalEnd = nowLyricsData.LyricTimeSpan;
                 }
             }
 
