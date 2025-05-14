@@ -179,6 +179,7 @@ namespace TewiMP.DataEditor
             { SettingParams.LoadLastExitPlayingSongAndSongList.ToString(), true },
             { SettingParams.TopNavigationStyle.ToString(), false },
             { SettingParams.LocalMusicPageItemSortBy.ToString(), 0 },
+            { SettingParams.HotKeyEnable.ToString(), false },
             { SettingParams.HotKeySettings.ToString(), JArray.FromObject(HotKeyManager.DefaultRegisterHotKeysList) },
             { SettingParams.StartupWithWindows.ToString(), false },
         };
@@ -260,6 +261,7 @@ namespace TewiMP.DataEditor
             LoadLastExitPlayingSongAndSongList,
             TopNavigationStyle,
             LocalMusicPageItemSortBy,
+            HotKeyEnable,
             HotKeySettings,
             StartupWithWindows
         }

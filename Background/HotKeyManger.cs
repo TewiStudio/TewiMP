@@ -143,12 +143,29 @@ namespace TewiMP.Background.HotKeys
 
     public class HotKeyManager
     {
-        public Window RegistedWindow { get; private set; }
-        public nint RegistedWindowHandle { get; private set; }
-        public ObservableCollection<HotKey> RegistedHotKeys { get; private set; } = new();
-
-        public static List<HotKey> DefaultRegisterHotKeysList { get; set; } = new()
+        private bool enableHotKey = false;
+        public bool EnableHotKey
         {
+            get => enableHotKey;
+            set
+            {
+                enableHotKey = value;
+                if (enableHotKey)
+                {
+                    RegisterHotKeys([.. RegisteredHotKeys]);
+                }
+                else
+                {
+                    UnregisterHotKeys([.. RegisteredHotKeys], false);
+                }
+            }
+        }
+        public Window RegisteredWindow { get; private set; }
+        public nint RegisteredWindowHandle { get; private set; }
+        public ObservableCollection<HotKey> RegisteredHotKeys { get; private set; } = [];
+        public static List<HotKey> WillRegisterHotKeysList { get; set; } = DefaultRegisterHotKeysList;
+        public static List<HotKey> DefaultRegisterHotKeysList { get; set; } =
+        [
             new(User32.HotKeyModifiers.MOD_CONTROL | User32.HotKeyModifiers.MOD_SHIFT, Windows.System.VirtualKey.Left, HotKeyID.PreviousSong),
             new(User32.HotKeyModifiers.MOD_CONTROL | User32.HotKeyModifiers.MOD_SHIFT, Windows.System.VirtualKey.Right, HotKeyID.NextSong),
             new(User32.HotKeyModifiers.MOD_CONTROL | User32.HotKeyModifiers.MOD_SHIFT, Windows.System.VirtualKey.Down, HotKeyID.Pause),
@@ -161,9 +178,7 @@ namespace TewiMP.Background.HotKeys
             new(User32.HotKeyModifiers.MOD_CONTROL | User32.HotKeyModifiers.MOD_SHIFT, Windows.System.VirtualKey.U, HotKeyID.TryActivityLyricWindow),
             new(User32.HotKeyModifiers.MOD_CONTROL | User32.HotKeyModifiers.MOD_SHIFT, Windows.System.VirtualKey.Home, HotKeyID.ReturnToFirstSong),
             new(User32.HotKeyModifiers.MOD_CONTROL | User32.HotKeyModifiers.MOD_SHIFT, Windows.System.VirtualKey.K, HotKeyID.LockLyricWindow)
-        };
-
-        public static List<HotKey> WillRegisterHotKeysList = DefaultRegisterHotKeysList;
+        ];
 
         public HotKeyManager()
         {
@@ -171,10 +186,10 @@ namespace TewiMP.Background.HotKeys
 
         public void Init(Window window)
         {
-            RegistedWindow = window;
-            RegistedWindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(window);
-
-            RegisterHotKeys(WillRegisterHotKeysList);
+            RegisteredWindow = window;
+            RegisteredWindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(window);
+            RegisteredHotKeys = [.. WillRegisterHotKeysList];
+            EnableHotKey = enableHotKey;
             InitCallBack();
         }
 
@@ -183,36 +198,50 @@ namespace TewiMP.Background.HotKeys
             if (insertIndex == -1) insertIndex = null;
             if (hotKey.IsDisabled)
             {
-                if (insertIndex != null)
-                    RegistedHotKeys.Insert((int)insertIndex, hotKey);
-                else
-                    RegistedHotKeys.Add(hotKey);
+                if (!RegisteredHotKeys.Contains(hotKey))
+                {
+                    if (insertIndex != null)
+                        RegisteredHotKeys.Insert((int)insertIndex, hotKey);
+                    else
+                        RegisteredHotKeys.Add(hotKey);
+                }
                 return true;
             }
 
-            var r = User32.RegisterHotKey(
-                RegistedWindowHandle, (int)hotKey.HotKeyID, hotKey.HotKeyModifiers, (uint)hotKey.VirtualKey);
+            bool r = true;
+            if (EnableHotKey)
+            {
+                r = User32.RegisterHotKey(
+                    RegisteredWindowHandle, (int)hotKey.HotKeyID, hotKey.HotKeyModifiers, (uint)hotKey.VirtualKey);
+            }
 
             if (!r) hotKey.IsUsed = true;
             else hotKey.IsUsed = false;
 
-            if (insertIndex != null)
-                RegistedHotKeys.Insert((int)insertIndex, hotKey);
-            else
-                RegistedHotKeys.Add(hotKey);
+            if (!RegisteredHotKeys.Contains(hotKey))
+            {
+                if (insertIndex != null)
+                    RegisteredHotKeys.Insert((int)insertIndex, hotKey);
+                else
+                    RegisteredHotKeys.Add(hotKey);
+            }
 
             return r;
         }
 
-        public bool UnregisterHotKey(HotKeyID hotKeyID)
+        public bool UnregisterHotKey(HotKeyID hotKeyID, bool removeFromList = true)
         {
-            var r = User32.UnregisterHotKey(RegistedWindowHandle, (int)hotKeyID);
-            foreach (var item in RegistedHotKeys)
+            var r = User32.UnregisterHotKey(RegisteredWindowHandle, (int)hotKeyID);
+
+            if (removeFromList)
             {
-                if (item.HotKeyID == hotKeyID)
+                foreach (var item in RegisteredHotKeys)
                 {
-                    RegistedHotKeys.Remove(item);
-                    break;
+                    if (item.HotKeyID == hotKeyID)
+                    {
+                        RegisteredHotKeys.Remove(item);
+                        break;
+                    }
                 }
             }
 
@@ -222,11 +251,11 @@ namespace TewiMP.Background.HotKeys
         public bool ChangeHotKey(HotKey hotKey)
         {
             int index = -1;
-            foreach (var item in RegistedHotKeys)
+            foreach (var item in RegisteredHotKeys)
             {
                 if (item.HotKeyID == hotKey.HotKeyID)
                 {
-                    index = RegistedHotKeys.IndexOf(item);
+                    index = RegisteredHotKeys.IndexOf(item);
                     break;
                 }
             }
@@ -253,12 +282,12 @@ namespace TewiMP.Background.HotKeys
         /// </summary>
         /// <param name="willRegisterHotKeysList"></param>
         /// <returns></returns>
-        public void UnregisterHotKeys(List<HotKey> willUnregisterHotKeysList)
+        public void UnregisterHotKeys(List<HotKey> willUnregisterHotKeysList, bool removeFromList = true)
         {
             // 循环列表注册热键
             foreach (HotKey key in willUnregisterHotKeysList)
             {
-                bool IsRegister = UnregisterHotKey(key.HotKeyID);
+                bool isRegister = UnregisterHotKey(key.HotKeyID, removeFromList);
             }
         }
 
@@ -269,7 +298,7 @@ namespace TewiMP.Background.HotKeys
             origPrc =
                 Marshal.GetDelegateForFunctionPointer<Windows.Win32.UI.WindowsAndMessaging.WNDPROC>(
                     PInvoke.User32.SetWindowLongPtr(
-                        new Windows.Win32.Foundation.HWND(RegistedWindowHandle),
+                        new Windows.Win32.Foundation.HWND(RegisteredWindowHandle),
                         PInvoke.User32.WindowLongIndexFlags.GWLP_WNDPROC,
                         hotKeyPrcPointer));
         }

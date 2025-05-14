@@ -7,7 +7,7 @@
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
+    mc:Ignorable="d" SizeChanged="Page_SizeChanged" Loaded="Page_Loaded">
 
     <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None" Padding="0,0,0,12">
 
@@ -19,6 +19,11 @@
                 <TextBlock x:Name="HeaderBaseTextBlock" Text="编辑热键" Style="{ThemeResource TBHeader}"/>
             </Grid>
         </ListView.Header>
+
+        <cc:SettingsCard Header="全局热键开关" Margin="0,4,4,0"
+                         Description="打开/关闭全局热键">
+            <ToggleSwitch Toggled="ToggleSwitch_Toggled" x:Name="HotkeyEnableToggleSwitch"/>
+        </cc:SettingsCard>
 
         <cc:SettingsCard Header="尝试重新应用热键" Margin="0,4,4,0"
                          Description="如果此程序被其它程序占用的热键被释放，重新注册可以使之前被占用的热键恢复在此程序的功能">

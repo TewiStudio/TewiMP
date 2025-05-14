@@ -263,7 +263,7 @@ namespace TewiMP
             SMTC.DisplayUpdater.ClearAll();
             SMTC.DisplayUpdater.Update();
             audioPlayer.DisposeAll();
-            hotKeyManager.UnregisterHotKeys([.. hotKeyManager.RegistedHotKeys]);
+            hotKeyManager.UnregisterHotKeys([.. hotKeyManager.RegisteredHotKeys]);
             logManager.Log("App", "正在退出程序...");
             LogManager.DisposeNowLogStream();
             Current.Exit();
@@ -346,6 +346,7 @@ namespace TewiMP
                 LocalAudioPage.ItemSortBy = SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.LocalMusicPageItemSortBy);
                 JArray hkd = SettingEditHelper.GetSetting<JArray>(settingData, DataFolderBase.SettingParams.HotKeySettings);
                 HotKeyManager.WillRegisterHotKeysList = hkd.ToObject<List<HotKey>>();
+                hotKeyManager.EnableHotKey = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.HotKeyEnable);
 
                 var audioEffects = SettingEditHelper.GetSetting<JArray>(audioEffectData, DataFolderBase.AudioEffectFlag.AudioEffectDatas);
 
@@ -442,7 +443,8 @@ namespace TewiMP
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.BackgroundRun, MainWindow.RunInBackground);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ImageDarkMass, Controls.ImageEx.ImageDarkMass);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.LoadLastExitPlayingSongAndSongList, LoadLastExitPlayingSongAndSongList);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeySettings, JArray.FromObject(App.hotKeyManager.RegistedHotKeys));
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeyEnable, hotKeyManager.EnableHotKey);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeySettings, JArray.FromObject(App.hotKeyManager.RegisteredHotKeys));
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.TopNavigationStyle, MainWindow.SNavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.LocalMusicPageItemSortBy, LocalAudioPage.ItemSortBy);
             

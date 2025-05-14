@@ -345,7 +345,7 @@ namespace TewiMP
 
             await Task.Delay(500);
             List<string> hotKeyUsed = new();
-            foreach (var hotKey in App.hotKeyManager.RegistedHotKeys)
+            foreach (var hotKey in App.hotKeyManager.RegisteredHotKeys)
             {
                 if (hotKey.IsUsed)
                 {

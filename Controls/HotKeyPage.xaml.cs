@@ -18,10 +18,10 @@ namespace TewiMP.Controls
 
         private async void HotKeyPage_Loaded(object sender, RoutedEventArgs e)
         {
-            HotKeyRoot.ItemsSource = App.hotKeyManager.RegistedHotKeys;
+            HotKeyRoot.ItemsSource = App.hotKeyManager.RegisteredHotKeys;
             await Task.Delay(100);
             if (HotKeyRoot.ItemsSource is null)
-                HotKeyRoot.ItemsSource = App.hotKeyManager.RegistedHotKeys;
+                HotKeyRoot.ItemsSource = App.hotKeyManager.RegisteredHotKeys;
         }
 
         private void HotKey_Unloaded(object sender, RoutedEventArgs e)
