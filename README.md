@@ -1,6 +1,6 @@
 # TewiMP
 
-基于 WinUI3 的 Windows 在线音乐播放器，
+基于 WinUI3 的 Windows 本地/在线音乐播放器，
 
 仅支持 Windows 10、11。
 
