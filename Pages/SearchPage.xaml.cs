@@ -21,8 +21,8 @@ namespace TewiMP.Pages
         public SearchPage()
         {
             InitializeComponent();
-            SearchSourceComboBox.ItemsSource = App.pluginManager.MusicSourcePlugins;
-            if (App.pluginManager.MusicSourcePlugins.Count != 0) SearchSourceComboBox.SelectedIndex = 0;
+            SearchSourceComboBox.ItemsSource = PluginManager.MusicSourcePlugins;
+            if (PluginManager.MusicSourcePlugins.Count != 0) SearchSourceComboBox.SelectedIndex = 0;
 
             var b = Enum.GetNames(typeof(SearchDataType)).ToList();
             b.RemoveAt(b.IndexOf(b.Last()));
@@ -39,7 +39,7 @@ namespace TewiMP.Pages
                 new SearchData
                 {
                     Key = title,
-                    From = SearchSourceComboBox.SelectedItem as MusicSourcePlugin,
+                    PluginSource = SearchSourceComboBox.SelectedItem as MusicSourcePlugin,
                     SearchDataType = (SearchDataType)Enum.Parse(typeof(SearchDataType), SearchTypeComboBox.SelectedItem as string)
                 }
             });

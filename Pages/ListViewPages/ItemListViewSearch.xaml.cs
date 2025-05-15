@@ -44,7 +44,7 @@ namespace TewiMP.Pages
             pageNumber = searchData.PageNumber;
             pageSize = searchData.PageSize;
             NavToObj = searchData.Key;
-            NowMusicFrom = searchData.From;
+            NowMusicFrom = searchData.PluginSource;
             NowSearchMode = searchData.SearchDataType;
             musicListData = new() { ListDataType = DataType.歌曲 };
             UpdateShyHeader();

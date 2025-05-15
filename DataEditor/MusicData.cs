@@ -9,7 +9,7 @@ using TewiMP.Plugins;
 
 namespace TewiMP.DataEditor
 {
-    public enum MusicFrom { kwMusic, kgMusic, qqMusic, neteaseMusic, miguMusic, localMusic, otherMusic }
+    public enum MusicFrom { localMusic, pluginMusicSource }
     public enum DataType { 歌曲, 歌单, 本地歌单, 专辑, 用户, 艺术家 }
     public enum SearchDataType { 歌曲 = 1, 歌单 = 1000, 专辑 = 10, 用户 = 1002, 艺术家 = 100 }
     public enum MusicKbps { aac, wma, Kbps128, Kbps192, Kbps320, Kbps1000 }
@@ -73,13 +73,14 @@ namespace TewiMP.DataEditor
     public class SearchData : OnlyClass, IIsListPage
     {
         public string Key { get; set; }
-        public MusicSourcePlugin From { get; set; }
+        [JsonIgnore]
+        public MusicSourcePlugin PluginSource { get; set; }
         public SearchDataType SearchDataType { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 30;
         public override string GetMD5()
         {
-            return $"{Key}{From}{SearchDataType}";
+            return $"{Key}{PluginSource}{SearchDataType}";
         }
     }
 
@@ -91,6 +92,8 @@ namespace TewiMP.DataEditor
         public string PicturePath { get; set; }
         public string Describee { get; set; }
         public MusicFrom From { get; set; }
+        [JsonIgnore]
+        public MusicSourcePlugin PluginSource { get; set; }
         public MusicListData HotSongs { get; set; }
         public int Count { get; set; }
 
@@ -122,6 +125,8 @@ namespace TewiMP.DataEditor
         public string RelaseTime { get; set; }
         public int Count { get; set; }
         public MusicFrom From { get; set; }
+        [JsonIgnore]
+        public MusicSourcePlugin PluginSource { get; set; }
         public List<Artist> Artists { get; set; }
         public MusicListData Songs { get; set; }
 
@@ -208,6 +213,9 @@ namespace TewiMP.DataEditor
                 }
             }
         }
+
+        [JsonIgnore]
+        public MusicSourcePlugin PluginSource { get; set; }
 
         string _artistName = null;
         [JsonIgnore]
@@ -422,6 +430,8 @@ namespace TewiMP.DataEditor
         public string ListShowName { get; set; }
         public string PicturePath { get; set; }
         public MusicFrom ListFrom { get; set; }
+        [JsonIgnore]
+        public MusicSourcePlugin PluginSource { get; set; }
         public DataType ListDataType { get; set; }
         public string ID { get; set; }
         public PlaySort PlaySort { get; set; }
@@ -496,32 +506,17 @@ namespace TewiMP.DataEditor
             {
                 switch (text)
                 {
-                    case "kwMusic":
-                        musicFrom = MusicFrom.kwMusic;
-                        break;
-                    case "neteaseMusic":
-                        musicFrom = MusicFrom.neteaseMusic;
-                        break;
-                    case "kgMusic":
-                        musicFrom = MusicFrom.kgMusic;
-                        break;
-                    case "qqMusic":
-                        musicFrom = MusicFrom.qqMusic;
-                        break;
-                    case "miguMusic":
-                        musicFrom = MusicFrom.miguMusic;
-                        break;
                     case "localMusic":
                         musicFrom = MusicFrom.localMusic;
                         break;
                     default:
-                        musicFrom = MusicFrom.otherMusic;
+                        musicFrom = MusicFrom.pluginMusicSource;
                         break;
                 }
             }
             catch
             {
-                musicFrom = MusicFrom.kwMusic;
+                musicFrom = MusicFrom.pluginMusicSource;
             }
 
             return musicFrom;

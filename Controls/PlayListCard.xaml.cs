@@ -43,10 +43,10 @@ namespace TewiMP.Controls
         }
 
         public async Task Init(MusicFrom musicFrom, string id)
-        {
+        {/*
             MusicListData = await App.metingServices.NeteaseServices.GetPlayList(id);
             Init(MusicListData);
-            UILoaded(null, null);
+            UILoaded(null, null);*/
         }
 
         public void Init(MusicListData musicListData)
@@ -240,7 +240,7 @@ namespace TewiMP.Controls
             }
         }
 
-        private static async void UpdataMusicList(MusicListData musicListData)
+        private static async void UpdateMusicList(MusicListData musicListData)
         {
             MainWindow.AddNotify("正在更新歌单...", null);
 
@@ -257,7 +257,7 @@ namespace TewiMP.Controls
                 });
 
 
-                var playlist = await App.metingServices.NeteaseServices.GetPlayList(musicListData.ID);
+                var playlist = await musicListData.PluginSource.GetPlayList(musicListData.ID);
                 musicListData = playlist;
 
                 var data = await PlayListHelper.ReadData();
@@ -276,7 +276,7 @@ namespace TewiMP.Controls
 
         private async void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
         {
-            UpdataMusicList(MusicListData);
+            UpdateMusicList(MusicListData);
         }
 
         private void Grid_AccessKeyInvoked(UIElement sender, Microsoft.UI.Xaml.Input.AccessKeyInvokedEventArgs args)

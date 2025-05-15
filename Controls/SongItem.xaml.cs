@@ -710,7 +710,7 @@ namespace TewiMP.Controls
                     Uri uri = null;
                     switch (MusicData.From)
                     {
-                        case MusicFrom.neteaseMusic:
+                        case MusicFrom.pluginMusicSource:
                             uri = new($"https://music.163.com/#/song?id={MusicData.ID}");
                             break;
                     }
@@ -731,7 +731,7 @@ namespace TewiMP.Controls
 
         private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var uri = await App.metingServices.NeteaseServices.GetUrl(MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
+            var uri = await MusicData.PluginSource.GetUrl(MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
             MainWindow.HideDialog();
             await MainWindow.ShowDialog("获取到的链接是：", uri);
         }

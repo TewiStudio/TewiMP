@@ -36,7 +36,7 @@
                 <PivotItem Header="导入外部列表" AccessKey="D">
                     <Grid x:Name="AddOutSidePage">
                         <StackPanel>
-                            <ComboBox x:Name="AddOutSidePage_PlatfromCb" Header="外部平台" Margin="0,10,0,0" AccessKey="P" IsEnabled="False"/>
+                            <ComboBox x:Name="AddOutSidePage_PlatfromCb" Header="外部平台" Margin="0,10,0,0" AccessKey="P"/>
                             <TextBox x:Name="AddOutSidePage_IDTb" Header="歌单ID" Margin="0,10,0,0" AccessKey="O"/>
                         </StackPanel>
                     </Grid>

@@ -6,6 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
+using TewiMP.Plugins;
 
 namespace TewiMP.Pages.DialogPages
 {
@@ -18,11 +19,8 @@ namespace TewiMP.Pages.DialogPages
         {
             InitializeComponent();
 
-            var b = Enum.GetNames(typeof(MusicFrom)).ToList();
-            AddOutSidePage_PlatfromCb.ItemsSource = b;
-            b.RemoveAt(6);
-            b.RemoveAt(5);
-            AddOutSidePage_PlatfromCb.SelectedIndex = 3;
+            AddOutSidePage_PlatfromCb.ItemsSource = PluginManager.MusicSourcePlugins;
+            AddOutSidePage_PlatfromCb.SelectedIndex = 0;
 
             ResultEvent += AddPlayListPage_ResultEvent;
         }
@@ -45,19 +43,9 @@ namespace TewiMP.Pages.DialogPages
                 {
                     try
                     {
-                        var platform = (MusicFrom)AddOutSidePage_PlatfromCb.SelectedIndex;
+                        var platform = (MusicSourcePlugin)AddOutSidePage_PlatfromCb.SelectedItem;
 
-                        MusicListData pl = null;
-
-                        switch (platform)
-                        {
-                            case MusicFrom.neteaseMusic:
-                                pl = await App.metingServices.NeteaseServices.GetPlayList(AddOutSidePage_IDTb.Text);
-                                break;
-                            case MusicFrom.kgMusic:
-                                pl = await App.metingServices.KgServices.GetPlayList(AddOutSidePage_IDTb.Text);
-                                break;
-                        }
+                        MusicListData pl = await platform.GetPlayList(AddOutSidePage_IDTb.Text);
                         
                         if (pl != null)
                         {

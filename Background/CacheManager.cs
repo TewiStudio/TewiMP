@@ -59,7 +59,7 @@ namespace TewiMP.Background
             }
 
             InCachingMusicData.Add(data);
-            string musicWebAddress = await WebHelper.GetAudioAddressAsync(data);
+            string musicWebAddress = await data.PluginSource.GetUrl(data.ID, 960);
             if (musicWebAddress is null)
             {
                 InCachingMusicData.Remove(data);

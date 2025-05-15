@@ -128,9 +128,9 @@ namespace TewiMP.Background
 
                 App.logManager.Log("LyricManager", "从网络中下载歌词");
                 Tuple<string, string> lyricTuple;
-                if (musicData.From == MusicFrom.neteaseMusic)
+                if (musicData.From == MusicFrom.pluginMusicSource)
                 {
-                    lyricTuple = await WebHelper.GetLyricStringAsync(musicData);
+                    lyricTuple = await musicData.PluginSource.GetLyric(musicData.ID);
                 }
                 else
                 {

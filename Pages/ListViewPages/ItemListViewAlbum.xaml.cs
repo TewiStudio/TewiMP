@@ -26,7 +26,7 @@ namespace TewiMP.Pages
         public bool IsNavigatedOutFromPage { get; set; } = false;
         private ScrollViewer scrollViewer { get; set; }
         public Album NavToObj { get; set; }
-        public MusicFrom NowMusicFrom { get; set; } = MusicFrom.neteaseMusic;
+        public MusicFrom NowMusicFrom { get; set; } = MusicFrom.pluginMusicSource;
 
         public ItemListViewAlbum()
         {
@@ -122,7 +122,7 @@ namespace TewiMP.Pages
             SelectReverseButton.Visibility = Visibility.Collapsed;
             SelectAllButton.Visibility = Visibility.Collapsed;
             LoadingTipControl.ShowLoading();
-            var obj = await App.metingServices.NeteaseServices.GetAlbum(NavToObj.ID);
+            var obj = await NavToObj.PluginSource.GetAlbum(NavToObj.ID);
             if (IsNavigatedOutFromPage) return;
             if (obj is null)
             {

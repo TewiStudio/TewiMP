@@ -32,8 +32,6 @@ namespace TewiMP
     {
         public static MediaPlayer BMP { get; private set; } = null;
         public static SystemMediaTransportControls SMTC { get; private set; } = null;
-        public static PluginManager pluginManager { get; private set; } = null;
-        public static MetingServices metingServices { get; private set; } = null;
         public static CacheManager cacheManager { get; private set; } = null;
         public static AudioPlayer audioPlayer { get; private set; } = null;
         public static PlayingList playingList { get; private set; } = null;
@@ -134,8 +132,6 @@ namespace TewiMP
             LogManager.InitNowLog();
             logManager = new();
             DataFolderBase.InitFiles();
-            pluginManager = new();
-            metingServices = new();
             cacheManager = new();
             audioPlayer = new();
             playingList = new();
@@ -240,7 +236,7 @@ namespace TewiMP
                 return;
             }
             DelayOpenWindows();
-            pluginManager.Init();
+            PluginManager.Init();
         }
 
         public async void DelayOpenWindows()
@@ -314,12 +310,6 @@ namespace TewiMP
                 audioPlayer.EqEnabled = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.EqualizerEnable);
                 MainWindow.SMusicPage.ShowLrcPage = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.MusicPageShowLyricPage);
 
-                string nmc = "NeteaseMusicCookie";
-                if (settingData.ContainsKey(nmc))
-                {
-                    metingServices.NeteaseCookie = (string)settingData[nmc];
-                }
-
                 downloadManager.DownloadQuality = (DataFolderBase.DownloadQuality)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.DownloadQuality);
                 downloadManager.DownloadingMaximum = SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.DownloadMaximum);
                 downloadManager.DownloadNamedMethod = (DataFolderBase.DownloadNamedMethod)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.DownloadNamedMethod);
@@ -371,8 +361,6 @@ namespace TewiMP
                 for (int i = 0; i < 10; i++) AudioEqualizerBands.CustomBands[i][2] = float.Parse(bData[i]);
                 AudioFilterStatic.ParametricEqDatas = SettingEditHelper.GetSetting<JArray>(audioEffectData, DataFolderBase.AudioEffectFlag.ParametricEqDatas).ToObject<ObservableCollection<EQData>>();
                 AudioFilterStatic.PassFilterDatas = SettingEditHelper.GetSetting<JArray>(audioEffectData, DataFolderBase.AudioEffectFlag.PassFilterEqDatas).ToObject<ObservableCollection<PassFilterData>>();
-
-                metingServices.InitMeting();
             }
             catch (Exception e)
             {
@@ -393,7 +381,6 @@ namespace TewiMP
         public static void SaveSettings()
         {
             logManager.Log("App", "正在保存设置...");
-            metingServices.InitMeting();
             var settingData = DataFolderBase.JSettingData;
             var audioEffectData = DataFolderBase.JAudioEffectData;
             if (DataFolderBase.CacheFolder != DataFolderBase.DefaultCacheFolder)

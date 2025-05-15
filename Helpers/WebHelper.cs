@@ -102,10 +102,10 @@ namespace TewiMP.Helpers
             {
                 switch (musicData.From)
                 {
-                    case MusicFrom.neteaseMusic:
+                    case MusicFrom.pluginMusicSource:
                         if (musicData.Album.ID is null)
                         {
-                            addressResult = await App.metingServices.NeteaseServices.GetPicFromMusicData(musicData);
+                            addressResult = await musicData.PluginSource.GetPicFromMusicData(musicData);
                             //System.Diagnostics.App.logManager.Log(addressResult);
                             /*string address = $"http://music.163.com/api/song/detail/?id={musicData.ID}&ids=%5B{musicData.ID}%5D";
                             var res = JObject.Parse(await GetStringAsync(address));*/
@@ -113,16 +113,9 @@ namespace TewiMP.Helpers
                         }
                         else
                         {
-                            var album = await App.metingServices.NeteaseServices.GetAlbum(musicData.Album.ID);
+                            var album = await musicData.PluginSource.GetAlbum(musicData.Album.ID);
                             addressResult = album?.PicturePath;
                         }
-                        break;
-                    case MusicFrom.kgMusic:
-                        try
-                        {
-                            addressResult = await App.metingServices.KgServices.GetPicFromMusicData(musicData);
-                        }
-                        catch { }
                         break;
                     default:
                         addressResult = musicData.Album.PicturePath;
@@ -133,94 +126,6 @@ namespace TewiMP.Helpers
 
             loadingImages.Remove(musicData);
             return addressResult;
-        }
-
-        /// <summary>
-        /// 获取音频网络地址
-        /// </summary>
-        /// <param name="musicData"></param>
-        /// <returns></returns>
-        public static async Task<string> GetAudioAddressAsync(MusicData musicData)
-        {
-            string returns = null;
-            try
-            {
-                switch (musicData.From)
-                {
-                    case MusicFrom.kwMusic:
-                        break;
-                    case MusicFrom.kgMusic:
-                        return await App.metingServices.KgServices.GetUrl(musicData.ID, 320);
-                    case MusicFrom.neteaseMusic:
-                        return await App.metingServices.NeteaseServices.GetUrl(musicData.ID, 960);
-                    case MusicFrom.qqMusic:
-                        break;
-                    case MusicFrom.miguMusic:
-                        break;
-                    default:
-                        return null;
-                }
-            }
-            catch(Exception err) { App.logManager.Log("WebHelper", $"获取歌曲链接时出现错误！{err.Message}", Background.LogLevel.Error); }
-            return returns;
-        }
-
-        public static async Task<Tuple<string, string>> GetLyricStringAsync(MusicData musicData)
-        {
-            switch (musicData.From)
-            {
-                case MusicFrom.neteaseMusic:
-                    return await App.metingServices.NeteaseServices.GetLyric(musicData.ID);
-                //string a = await GetStringAsync($"https://api.injahow.cn/meting/?server=netease&type=song&id={musicData.ID}");
-                default: return null;
-            }
-        }
-
-        /// <summary>
-        /// 搜索平台数据
-        /// </summary>
-        /// <param name="searchData">搜索数据</param>
-        /// <param name="pageNumber">搜索页</param>
-        /// <param name="pageSize">页大小</param>
-        /// <param name="searchFrom">搜索平台</param>
-        /// <param name="dataType">搜索数据类型</param>
-        /// <returns>Class数据</returns>
-        /// <exception cref="ArgumentOutOfRangeException"></exception>
-        /// <exception cref="NullReferenceException"></exception>
-        /// <exception cref="WebException">internal not conncetd or timeout</exception>
-        public static async Task<object> SearchData(
-            string keyword,
-            int pageNumber = 1,
-            int pageSize = 30,
-            MusicFrom searchFrom = MusicFrom.neteaseMusic,
-            SearchDataType searchDataType = SearchDataType.歌曲)
-        {
-            // TODO!!!:设置ListDataType
-            object listData = null;
-            switch (searchFrom)
-            {
-                case MusicFrom.kwMusic:
-                    break;
-
-                case MusicFrom.kgMusic:
-                    //var a = App.metingServices.KgServices.Services.Search(keyword);
-                    listData = await App.metingServices.KgServices.GetSearch(keyword, pageNumber, pageSize);
-                    break;
-
-                case MusicFrom.neteaseMusic:
-                    listData = await App.metingServices.NeteaseServices.GetSearch(keyword, pageNumber, pageSize, (int)searchDataType);
-                    break;
-
-                case MusicFrom.qqMusic:
-                    break;
-
-                case MusicFrom.miguMusic:
-                    break;
-
-                default: throw new ArgumentOutOfRangeException(nameof(searchFrom));
-            }
-
-            return listData;
         }
     }
 }

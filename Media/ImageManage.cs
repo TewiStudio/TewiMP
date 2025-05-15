@@ -125,7 +125,7 @@ namespace TewiMP.Media
 
                     if (WebHelper.IsNetworkConnected)
                     {
-                        string b = $@"{DataFolderBase.ImageCacheFolder}\{musicData.From}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
+                        string b = $@"{DataFolderBase.ImageCacheFolder}\{musicData.PluginSource}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
                         string a;
                         if (musicData.Album?.PicturePath != null)
                         {

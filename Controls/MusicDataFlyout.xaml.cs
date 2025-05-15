@@ -152,7 +152,7 @@ namespace TewiMP.Controls
                     string url = null;
                     switch (songItemBind.MusicData.From)
                     {
-                        case MusicFrom.neteaseMusic:
+                        case MusicFrom.pluginMusicSource:
                             url = $"https://music.163.com/#/song?id={songItemBind.MusicData.ID}";
                             break;
                     }
@@ -169,7 +169,7 @@ namespace TewiMP.Controls
                     Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dp);
                     break;
                 case "link":
-                    var link = await App.metingServices.NeteaseServices.GetUrl(songItemBind.MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
+                    var link = await songItemBind.MusicData.PluginSource.GetUrl(songItemBind.MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
                     MainWindow.HideDialog();
                     await MainWindow.ShowDialog("获取到的链接是：", link);
                     break;

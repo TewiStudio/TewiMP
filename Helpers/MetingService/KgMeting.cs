@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
@@ -263,7 +263,7 @@ namespace TewiMP.Helpers.MetingService
 
                     Album Album = null;
                     try
-                    {/*
+                    {*//*
                         if (data["code"].ToString() == "200")
                         {
                             JObject album = (JObject)data["album"];
@@ -293,7 +293,7 @@ namespace TewiMP.Helpers.MetingService
                                 ListDataType = DataType.专辑
                             };
                             Album.Songs.Songs = UnpackMusicData(data["songs"]);
-                        }*/
+                        }*//*
                     }
                     catch (Exception err)
                     {
@@ -361,3 +361,4 @@ namespace TewiMP.Helpers.MetingService
         }
     }
 }
+*/

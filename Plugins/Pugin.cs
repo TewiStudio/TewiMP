@@ -33,25 +33,25 @@ namespace TewiMP.Plugins
         {
             if (left is null && right is null) return true;
             if (left is null || right is null) return false;
-            return left.PluginInfo.NameAndAuthor == right.PluginInfo.NameAndAuthor;
+            return left.PluginInfo == right.PluginInfo;
         }
 
         public static bool operator !=(Plugin left, Plugin right)
         {
             if (left is null && right is null) return false;
             if (left is null || right is null) return true;
-            return !(left.PluginInfo.NameAndAuthor == right.PluginInfo.NameAndAuthor);
+            return !(left.PluginInfo == right.PluginInfo);
         }
 
         public override bool Equals(object other)
         {
-            if (!(other is Plugin)) return false;
-            return string.Equals(PluginInfo.NameAndAuthor, (other as Plugin).PluginInfo.NameAndAuthor, StringComparison.InvariantCulture);
+            if (other is not Plugin) return false;
+            return PluginInfo.Equals(PluginInfo, (other as Plugin).PluginInfo);
         }
 
         public override int GetHashCode()
         {
-            return (PluginInfo.NameAndAuthor != null ? StringComparer.InvariantCulture.GetHashCode(PluginInfo.NameAndAuthor) : 0);
+            return (PluginInfo != null ? PluginInfo.GetHashCode() : 0);
         }
     }
 
@@ -79,5 +79,30 @@ namespace TewiMP.Plugins
         public string Author { set; get; }
         public string Version { set; get; }
         public string NameAndAuthor => $"{Name} - {Author}";
+
+        public static bool operator ==(PluginInfo left, PluginInfo right)
+        {
+            if (left is null && right is null) return true;
+            if (left is null || right is null) return false;
+            return left.NameAndAuthor == right.NameAndAuthor;
+        }
+
+        public static bool operator !=(PluginInfo left, PluginInfo right)
+        {
+            if (left is null && right is null) return false;
+            if (left is null || right is null) return true;
+            return !(left.NameAndAuthor == right.NameAndAuthor);
+        }
+
+        public override bool Equals(object other)
+        {
+            if (!(other is PluginInfo)) return false;
+            return string.Equals(NameAndAuthor, (other as PluginInfo).NameAndAuthor, StringComparison.InvariantCulture);
+        }
+
+        public override int GetHashCode()
+        {
+            return (string.IsNullOrEmpty(NameAndAuthor) ? StringComparer.InvariantCulture.GetHashCode(NameAndAuthor) : 0);
+        }
     }
 }

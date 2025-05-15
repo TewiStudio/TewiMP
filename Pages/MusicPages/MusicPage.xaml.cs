@@ -762,7 +762,7 @@ namespace TewiMP.Pages.MusicPages
             string url = null;
             switch (MusicData.From)
             {
-                case MusicFrom.neteaseMusic:
+                case MusicFrom.pluginMusicSource:
                     url = $"https://music.163.com/#/song?id={MusicData.ID}";
                     break;
             }

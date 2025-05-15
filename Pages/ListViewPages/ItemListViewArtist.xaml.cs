@@ -24,7 +24,7 @@ namespace TewiMP.Pages
         public bool IsNavigatedOutFromPage { get; set; } = false;
         private ScrollViewer scrollViewer { get; set; }
         public Artist NavToObj { get; set; }
-        public MusicFrom NowMusicFrom { get; set; } = MusicFrom.neteaseMusic;
+        public MusicFrom NowMusicFrom { get; set; } = MusicFrom.pluginMusicSource;
 
         public ItemListViewArtist()
         {
@@ -91,7 +91,7 @@ namespace TewiMP.Pages
             SelectReverseButton.Visibility = Visibility.Collapsed;
             SelectAllButton.Visibility = Visibility.Collapsed;
             LoadingTipControl.ShowLoading();
-            var obj = await App.metingServices.NeteaseServices.GetArtist(NavToObj.ID);
+            var obj = await NavToObj.PluginSource.GetArtist(NavToObj.ID);
             if (obj is null)
             {
                 MainWindow.AddNotify("加载艺术家信息时出现错误", "无法加载艺术家信息，请重试。", NotifySeverity.Error);

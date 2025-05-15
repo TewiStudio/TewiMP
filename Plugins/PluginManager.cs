@@ -1,16 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Collections.ObjectModel;
 
 namespace TewiMP.Plugins
 {
-    public class PluginManager
+    public static class PluginManager
     {
-        public ObservableCollection<Plugin> Plugins { get; private set; } = [];
-        public ObservableCollection<MusicSourcePlugin> MusicSourcePlugins { get; private set; } = [];
+        public static ObservableCollection<Plugin> Plugins { get; private set; } = [];
+        public static ObservableCollection<MusicSourcePlugin> MusicSourcePlugins { get; private set; } = [];
 
-        public void Init()
+        public static void Init()
         {
             RemoveAllPlugin();
             DirectoryInfo directoryInfo = new(DataEditor.DataFolderBase.PluginFolder);
@@ -45,7 +46,7 @@ namespace TewiMP.Plugins
             }
         }
 
-        public void RemoveAllPlugin()
+        public static void RemoveAllPlugin()
         {
             foreach (var plugin in MusicSourcePlugins)
             {
@@ -54,29 +55,36 @@ namespace TewiMP.Plugins
             MusicSourcePlugins.Clear();
         }
 
-        public void AddPlugin(Plugin plugin, bool isMusicSourcePlugin = false)
+        public static void AddPlugin(Plugin plugin, bool isMusicSourcePlugin = false)
         {
-            if (isMusicSourcePlugin) MusicSourcePlugins.Add(plugin as MusicSourcePlugin);
+            if (isMusicSourcePlugin)
+            {
+                var p = plugin as MusicSourcePlugin;
+                MusicSourcePlugins.Add(p);
+            }
             else Plugins.Add(plugin);
 
             EnablePlugin(plugin);
             App.logManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}.");
         }
 
-        public void RemovePlugin(Plugin plugin, bool isMusicSourcePlugin = false)
+        public static void RemovePlugin(Plugin plugin, bool isMusicSourcePlugin = false)
         {
             DisablePlugin(plugin);
-            if (isMusicSourcePlugin) MusicSourcePlugins.Remove(plugin as MusicSourcePlugin);
+            if (isMusicSourcePlugin)
+            {
+                MusicSourcePlugins.Remove(plugin as MusicSourcePlugin);
+            }
             else Plugins.Remove(plugin);
             App.logManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}.");
         }
 
-        public void EnablePlugin(Plugin plugin)
+        public static void EnablePlugin(Plugin plugin)
         {
             plugin.OnEnable();
         }
 
-        public void DisablePlugin(Plugin plugin)
+        public static void DisablePlugin(Plugin plugin)
         {
             plugin.OnDisable();
         }

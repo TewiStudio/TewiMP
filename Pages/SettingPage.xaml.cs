@@ -8,8 +8,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Composition;
 using TewiMP.Helpers;
-using TewiMP.DataEditor;
+using TewiMP.Plugins;
 using TewiMP.Windowed;
+using TewiMP.DataEditor;
 using TewiMP.Background;
 
 namespace TewiMP.Pages
@@ -942,7 +943,7 @@ namespace TewiMP.Pages
 
         private void SettingsCard_Click_3(object sender, RoutedEventArgs e)
         {
-            App.pluginManager.Init();
+            PluginManager.Init();
         }
     }
 }

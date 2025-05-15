@@ -465,9 +465,9 @@ namespace TewiMP.Pages.ListViewPages
             isInInitBindings = true;
             LoadingTipControl.ShowLoading();
 
-            if (musicListData.Songs is null && musicListData.ListFrom == MusicFrom.neteaseMusic)
+            if (musicListData.Songs is null && musicListData.ListFrom == MusicFrom.pluginMusicSource)
             {
-                musicListData = await App.metingServices.NeteaseServices.GetPlayList(musicListData.ID);
+                musicListData = await musicListData.PluginSource.GetPlayList(musicListData.ID);
                 InitInfo();
             }
 

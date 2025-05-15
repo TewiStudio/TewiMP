@@ -182,7 +182,7 @@ namespace TewiMP.Background
             var saveLyric = SaveLyricToLrcFile;
             try
             {
-                addressPath = await App.metingServices.NeteaseServices.GetUrl(dm.MusicData.ID, (int)downloadQuality);
+                addressPath = await dm.MusicData.PluginSource.GetUrl(dm.MusicData.ID, (int)downloadQuality);
             }
             catch
             {
@@ -259,7 +259,7 @@ namespace TewiMP.Background
                             if (a.PicturePath is null)
                             {
                                 result =
-                                    (await App.metingServices.NeteaseServices.GetArtist(a.ID)).PicturePath;
+                                    (await dm.MusicData.PluginSource.GetArtist(a.ID)).PicturePath;
                             }
                             var data = await WebHelper.Client.GetByteArrayAsync(result);
                             artistsPictureData.Add(new(a.Name, data));
@@ -323,7 +323,7 @@ namespace TewiMP.Background
                 tag.AlbumArtists = tag.Performers;
             });
 
-            var lyric = await App.metingServices.NeteaseServices.GetLyric(dm.MusicData.ID);
+            var lyric = await dm.MusicData.PluginSource.GetLyric(dm.MusicData.ID);
             if (lyric != null)
             {
                 if (!lyric.Item1.Contains("纯音乐，请欣赏"))
