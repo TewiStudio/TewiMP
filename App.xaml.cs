@@ -4,17 +4,22 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
+using NAudio.Wave;
+using WinRT.Interop;
+using Windows.Media;
+using Windows.Media.Playback;
 using Windows.Storage;
 using Windows.Storage.Streams;
 using Windows.UI.Popups;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json.Linq;
 using TewiMP.Pages;
 using TewiMP.Media;
 using TewiMP.Helpers;
-using TewiMP.DataEditor;
+using TewiMP.Plugins;
 using TewiMP.Windowed;
+using TewiMP.DataEditor;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
 
@@ -25,8 +30,9 @@ namespace TewiMP
     /// </summary>
     public partial class App : Application
     {
-        public static Windows.Media.Playback.MediaPlayer BMP { get; private set; } = null;
-        public static Windows.Media.SystemMediaTransportControls SMTC { get; private set; } = null;
+        public static MediaPlayer BMP { get; private set; } = null;
+        public static SystemMediaTransportControls SMTC { get; private set; } = null;
+        public static PluginManager pluginManager { get; private set; } = null;
         public static MetingServices metingServices { get; private set; } = null;
         public static CacheManager cacheManager { get; private set; } = null;
         public static AudioPlayer audioPlayer { get; private set; } = null;
@@ -128,6 +134,7 @@ namespace TewiMP
             LogManager.InitNowLog();
             logManager = new();
             DataFolderBase.InitFiles();
+            pluginManager = new();
             metingServices = new();
             cacheManager = new();
             audioPlayer = new();
@@ -138,8 +145,8 @@ namespace TewiMP
             playListReader = new();
             hotKeyManager = new();
 
-            BMP = Windows.Media.Playback.BackgroundMediaPlayer.Current;
-            BMP.AudioCategory = Windows.Media.Playback.MediaPlayerAudioCategory.Media;
+            BMP = BackgroundMediaPlayer.Current;
+            BMP.AudioCategory = MediaPlayerAudioCategory.Media;
 
             SMTC = BMP?.SystemMediaTransportControls;
             SMTC.IsPlayEnabled = true;
@@ -147,7 +154,7 @@ namespace TewiMP
             SMTC.IsNextEnabled = true;
             SMTC.IsPreviousEnabled = true;
             SMTC.IsStopEnabled = true;
-            SMTC.DisplayUpdater.Type = Windows.Media.MediaPlaybackType.Music;
+            SMTC.DisplayUpdater.Type = MediaPlaybackType.Music;
             SMTC.DisplayUpdater.AppMediaId = AppName;
             SMTC.DisplayUpdater.MusicProperties.Title = AppName;
             SMTC.DisplayUpdater.MusicProperties.Artist = "没有正在播放的歌曲";
@@ -176,13 +183,13 @@ namespace TewiMP
             };
             audioPlayer.PlayStateChanged += (_) =>
             {
-                if (_.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                if (_.PlaybackState == PlaybackState.Playing)
                 {
-                    SMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Playing;
+                    SMTC.PlaybackStatus = MediaPlaybackStatus.Playing;
                 }
                 else
                 {
-                    SMTC.PlaybackStatus = Windows.Media.MediaPlaybackStatus.Paused;
+                    SMTC.PlaybackStatus = MediaPlaybackStatus.Paused;
                 }
             };
             playingList.NowPlayingImageLoading += (_, __) =>
@@ -232,8 +239,8 @@ namespace TewiMP
                 ShowErrorDialog();
                 return;
             }
-
             DelayOpenWindows();
+            pluginManager.Init();
         }
 
         public async void DelayOpenWindows()
@@ -274,8 +281,8 @@ namespace TewiMP
             MessageDialog messageDialog = new("设置文件出现了一些错误，且程序尝试 5 次后也无法恢复默认配置。\n" +
                 $"请尝试删除 文档->{AppName}->UserData 里的 Setting 文件。\n" +
                 "如果仍然出现问题，请到 GitHub 里向项目提出 Issues。", $"{AppName} - 程序无法启动");
-            var hwnd = WinRT.Interop.WindowNative.GetWindowHandle(WindowLocal);
-            WinRT.Interop.InitializeWithWindow.Initialize(messageDialog, hwnd);
+            var hwnd = WindowNative.GetWindowHandle(WindowLocal);
+            InitializeWithWindow.Initialize(messageDialog, hwnd);
             await messageDialog.ShowAsync();
             Current.Exit();
         }

@@ -939,5 +939,10 @@ namespace TewiMP.Pages
         {
             LogWindow.ShowWindow();
         }
+
+        private void SettingsCard_Click_3(object sender, RoutedEventArgs e)
+        {
+            App.pluginManager.Init();
+        }
     }
 }

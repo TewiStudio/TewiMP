@@ -1,0 +1,83 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using TewiMP.DataEditor;
+
+namespace TewiMP.Plugins
+{
+    public abstract class Plugin
+    {
+        public bool IsEnable { get; private set; } = false;
+        public abstract PluginInfo PluginInfo { get; }
+
+        /// <summary>
+        /// 当插件被加载时调用。
+        /// </summary>
+        public virtual void OnEnable()
+        {
+            IsEnable = true;
+        }
+
+        /// <summary>
+        /// 当插件被卸载时调用。
+        /// </summary>
+        public virtual void OnDisable()
+        {
+            IsEnable = false;
+        }
+
+        public static bool operator ==(Plugin left, Plugin right)
+        {
+            if (left is null && right is null) return true;
+            if (left is null || right is null) return false;
+            return left.PluginInfo.NameAndAuthor == right.PluginInfo.NameAndAuthor;
+        }
+
+        public static bool operator !=(Plugin left, Plugin right)
+        {
+            if (left is null && right is null) return false;
+            if (left is null || right is null) return true;
+            return !(left.PluginInfo.NameAndAuthor == right.PluginInfo.NameAndAuthor);
+        }
+
+        public override bool Equals(object other)
+        {
+            if (!(other is Plugin)) return false;
+            return string.Equals(PluginInfo.NameAndAuthor, (other as Plugin).PluginInfo.NameAndAuthor, StringComparison.InvariantCulture);
+        }
+
+        public override int GetHashCode()
+        {
+            return (PluginInfo.NameAndAuthor != null ? StringComparer.InvariantCulture.GetHashCode(PluginInfo.NameAndAuthor) : 0);
+        }
+    }
+
+    public abstract class MusicSourcePlugin : Plugin
+    {
+        public abstract Task<string> GetUrl(string id, int br);
+        public abstract Task<Tuple<string, string>> GetLyric(string id);
+        public abstract Task<string> GetPic(string id);
+        public abstract Task<string> GetPicFromMusicData(MusicData musicData);
+        public abstract Task<object> GetSearch(string keyword, int pageNumber = 1, int pageSize = 30, int type = 0);
+        public abstract Task<MusicListData> GetPlayList(string id);
+        public abstract Task<Artist> GetArtist(string id);
+        public abstract Task<Album> GetAlbum(string id);
+        public abstract Task<MusicData> GetMusicData(string id);
+
+        public override string ToString()
+        {
+            return PluginInfo.Name;
+        }
+    }
+
+    public class PluginInfo
+    {
+        public string Name { set; get; }
+        public string Author { set; get; }
+        public string Version { set; get; }
+        public string NameAndAuthor => $"{Name} - {Author}";
+    }
+}

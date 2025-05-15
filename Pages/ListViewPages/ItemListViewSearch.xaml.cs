@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -9,12 +10,12 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Composition;
+using CommunityToolkit.WinUI;
 using TewiMP.Helpers;
+using TewiMP.Plugins;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
 using TewiMP.Pages.ListViewPages;
-using CommunityToolkit.WinUI;
-using System.Collections.Generic;
 
 namespace TewiMP.Pages
 {
@@ -24,7 +25,7 @@ namespace TewiMP.Pages
         private ScrollViewer scrollViewer { get; set; }
         public object NavToObj { get; set; }
         public SearchDataType NowSearchMode { get; set; } = SearchDataType.歌曲;
-        public MusicFrom NowMusicFrom { get; set; } = MusicFrom.neteaseMusic;
+        public MusicSourcePlugin NowMusicFrom { get; set; }
         MusicListData musicListData;
 
         public ItemListViewSearch()
@@ -94,7 +95,7 @@ namespace TewiMP.Pages
             SearchPageSelectorCustom.Visibility = Visibility.Visible;
             SearchHomeButton.Visibility = Visibility.Visible;
             var searchData = NavToObj as string;
-            Result_Search_Header.Text = $"\"{searchData}\" {NowSearchMode}名的搜索结果";
+            Result_Search_Header.Text = $"\"{searchData}\" {NowSearchMode}的搜索结果";
             NowPage.Text = pageNumber.ToString();
 
             MusicDataList.Clear();
@@ -102,7 +103,7 @@ namespace TewiMP.Pages
 
             try
             {
-                searchDatas = await WebHelper.SearchData(searchData, pageNumber, pageSize, NowMusicFrom, NowSearchMode);
+                searchDatas = await NowMusicFrom.GetSearch(searchData, pageNumber, pageSize, (int)NowSearchMode);
             }
             catch (ArgumentOutOfRangeException)
             {

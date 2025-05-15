@@ -12,6 +12,11 @@ namespace TewiMP.DataEditor
     public static class DataFolderBase
     {
         /// <summary>
+        /// 插件路径
+        /// </summary>
+        public static string PluginFolder { get; set; } = Path.Combine(Environment.CurrentDirectory, "Plugins");
+
+        /// <summary>
         /// 程序数据文件夹路径（Roaming）
         /// </summary>
         public static string BaseFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), App.AppName);
@@ -289,6 +294,7 @@ namespace TewiMP.DataEditor
         public static void InitFiles()
         {
             App.logManager.Log("DataFolderBase", "初始化文件目录中...");
+            Directory.CreateDirectory(PluginFolder);
             Directory.CreateDirectory(BaseFolder);
             Directory.CreateDirectory(BaseLocalFolder);
             Directory.CreateDirectory(UserDataFolder);

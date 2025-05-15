@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using TewiMP.Helpers;
+using TewiMP.Plugins;
 
 namespace TewiMP.DataEditor
 {
@@ -72,7 +73,7 @@ namespace TewiMP.DataEditor
     public class SearchData : OnlyClass, IIsListPage
     {
         public string Key { get; set; }
-        public MusicFrom From { get; set; }
+        public MusicSourcePlugin From { get; set; }
         public SearchDataType SearchDataType { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 30;

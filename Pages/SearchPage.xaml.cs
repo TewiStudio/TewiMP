@@ -3,6 +3,7 @@ using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using TewiMP.Plugins;
 using TewiMP.DataEditor;
 
 namespace TewiMP.Pages
@@ -20,9 +21,8 @@ namespace TewiMP.Pages
         public SearchPage()
         {
             InitializeComponent();
-            var a = Enum.GetNames(typeof(MusicFrom)).ToList();
-            SearchSourceComboBox.ItemsSource = a;
-            SearchSourceComboBox.SelectedIndex = 3;
+            SearchSourceComboBox.ItemsSource = App.pluginManager.MusicSourcePlugins;
+            if (App.pluginManager.MusicSourcePlugins.Count != 0) SearchSourceComboBox.SelectedIndex = 0;
 
             var b = Enum.GetNames(typeof(SearchDataType)).ToList();
             b.RemoveAt(b.IndexOf(b.Last()));
@@ -39,7 +39,7 @@ namespace TewiMP.Pages
                 new SearchData
                 {
                     Key = title,
-                    From = (MusicFrom)Enum.Parse(typeof(MusicFrom), SearchSourceComboBox.SelectedItem as string),
+                    From = SearchSourceComboBox.SelectedItem as MusicSourcePlugin,
                     SearchDataType = (SearchDataType)Enum.Parse(typeof(SearchDataType), SearchTypeComboBox.SelectedItem as string)
                 }
             });

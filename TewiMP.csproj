@@ -13,6 +13,7 @@
 		<WindowsSdkPackageVersion>10.0.22621.38</WindowsSdkPackageVersion>
 		<TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
 		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<PlatformTarget>x64</PlatformTarget>
 		<Platforms>x86;x64;arm64</Platforms>
 		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
 		<UseWinUI>true</UseWinUI>
@@ -31,24 +32,24 @@
 		<PackageProjectUrl>https://github.com/TewiStudio/TewiMP</PackageProjectUrl>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-	  <DebugType>portable</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <DebugType>portable</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|arm64'">
-	  <DebugType>portable</DebugType>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	  <Optimize>True</Optimize>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	  <Optimize>True</Optimize>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|arm64'">
-	  <DebugType>none</DebugType>
+	  <DebugType>embedded</DebugType>
 	  <Optimize>True</Optimize>
 	</PropertyGroup>
 
@@ -127,7 +128,7 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250401001" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.250108004" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="PInvoke.BCrypt" Version="0.7.124" />

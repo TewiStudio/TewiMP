@@ -100,12 +100,13 @@ namespace TewiMP
         {
             SWindow = this;
             InitializeComponent();
+
             Handle = WindowHelperzn.WindowHelper.GetWindowHandle(this);
             SOverlappedPresenter = OverlappedPresenter.Create();
             AppWindow.SetPresenter(SOverlappedPresenter);
             AppWindowInstance = AppWindow;
-            SOverlappedPresenter.PreferredMinimumHeight = 132;
-            SOverlappedPresenter.PreferredMinimumWidth = 320;
+            //SOverlappedPresenter.PreferredMinimumHeight = 132;
+            //SOverlappedPresenter.PreferredMinimumWidth = 320;
             //SFullScreenPresenter = SFullScreenPresenter.Create();
 
             NowDPI = CodeHelper.GetScaleAdjustment(this);
@@ -141,6 +142,9 @@ namespace TewiMP
             InitDialog();
             equalizerPage = new Pages.DialogPages.EqualizerPage();
             //SubClassing();
+
+            NavView.SelectedItem = NavView.MenuItems[1];
+            NavView.IsBackEnabled = false;
 
             AppWindow.Title = App.AppName;
             AppWindow.SetIcon(System.IO.Path.Combine("Images", "Icons", "icon.ico"));
@@ -185,9 +189,6 @@ namespace TewiMP
 
             App.LoadSettings();
             SetBackdrop(m_currentBackdrop);
-
-            NavView.SelectedItem = NavView.MenuItems[1];
-            NavView.IsBackEnabled = false;
 
             Canvas.SetZIndex(AppTitleBar, 1);
 

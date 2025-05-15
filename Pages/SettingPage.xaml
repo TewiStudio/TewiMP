@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TewiMP"
     xmlns:control="using:TewiMP.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:community="using:CommunityToolkit.WinUI.Controls"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -514,6 +515,12 @@
                 <cc:SettingsCard Header="显示帧数、GPU使用率指示器">
                     <ToggleSwitch Toggled="ToggleSwitch_Toggled_1" Tag="1"/>
                 </cc:SettingsCard>
+                <cc:SettingsCard Header="重新加载插件"
+                                 IsClickEnabled="True"
+                                 ClickMode="Press"
+                                 ActionIcon="{ui:FontIcon Glyph=&#xE72C;}"
+                                 Click="SettingsCard_Click_3"/>
+
             </cc:SettingsExpander.Items>
         </cc:SettingsExpander>
     </ListView>
