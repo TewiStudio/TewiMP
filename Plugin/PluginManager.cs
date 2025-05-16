@@ -38,18 +38,21 @@ namespace TewiMP.Plugin
                 }
                 else
                 {
-                    MainWindow.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 IPlugin 接口。");
+                    MainWindow.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 Plugin 类。");
                     App.logManager.Log("PluginManager", $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
                     continue;
                 }
 
-                AddPlugin(Activator.CreateInstance(type) as Plugin, isMusicSourcePlugin);
+                if (isMusicSourcePlugin)
+                    AddPlugin(Activator.CreateInstance(type) as MusicSourcePlugin);
+                else
+                    AddPlugin(Activator.CreateInstance(type) as Plugin);
             }
 
             Assembly assembly = Assembly.GetExecutingAssembly();
 
             // 程序自带插件
-            string targetNamespace = "TewiMP.Plugin.Plugins";
+            string targetNamespace = "TewiMP.Plugin.BuildInPlugins";
             var classes = assembly.GetTypes();
             var result = classes.Where(t => t.Namespace?.Contains(targetNamespace) == true && t.Name.Equals("Main")).ToList();
 
@@ -70,42 +73,54 @@ namespace TewiMP.Plugin
                     App.logManager.Log("PluginManager", $"Load plugin failed: {type} does not inherit the IPlugin interface.");
                     continue;
                 }
-                AddPlugin(Activator.CreateInstance(type) as Plugin, isMusicSourcePlugin);
+                if (isMusicSourcePlugin)
+                    AddPlugin(Activator.CreateInstance(type) as MusicSourcePlugin);
+                else
+                    AddPlugin(Activator.CreateInstance(type) as Plugin);
             }
 
         }
 
         public static void RemoveAllPlugin()
         {
+            foreach (var plugin in Plugins)
+            {
+                DisablePlugin(plugin);
+            }
             foreach (var plugin in MusicSourcePlugins)
             {
                 DisablePlugin(plugin);
             }
+            Plugins.Clear();
             MusicSourcePlugins.Clear();
         }
 
-        public static void AddPlugin(Plugin plugin, bool isMusicSourcePlugin = false)
+        public static void AddPlugin(Plugin plugin)
         {
-            if (isMusicSourcePlugin)
-            {
-                var p = plugin as MusicSourcePlugin;
-                MusicSourcePlugins.Add(p);
-            }
-            else Plugins.Add(plugin);
-
+            Plugins.Add(plugin);
             EnablePlugin(plugin);
             App.logManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}.");
         }
 
-        public static void RemovePlugin(Plugin plugin, bool isMusicSourcePlugin = false)
+        public static void AddPlugin(MusicSourcePlugin plugin)
+        {
+            MusicSourcePlugins.Add(plugin);
+            EnablePlugin(plugin);
+            App.logManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}.");
+        }
+
+        public static void RemovePlugin(Plugin plugin)
         {
             DisablePlugin(plugin);
-            if (isMusicSourcePlugin)
-            {
-                MusicSourcePlugins.Remove(plugin as MusicSourcePlugin);
-            }
-            else Plugins.Remove(plugin);
+            Plugins.Remove(plugin);
             App.logManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}.");
+        }
+
+        public static void RemovePlugin(MusicSourcePlugin plugin)
+        {
+            DisablePlugin(plugin);
+            MusicSourcePlugins.Remove(plugin);
+            App.logManager.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}.");
         }
 
         public static void EnablePlugin(Plugin plugin)

@@ -446,7 +446,7 @@ namespace TewiMP.Pages.MusicPages
             Title2RunText.Text = audioPlayer.MusicData.Title2;
             ArtistRunText.Text = audioPlayer.MusicData.ArtistName;
             AlbumRunText.Text = audioPlayer.MusicData.Album.Title;
-            OtherRunText.Text = audioPlayer.MusicData.From.ToString();
+            OtherRunText.Text = audioPlayer.MusicData.From == MusicFrom.pluginMusicSource ? audioPlayer.MusicData.PluginInfo.Name : MusicFrom.localMusic.ToString();
             AudioInfoRunText.Text = audioPlayer.WaveInfo;
 
             if (audioPlayer.MusicData != MusicData)
