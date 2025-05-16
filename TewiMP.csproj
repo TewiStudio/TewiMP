@@ -373,6 +373,10 @@
 	  </EmbeddedResource>
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Plugin\Plugins\" />
+	</ItemGroup>
+
 	<Target Name="RemovingLanuageFolders" AfterTargets="Build">
 		<ItemGroup>
 			<RemovingFiles Include="$(OutDir)*\*.mui" Exclude="$(OutDir)zh-CN\*.mui" />

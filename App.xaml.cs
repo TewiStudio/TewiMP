@@ -129,9 +129,9 @@ namespace TewiMP
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
             base.OnLaunched(args);
-            LogManager.InitNowLog();
             logManager = new();
             DataFolderBase.InitFiles();
+            LogManager.InitNowLog();
             cacheManager = new();
             audioPlayer = new();
             playingList = new();

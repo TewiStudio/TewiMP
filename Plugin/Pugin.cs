@@ -81,7 +81,12 @@ namespace TewiMP.Plugin
 
         public Plugin GetPlugin() => PluginManager.Plugins.First(p => p.PluginInfo == this);
 
-        public MusicSourcePlugin GetMusicSourcePlugin() => PluginManager.MusicSourcePlugins.First(p => p.PluginInfo == this);
+        public MusicSourcePlugin GetMusicSourcePlugin()
+        {
+            var matched = PluginManager.MusicSourcePlugins.Where(p => p.PluginInfo == this);
+            if (!matched.Any()) throw new PluginNotFoundException($"找不到插件：{NameAndAuthor}");
+            return matched.First();
+        }
 
         public override string ToString()
         {
@@ -112,5 +117,12 @@ namespace TewiMP.Plugin
         {
             return (string.IsNullOrEmpty(NameAndAuthor) ? StringComparer.InvariantCulture.GetHashCode(NameAndAuthor) : 0);
         }
+    }
+
+    public class PluginNotFoundException : Exception
+    {
+        public PluginNotFoundException() : base() { }
+        public PluginNotFoundException(string message) : base(message) { }
+        public PluginNotFoundException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

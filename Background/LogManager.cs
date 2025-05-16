@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using TewiMP.DataEditor;
 using TewiMP.Helpers;
 
@@ -51,6 +53,13 @@ namespace TewiMP.Background
             WriteToLogStream($"{App.AppName} launched on {StartTime}");
             WriteToLogStream($"Version: {App.Version}, built time: {App.Version.ReleaseTime}");
             WriteToLogStream($"System: {Environment.OSVersion}\n");
+            if (App.logManager is not null)
+            {
+                foreach (var l in App.logManager.LogDatas)
+                {
+                    WriteToLogStream($"[{l.LogTime}][{l.LogLevel}][{l.LogName}]: {l.LogContent}");
+                }
+            }
         }
 
         public static void WriteToLogStream(string text)
