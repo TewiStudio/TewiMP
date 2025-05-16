@@ -91,7 +91,7 @@ namespace TewiMP.Pages
             SelectReverseButton.Visibility = Visibility.Collapsed;
             SelectAllButton.Visibility = Visibility.Collapsed;
             LoadingTipControl.ShowLoading();
-            var obj = await NavToObj.PluginSource.GetArtist(NavToObj.ID);
+            var obj = await NavToObj.PluginInfo.GetMusicSourcePlugin().GetArtist(NavToObj.ID);
             if (obj is null)
             {
                 MainWindow.AddNotify("加载艺术家信息时出现错误", "无法加载艺术家信息，请重试。", NotifySeverity.Error);
@@ -101,7 +101,7 @@ namespace TewiMP.Pages
             NavToObj = obj;
             musicListData = NavToObj.HotSongs;
             Artist_SmallName.Text = string.IsNullOrEmpty(NavToObj.Name2) ? NavToObj.Name : $"{NavToObj.Name}（{NavToObj.Name2}）";
-            //ToolTipService.SetToolTip(Artist_Info, NavToObj.Describee);
+            //ToolTipService.SetToolTip(Artist_Info, NavToObj.Describe);
 
             if (musicListData != null)
             {

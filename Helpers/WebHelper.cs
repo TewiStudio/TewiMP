@@ -105,7 +105,7 @@ namespace TewiMP.Helpers
                     case MusicFrom.pluginMusicSource:
                         if (musicData.Album.ID is null)
                         {
-                            addressResult = await musicData.PluginSource.GetPicFromMusicData(musicData);
+                            addressResult = await musicData.PluginInfo.GetMusicSourcePlugin().GetPicFromMusicData(musicData);
                             //System.Diagnostics.App.logManager.Log(addressResult);
                             /*string address = $"http://music.163.com/api/song/detail/?id={musicData.ID}&ids=%5B{musicData.ID}%5D";
                             var res = JObject.Parse(await GetStringAsync(address));*/
@@ -113,7 +113,7 @@ namespace TewiMP.Helpers
                         }
                         else
                         {
-                            var album = await musicData.PluginSource.GetAlbum(musicData.Album.ID);
+                            var album = await musicData.PluginInfo.GetMusicSourcePlugin().GetAlbum(musicData.Album.ID);
                             addressResult = album?.PicturePath;
                         }
                         break;

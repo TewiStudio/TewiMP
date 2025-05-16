@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using TewiMP.DataEditor;
 
-namespace TewiMP.Plugins
+namespace TewiMP.Plugin
 {
     public abstract class Plugin
     {
+        [JsonIgnore]
         public bool IsEnable { get; private set; } = false;
         public abstract PluginInfo PluginInfo { get; }
 
@@ -78,7 +77,16 @@ namespace TewiMP.Plugins
         public string Name { set; get; }
         public string Author { set; get; }
         public string Version { set; get; }
-        public string NameAndAuthor => $"{Name} - {Author}";
+        [JsonIgnore] public string NameAndAuthor => $"{Name} - {Author}";
+
+        public Plugin GetPlugin() => PluginManager.Plugins.First(p => p.PluginInfo == this);
+
+        public MusicSourcePlugin GetMusicSourcePlugin() => PluginManager.MusicSourcePlugins.First(p => p.PluginInfo == this);
+
+        public override string ToString()
+        {
+            return $"{Name}{Author}";
+        }
 
         public static bool operator ==(PluginInfo left, PluginInfo right)
         {

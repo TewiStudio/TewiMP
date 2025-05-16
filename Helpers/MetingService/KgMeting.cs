@@ -274,8 +274,8 @@ namespace TewiMP.Helpers.MetingService
                                 Title2 = album["alias"].Any() ? (string)album["alias"].First : null,
                                 ID = id,
                                 PicturePath = (string)album["picUrl"],
-                                Describee = (string)album["description"],
-                                RelaseTime = (string)album["publishTime"]
+                                Describe = (string)album["description"],
+                                ReleaseTime = (string)album["publishTime"]
                             };
                             Album.Artists = new()
                             {

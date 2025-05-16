@@ -125,7 +125,7 @@ namespace TewiMP.Media
 
                     if (WebHelper.IsNetworkConnected)
                     {
-                        string b = $@"{DataFolderBase.ImageCacheFolder}\{musicData.PluginSource}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
+                        string b = $@"{DataFolderBase.ImageCacheFolder}\{musicData.PluginInfo}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
                         string a;
                         if (musicData.Album?.PicturePath != null)
                         {
@@ -188,7 +188,7 @@ namespace TewiMP.Media
             {
                 if (WebHelper.IsNetworkConnected)
                 {
-                    string b = $@"{DataFolderBase.ImageCacheFolder}\{musicListData.ListFrom}{musicListData.ListDataType}{musicListData.ID}";
+                    string b = $@"{DataFolderBase.ImageCacheFolder}\{musicListData.PluginInfo}{musicListData.ListDataType}{musicListData.ID}";
                     await Task.Run(() =>
                     {
                         if (!File.Exists(b))

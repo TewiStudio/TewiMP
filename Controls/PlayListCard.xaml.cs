@@ -257,7 +257,7 @@ namespace TewiMP.Controls
                 });
 
 
-                var playlist = await musicListData.PluginSource.GetPlayList(musicListData.ID);
+                var playlist = await musicListData.PluginInfo.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
                 musicListData = playlist;
 
                 var data = await PlayListHelper.ReadData();

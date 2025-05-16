@@ -12,7 +12,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Composition;
 using CommunityToolkit.WinUI;
 using TewiMP.Helpers;
-using TewiMP.Plugins;
+using TewiMP.Plugin;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
 using TewiMP.Pages.ListViewPages;
@@ -44,7 +44,7 @@ namespace TewiMP.Pages
             pageNumber = searchData.PageNumber;
             pageSize = searchData.PageSize;
             NavToObj = searchData.Key;
-            NowMusicFrom = searchData.PluginSource;
+            NowMusicFrom = searchData.SourcePlugin;
             NowSearchMode = searchData.SearchDataType;
             musicListData = new() { ListDataType = DataType.歌曲 };
             UpdateShyHeader();

@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
-using TewiMP.Plugins;
+using TewiMP.Plugin;
 
 namespace TewiMP.Pages.DialogPages
 {
@@ -44,9 +44,7 @@ namespace TewiMP.Pages.DialogPages
                     try
                     {
                         var platform = (MusicSourcePlugin)AddOutSidePage_PlatfromCb.SelectedItem;
-
                         MusicListData pl = await platform.GetPlayList(AddOutSidePage_IDTb.Text);
-                        
                         if (pl != null)
                         {
                             musicListData = pl;

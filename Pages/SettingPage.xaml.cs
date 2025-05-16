@@ -8,7 +8,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Composition;
 using TewiMP.Helpers;
-using TewiMP.Plugins;
+using TewiMP.Plugin;
 using TewiMP.Windowed;
 using TewiMP.DataEditor;
 using TewiMP.Background;

@@ -169,7 +169,7 @@ namespace TewiMP.Controls
                     Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dp);
                     break;
                 case "link":
-                    var link = await songItemBind.MusicData.PluginSource.GetUrl(songItemBind.MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
+                    var link = await songItemBind.MusicData.PluginInfo.GetMusicSourcePlugin().GetUrl(songItemBind.MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
                     MainWindow.HideDialog();
                     await MainWindow.ShowDialog("获取到的链接是：", link);
                     break;

@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Collections.ObjectModel;
 
-namespace TewiMP.Plugins
+namespace TewiMP.Plugin
 {
     public static class PluginManager
     {
@@ -44,6 +45,34 @@ namespace TewiMP.Plugins
 
                 AddPlugin(Activator.CreateInstance(type) as Plugin, isMusicSourcePlugin);
             }
+
+            Assembly assembly = Assembly.GetExecutingAssembly();
+
+            // 程序自带插件
+            string targetNamespace = "TewiMP.Plugin.Plugins";
+            var classes = assembly.GetTypes();
+            var result = classes.Where(t => t.Namespace?.Contains(targetNamespace) == true && t.Name.Equals("Main")).ToList();
+
+            foreach (var type in result)
+            {
+                bool isMusicSourcePlugin = false;
+                if (typeof(MusicSourcePlugin).IsAssignableFrom(type))
+                {
+                    isMusicSourcePlugin = true;
+                }
+                else if (typeof(Plugin).IsAssignableFrom(type))
+                {
+
+                }
+                else
+                {
+                    MainWindow.AddNotify("加载插件失败", $"\"{type}\" 加载失败：未继承 IPlugin 接口。");
+                    App.logManager.Log("PluginManager", $"Load plugin failed: {type} does not inherit the IPlugin interface.");
+                    continue;
+                }
+                AddPlugin(Activator.CreateInstance(type) as Plugin, isMusicSourcePlugin);
+            }
+
         }
 
         public static void RemoveAllPlugin()

@@ -28,12 +28,12 @@ namespace TewiMP.Helpers
         {
             return await Task.Run(() =>
             {
-                System.IO.DirectoryInfo directory = new System.IO.DirectoryInfo(DataEditor.DataFolderBase.AudioCacheFolder);
-                System.IO.FileInfo[] fileInfo = directory.GetFiles();
-                foreach (System.IO.FileInfo file in fileInfo)
+                DirectoryInfo directory = new DirectoryInfo(DataEditor.DataFolderBase.AudioCacheFolder);
+                FileInfo[] fileInfo = directory.GetFiles();
+                foreach (FileInfo file in fileInfo)
                 {
                     string name = file.Name.Split('.')[0];
-                    if (name == musicData.From + musicData.ID)
+                    if (name == $"{musicData.PluginInfo}{musicData.ID}")
                     {
                         return file.FullName;
                     }
@@ -79,7 +79,7 @@ namespace TewiMP.Helpers
         {
             var filename = musicData.From == DataEditor.MusicFrom.localMusic ?
                 $"{musicData.From}{musicData.MD5.Replace(@"/", "#")}" :
-                $"{musicData.From}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
+                $"{musicData.PluginInfo}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
             return await GetImageCache(filename);
         }
         
@@ -97,7 +97,7 @@ namespace TewiMP.Helpers
             {
                 return musicListData.PicturePath;
             }
-            return await GetImageCache($"{musicListData.ListFrom}{musicListData.ListDataType}{musicListData.ID}");
+            return await GetImageCache($"{musicListData.PluginInfo}{musicListData.ListDataType}{musicListData.ID}");
         }
         
         /// <summary>
@@ -124,7 +124,7 @@ namespace TewiMP.Helpers
                     FileInfo[] fileInfo = directory.GetFiles();
                     foreach (FileInfo file in fileInfo)
                     {
-                        if (file.Name == musicData.From + musicData.ID)
+                        if (file.Name == $"{musicData.PluginInfo}{musicData.ID}")
                         {
                             return file.FullName;
                         }

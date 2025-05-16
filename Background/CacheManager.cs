@@ -59,7 +59,7 @@ namespace TewiMP.Background
             }
 
             InCachingMusicData.Add(data);
-            string musicWebAddress = await data.PluginSource.GetUrl(data.ID, 960);
+            string musicWebAddress = await data.PluginInfo.GetMusicSourcePlugin().GetUrl(data.ID, 960);
             if (musicWebAddress is null)
             {
                 InCachingMusicData.Remove(data);
@@ -68,7 +68,7 @@ namespace TewiMP.Background
             }
 
             App.logManager.Log("CacheManager", "正在下载缓存文件...");
-            musicPathResult = @$"{DataFolderBase.AudioCacheFolder}\{data.From}{data.ID}";
+            musicPathResult = @$"{DataFolderBase.AudioCacheFolder}\{data.PluginInfo}{data.ID}";
             await Task.Run(() => File.Create(musicPathResult).Close()); // 创建缓存文件
 
             try

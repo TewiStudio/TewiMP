@@ -467,7 +467,7 @@ namespace TewiMP.Pages.ListViewPages
 
             if (musicListData.Songs is null && musicListData.ListFrom == MusicFrom.pluginMusicSource)
             {
-                musicListData = await musicListData.PluginSource.GetPlayList(musicListData.ID);
+                musicListData = await musicListData.PluginInfo.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
                 InitInfo();
             }
 

@@ -17,7 +17,7 @@ using Newtonsoft.Json.Linq;
 using TewiMP.Pages;
 using TewiMP.Media;
 using TewiMP.Helpers;
-using TewiMP.Plugins;
+using TewiMP.Plugin;
 using TewiMP.Windowed;
 using TewiMP.DataEditor;
 using TewiMP.Background;

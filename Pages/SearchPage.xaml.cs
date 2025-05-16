@@ -3,7 +3,7 @@ using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
-using TewiMP.Plugins;
+using TewiMP.Plugin;
 using TewiMP.DataEditor;
 
 namespace TewiMP.Pages
@@ -35,11 +35,10 @@ namespace TewiMP.Pages
             ListViewPages.ListViewPage.SetPageToListViewPage(new()
             {
                 PageType = ListViewPages.PageType.Search,
-                Param =
-                new SearchData
+                Param = new SearchData
                 {
                     Key = title,
-                    PluginSource = SearchSourceComboBox.SelectedItem as MusicSourcePlugin,
+                    SourcePlugin = SearchSourceComboBox.SelectedItem as MusicSourcePlugin,
                     SearchDataType = (SearchDataType)Enum.Parse(typeof(SearchDataType), SearchTypeComboBox.SelectedItem as string)
                 }
             });

@@ -339,7 +339,7 @@ namespace TewiMP.Controls
             Pages.ListViewPages.ListViewPage.SetPageToListViewPage(new() { PageType = Pages.ListViewPages.PageType.Artist, Param = (sender as MenuFlyoutItem).Tag });
 
             //var artist = await App.metingServices.NeteaseServices.GetArtist(((Artist)(sender as MenuFlyoutItem).Tag).ID);
-            //await MainWindow.ShowDialog("result", $"{artist.Name}\n{artist.PicturePath}\n{artist.Describee}\n{artist.HotSongs.Songs.Count}");
+            //await MainWindow.ShowDialog("result", $"{artist.Name}\n{artist.PicturePath}\n{artist.Describe}\n{artist.HotSongs.Songs.Count}");
         }
 
         bool isDisposed = false;
@@ -731,7 +731,7 @@ namespace TewiMP.Controls
 
         private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var uri = await MusicData.PluginSource.GetUrl(MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
+            var uri = await MusicData.PluginInfo.GetMusicSourcePlugin().GetUrl(MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
             MainWindow.HideDialog();
             await MainWindow.ShowDialog("获取到的链接是：", uri);
         }

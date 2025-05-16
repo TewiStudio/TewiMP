@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
+using System.IO;
 
 namespace TewiMP.Background
 {
@@ -130,7 +131,7 @@ namespace TewiMP.Background
                 Tuple<string, string> lyricTuple;
                 if (musicData.From == MusicFrom.pluginMusicSource)
                 {
-                    lyricTuple = await musicData.PluginSource.GetLyric(musicData.ID);
+                    lyricTuple = await musicData.PluginInfo.GetMusicSourcePlugin().GetLyric(musicData.ID);
                 }
                 else
                 {
@@ -143,14 +144,14 @@ namespace TewiMP.Background
                 }
                 else
                 {
-                    string path = $@"{DataFolderBase.LyricCacheFolder}\{musicData.From}{musicData.ID}";
+                    string path = Path.Combine(DataFolderBase.LyricCacheFolder, $"{musicData.PluginInfo}{musicData.ID}");
                     await Task.Run(() =>
                     {
-                        if (!System.IO.File.Exists(path))
+                        if (!File.Exists(path))
                         {
-                            System.IO.File.Create(path).Close();
+                            File.Create(path).Close();
                         }
-                        System.IO.File.WriteAllText(path, $"{lyricTuple.Item1}\n{lyricTuple.Item2}");
+                        File.WriteAllText(path, $"{lyricTuple.Item1}\n{lyricTuple.Item2}");
                     });
                     resultPath = path;
                     App.logManager.Log("LyricManager", "下载网络歌词完成");
@@ -194,11 +195,11 @@ namespace TewiMP.Background
             if (lrcEncode == Encoding.Default)
             {
                 Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-                f = await System.IO.File.ReadAllTextAsync(lyricPath, Encoding.GetEncoding("GB2312"));
+                f = await File.ReadAllTextAsync(lyricPath, Encoding.GetEncoding("GB2312"));
             }
             else
             {
-                f = await System.IO.File.ReadAllTextAsync(lyricPath, lrcEncode);
+                f = await File.ReadAllTextAsync(lyricPath, lrcEncode);
             }
 
             if (f.Length < 10)

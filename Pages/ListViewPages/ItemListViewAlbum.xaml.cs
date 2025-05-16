@@ -122,7 +122,7 @@ namespace TewiMP.Pages
             SelectReverseButton.Visibility = Visibility.Collapsed;
             SelectAllButton.Visibility = Visibility.Collapsed;
             LoadingTipControl.ShowLoading();
-            var obj = await NavToObj.PluginSource.GetAlbum(NavToObj.ID);
+            var obj = await NavToObj.PluginInfo.GetMusicSourcePlugin().GetAlbum(NavToObj.ID);
             if (IsNavigatedOutFromPage) return;
             if (obj is null)
             {
@@ -142,7 +142,7 @@ namespace TewiMP.Pages
             if (musicListData != null)
             {
                 LoadImage();
-                DescribeeText.Text = obj.Describee;
+                DescribeeText.Text = obj.Describe;
                 await Task.Delay(100);
                 var dpi = CodeHelper.GetScaleAdjustment(App.WindowLocal);
 

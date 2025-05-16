@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using TewiMP.Helpers;
-using TewiMP.Plugins;
+using TewiMP.Plugin;
 
 namespace TewiMP.DataEditor
 {
@@ -73,14 +73,13 @@ namespace TewiMP.DataEditor
     public class SearchData : OnlyClass, IIsListPage
     {
         public string Key { get; set; }
-        [JsonIgnore]
-        public MusicSourcePlugin PluginSource { get; set; }
+        public MusicSourcePlugin SourcePlugin { get; set; }
         public SearchDataType SearchDataType { get; set; }
         public int PageNumber { get; set; } = 1;
         public int PageSize { get; set; } = 30;
         public override string GetMD5()
         {
-            return $"{Key}{PluginSource}{SearchDataType}";
+            return $"{Key}{SourcePlugin.PluginInfo}{SearchDataType}";
         }
     }
 
@@ -92,8 +91,7 @@ namespace TewiMP.DataEditor
         public string PicturePath { get; set; }
         public string Describee { get; set; }
         public MusicFrom From { get; set; }
-        [JsonIgnore]
-        public MusicSourcePlugin PluginSource { get; set; }
+        public PluginInfo PluginInfo { get; set; }
         public MusicListData HotSongs { get; set; }
         public int Count { get; set; }
 
@@ -121,12 +119,11 @@ namespace TewiMP.DataEditor
         public string Title2 { get; set; }
         public string ID { get; set; }
         public string PicturePath { get; set; }
-        public string Describee { get; set; }
-        public string RelaseTime { get; set; }
+        public string Describe { get; set; }
+        public string ReleaseTime { get; set; }
         public int Count { get; set; }
         public MusicFrom From { get; set; }
-        [JsonIgnore]
-        public MusicSourcePlugin PluginSource { get; set; }
+        public PluginInfo PluginInfo { get; set; }
         public List<Artist> Artists { get; set; }
         public MusicListData Songs { get; set; }
 
@@ -150,7 +147,7 @@ namespace TewiMP.DataEditor
             Title = string.IsNullOrEmpty(title) ? "未知" : title;
             this.ID = ID == "0" || string.IsNullOrEmpty(ID) ? null : ID;
             PicturePath = picturePath;
-            Describee = describee;
+            Describe = describee;
             Songs = songs;
         }
 
@@ -169,7 +166,7 @@ namespace TewiMP.DataEditor
 
         public override string GetMD5()
         {
-            return $"{Title}{Title2}{ID}{Artists?.Count}{Describee}{RelaseTime}";
+            return $"{Title}{Title2}{ID}{Artists?.Count}{Describe}{ReleaseTime}";
         }
 
         public override string ToString()
@@ -214,8 +211,7 @@ namespace TewiMP.DataEditor
             }
         }
 
-        [JsonIgnore]
-        public MusicSourcePlugin PluginSource { get; set; }
+        public PluginInfo PluginInfo { get; set; }
 
         string _artistName = null;
         [JsonIgnore]
@@ -430,8 +426,7 @@ namespace TewiMP.DataEditor
         public string ListShowName { get; set; }
         public string PicturePath { get; set; }
         public MusicFrom ListFrom { get; set; }
-        [JsonIgnore]
-        public MusicSourcePlugin PluginSource { get; set; }
+        public PluginInfo PluginInfo { get; set; }
         public DataType ListDataType { get; set; }
         public string ID { get; set; }
         public PlaySort PlaySort { get; set; }
