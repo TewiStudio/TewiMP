@@ -218,7 +218,14 @@ namespace TewiMP.Controls
                     MainWindow.NotifyCountDown(itema);
                     break;
                 case "info":
-                    await MainWindow.ShowDialog($"{songItemBind.MusicData.Title} 的详细信息：", $"标题：{songItemBind.MusicData.Title}\n艺术家&专辑：{songItemBind.MusicData.ButtonName}\nID：{songItemBind.MusicData.ID}\n来源：{songItemBind.MusicData.From}\n图片地址：{songItemBind.MusicData.Album.PicturePath}");
+                    await MainWindow.ShowDialog(
+                        $"{songItemBind.MusicData.Title} 的详细信息：",
+                        $"标题：{songItemBind.MusicData.Title}\n" +
+                            $"艺术家&专辑：{songItemBind.MusicData.ButtonName}\n" +
+                            $"ID：{songItemBind.MusicData.ID}\n" +
+                            $"来源：{songItemBind.MusicData.From}" +
+                                $"{(songItemBind.MusicData.PluginInfo is not null ? $" {songItemBind.MusicData.PluginInfo.Name}" : "")}" +
+                            $"\n图片地址：{songItemBind.MusicData.Album.PicturePath}");
                     break;
             }
         }
@@ -226,14 +233,14 @@ namespace TewiMP.Controls
         NotifyItem item = null;
         private void CacheManager_CachingStateChangeMusicData(MusicData musicData, object value)
         {
-            if (musicData != songItemBind.MusicData) return;
+            if (musicData != songItemBind?.MusicData) return;
             item.SetProcess(100, (int)value);
             item.SetNotifyItemData(item.GetNotifyItemData().Title, $"{value}%", NotifySeverity.Loading);
         }
 
         private void CacheManager_CachedMusicData(MusicData musicData, object value)
         {
-            if (musicData != songItemBind.MusicData) return;
+            if (musicData != songItemBind?.MusicData) return;
             App.cacheManager.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
             App.cacheManager.CachedMusicData -= CacheManager_CachedMusicData;
             item.SetNotifyItemData(item.GetNotifyItemData().Title, "缓存完成。", NotifySeverity.Complete);
