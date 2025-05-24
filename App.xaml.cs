@@ -383,7 +383,6 @@ namespace TewiMP
             logManager.Log("App", "正在保存设置...");
             var settingData = DataFolderBase.JSettingData;
             var audioEffectData = DataFolderBase.JAudioEffectData;
-            var pluginSettingsData = DataFolderBase.PluginSettingsData;
             if (DataFolderBase.CacheFolder != DataFolderBase.DefaultCacheFolder)
             {
                 SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.CacheFolderPath, DataFolderBase.CacheFolder);
@@ -462,7 +461,6 @@ namespace TewiMP
 
             DataFolderBase.JSettingData = settingData;
             DataFolderBase.JAudioEffectData = audioEffectData;
-            DataFolderBase.PluginSettingsData = pluginSettingsData;
             logManager.Log("App", "设置配置已存储。");
         }
 
