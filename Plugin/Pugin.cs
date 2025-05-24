@@ -1,16 +1,17 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using Newtonsoft.Json;
 using TewiMP.DataEditor;
 
 namespace TewiMP.Plugin
 {
     public abstract class Plugin
     {
-        [JsonIgnore]
-        public bool IsEnable { get; private set; } = false;
+        [JsonIgnore] public bool IsEnable { get; private set; } = false;
         public abstract PluginInfo PluginInfo { get; }
+        public abstract Dictionary<string, object> PluginSettings { get; protected set; }
 
         /// <summary>
         /// 当插件被加载时调用。
@@ -26,6 +27,87 @@ namespace TewiMP.Plugin
         public virtual void OnDisable()
         {
             IsEnable = false;
+        }
+
+        /// <summary>
+        /// 当插件设置被修改时调用
+        /// </summary>
+        protected virtual void OnSettingsChanged(string key, object value)
+        {
+
+        }
+
+        /// <summary>
+        /// 当插件设置字典被修改时调用
+        /// </summary>
+        protected virtual void OnPluginSettingsChanged()
+        {
+
+        }
+
+        /// <summary>
+        /// 获取插件设置值，如果没有则添加一个默认值。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="keyString"></param>
+        /// <param name="defaultValue"></param>
+        /// <returns></returns>
+        public T GetSetting<T>(string keyString, T defaultValue = default)
+        {
+            if (PluginSettings.TryGetValue(keyString, out object value))
+            {
+                return (T)value;
+            }
+            else
+            {
+                PluginSettings.Add(keyString, defaultValue);
+                return defaultValue;
+            }
+        }
+
+        /// <summary>
+        /// 设置插件设置值，如果没有则添加设置的值。
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="keyString"></param>
+        /// <param name="value"></param>
+        public void SetSetting<T>(string keyString, T value)
+        {
+            if (PluginSettings.ContainsKey(keyString))
+            {
+                PluginSettings[keyString] = value;
+            }
+            else
+            {
+                PluginSettings.Add(keyString, value);
+            }
+            OnSettingsChanged(keyString, value);
+        }
+
+        public void SetPluginSettings(Dictionary<string, object> settings)
+        {
+            PluginSettings = settings;
+            OnPluginSettingsChanged();
+        }
+
+        /// <summary>
+        /// 通过 Key 返回向用户显示的插件设置名
+        /// </summary>
+        /// <param name="keyString"></param>
+        /// <returns></returns>
+        public virtual string GetUserViewPluginSettingName(string keyString)
+        {
+            return keyString;
+        }
+
+        /// <summary>
+        /// 通过 Key 返回向用户显示的插件设置描述
+        /// </summary>
+        /// <param name="keyString"></param>
+        /// <returns></returns>
+        public virtual string GetUserViewPluginSettingDescribe(string keyString)
+        {
+            return null;
         }
 
         public static bool operator ==(Plugin left, Plugin right)
@@ -77,14 +159,49 @@ namespace TewiMP.Plugin
         public string Name { set; get; }
         public string Author { set; get; }
         public string Version { set; get; }
+        public Dictionary<string, object> PluginSettings
+        {
+            get
+            {
+                if (GetPlugin(false) is Plugin p) return p.PluginSettings;
+                else if (GetMusicSourcePlugin(false) is MusicSourcePlugin mp) return mp.PluginSettings;
+                else return null;
+            }
+            set
+            {
+                if (GetPlugin(false) is Plugin p)
+                {
+                    p.SetPluginSettings(value);
+                }
+                else if (GetMusicSourcePlugin(false) is MusicSourcePlugin mp)
+                {
+                    mp.SetPluginSettings(value);
+                }
+            }
+        }
         [JsonIgnore] public string NameAndAuthor => $"{Name} - {Author}";
 
-        public Plugin GetPlugin() => PluginManager.Plugins.First(p => p.PluginInfo == this);
+        public Plugin GetPlugin(bool throwError = true)
+        {
+            var matched = PluginManager.Plugins.Where(p => p.PluginInfo == this);
+            if (!matched.Any())
+            {
+                if (throwError)
+                    throw new PluginNotFoundException($"找不到插件：{NameAndAuthor}");
+                else return null;
+            }
+            return matched.First();
+        }
 
-        public MusicSourcePlugin GetMusicSourcePlugin()
+        public MusicSourcePlugin GetMusicSourcePlugin(bool throwError = true)
         {
             var matched = PluginManager.MusicSourcePlugins.Where(p => p.PluginInfo == this);
-            if (!matched.Any()) throw new PluginNotFoundException($"找不到插件：{NameAndAuthor}");
+            if (!matched.Any())
+            {
+                if (throwError)
+                    throw new PluginNotFoundException($"找不到插件：{NameAndAuthor}");
+                else return null;
+            }
             return matched.First();
         }
 
@@ -117,6 +234,13 @@ namespace TewiMP.Plugin
         {
             return (string.IsNullOrEmpty(NameAndAuthor) ? StringComparer.InvariantCulture.GetHashCode(NameAndAuthor) : 0);
         }
+    }
+
+    public class PluginLoadException : Exception
+    {
+        public PluginLoadException() : base() { }
+        public PluginLoadException(string message) : base(message) { }
+        public PluginLoadException(string message, Exception innerException) : base(message, innerException) { }
     }
 
     public class PluginNotFoundException : Exception

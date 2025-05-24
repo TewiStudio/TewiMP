@@ -1,0 +1,66 @@
+﻿<Page
+    x:Class="TewiMP.Pages.SettingPlugin"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:plugin="using:TewiMP.Plugin"
+    xmlns:local="using:TewiMP.Pages"
+    xmlns:controls="using:TewiMP.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:cc="using:CommunityToolkit.WinUI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" SizeChanged="Page_SizeChanged" Loaded="Page_Loaded">
+
+    <Page.Resources>
+        <Style TargetType="cc:SettingsCard">
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+        <Style TargetType="cc:SettingsExpander">
+            <Setter Property="Margin" Value="0,4,4,0"/>
+        </Style>
+        <DataTemplate x:Key="PluginDataTemplate" x:DataType="plugin:Plugin">
+            <cc:SettingsCard 
+                Header="{Binding PluginInfo.Name}"
+                Description="{Binding PluginInfo.Author}"
+                IsClickEnabled="True"
+                ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
+                Click="SettingsCard_Click_1"/>
+        </DataTemplate>
+    </Page.Resources>
+    
+    <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None" Padding="0,0,0,12">
+
+        <ListView.Header>
+            <StackPanel Orientation="Vertical">
+                <Grid x:Name="HeaderBaseGrid">
+                    <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1"/>
+                    <TextBlock x:Name="HeaderBaseTextBlock" Text="插件设置" Style="{ThemeResource TBHeader}"/>
+                </Grid>
+                <cc:SettingsCard
+                    Header="重新加载所有插件"
+                    IsClickEnabled="True"
+                    ClickMode="Press"
+                    ActionIcon="{ui:FontIcon Glyph=&#xE72C;}"
+                    Click="SettingsCard_Click"
+                    Margin="16,0,16,0"/>
+            </StackPanel>
+        </ListView.Header>
+
+        <cc:SettingsExpander
+            x:Name="PluginMusicSource"
+            Header="歌曲源插件"
+            IsExpanded="True"
+            ItemTemplate="{StaticResource PluginDataTemplate}">
+        </cc:SettingsExpander>
+
+        <cc:SettingsExpander
+            x:Name="PluginOther"
+            Header="其它插件"
+            IsExpanded="True"
+            ItemTemplate="{StaticResource PluginDataTemplate}">
+        </cc:SettingsExpander>
+
+    </ListView>
+</Page>

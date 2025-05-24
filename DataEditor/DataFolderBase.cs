@@ -52,6 +52,11 @@ namespace TewiMP.DataEditor
         public static string AudioEffectDataPath { get; } = Path.Combine(UserDataFolder, "AudioEffect");
 
         /// <summary>
+        /// 插件设置数据文件路径
+        /// </summary>
+        public static string PluginSettings{ get; } = Path.Combine(UserDataFolder, "PluginSettings");
+
+        /// <summary>
         /// 历史记录数据文件路径
         /// </summary>
         public static string HistoryDataPath { get; } = Path.Combine(UserDataFolder, "History");
@@ -332,6 +337,12 @@ namespace TewiMP.DataEditor
                 File.WriteAllText(AudioEffectDataPath, AudioEffectDefault.ToString());
             }
             
+            if (!File.Exists(PluginSettings))
+            {
+                File.Create(PluginSettings).Close();
+                File.WriteAllText(PluginSettings, "[]");
+            }
+            
             if (!File.Exists(HistoryDataPath))
             {
                 File.Create(HistoryDataPath).Close();
@@ -385,6 +396,21 @@ namespace TewiMP.DataEditor
             set
             {
                 File.WriteAllText(AudioEffectDataPath, value.ToString());
+            }
+        }
+
+        /// <summary>
+        /// <list type="table">
+        ///     <item>插件数据文件的实例。</item>
+        ///     <item>使用时会读取设置文件，设置时会写入数据文件</item>
+        /// </list>
+        /// </summary>
+        public static JArray PluginSettingsData
+        {
+            get => JArray.Parse(File.ReadAllText(PluginSettings));
+            set
+            {
+                File.WriteAllText(PluginSettings, value.ToString());
             }
         }
     }

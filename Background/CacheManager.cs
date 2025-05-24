@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using TewiMP.DataEditor;
 using TewiMP.Helpers;
 using System.Diagnostics;
+using TewiMP.Plugin;
 
 namespace TewiMP.Background
 {
@@ -56,6 +57,13 @@ namespace TewiMP.Background
                 InCachingMusicData.Remove(data);
                 CachedMusicData?.Invoke(data, "网络未连接，请连接网络后重试。");
                 throw new WebException("网络未连接，请连接网络后重试。");
+            }
+
+            if (data.PluginInfo.GetMusicSourcePlugin(false) is null)
+            {
+                InCachingMusicData.Remove(data);
+                CachedMusicData?.Invoke(data, "未找到此音乐源插件。");
+                throw new PluginNotFoundException("未找到此音乐源插件。");
             }
 
             InCachingMusicData.Add(data);

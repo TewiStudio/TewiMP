@@ -428,7 +428,7 @@
         </cc:SettingsExpander>
 
         <cc:SettingsExpander Header="其它设置"
-                             Description="热键设置、显示托盘图标、后台运行、恢复默认设置">
+                             Description="热键设置、插件设置、显示托盘图标、后台运行、恢复默认设置">
             <cc:SettingsExpander.HeaderIcon>
                 <FontIcon Glyph="&#xE712;"/>
             </cc:SettingsExpander.HeaderIcon>
@@ -438,6 +438,15 @@
                                  Description="重置热键设置、重新注册热键、更改热键按键设置"
                                  IsClickEnabled="True"
                                  Click="HotKeySettings_Click">
+                    <cc:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xf210;"/>
+                    </cc:SettingsCard.HeaderIcon>
+                </cc:SettingsCard>
+                <cc:SettingsCard x:Name="PluginSettings"
+                                 Header="插件设置"
+                                 Description="重新加载插件、更改插件设置"
+                                 IsClickEnabled="True"
+                                 Click="PluginSettings_Click">
                     <cc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xf210;"/>
                     </cc:SettingsCard.HeaderIcon>
@@ -515,12 +524,6 @@
                 <cc:SettingsCard Header="显示帧数、GPU使用率指示器">
                     <ToggleSwitch Toggled="ToggleSwitch_Toggled_1" Tag="1"/>
                 </cc:SettingsCard>
-                <cc:SettingsCard Header="重新加载插件"
-                                 IsClickEnabled="True"
-                                 ClickMode="Press"
-                                 ActionIcon="{ui:FontIcon Glyph=&#xE72C;}"
-                                 Click="SettingsCard_Click_3"/>
-
             </cc:SettingsExpander.Items>
         </cc:SettingsExpander>
     </ListView>

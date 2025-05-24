@@ -624,6 +624,7 @@ namespace TewiMP.Pages
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
             var path = await FileHelper.UserSelectFile(Windows.Storage.Pickers.PickerViewMode.Thumbnail, Windows.Storage.Pickers.PickerLocationId.PicturesLibrary);
+            if (path is null) return;
             MainWindow.ImagePath = path.Path;
             MainWindow.SetBackdrop(MainWindow.BackdropType.Image);
         }
@@ -892,6 +893,11 @@ namespace TewiMP.Pages
             MainWindow.SetNavViewContent(typeof(SettingHotKeyPage));
         }
 
+        private void PluginSettings_Click(object sender, RoutedEventArgs e)
+        {
+            MainWindow.SetNavViewContent(typeof(SettingPlugin));
+        }
+
         private void SettingsCard_Click(object sender, RoutedEventArgs e)
         {
             //await MainWindow.ShowEqualizerDialog();
@@ -939,11 +945,6 @@ namespace TewiMP.Pages
         private void SettingsCard_Click_2(object sender, RoutedEventArgs e)
         {
             LogWindow.ShowWindow();
-        }
-
-        private void SettingsCard_Click_3(object sender, RoutedEventArgs e)
-        {
-            PluginManager.Init();
         }
     }
 }

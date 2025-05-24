@@ -21,13 +21,6 @@ namespace TewiMP.Pages
         public SearchPage()
         {
             InitializeComponent();
-            SearchSourceComboBox.ItemsSource = PluginManager.MusicSourcePlugins;
-            if (PluginManager.MusicSourcePlugins.Count != 0) SearchSourceComboBox.SelectedIndex = 0;
-
-            var b = Enum.GetNames(typeof(SearchDataType)).ToList();
-            b.RemoveAt(b.IndexOf(b.Last()));
-            SearchTypeComboBox.ItemsSource = b;
-            SearchTypeComboBox.SelectedIndex = 0;
         }
 
         public void StartSearch(string title)
@@ -82,11 +75,6 @@ namespace TewiMP.Pages
         {
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            SearchTextBox.Focus(FocusState.Keyboard);
-        }
-
         private void Page_PreviewKeyDown(object sender, Microsoft.UI.Xaml.Input.KeyRoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(SearchTextBox.Text))
@@ -97,6 +85,26 @@ namespace TewiMP.Pages
             {
                 MainWindow.CanKeyDownBack = false;
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            SearchSourceComboBox.ItemsSource = PluginManager.MusicSourcePlugins;
+#if !DEBUG
+            if (PluginManager.MusicSourcePlugins.Count > 0)
+                SearchSourceComboBox.SelectedIndex = 0;
+#endif
+
+            var b = Enum.GetNames(typeof(SearchDataType)).ToList();
+            b.RemoveAt(b.IndexOf(b.Last()));
+            SearchTypeComboBox.ItemsSource = b;
+            SearchTypeComboBox.SelectedIndex = 0;
+            SearchTextBox.Focus(FocusState.Keyboard);
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            SearchSourceComboBox.ItemsSource = null;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace TewiMP.Plugin.BuildInPlugins.BuildInPluginSample
+﻿using System.Collections.Generic;
+
+namespace TewiMP.Plugin.BuildInPlugins.BuildInPluginSample
 {
     public class Main : Plugin
     {
@@ -6,7 +8,14 @@
         {
             Name = "BuildIn Plugin Sample",
             Author = "TewiStudio",
-            Version = "justTest"
+            Version = "justTest",
+        };
+        public override Dictionary<string, object> PluginSettings { get; protected set; } = new()
+        {
+            { "Settings Test String", "Test" },
+            { "Settings Test Number", 123 },
+            { "Settings Test Bool", true },
+            { "Settings Test List", new List<string> { "1", "2", "3" } }
         };
 
         public override void OnEnable()
@@ -19,6 +28,12 @@
         {
             base.OnDisable();
             App.logManager.Log("BuildIn Plugin Sample", "I have been disabled!");
+        }
+
+        protected override void OnSettingsChanged(string key, object value)
+        {
+            base.OnSettingsChanged(key, value);
+            App.logManager.Log("BuildIn Plugin Sample", $"Settings \"{key}\" has been changed to {value}!");
         }
     }
 }

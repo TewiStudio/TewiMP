@@ -124,7 +124,7 @@
 		<PackageReference Include="FFmpeg.AutoGen" Version="7.0.0" />
 		<PackageReference Include="Melanchall.DryWetMidi" Version="7.2.0" />
 		<PackageReference Include="Microsoft.Graphics.Win2D" Version="1.1.1" />
-		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.106">
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.183">
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
@@ -275,6 +275,9 @@
 		<Page Update="Pages\SettingEqPage.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 			<SubType>Designer</SubType>
+		</Page>
+		<Page Update="Pages\SettingPlugin.xaml">
+		  <SubType>Designer</SubType>
 		</Page>
 		<Page Update="Pages\SettingHotKeyPage.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>

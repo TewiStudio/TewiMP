@@ -217,6 +217,7 @@ namespace TewiMP.Background
                 PlayingListItemChange?.Invoke(NowPlayingList);
         }
 
+        int nextErrorCount = 0;
         public async Task<bool> Play(MusicData musicData, bool isAutoPlay = false, SetPlayInfo isNextPlay = default)
         {
             Add(musicData, true, true);
@@ -240,7 +241,7 @@ namespace TewiMP.Background
                 playState = NAudio.Wave.PlaybackState.Playing;
             }
 
-            var a = true;
+            var clear = false;
             //System.Diagnostics.App.logManager.Log(musicData.Title);
             try
             {
@@ -248,10 +249,10 @@ namespace TewiMP.Background
                 if (playState == NAudio.Wave.PlaybackState.Playing)
                     App.audioPlayer.SetPlay(false);
                 App.logManager.Log("PlayingList", $"设置播放完成：\"{musicData.Title}\"");
+                clear = true;
             }
             catch (DivideByZeroException)
             {
-                a = false;
                 var data = DataFolderBase.JSettingData;
                 data[DataFolderBase.SettingParams.AudioLatency.ToString()] =
                     DataFolderBase.SettingDefault[DataFolderBase.SettingParams.AudioLatency.ToString()];
@@ -279,7 +280,6 @@ namespace TewiMP.Background
             {
                 LogHelper.WriteLog("PlayingList Play Error", e.ToString(), false);
                 App.logManager.Log("PlayingList", $"播放音频时出现错误。\n错误信息：{e.Message}", LogLevel.Error);
-                a = false;
 
 #if DEBUG
                 MainWindow.AddNotify("播放音频时出现错误", e.ToString(), NotifySeverity.Error);
@@ -287,8 +287,12 @@ namespace TewiMP.Background
                 MainWindow.AddNotify("播放音频时出现错误", e.Message, NotifySeverity.Error);
 #endif
 
-                if (NextWhenPlayError)
+            }
+            if (!clear)
+            {
+                if (NextWhenPlayError && nextErrorCount <= 10)
                 {
+                    nextErrorCount++;
                     if (isNextPlay == SetPlayInfo.Next)
                     {
                         var index = NowPlayingList.IndexOf(musicData) + 1;
@@ -302,9 +306,20 @@ namespace TewiMP.Background
                         await Play(NowPlayingList[index], true, isNextPlay);
                     }
                 }
+                else
+                {
+                    if (nextErrorCount > 10)
+                    {
+                        MainWindow.AddNotify("无法继续播放", "因为错误次数太多，自动播放下一首歌曲的功能已在此次禁用。", NotifySeverity.Error);
+                        nextErrorCount = 0;
+                    }
+                }
             }
-
-            return a;
+            else
+            {
+                nextErrorCount = 0;
+            }
+            return clear;
         }
 
         private async void AddHistory(MusicData musicData)

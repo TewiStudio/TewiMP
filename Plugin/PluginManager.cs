@@ -1,27 +1,40 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
+using TewiMP.DataEditor;
 
 namespace TewiMP.Plugin
 {
     public static class PluginManager
     {
+        public static List<PluginInfo> PluginInfoSettings = [];
         public static ObservableCollection<Plugin> Plugins { get; private set; } = [];
         public static ObservableCollection<MusicSourcePlugin> MusicSourcePlugins { get; private set; } = [];
+        //private static AssemblyLoadContext assemblyLoadContext;
 
         public static void Init()
         {
             RemoveAllPlugin();
-            DirectoryInfo directoryInfo = new(DataEditor.DataFolderBase.PluginFolder);
+            /*
+            assemblyLoadContext?.Unload();
+            GC.Collect();
+            assemblyLoadContext = new AssemblyLoadContext("Plugins", true);*/
+
+            DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
             var dllFiles = directoryInfo.GetFiles();
             App.logManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}");
 
             for (int i = 0; i < dllFiles.Length; i++)
             {
+                if (dllFiles[i].Extension.ToLower() is not ".dll") continue;
                 var fileData = File.ReadAllBytes(dllFiles[i].FullName);
+
+                //Assembly asm = assemblyLoadContext.LoadFromStream(new MemoryStream(fileData));
                 Assembly asm = Assembly.Load(fileData);
                 var manifestModuleName = asm.ManifestModule.ScopeName;
                 var classLibraryName = manifestModuleName.Remove(manifestModuleName.LastIndexOf("."), manifestModuleName.Length - manifestModuleName.LastIndexOf("."));
@@ -79,6 +92,18 @@ namespace TewiMP.Plugin
                     AddPlugin(Activator.CreateInstance(type) as Plugin);
             }
 
+            JArray pluginSettingsData = DataFolderBase.PluginSettingsData;
+            PluginInfoSettings = pluginSettingsData.ToObject<List<PluginInfo>>() ?? [];
+            foreach (var p in Plugins)
+            {
+                SetPluginSettingsToPlugin(p);
+                EnablePlugin(p);
+            }
+            foreach (var p in MusicSourcePlugins)
+            {
+                SetPluginSettingsToPlugin(p);
+                EnablePlugin(p);
+            }
         }
 
         public static void RemoveAllPlugin()
@@ -98,14 +123,12 @@ namespace TewiMP.Plugin
         public static void AddPlugin(Plugin plugin)
         {
             Plugins.Add(plugin);
-            EnablePlugin(plugin);
             App.logManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}.");
         }
 
         public static void AddPlugin(MusicSourcePlugin plugin)
         {
             MusicSourcePlugins.Add(plugin);
-            EnablePlugin(plugin);
             App.logManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}.");
         }
 
@@ -131,6 +154,30 @@ namespace TewiMP.Plugin
         public static void DisablePlugin(Plugin plugin)
         {
             plugin.OnDisable();
+        }
+
+        public static void UpdatePluginInfoSettings()
+        {
+            PluginInfoSettings.Clear();
+            foreach (var p in MusicSourcePlugins) PluginInfoSettings.Add(p.PluginInfo);
+            foreach (var p in Plugins) PluginInfoSettings.Add(p.PluginInfo);
+        }
+
+        public static void SavePluginInfoSettings()
+        {
+            UpdatePluginInfoSettings();
+            DataFolderBase.PluginSettingsData = JArray.FromObject(PluginInfoSettings);
+        }
+
+        public static void SetPluginSettingsToPlugin(Plugin plugin)
+        {
+            foreach (var p in PluginInfoSettings)
+            {
+                if (plugin.PluginInfo == p)
+                {
+                    plugin.SetPluginSettings(p.PluginSettings);
+                }
+            }
         }
     }
 }

@@ -143,9 +143,6 @@ namespace TewiMP
             equalizerPage = new Pages.DialogPages.EqualizerPage();
             //SubClassing();
 
-            NavView.SelectedItem = NavView.MenuItems[1];
-            NavView.IsBackEnabled = false;
-
             AppWindow.Title = App.AppName;
             AppWindow.SetIcon(System.IO.Path.Combine("Images", "Icons", "icon.ico"));
 
@@ -442,13 +439,15 @@ namespace TewiMP
         #region Window Events
         private void WindowGridBase_Loaded(object sender, RoutedEventArgs e)
         {
+            NavView.SelectedItem = NavView.MenuItems[1];
+            NavView.IsBackEnabled = false;
+
             PlayingListBaseView.ItemsSource = App.playingList.NowPlayingList;
             //SystemNavigationManager.GetForCurrentView().BackRequested += (_, __) => { TryGoBack(); };
 #if DEBUG
             DebugViewPopup.XamlRoot = WindowGridBase.XamlRoot;
             DebugViewPopup.IsOpen = true;
 #endif
-
         }
 
         private void WindowGridBase_ActualThemeChanged(FrameworkElement sender, object args)
