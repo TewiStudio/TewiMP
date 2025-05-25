@@ -457,10 +457,10 @@ namespace TewiMP
             SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.ParametricEqDatas, AudioFilterStatic.ParametricEqDatas);
             SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.PassFilterEqDatas, AudioFilterStatic.PassFilterDatas);
 
-            PluginManager.SavePluginInfoSettings();
-
             DataFolderBase.JSettingData = settingData;
             DataFolderBase.JAudioEffectData = audioEffectData;
+            PluginManager.SavePluginInfoSettings();
+
             logManager.Log("App", "设置配置已存储。");
         }
 

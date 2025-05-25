@@ -10,7 +10,7 @@ namespace TewiMP.Plugin.BuildInPlugins.BuildInPluginSample
             Author = "TewiStudio",
             Version = "justTest",
         };
-        public override Dictionary<string, object> PluginSettings { get; protected set; } = new()
+        protected override Dictionary<string, object> PluginSettings { get; set; } = new()
         {
             { "Settings Test String", "Test" },
             { "Settings Test Number", 123 },

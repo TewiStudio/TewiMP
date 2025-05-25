@@ -7,7 +7,7 @@
     xmlns:animations="using:CommunityToolkit.WinUI.UI.Animations"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Background="Transparent"
-    Loaded="UILoaded" Unloaded="UIUnloaded"
+    Loaded="UILoaded" Unloaded="UIUnloaded" DataContextChanged="PlayListCard_DataContextChanged"
     PointerEntered="Grid_PointerEntered" PointerExited="Grid_PointerExited"
     PointerPressed="Grid_PointerPressed" PointerReleased="Grid_PointerReleased"
     RightTapped="Grid_RightTapped" Holding="Grid_Holding" AccessKeyInvoked="Grid_AccessKeyInvoked">
@@ -29,10 +29,6 @@
         CornerRadius="8" BorderThickness="1"
         BorderBrush="{ThemeResource ControlElevationBorderBrush}">
         <Grid CornerRadius="7">
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition Height="auto"/>
-            </Grid.RowDefinitions>
             <local:ImageEx
                 x:Name="PlayListImage" Stretch="UniformToFill" PointInBehavior="OnlyLightUp"
                 HorizontalAlignment="Center" VerticalAlignment="Center" CornerRadius="8"/>
@@ -60,6 +56,27 @@
                         </TextBlock>
                     </local:AutoScrollViewer>
                 </Grid>
+            </Grid>
+            <Grid
+                x:Name="MusicSourceRoot"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Left"
+                Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                BorderThickness="1" Opacity=".9"
+                CornerRadius="8" Margin="4" Visibility="Collapsed">
+                <Button
+                    x:Name="MusicSourceBtn"
+                    CornerRadius="8"
+                    Padding="8,4,26,4"
+                    Content=""
+                    FontSize="12"
+                    Background="Transparent"
+                    Click="MusicSourceBtn_Click"/>
+                <FontIcon
+                    Glyph="&#xE8A7;" FontSize="14"
+                    Margin="0,0,8,0" IsHitTestVisible="False"
+                    HorizontalAlignment="Right"/>
             </Grid>
         </Grid>
     </Border>

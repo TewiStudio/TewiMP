@@ -12,7 +12,7 @@ namespace TewiMP.Plugin
 {
     public static class PluginManager
     {
-        public static List<PluginInfo> PluginInfoSettings = [];
+        public static Dictionary<PluginInfo, Dictionary<string, object>> PluginInfoSettings { get; set; } = [];
         public static ObservableCollection<Plugin> Plugins { get; private set; } = [];
         public static ObservableCollection<MusicSourcePlugin> MusicSourcePlugins { get; private set; } = [];
         //private static AssemblyLoadContext assemblyLoadContext;
@@ -92,18 +92,9 @@ namespace TewiMP.Plugin
                     AddPlugin(Activator.CreateInstance(type) as Plugin);
             }
 
-            JArray pluginSettingsData = DataFolderBase.PluginSettingsData;
-            PluginInfoSettings = pluginSettingsData.ToObject<List<PluginInfo>>() ?? [];
-            foreach (var p in Plugins)
-            {
-                SetPluginSettingsToPlugin(p);
-                EnablePlugin(p);
-            }
-            foreach (var p in MusicSourcePlugins)
-            {
-                SetPluginSettingsToPlugin(p);
-                EnablePlugin(p);
-            }
+            LoadPluginInfoSettings();
+            foreach (var p in Plugins) EnablePlugin(p);
+            foreach (var p in MusicSourcePlugins) EnablePlugin(p);
         }
 
         public static void RemoveAllPlugin()
@@ -159,24 +150,49 @@ namespace TewiMP.Plugin
         public static void UpdatePluginInfoSettings()
         {
             PluginInfoSettings.Clear();
-            foreach (var p in MusicSourcePlugins) PluginInfoSettings.Add(p.PluginInfo);
-            foreach (var p in Plugins) PluginInfoSettings.Add(p.PluginInfo);
+            foreach (var p in MusicSourcePlugins)
+            {
+                PluginInfoSettings.Add(p.PluginInfo, p.GetPluginSettings());
+            }
+            foreach (var p in Plugins)
+            {
+                PluginInfoSettings.Add(p.PluginInfo, p.GetPluginSettings());
+            }
+        }
+
+        public static void LoadPluginInfoSettings()
+        {
+            JObject pluginSettingsData = DataFolderBase.PluginSettingsData;
+            foreach (var item in pluginSettingsData)
+            {
+                var plugins = Plugins.Where(plugin => plugin.PluginInfo.ToString() == item.Key);
+                if (plugins.Any())
+                {
+                    plugins.First().SetPluginSettings(item.Value.ToObject<Dictionary<string, object>>());
+                }
+
+                var musicSourcePlugins = MusicSourcePlugins.Where(plugin => plugin.PluginInfo.ToString() == item.Key);
+                if (musicSourcePlugins.Any())
+                {
+                    musicSourcePlugins.First().SetPluginSettings(item.Value.ToObject<Dictionary<string, object>>());
+                }
+            }
+            UpdatePluginInfoSettings();
         }
 
         public static void SavePluginInfoSettings()
         {
             UpdatePluginInfoSettings();
-            DataFolderBase.PluginSettingsData = JArray.FromObject(PluginInfoSettings);
+            var j = JObject.FromObject(PluginInfoSettings);
+            DataFolderBase.PluginSettingsData = j;
         }
 
         public static void SetPluginSettingsToPlugin(Plugin plugin)
         {
-            foreach (var p in PluginInfoSettings)
+            foreach (var settings in PluginInfoSettings)
             {
-                if (plugin.PluginInfo == p)
-                {
-                    plugin.SetPluginSettings(p.PluginSettings);
-                }
+                if (plugin.PluginInfo != settings.Key) continue;
+                plugin.SetPluginSettings(settings.Value);
             }
         }
     }

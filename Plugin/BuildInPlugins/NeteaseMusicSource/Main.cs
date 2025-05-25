@@ -18,7 +18,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
             Author = "TewiStudio",
             Version = "V0.0.1",
         };
-        public override Dictionary<string, object> PluginSettings { get; protected set; } = new()
+        protected override Dictionary<string, object> PluginSettings { get; set; } = new()
         {
             { "RetryCount", 15.0 },
             { "NeteaseCookie", "" },

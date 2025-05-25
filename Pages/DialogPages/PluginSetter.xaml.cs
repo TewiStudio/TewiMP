@@ -20,7 +20,7 @@ namespace TewiMP.Pages.DialogPages
         ObservableCollection<PluginSetting> values = [];
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
-            foreach (var item in Plugin.PluginSettings)
+            foreach (var item in Plugin.GetPluginSettings())
             {
                 values.Add(new(Plugin, item));
             }

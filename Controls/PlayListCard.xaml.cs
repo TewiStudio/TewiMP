@@ -28,7 +28,6 @@ namespace TewiMP.Controls
             InitializeComponent();
             ConnectAnimationElement = PlayListImage;
             ConnectAnimationElement1 = TextBaseTb;
-            DataContextChanged += PlayListCard_DataContextChanged;
         }
 
         private void PlayListCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
@@ -56,10 +55,13 @@ namespace TewiMP.Controls
             if (MusicListData.ListDataType != DataType.歌单)
             {
                 RefreshPlayListButton.Visibility = Visibility.Collapsed;
+                MusicSourceRoot.Visibility = Visibility.Collapsed;
             }
             else
             {
                 RefreshPlayListButton.Visibility = Visibility.Visible;
+                MusicSourceRoot.Visibility = Visibility.Visible;
+                MusicSourceBtn.Content = MusicListData.PluginInfo.Name;
             }
             if (musicListData.ListDataType == DataType.本地歌单)
             {
@@ -293,6 +295,11 @@ namespace TewiMP.Controls
         private async void InsertButton_Click(object sender, RoutedEventArgs e)
         {
             await MainWindow.ShowDialog("排序播放列表", "");
+        }
+
+        private async void MusicSourceBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await MusicListData.PluginInfo.GetMusicSourcePlugin().ShowSettingsDialog();
         }
     }
 }

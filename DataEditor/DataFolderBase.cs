@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using TewiMP.Windowed;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
+using TewiMP.Plugin;
 
 namespace TewiMP.DataEditor
 {
@@ -340,7 +341,7 @@ namespace TewiMP.DataEditor
             if (!File.Exists(PluginSettings))
             {
                 File.Create(PluginSettings).Close();
-                File.WriteAllText(PluginSettings, "[]");
+                File.WriteAllText(PluginSettings, JObject.FromObject(PluginManager.PluginInfoSettings).ToString());
             }
             
             if (!File.Exists(HistoryDataPath))
@@ -405,9 +406,9 @@ namespace TewiMP.DataEditor
         ///     <item>使用时会读取设置文件，设置时会写入数据文件</item>
         /// </list>
         /// </summary>
-        public static JArray PluginSettingsData
+        public static JObject PluginSettingsData
         {
-            get => JArray.Parse(File.ReadAllText(PluginSettings));
+            get => JObject.Parse(File.ReadAllText(PluginSettings));
             set
             {
                 File.WriteAllText(PluginSettings, value.ToString());

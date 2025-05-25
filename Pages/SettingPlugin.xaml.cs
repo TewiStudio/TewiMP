@@ -98,7 +98,8 @@ namespace TewiMP.Pages
             {
                 if (card.DataContext is Plugin.Plugin plugin)
                 {
-                    await MainWindow.ShowDialog(plugin.PluginInfo.Name, new PluginSetter() { Plugin = plugin }, "返回");
+                    await plugin.ShowSettingsDialog();
+                    PluginManager.SavePluginInfoSettings();
                 }
             }
         }

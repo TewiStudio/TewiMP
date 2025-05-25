@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using Newtonsoft.Json;
 using TewiMP.DataEditor;
+using TewiMP.Pages.DialogPages;
 
 namespace TewiMP.Plugin
 {
@@ -11,7 +12,7 @@ namespace TewiMP.Plugin
     {
         [JsonIgnore] public bool IsEnable { get; private set; } = false;
         public abstract PluginInfo PluginInfo { get; }
-        public abstract Dictionary<string, object> PluginSettings { get; protected set; }
+        protected abstract Dictionary<string, object> PluginSettings { get; set; }
 
         /// <summary>
         /// 当插件被加载时调用。
@@ -54,13 +55,13 @@ namespace TewiMP.Plugin
         /// <returns></returns>
         public T GetSetting<T>(string keyString, T defaultValue = default)
         {
-            if (PluginSettings.TryGetValue(keyString, out object value))
+            if (PluginSettings is not null && PluginSettings.TryGetValue(keyString, out object value))
             {
                 return (T)value;
             }
             else
             {
-                PluginSettings.Add(keyString, defaultValue);
+                PluginSettings?.Add(keyString, defaultValue);
                 return defaultValue;
             }
         }
@@ -81,6 +82,7 @@ namespace TewiMP.Plugin
             {
                 PluginSettings.Add(keyString, value);
             }
+            PluginManager.UpdatePluginInfoSettings();
             OnSettingsChanged(keyString, value);
         }
 
@@ -88,6 +90,11 @@ namespace TewiMP.Plugin
         {
             PluginSettings = settings;
             OnPluginSettingsChanged();
+        }
+
+        public Dictionary<string, object> GetPluginSettings()
+        {
+            return PluginSettings;
         }
 
         /// <summary>
@@ -108,6 +115,11 @@ namespace TewiMP.Plugin
         public virtual string GetUserViewPluginSettingDescribe(string keyString)
         {
             return null;
+        }
+
+        public async Task ShowSettingsDialog()
+        {
+            await MainWindow.ShowDialog(PluginInfo.Name, new PluginSetter() { Plugin = this }, "返回");
         }
 
         public static bool operator ==(Plugin left, Plugin right)
@@ -159,26 +171,6 @@ namespace TewiMP.Plugin
         public string Name { set; get; }
         public string Author { set; get; }
         public string Version { set; get; }
-        public Dictionary<string, object> PluginSettings
-        {
-            get
-            {
-                if (GetPlugin(false) is Plugin p) return p.PluginSettings;
-                else if (GetMusicSourcePlugin(false) is MusicSourcePlugin mp) return mp.PluginSettings;
-                else return null;
-            }
-            set
-            {
-                if (GetPlugin(false) is Plugin p)
-                {
-                    p.SetPluginSettings(value);
-                }
-                else if (GetMusicSourcePlugin(false) is MusicSourcePlugin mp)
-                {
-                    mp.SetPluginSettings(value);
-                }
-            }
-        }
         [JsonIgnore] public string NameAndAuthor => $"{Name} - {Author}";
 
         public Plugin GetPlugin(bool throwError = true)
