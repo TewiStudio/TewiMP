@@ -74,9 +74,9 @@ namespace TewiMP
         {
             Available = true,
             SuffixType = SuffixType.Beta,
-            Version = "0.0.1",
-            VersionF = 1f,
-            ReleaseTime = 1744627462L.ToDateTime(),
+            Version = "0.0.2",
+            VersionF = 2f,
+            ReleaseTime = 1748602954L.ToDateTime(),
             ExtendMessage = null
         };
         public static string AppVersion => Version.Version;

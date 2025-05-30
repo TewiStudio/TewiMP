@@ -62,6 +62,7 @@ namespace TewiMP.Plugin
                     AddPlugin(Activator.CreateInstance(type) as Plugin);
             }
 
+#if DEBUG
             Assembly assembly = Assembly.GetExecutingAssembly();
 
             // 程序自带插件
@@ -91,6 +92,7 @@ namespace TewiMP.Plugin
                 else
                     AddPlugin(Activator.CreateInstance(type) as Plugin);
             }
+#endif
 
             LoadPluginInfoSettings();
             foreach (var p in Plugins) EnablePlugin(p);
