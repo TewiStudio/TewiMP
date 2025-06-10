@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TewiMP.DataEditor;
 using TewiMP.Media;
 
 namespace TewiMP.Plugin.BuildInPlugins.FFmpegPathSelector
@@ -37,6 +38,12 @@ namespace TewiMP.Plugin.BuildInPlugins.FFmpegPathSelector
             {
                 base.OnSettingsChanged(key, value);
             }
+        }
+
+        public override void OnEnable()
+        {
+            var path = GetSetting("ffmpegPath", "");
+            AudioFileReader.FFmpegPath = string.IsNullOrEmpty(path) ? DataFolderBase.FFmpegPath : path;
         }
     }
 }

@@ -143,6 +143,7 @@ namespace TewiMP.Media
                 return;
             }
 
+            App.logManager.Log("AudioFileReader", $"ffmpeg.exe: {FFmpegPath}");
             if (!File.Exists(FFmpegPath))
             {
                 throw new System.Exception("找不到 ffmpeg.exe，请检查 ffmpeg.exe 是否被删除，或者其路径设置是否正确。");
@@ -169,6 +170,7 @@ namespace TewiMP.Media
             _ffmpegProcess = Process.Start(psi);
             if (_ffmpegProcess is not null)
             {
+                App.logManager.Log("AudioFileReader", $"正在使用 FFmpeg 解码器，文件标识符为：{addr}");
                 _ffmpegProcess.StandardOutput.BaseStream.CopyTo(_ffmpegReadMemory = new());
                 _ffmpegReadMemory.Position = 0;
                 _ffmpegProcess.Kill();
