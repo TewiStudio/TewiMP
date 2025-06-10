@@ -16,7 +16,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
         {
             Name = "neteaseMusic",
             Author = "TewiStudio",
-            Version = "V0.0.1",
+            Version = "1.0.0",
         };
         protected override Dictionary<string, object> PluginSettings { get; set; } = new()
         {

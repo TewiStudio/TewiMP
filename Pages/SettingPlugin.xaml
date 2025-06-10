@@ -22,6 +22,7 @@
             <cc:SettingsCard 
                 Header="{Binding PluginInfo.Name}"
                 Description="{Binding PluginInfo.Author}"
+                DataContextChanged="SettingsCard_DataContextChanged"
                 IsClickEnabled="True"
                 ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
                 Click="SettingsCard_Click_1"/>

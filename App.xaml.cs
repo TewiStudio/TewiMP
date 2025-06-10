@@ -96,7 +96,6 @@ namespace TewiMP
         /// </summary>
         public App()
         {
-            //Media.Decoder.FFmpeg.FFmpegBinariesHelper.InitFFmpeg();
             InitializeComponent();
             AppStatic = this;
             UnhandledException += App_UnhandledException;

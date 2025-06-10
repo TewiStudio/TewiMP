@@ -1,7 +1,6 @@
 ﻿using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +10,8 @@ namespace TewiMP.Media
 {
     public class AudioFileReader : WaveStream, ISampleProvider
     {
+        public static string FFmpegPath = DataEditor.DataFolderBase.FFmpegPath;
+
         private List<BiQuadFilter[]> _filters = new();
         private WaveStream readerStream;
         private readonly SampleChannel sampleChannel;
@@ -142,6 +143,11 @@ namespace TewiMP.Media
                 return;
             }
 
+            if (!File.Exists(FFmpegPath))
+            {
+                throw new System.Exception("找不到 ffmpeg.exe，请检查 ffmpeg.exe 是否被删除，或者其路径设置是否正确。");
+            }
+
             var tFile = App.audioPlayer.tfile;
             string codec = tFile.BitDepth switch
             {
@@ -153,7 +159,7 @@ namespace TewiMP.Media
             };
             var psi = new ProcessStartInfo
             {
-                FileName = Path.Combine(Environment.CurrentDirectory, "ffmpeg.exe"),
+                FileName = FFmpegPath,
                 Arguments = $"-i \"{fileName}\" -f {codec} -acodec pcm_{codec} -ac 2 -ar {tFile.SampleRate} -",
                 RedirectStandardOutput = true,
                 UseShellExecute = false,

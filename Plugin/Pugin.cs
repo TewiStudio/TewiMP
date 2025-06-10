@@ -171,6 +171,7 @@ namespace TewiMP.Plugin
         public string Name { set; get; }
         public string Author { set; get; }
         public string Version { set; get; }
+        public string Describe { set; get; }
         [JsonIgnore] public string NameAndAuthor => $"{Name} - {Author}";
 
         public Plugin GetPlugin(bool throwError = true)

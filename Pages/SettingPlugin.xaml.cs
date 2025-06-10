@@ -103,5 +103,16 @@ namespace TewiMP.Pages
                 }
             }
         }
+
+        private void SettingsCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            if (sender is SettingsCard card && args.NewValue is Plugin.Plugin dataContent)
+            {
+                card.Header = $"{dataContent.PluginInfo.Name} ({dataContent.PluginInfo.Version})";
+                card.Description = string.IsNullOrEmpty(dataContent.PluginInfo.Describe) ?
+                    $"by {dataContent.PluginInfo.Author}" :
+                    $"{dataContent.PluginInfo.Describe}\nby {dataContent.PluginInfo.Author}";
+            }
+        }
     }
 }

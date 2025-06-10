@@ -18,6 +18,11 @@ namespace TewiMP.DataEditor
         public static string PluginFolder { get; set; } = Path.Combine(Environment.CurrentDirectory, "Plugins");
 
         /// <summary>
+        /// FFmpeg路径
+        /// </summary>
+        public static string FFmpegPath { get; set; } = Path.Combine(Environment.CurrentDirectory, "ffmpeg.exe");
+
+        /// <summary>
         /// 程序数据文件夹路径（Roaming）
         /// </summary>
         public static string BaseFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), App.AppName);
