@@ -172,16 +172,11 @@
 		<Page Update="Controls\MainMusicDataItem.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>
-		<None Update="Images\Icons\icon.ico">
+		<None Update="ffmpeg.exe">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Media\Decoder\Flac\NAudio.Flac\FlacFrame_GetBuffer.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>FlacFrame_GetBuffer.cs</LastGenOutput>
-		</None>
-		<None Update="Media\Decoder\Flac\NAudio.Flac\SubFrames\FlacSubFrameLPC_Calculation.tt">
-			<Generator>TextTemplatingFileGenerator</Generator>
-			<LastGenOutput>FlacSubFrameLPC_Calculation.cs</LastGenOutput>
+		<None Update="Images\Icons\icon.ico">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<Page Update="Pages\ListViewPages\PlayListPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
@@ -352,16 +347,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Compile Update="Media\Decoder\Flac\NAudio.Flac\FlacFrame_GetBuffer.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>FlacFrame_GetBuffer.tt</DependentUpon>
-		</Compile>
-		<Compile Update="Media\Decoder\Flac\NAudio.Flac\SubFrames\FlacSubFrameLPC_Calculation.cs">
-			<DesignTime>True</DesignTime>
-			<AutoGen>True</AutoGen>
-			<DependentUpon>FlacSubFrameLPC_Calculation.tt</DependentUpon>
-		</Compile>
 		<Compile Update="Properties\Resources.Designer.cs">
 		  <DesignTime>True</DesignTime>
 		  <AutoGen>True</AutoGen>

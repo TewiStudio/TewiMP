@@ -22,6 +22,7 @@ namespace TewiMP.Background
 
         public ObservableCollection<LyricData> NowPlayingLyrics = new();
 
+        public bool ShowRomaLyric = true;
         public bool FastUpdateMode = false;
         public double DefaultUpdateInterval = 100;
         public double FastUpdateInterval = 100;

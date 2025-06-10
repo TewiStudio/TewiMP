@@ -1,8 +1,10 @@
-﻿using System.IO;
-using System.Collections.Generic;
-using NAudio.Dsp;
+﻿using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using TewiMP.Helpers;
 
 namespace TewiMP.Media
@@ -52,6 +54,8 @@ namespace TewiMP.Media
             }
         }
 
+        private Process _ffmpegProcess;
+        private MemoryStream _ffmpegReadMemory;
         public string addr = null;
         public bool isMidi = false;
         public string DecodeName = null;
@@ -75,44 +79,16 @@ namespace TewiMP.Media
             {
                 throw new FileNotFoundException();
             }
-
-/*
-            foreach (var file in Directory.GetFiles(DataEditor.DataFolderBase.RemovedIDv3CacheFolder))
-            {
-                try
-                {
-                    File.Delete(file);
-                }
-                catch { }
-            }
-
-            string newPath = Path.Combine(DataEditor.DataFolderBase.RemovedIDv3CacheFolder, Path.GetFileName(fileName));
-            File.Copy(fileName, newPath);
-            TagLib.File tagFile = TagLib.File.Create(newPath);
-            tagFile.RemoveTags(TagLib.TagTypes.AllTags);
-            tagFile.Save();
-            tagFile.Dispose();
-            fileName = newPath;
-*/
             FileStream f = File.OpenRead(fileName);
             if (f.Length <= 10)
             {
                 throw new FileLoadException("无法读取此音频文件。");
             }
 
-            try
-            {
-                addr = FileHelper.FileTypeGet(f);
-            }
-            catch
-            {
-                addr = "-1";
-            }
-
-            bool useMFR = false;
-            //addr = "-1";
+            DecodeName = null;
+            addr = FileHelper.FileTypeGet(f);
             FileAddr = addr;
-            switch (addr)
+            /*switch (addr)
             {
                 case "10276":
                     if (!cueFile)
@@ -157,13 +133,55 @@ namespace TewiMP.Media
                     DecodeName = null;
                     break;
                 default: useMFR = true; break;
+            }*/
+
+
+            if (addr == "7784") // MIDI文件处理
+            {
+                isMidi = true;
+                return;
             }
 
-            if (useMFR)
+            var tFile = App.audioPlayer.tfile;
+            string codec = tFile.BitDepth switch
+            {
+                8 => "u8",
+                16 => "s16le",
+                24 => "s24le",
+                32 => "s32le",
+                _ => "s16le"
+            };
+            var psi = new ProcessStartInfo
+            {
+                FileName = Path.Combine(Environment.CurrentDirectory, "ffmpeg.exe"),
+                Arguments = $"-i \"{fileName}\" -f {codec} -acodec pcm_{codec} -ac 2 -ar {tFile.SampleRate} -",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            _ffmpegProcess = Process.Start(psi);
+            if (_ffmpegProcess is not null)
+            {
+                _ffmpegProcess.StandardOutput.BaseStream.CopyTo(_ffmpegReadMemory = new());
+                _ffmpegReadMemory.Position = 0;
+                _ffmpegProcess.Kill();
+                _ffmpegProcess.Dispose();
+                if (tFile.BitDepth == -1) // 当一些音频数据无位深时
+                {
+                    readerStream = new RawSourceWaveStream(_ffmpegReadMemory, new WaveFormat((int)tFile.SampleRate, tFile.ChannelsArrangement.NbChannels));
+                }
+                else
+                {
+                    readerStream = new RawSourceWaveStream(_ffmpegReadMemory, new WaveFormat((int)tFile.SampleRate, tFile.BitDepth, tFile.ChannelsArrangement.NbChannels));
+                }
+                DecodeName = $"TewiMP built-in FFmpeg Decoder";
+            }
+            else
             {
                 App.logManager.Log("AudioFileReader", $"正在使用 Microsoft MediaFoundationReader 解码器，文件标识符为：{addr}");
-                DecodeName = $"Microsoft MediaFoundation Decoder";
                 readerStream = new MediaFoundationReader(fileName);
+                DecodeName = $"Microsoft MediaFoundation Decoder";
             }
         }
 
@@ -336,8 +354,12 @@ namespace TewiMP.Media
         {
             if (disposing && readerStream != null)
             {
+                _ffmpegReadMemory?.Dispose();
+                _ffmpegReadMemory = null;
+
                 readerStream.Dispose();
                 readerStream = null;
+
             }
 
             IsDisposed = true;

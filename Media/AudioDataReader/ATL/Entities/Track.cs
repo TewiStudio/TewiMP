@@ -291,7 +291,7 @@ namespace ATL
         /// Low-level / technical informations about the audio file
         /// </summary>
         public TechnicalInfo TechnicalInformation { get; internal set; }
-
+        public long AudioDataSize { get; internal set; }
 
         /// <summary>
         /// List of pictures stored in the tag
@@ -342,6 +342,7 @@ namespace ATL
             if (null == stream) fileIO = new AudioFileIO(Path, onlyReadEmbeddedPictures, Settings.ReadAllMetaFrames);
             else fileIO = new AudioFileIO(stream, mimeType, onlyReadEmbeddedPictures, Settings.ReadAllMetaFrames);
 
+            AudioDataSize = fileIO.AudioDataSize;
             IMetaDataIO metadata = fileIO.Metadata;
             MetadataFormats = new List<Format>(metadata.MetadataFormats);
 

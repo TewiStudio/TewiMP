@@ -522,7 +522,7 @@ namespace TewiMP.Helpers
     public static class LyricHelper
     {
         public static string NoneLyricString = "·········";
-        public async static Task<LyricData[]> LyricToLrcData(string lyricText)
+        public async static Task<LyricData[]> LyricToLrcData(string lyricText, bool romaji = true)
         {
             Dictionary<TimeSpan, LyricData> lyricDictionary = new();
             IOrderedEnumerable<KeyValuePair<TimeSpan, LyricData>> sorter = null;

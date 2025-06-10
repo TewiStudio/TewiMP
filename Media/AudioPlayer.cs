@@ -730,9 +730,9 @@ namespace TewiMP.Media
                 if (filePath == FileReader.FileName)
                 {
                     if (MusicData.CUETrackData != null)
-                        FileReader.CurrentTime = MusicData.CUETrackData.StartDuration;
+                        CurrentTime = MusicData.CUETrackData.StartDuration;
                     else
-                        FileReader.CurrentTime = TimeSpan.Zero;
+                        CurrentTime = TimeSpan.Zero;
                     PreviewSourceChanged?.Invoke(this);
                     SourceChanged?.Invoke(this);
                     localFileIniting = false;
@@ -756,7 +756,8 @@ namespace TewiMP.Media
 
             await Task.Run(() =>
             {
-                FileSize = File.ReadAllBytes(filePath).Length;
+                UpdateInfo();
+                FileSize = (int)tfile.AudioDataSize;
                 fileReader = new AudioFileReader(filePath, cueFile);
 
                 if (fileReader.isMidi)
@@ -764,7 +765,6 @@ namespace TewiMP.Media
                     WaveInfo = "midi";
                     return;
                 }
-                UpdateInfo();
 
                 fileProvider = new AudioEffects.SoundTouchWaveProvider(fileReader);
                 fileReader.EqEnabled = EqEnabled;
@@ -936,7 +936,7 @@ namespace TewiMP.Media
                 FileType = tfile.AudioFormat.MimeList.First().Split('/')[1];
                 try
                 {
-                    WaveInfo = $"{(decimal)tfile.SampleRate / 1000}kHz-{tfile.Bitrate}kbps-{FileType}";
+                    WaveInfo = $"{tfile.SampleRate / 1000d}kHz-{tfile.Bitrate}kbps-{FileType}";
                 }
                 catch
                 {

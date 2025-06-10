@@ -537,7 +537,7 @@ namespace TewiMP
         {
             var newestVersion = GetNewVersionByReleaseData(Version.SuffixType);
             if (!newestVersion.Available) return false;
-            return newestVersion.VersionF <= Version.VersionF;
+            return newestVersion.VersionF <= Version.VersionF && newestVersion.VersionF != 0;
         }
 
         public static async void SetStartupWithWindows(bool startup)

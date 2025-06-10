@@ -63,9 +63,17 @@
                 <StackPanel x:Name="FileInfoSp" Grid.Column="1" Margin="8,-2,0,0">
                     <TextBlock Text="文件" Style="{ThemeResource TitleTextStyle}"/>
                     <TextBlock Style="{ThemeResource SubTextStyle}" Text="文件路径"/>
-                    <TextBlock Text="加载中..."/>
+                    <TextBlock>
+                        <Hyperlink Click="Hyperlink_Click">
+                            <Run Text="加载中..."/>
+                        </Hyperlink>
+                    </TextBlock>
                     <TextBlock Style="{ThemeResource SubTextStyle}" Text="文件位置"/>
-                    <TextBlock Text="加载中..."/>
+                    <TextBlock>
+                        <Hyperlink Click="Hyperlink_Click_1">
+                            <Run Text="加载中..."/>
+                        </Hyperlink>
+                    </TextBlock>
                     <TextBlock Style="{ThemeResource SubTextStyle}" Text="创建日期"/>
                     <TextBlock Text="加载中..."/>
                     <TextBlock Style="{ThemeResource SubTextStyle}" Text="文件大小"/>

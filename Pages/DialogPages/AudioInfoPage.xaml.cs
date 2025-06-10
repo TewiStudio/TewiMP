@@ -1,13 +1,14 @@
-﻿using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CueSharp;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.Media;
-using TewiMP.Helpers;
-using CueSharp;
-using NAudio.Wave.Asio;
+using Microsoft.UI.Xaml.Documents;
 using NAudio.Wave;
+using NAudio.Wave.Asio;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using TewiMP.Helpers;
+using TewiMP.Media;
 
 namespace TewiMP.Pages.DialogPages
 {
@@ -38,8 +39,8 @@ namespace TewiMP.Pages.DialogPages
                 filePath = fileInfo.DirectoryName;
             });
 
-            ((TextBlock)FileInfoSp.Children[2]).Text = App.audioPlayer.FileReader.FileName;
-            ((TextBlock)FileInfoSp.Children[4]).Text = filePath;
+            ((Run)((Hyperlink)((TextBlock)FileInfoSp.Children[2]).Inlines[0]).Inlines[0]).Text = App.audioPlayer.FileReader.FileName;
+            ((Run)((Hyperlink)((TextBlock)FileInfoSp.Children[4]).Inlines[0]).Inlines[0]).Text = filePath;
             ((TextBlock)FileInfoSp.Children[6]).Text = createTime;
             ((TextBlock)FileInfoSp.Children[8]).Text = CodeHelper.GetAutoSizeString(App.audioPlayer.FileSize, 2);
         }
@@ -290,6 +291,22 @@ namespace TewiMP.Pages.DialogPages
                     return "Lossless";
                 default:
                     return null;
+            }
+        }
+
+        private async void Hyperlink_Click(Hyperlink sender, HyperlinkClickEventArgs args)
+        {
+            if (sender.Inlines[0] is Run run)
+            {
+                await FileHelper.ExploreFile(run.Text);
+            }
+        }
+
+        private async void Hyperlink_Click_1(Hyperlink sender, HyperlinkClickEventArgs args)
+        {
+            if (sender.Inlines[0] is Run run)
+            {
+                await FileHelper.ExploreFolder(run.Text);
             }
         }
     }

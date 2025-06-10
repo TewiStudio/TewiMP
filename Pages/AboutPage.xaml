@@ -134,6 +134,12 @@
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
                                          Click="SettingsCard_Click"
+                                         Tag="https://git.ffmpeg.org/ffmpeg.git"
+                                         Header="FFmpeg"
+                                         Description="FFmpeg is a collection of libraries and tools to process multimedia content such as audio, video, subtitles and related metadata."/>
+                        <cc:SettingsCard IsClickEnabled="True"
+                                         ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
+                                         Click="SettingsCard_Click"
                                          Tag="https://github.com/mono/taglib-sharp"
                                          Header="taglib-sharp"
                                          Description="Library for reading and writing metadata in media files."/>
