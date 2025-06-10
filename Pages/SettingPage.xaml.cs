@@ -799,7 +799,10 @@ namespace TewiMP.Pages
                     toggleSwitch.IsOn = MainWindow.RunInBackground;
                     break;
                 case "3":
-                    toggleSwitch.IsOn = MainWindow.RunInBackground;
+                    toggleSwitch.IsOn = File.Exists(DataFolderBase.StartupShortcutPath);
+                    break;
+                case "4":
+                    toggleSwitch.IsOn = LyricManager.UseRomajiLyric;
                     break;
             }
         }
@@ -820,6 +823,9 @@ namespace TewiMP.Pages
                     break;
                 case "3":
                     App.SetStartupWithWindows(toggleSwitch.IsOn);
+                    break;
+                case "4":
+                    LyricManager.UseRomajiLyric = toggleSwitch.IsOn;
                     break;
             }
         }

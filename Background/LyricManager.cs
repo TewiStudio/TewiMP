@@ -22,7 +22,7 @@ namespace TewiMP.Background
 
         public ObservableCollection<LyricData> NowPlayingLyrics = new();
 
-        public bool ShowRomaLyric = true;
+        public static bool UseRomajiLyric = true;
         public bool FastUpdateMode = false;
         public double DefaultUpdateInterval = 100;
         public double FastUpdateInterval = 100;
@@ -212,7 +212,7 @@ namespace TewiMP.Background
                 return;
             }
 
-            InitLyricList(await LyricHelper.LyricToLrcData(f));
+            InitLyricList(await LyricHelper.LyricToLrcData(f, UseRomajiLyric));
         }
 
         public void InitLyricList(LyricData[] lyricDatas)

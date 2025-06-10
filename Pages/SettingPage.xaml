@@ -259,6 +259,11 @@
                         <FontIcon Glyph="&#xEC92;"/>
                     </cc:SettingsCard.HeaderIcon>
                 </cc:SettingsCard>
+                <cc:SettingsCard Header="歌词显示日语罗马音"
+                                 Description="显示将日语歌词解析后的罗马音">
+                    <ToggleSwitch Loaded="ToggleSwitch_Loaded" Tag="4"
+                                  Toggled="ToggleSwitch_Toggled_2"/>
+                </cc:SettingsCard>
                 <cc:SettingsCard Header="行为">
                     <ComboBox Loaded="ComboBox_Loaded_1" SelectionChanged="ComboBox_SelectionChanged">
                         <x:String>循环播放</x:String>
@@ -448,7 +453,7 @@
                                  IsClickEnabled="True"
                                  Click="PluginSettings_Click">
                     <cc:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xf210;"/>
+                        <FontIcon Glyph="&#xEA86;"/>
                     </cc:SettingsCard.HeaderIcon>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="开机自启"

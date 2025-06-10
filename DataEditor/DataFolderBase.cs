@@ -193,6 +193,7 @@ namespace TewiMP.DataEditor
             { SettingParams.HotKeyEnable.ToString(), false },
             { SettingParams.HotKeySettings.ToString(), JArray.FromObject(HotKeyManager.DefaultRegisterHotKeysList) },
             { SettingParams.StartupWithWindows.ToString(), false },
+            { SettingParams.UseRomajiLyric.ToString(), true },
         };
         
         /// <summary>
@@ -274,7 +275,8 @@ namespace TewiMP.DataEditor
             LocalMusicPageItemSortBy,
             HotKeyEnable,
             HotKeySettings,
-            StartupWithWindows
+            StartupWithWindows,
+            UseRomajiLyric
         }
 
         public enum AudioEffectFlag

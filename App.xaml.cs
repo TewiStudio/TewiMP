@@ -344,6 +344,7 @@ namespace TewiMP
                 JArray hkd = SettingEditHelper.GetSetting<JArray>(settingData, DataFolderBase.SettingParams.HotKeySettings);
                 HotKeyManager.WillRegisterHotKeysList = hkd.ToObject<List<HotKey>>();
                 hotKeyManager.EnableHotKey = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.HotKeyEnable);
+                LyricManager.UseRomajiLyric = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.UseRomajiLyric);
 
                 var audioEffects = SettingEditHelper.GetSetting<JArray>(audioEffectData, DataFolderBase.AudioEffectFlag.AudioEffectDatas);
 
@@ -441,6 +442,7 @@ namespace TewiMP
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeySettings, JArray.FromObject(App.hotKeyManager.RegisteredHotKeys));
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.TopNavigationStyle, MainWindow.SNavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.LocalMusicPageItemSortBy, LocalAudioPage.ItemSortBy);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.UseRomajiLyric, LyricManager.UseRomajiLyric);
             
             List<float> c = [];
             foreach (var d in AudioEqualizerBands.CustomBands) c.Add(d[2]);

@@ -522,7 +522,7 @@ namespace TewiMP.Helpers
     public static class LyricHelper
     {
         public static string NoneLyricString = "·········";
-        public async static Task<LyricData[]> LyricToLrcData(string lyricText, bool romaji = true)
+        public async static Task<LyricData[]> LyricToLrcData(string lyricText, bool useRomaji = true)
         {
             Dictionary<TimeSpan, LyricData> lyricDictionary = new();
             IOrderedEnumerable<KeyValuePair<TimeSpan, LyricData>> sorter = null;
@@ -595,7 +595,7 @@ namespace TewiMP.Helpers
             Kawazu.KawazuConverter converter = new();
             foreach (var l in sorter)
             {
-                if (l.Value.Lyric?.First() != null)
+                if (useRomaji && l.Value.Lyric?.First() != null)
                 {
                     var percent = await Task.Run(() =>
                     {
@@ -617,7 +617,7 @@ namespace TewiMP.Helpers
                 lyricList.Add(l.Value);
             }
             converter.Dispose();
-            return lyricList.ToArray();
+            return [.. lyricList];
         }
 
         static TimeSpan? GetLrcTimeStringTimeSpan(string timeString)
