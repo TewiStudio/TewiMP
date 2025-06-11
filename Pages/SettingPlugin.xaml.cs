@@ -4,10 +4,10 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
-using TewiMP.Plugin;
 using CommunityToolkit.WinUI.Controls;
-using TewiMP.Pages.DialogPages;
-using System.Threading.Tasks;
+using TewiMP.Plugin;
+using TewiMP.Helpers;
+using TewiMP.DataEditor;
 
 namespace TewiMP.Pages
 {
@@ -38,7 +38,7 @@ namespace TewiMP.Pages
             // 设置 header 为顶层
             var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ListViewBase.Header);
             var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
-            Canvas.SetZIndex(headerContainer, 1);
+            Canvas.SetZIndex(HeaderBaseGrid, 1);
 
             var scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;
             scrollViewer.CanContentRenderOutsideBounds = true;
@@ -113,6 +113,11 @@ namespace TewiMP.Pages
                     $"by {dataContent.PluginInfo.Author}" :
                     $"{dataContent.PluginInfo.Describe}\nby {dataContent.PluginInfo.Author}";
             }
+        }
+
+        private async void SettingsCard_Click_2(object sender, RoutedEventArgs e)
+        {
+            await FileHelper.ExploreFolder(DataFolderBase.PluginFolder);
         }
     }
 }

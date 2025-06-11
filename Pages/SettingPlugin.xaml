@@ -12,9 +12,6 @@
     mc:Ignorable="d" SizeChanged="Page_SizeChanged" Loaded="Page_Loaded">
 
     <Page.Resources>
-        <Style TargetType="cc:SettingsCard">
-            <Setter Property="Margin" Value="0,4,0,0"/>
-        </Style>
         <Style TargetType="cc:SettingsExpander">
             <Setter Property="Margin" Value="0,4,4,0"/>
         </Style>
@@ -35,8 +32,8 @@
             <StackPanel Orientation="Vertical">
                 <Grid x:Name="HeaderBaseGrid">
                     <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1"/>
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="0,0,0,1"/>
                     <TextBlock x:Name="HeaderBaseTextBlock" Text="插件设置" Style="{ThemeResource TBHeader}"/>
                 </Grid>
                 <cc:SettingsCard
@@ -45,6 +42,13 @@
                     ClickMode="Press"
                     ActionIcon="{ui:FontIcon Glyph=&#xE72C;}"
                     Click="SettingsCard_Click"
+                    Margin="16,0,16,4"/>
+                <cc:SettingsCard
+                    Header="浏览插件文件夹"
+                    IsClickEnabled="True"
+                    ClickMode="Press"
+                    ActionIcon="{ui:FontIcon Glyph=&#xE8DE;}"
+                    Click="SettingsCard_Click_2"
                     Margin="16,0,16,0"/>
             </StackPanel>
         </ListView.Header>

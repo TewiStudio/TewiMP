@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using TewiMP.DataEditor;
-using TewiMP.Media;
 
 namespace TewiMP.Plugin.BuildInPlugins.EGetVersionJson
 {
