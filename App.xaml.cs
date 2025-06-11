@@ -22,6 +22,7 @@ using TewiMP.Windowed;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
+using System.Reflection;
 
 namespace TewiMP
 {
@@ -43,47 +44,40 @@ namespace TewiMP
         public static LogManager logManager { get; private set; } = null;
         public static App AppStatic { get; private set; } = null;
         public static string AppName { get; } = "TewiMP";
-        public static VersionData StableVersion { get; } = new()
+        public static VersionData StableVersion { get; set; } = new()
         {
             Available = false,
             SuffixType = SuffixType.Stable,
-            Version = "0",
-            VersionF = 0f,
+            Version = new Version(0, 0, 0, 0),
             ReleaseTime = DateTime.MinValue,
             ExtendMessage = null
         };
-        public static VersionData PreviewVersion { get; } = new()
+        public static VersionData PreviewVersion { get; set; } = new()
         {
             Available = false,
             SuffixType = SuffixType.Preview,
-            Version = "0",
-            VersionF = 0f,
+            Version = new Version(0, 0, 0, 0),
             ReleaseTime = DateTime.MinValue,
             ExtendMessage = null
         };
-        public static VersionData BetaVersion { get; } = new()
+        public static VersionData BetaVersion { get; set; } = new()
         {
             Available = false,
             SuffixType = SuffixType.Beta,
-            Version = "0",
-            VersionF = 0f,
+            Version = new Version(0, 0, 0, 0),
             ReleaseTime = DateTime.MinValue,
             ExtendMessage = null
         };
-        public static VersionData Version { get; set; } = new()
+        public static VersionData NowVersion { get; set; } = new()
         {
             Available = true,
             SuffixType = SuffixType.Beta,
-            Version = "0.0.2",
-            VersionF = 2f,
-            ReleaseTime = 1748602954L.ToDateTime(),
+            Version = Assembly.GetExecutingAssembly().GetName().Version,
+            ReleaseTime = 1749638422L.ToDateTime(),
             ExtendMessage = null
         };
-        public static string AppVersion => Version.Version;
-        public static float AppVersionF => Version.VersionF;
-        public static DateTime AppVersionReleaseDate => Version.ReleaseTime;
-
-
+        public static Version AppVersion => NowVersion.Version;
+        public static DateTime AppVersionReleaseDate => NowVersion.ReleaseTime;
 
         public static Window WindowLocal;
         public static NotifyIconWindow NotifyIconWindow;
@@ -275,11 +269,10 @@ namespace TewiMP
         {
             MessageDialog messageDialog = new("设置文件出现了一些错误，且程序尝试 5 次后也无法恢复默认配置。\n" +
                 $"请尝试删除 文档->{AppName}->UserData 里的 Setting 文件。\n" +
-                "如果仍然出现问题，请到 GitHub 里向项目提出 Issues。", $"{AppName} - 程序无法启动");
+                "如果仍然出现问题，请到 GitHub 里向项目提出 Issues。", $"{AppName} - 程序无法正常启动");
             var hwnd = WindowNative.GetWindowHandle(WindowLocal);
             InitializeWithWindow.Initialize(messageDialog, hwnd);
             await messageDialog.ShowAsync();
-            Current.Exit();
         }
 
         static bool loadFailed = false;
@@ -477,41 +470,20 @@ namespace TewiMP
             var data = await WebHelper.GetStringAsync("https://data.tewi.top/datas/TewiMP/update.json");
             if (string.IsNullOrEmpty(data)) return;
             logManager.Log("App", $"Update datas: {data}");
-            var json = JObject.Parse(data);
+            var json = JArray.Parse(data);
 
-            var stable = json["stable"];
-            var preview = json["preview"];
-            var beta = json["beta"];
-
-            StableVersion.Available =     (bool)  stable["available"];
-            StableVersion.Version =       (string)stable["version"];
-            StableVersion.VersionF =      (float) stable["versionF"];
-            StableVersion.ReleaseTime =   ((long) stable["releaseDate"]).ToDateTime();
-            StableVersion.Url =           (string)stable["url"];
-            StableVersion.ExtendMessage = (string)stable["extendMessage"];
-            
-            PreviewVersion.Available =     (bool)  preview["available"];
-            PreviewVersion.Version =       (string)preview["version"];
-            PreviewVersion.VersionF =      (float) preview["versionF"];
-            PreviewVersion.ReleaseTime =   ((long) preview["releaseDate"]).ToDateTime();
-            PreviewVersion.Url =           (string)preview["url"];
-            PreviewVersion.ExtendMessage = (string)preview["extendMessage"];
-            
-            BetaVersion.Available =     (bool)  beta["available"];
-            BetaVersion.Version =       (string)beta["version"];
-            BetaVersion.VersionF =      (float) beta["versionF"];
-            BetaVersion.ReleaseTime =   ((long) beta["releaseDate"]).ToDateTime();
-            BetaVersion.Url =           (string)beta["url"];
-            BetaVersion.ExtendMessage = (string)beta["extendMessage"];
+            StableVersion = json[0].ToObject<VersionData>();
+            PreviewVersion = json[1].ToObject<VersionData>();
+            BetaVersion = json[2].ToObject<VersionData>();
 
             if (AppVersionIsNewest()) return;
-            var newestVersion = GetNewVersionByReleaseData(Version.SuffixType);
+            var newestVersion = GetNewVersionByReleaseData(NowVersion.SuffixType);
 
             if (addNotify)
             {
                 MainWindow.AddNotify(
                     "有新版本！",
-                    $"可更新到版本 {newestVersion.Version} {newestVersion.SuffixType}，当前版本为 {Version.Version} {Version.SuffixType}。" +
+                    $"可更新到版本 {newestVersion.Version} {newestVersion.SuffixType}，当前版本为 {NowVersion.Version} {NowVersion.SuffixType}。" +
                         (string.IsNullOrEmpty(newestVersion.ExtendMessage) ? "" : $"\n{newestVersion.ExtendMessage}"),
                     NotifySeverity.Warning, TimeSpan.FromMilliseconds(10000),
                     "前往下载页面 ⨠", async () =>
@@ -531,14 +503,14 @@ namespace TewiMP
             SuffixType.Stable => StableVersion,
             SuffixType.Preview => PreviewVersion,
             SuffixType.Beta => BetaVersion,
-            _ => Version
+            _ => NowVersion
         };
 
         public static bool AppVersionIsNewest()
         {
-            var newestVersion = GetNewVersionByReleaseData(Version.SuffixType);
+            var newestVersion = GetNewVersionByReleaseData(NowVersion.SuffixType);
             if (!newestVersion.Available) return false;
-            return newestVersion.VersionF <= Version.VersionF && newestVersion.VersionF != 0;
+            return newestVersion.Version <= NowVersion.Version;
         }
 
         public static async void SetStartupWithWindows(bool startup)
@@ -547,7 +519,7 @@ namespace TewiMP
             {
                 if (startup)
                 {
-                    var location = System.Reflection.Assembly.GetEntryAssembly().Location;
+                    var location = Assembly.GetEntryAssembly().Location;
                     location = location.Replace($"{AppName}.dll", $"{AppName}.exe");
                     if (File.Exists(DataFolderBase.StartupShortcutPath)) return;
                     FileHelper.CreateShortcut(DataFolderBase.StartupShortcutPath, location, "-OpenWithWindows");
@@ -584,8 +556,7 @@ namespace TewiMP
     {
         public SuffixType SuffixType { get; set; }
         public bool Available { get; set; }
-        public string Version { get; set; }
-        public float VersionF { get; set; }
+        public Version Version { get; set; }
         public string Url { get; set; }
         public DateTime ReleaseTime { get; set; }
         public string ExtendMessage { get; set; }

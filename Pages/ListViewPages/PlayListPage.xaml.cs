@@ -540,7 +540,7 @@ namespace TewiMP.Pages.ListViewPages
             isInInitBindings = false;
 
             await Task.Delay(10);
-            scrollViewer.ScrollToVerticalOffset(PageData.VerticalOffset);
+            if (PageData is not null && PageData.VerticalOffset is not 0) scrollViewer.ScrollToVerticalOffset(PageData.VerticalOffset);
         }
 
         void InitInfo()

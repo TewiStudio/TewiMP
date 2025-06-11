@@ -51,7 +51,7 @@ namespace TewiMP.Background
             NowLog = new FileStream(NowLogFilePath, FileMode.CreateNew, FileAccess.Write);
             NowLogWriter = new StreamWriter(NowLog);
             WriteToLogStream($"{App.AppName} launched on {StartTime}");
-            WriteToLogStream($"Version: {App.Version}, built time: {App.Version.ReleaseTime}");
+            WriteToLogStream($"Version: {App.NowVersion}, built time: {App.NowVersion.ReleaseTime}");
             WriteToLogStream($"System: {Environment.OSVersion}\n");
             if (App.logManager is not null)
             {

@@ -18,7 +18,7 @@ namespace TewiMP.Pages
         public AboutPage()
         {
             InitializeComponent();
-            VersionRun.Text = $"v{App.AppVersion} {App.Version.SuffixType}";
+            VersionRun.Text = $"v{App.AppVersion} {App.NowVersion.SuffixType}";
             waveOut = new WaveOut();
             bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat());
             waveOut.Init(bufferedWaveProvider);
@@ -152,7 +152,7 @@ namespace TewiMP.Pages
 
         private void CheckUpdate()
         {
-            var newestVersion = App.GetNewVersionByReleaseData(App.Version.SuffixType);
+            var newestVersion = App.GetNewVersionByReleaseData(App.NowVersion.SuffixType);
             if (App.AppVersionIsNewest())
             {
                 UpdateExpander.Description = "当前版本是最新版本";
@@ -167,7 +167,7 @@ namespace TewiMP.Pages
             NewestVersionRun.Text = $"{newestVersion.Version} {newestVersion.SuffixType}";
             NewestVersion.Description = $"时间：{newestVersion.ReleaseTime}";
 
-            NowVersionRun.Text = $"{App.AppVersion} {App.Version.SuffixType}";
+            NowVersionRun.Text = $"{App.AppVersion} {App.NowVersion.SuffixType}";
             NowVersion.Description = $"时间：{App.AppVersionReleaseDate}";
         }
 
@@ -180,7 +180,7 @@ namespace TewiMP.Pages
 
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            var newestVersion = App.GetNewVersionByReleaseData(App.Version.SuffixType);
+            var newestVersion = App.GetNewVersionByReleaseData(App.NowVersion.SuffixType);
             await CodeHelper.OpenInBrowser(newestVersion.Url);
         }
 

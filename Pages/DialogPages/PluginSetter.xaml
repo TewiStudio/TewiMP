@@ -21,7 +21,13 @@
                     Loading="SettingsCard_Loading"
                     DataContextChanged="SettingsCard_DataContextChanged">
                     <Grid Margin="0,4,0,0">
-                        <TextBox PlaceholderText="默认" TextChanged="TextBox_TextChanged" MaxWidth="430"/>
+                        <TextBox
+                            PlaceholderText="默认"
+                            TextChanged="TextBox_TextChanged"
+                            MaxWidth="430"
+                            AcceptsReturn="True"
+                            TextWrapping="Wrap"
+                            ScrollViewer.VerticalScrollBarVisibility="Auto"/>
                         <NumberBox SpinButtonPlacementMode="Inline" ValueChanged="NumberBox_ValueChanged"/>
                         <ToggleSwitch Toggled="ToggleSwitch_Toggled"/>
                     </Grid>
