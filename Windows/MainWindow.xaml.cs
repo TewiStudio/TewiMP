@@ -359,7 +359,7 @@ namespace TewiMP
         static bool isOpeningMusicLoaded = false;
         public async void AddOpeningMusic(string[] fileName)
         {
-            if (!fileName.Any()) return;
+            if (fileName.Length == 0) return;
             isOpeningMusicLoaded = true;
 
             List<MusicData> mlist = new();
@@ -370,7 +370,7 @@ namespace TewiMP
                     App.playingList.Add(musicData); mlist.Add(musicData);
                 }
             }
-            if (mlist.Any())
+            if (mlist.Count > 0)
             {
                 await App.playingList.Play(mlist.First());
             }

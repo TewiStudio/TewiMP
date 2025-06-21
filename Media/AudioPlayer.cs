@@ -421,7 +421,7 @@ namespace TewiMP.Media
                     }
                     else
                     {
-                        if (MusicData.CUETrackData != null)
+                        if (MusicData.CUETrackData != null && MusicData.CUETrackData.Duration > TimeSpan.Zero)
                         {
                             return MusicData.CUETrackData.Duration;
                         }
@@ -652,7 +652,14 @@ namespace TewiMP.Media
             freezeSetSourceCount--;
             if (freezeSetSourceCount > 0) return;
 
-            isCUEEndCalled = false;
+            if (isCUEEndCalled)
+            {
+                isCUEEndCalled = false;
+                CurrentTime = TimeSpan.Zero;
+            }
+
+            App.logManager.Log("AudioPlayer", $"当前播放：{MusicData.Title}, Time: {CurrentTime}/{TotalTime}, IsMIDI: {FileReader.isMidi}, IsCUE: {MusicData.CUETrackData != null}");
+
             if (musicData == MusicData)
             {
                 if (FileReader != null)
@@ -728,11 +735,11 @@ namespace TewiMP.Media
             if (FileReader != null)
             {
                 if (filePath == FileReader.FileName)
-                {
+                {/*
                     if (MusicData.CUETrackData != null)
                         CurrentTime = MusicData.CUETrackData.StartDuration;
-                    else
-                        CurrentTime = TimeSpan.Zero;
+                    else*/
+                    CurrentTime = TimeSpan.Zero;
                     PreviewSourceChanged?.Invoke(this);
                     SourceChanged?.Invoke(this);
                     localFileIniting = false;
@@ -948,14 +955,6 @@ namespace TewiMP.Media
         public void UpdateEqualizer()
         {
             FileReader?.CreateFilters();
-        }
-
-        [Obsolete(message:"不建议使用，性能较差")]
-        public void SetEqualizer(int position, float db)
-        {
-            EqualizerBand[position][2] = db;
-            if (FileReader != null)
-                FileReader.CreateFilters();
         }
 
         bool isCUEEndCalled = false;

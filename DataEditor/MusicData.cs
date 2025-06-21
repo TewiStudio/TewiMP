@@ -296,7 +296,7 @@ namespace TewiMP.DataEditor
                 {
                     var encoding = CodeHelper.GetEncoding(localFile.FullName, System.Text.Encoding.Default);
                     CueSharp.CueSheet cueSheet = new CueSharp.CueSheet(localFile.FullName, encoding);
-                    string path = $"{localFile.DirectoryName}\\{cueSheet.Tracks.First().DataFile.Filename}";
+                    string path = Path.Combine(localFile.DirectoryName, cueSheet.Tracks.First().DataFile.Filename);
                     TimeSpan duration = default;
 
                     var track = new ATL.Track(path);
@@ -323,15 +323,10 @@ namespace TewiMP.DataEditor
                             endTime = duration;
                         }
 
-                        string finalPath;
-                        if (string.IsNullOrEmpty(path))
-                        {
-                            finalPath = Path.Combine(localFile.DirectoryName, t.DataFile.Filename);
-                        }
-                        else
-                        {
-                            finalPath = path;
-                        }
+                        if (startTime >= endTime) endTime = TimeSpan.Zero;
+
+                        string finalPath = string.IsNullOrEmpty(t.DataFile.Filename) ? path : Path.Combine(localFile.DirectoryName, t.DataFile.Filename);
+
                         MusicData musicData = new(
                             t.Title, null,
                             new List<Artist>() { new(string.IsNullOrEmpty(t.Performer) ? cueSheet.Performer : t.Performer) },
@@ -350,7 +345,6 @@ namespace TewiMP.DataEditor
                         };
                         data.Add(musicData);
                     }
-                    data.Reverse();
                     return data.ToArray();
                 }
                 else

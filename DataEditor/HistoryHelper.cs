@@ -28,8 +28,12 @@ namespace TewiMP.DataEditor
             JObject keyValuePairs = null;
             await Task.Run(() =>
             {
-                var t = System.IO.File.ReadAllText(DataFolderBase.HistoryDataPath);
-                keyValuePairs = JObject.Parse(t);
+                try
+                {
+                    var t = System.IO.File.ReadAllText(DataFolderBase.HistoryDataPath);
+                    keyValuePairs = JObject.Parse(t);
+                }
+                catch { }
             });
             return keyValuePairs;
         }
@@ -50,6 +54,7 @@ namespace TewiMP.DataEditor
         public static async Task AddHistory(SongHistoryData historyData)
         {
             var datas = await HistoryHelper.GetHistoriesJObject();
+            if (datas is null) return;
             try
             {
                 await Task.Run(() =>

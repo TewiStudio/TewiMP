@@ -240,6 +240,10 @@ namespace CueSharp
                         break;
                     case "FILE":
                         currentFile = ParseFile(file[i], trackOn);
+                        if (trackOn > -1)
+                        {
+                            m_Tracks[trackOn].DataFile = currentFile;
+                        }
                         break;
                     case "FLAGS":
                         ParseFlags(file[i], trackOn);
