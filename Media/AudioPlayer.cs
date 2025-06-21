@@ -658,7 +658,8 @@ namespace TewiMP.Media
                 CurrentTime = TimeSpan.Zero;
             }
 
-            App.logManager.Log("AudioPlayer", $"当前播放：{MusicData.Title}, Time: {CurrentTime}/{TotalTime}, IsMIDI: {FileReader.isMidi}, IsCUE: {MusicData.CUETrackData != null}");
+            if (MusicData is not null)
+                App.logManager.Log("AudioPlayer", $"当前播放：{MusicData.Title}, Time: {CurrentTime}/{TotalTime}, IsMIDI: {FileReader.isMidi}, IsCUE: {MusicData.CUETrackData != null}");
 
             if (musicData == MusicData)
             {
