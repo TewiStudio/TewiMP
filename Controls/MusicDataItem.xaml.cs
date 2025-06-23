@@ -26,7 +26,7 @@ namespace TewiMP.Controls
         {
             if (isStaticInited) return;
             isStaticInited = true;
-            App.audioPlayer.SourceChanged += (_) =>
+            App.Instance.audioPlayer.SourceChanged += (_) =>
             {
                 foreach (MusicDataItem item in staticMusicDataItem)
                 {
@@ -89,7 +89,7 @@ namespace TewiMP.Controls
 
         public bool IsMusicDataPlaying
         {
-            get => songItemBind?.MusicData == App.audioPlayer.MusicData;
+            get => songItemBind?.MusicData == App.Instance.audioPlayer.MusicData;
         }
 
         SongItemBindBase songItemBind;
@@ -152,7 +152,7 @@ namespace TewiMP.Controls
 
             if (isExists)
             {
-                var bitmapTuple = await ImageManage.GetImageSource(musicData, (int)(56 * MainWindow.NowDPI), (int)(56 * MainWindow.NowDPI), true);
+                var bitmapTuple = await ImageManage.GetImageSource(musicData, (int)(56 * App.MainWindowInstance.NowDPI), (int)(56 * App.MainWindowInstance.NowDPI), true);
                 result = bitmapTuple.Item1;
                 FileNotExists_Root.Visibility = Visibility.Collapsed;
             }
@@ -227,16 +227,16 @@ namespace TewiMP.Controls
 
             if (IsMusicDataPlaying)
             {
-                App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-                App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-                SetPlayingIcon(App.audioPlayer.PlaybackState);
+                App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+                App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+                SetPlayingIcon(App.Instance.audioPlayer.PlaybackState);
                 OnMouseIn();
                 Background_PlayingRectangle.Opacity = 1;
                 last_IsMusicDataPlaying = true;
             }
             else
             {
-                App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+                App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
                 if (last_IsMusicDataPlaying) // 只有当上次调用此函数时 IsMusicDataPlaying 判断为 true 时才执行下面的恢复样式代码
                 {
                     SetPlayingIcon(NAudio.Wave.PlaybackState.Paused);
@@ -338,7 +338,7 @@ namespace TewiMP.Controls
             {
                 rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
             }
-            App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+            App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
             staticMusicDataItem.Remove(this);
             songItemBind = null;
             Info_Image.Source = null;
@@ -377,7 +377,7 @@ namespace TewiMP.Controls
         private async void UserControl_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             if (isMouseEventClosed) return;
-            await App.playingList.Play(songItemBind.MusicData, true);
+            await App.Instance.playingList.Play(songItemBind.MusicData, true);
         }
 
         private void UserControl_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -406,13 +406,13 @@ namespace TewiMP.Controls
         {
             if (IsMusicDataPlaying)
             {
-                if (App.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
-                    App.audioPlayer.SetPause();
+                if (App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                    App.Instance.audioPlayer.SetPause();
                 else
-                    App.audioPlayer.SetPlay();
+                    App.Instance.audioPlayer.SetPlay();
             }
             else
-                await App.playingList.Play(songItemBind.MusicData, true);
+                await App.Instance.playingList.Play(songItemBind.MusicData, true);
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)

@@ -60,7 +60,7 @@ namespace TewiMP.Helpers.MetingService
                     return null;
                 };
 
-                for (int i = 0; i <= App.metingServices.RetryCount; i++)
+                for (int i = 0; i <= App.Instance.metingServices.RetryCount; i++)
                 {
                     var a = getSearchAction();
                     if (a != null)
@@ -97,7 +97,7 @@ namespace TewiMP.Helpers.MetingService
                     return null;
                 };
 
-                for (int i = 0; i <= App.metingServices.RetryCount; i++)
+                for (int i = 0; i <= App.Instance.metingServices.RetryCount; i++)
                 {
                     var a = getAddressAction();
                     if (a != null)
@@ -148,7 +148,7 @@ namespace TewiMP.Helpers.MetingService
                     return musicData;
                 };
 
-                for (int i = 0; i <= App.metingServices.RetryCount; i++)
+                for (int i = 0; i <= App.Instance.metingServices.RetryCount; i++)
                 {
                     MusicData a = null;
                     try
@@ -196,7 +196,7 @@ namespace TewiMP.Helpers.MetingService
                     return null;
                 };
 
-                for (int i = 0; i <= App.metingServices.RetryCount; i++)
+                for (int i = 0; i <= App.Instance.metingServices.RetryCount; i++)
                 {
                     var a = getPicAction();
                     if (a != null)
@@ -228,7 +228,7 @@ namespace TewiMP.Helpers.MetingService
                     }
                 };
 
-                for (int i = 0; i <= App.metingServices.RetryCount; i++)
+                for (int i = 0; i <= App.Instance.metingServices.RetryCount; i++)
                 {
                     string a = null;
                     try
@@ -297,13 +297,13 @@ namespace TewiMP.Helpers.MetingService
                     }
                     catch (Exception err)
                     {
-                        //App.logManager.Log(err);
+                        //LogManager.Log(err);
                     }
 
                     return Album;
                 };
 
-                for (int i = 0; i <= App.metingServices.RetryCount; i++)
+                for (int i = 0; i <= App.Instance.metingServices.RetryCount; i++)
                 {
                     Album a = null;
                     try
@@ -342,7 +342,7 @@ namespace TewiMP.Helpers.MetingService
                 }
             };
 
-            for (int i = 0; i <= App.metingServices.RetryCount; i++)
+            for (int i = 0; i <= App.Instance.metingServices.RetryCount; i++)
             {
                 string a = null;
                 try

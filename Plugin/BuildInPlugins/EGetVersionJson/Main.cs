@@ -18,7 +18,7 @@ namespace TewiMP.Plugin.BuildInPlugins.EGetVersionJson
 
         public override void OnEnable()
         {
-            SetSetting("Json", Newtonsoft.Json.Linq.JObject.FromObject(App.NowVersion).ToString());
+            SetSetting("Json", Newtonsoft.Json.Linq.JObject.FromObject(App.Instance.NowVersion).ToString());
         }
     }
 }

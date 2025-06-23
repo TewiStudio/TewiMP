@@ -119,7 +119,7 @@ namespace TewiMP.Plugin
 
         public async Task ShowSettingsDialog()
         {
-            await MainWindow.ShowDialog(PluginInfo.Name, new PluginSetter() { Plugin = this }, "返回");
+            await App.MainWindowInstance.ShowDialog(PluginInfo.Name, new PluginSetter() { Plugin = this }, "返回");
         }
 
         public static bool operator ==(Plugin left, Plugin right)

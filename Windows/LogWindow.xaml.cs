@@ -61,7 +61,7 @@ namespace TewiMP.Windowed
             scrollViewer = (VisualTreeHelper.GetChild(LogList, 0) as Border).Child as ScrollViewer;
             scrollViewer.LayoutUpdated -= ScrollViewer_LayoutUpdated;
             scrollViewer.LayoutUpdated += ScrollViewer_LayoutUpdated;
-            LogList.ItemsSource = App.logManager.LogDatas;
+            LogList.ItemsSource = App.Instance.logManager.LogDatas;
         }
 
         private void Grid_Unloaded(object sender, RoutedEventArgs e)

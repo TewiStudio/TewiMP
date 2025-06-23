@@ -38,7 +38,7 @@ namespace TewiMP.Background
         /// <exception cref="CacheIsLoadingException"></exception>
         public async Task<string> StartCacheMusic(MusicData data)
         {
-            App.logManager.Log("CacheManager", $"开始缓存：\"{data}\"");
+            LogManager.Log("CacheManager", $"开始缓存：\"{data}\"");
             if (data.From == MusicFrom.localMusic) throw new Exception("无法缓存本地文件。");
             AddingCacheMusicData?.Invoke(data, "正在开始缓存");
             if (InCachingMusicData.Contains(data)) throw new CacheIsLoadingException("此音频正在缓冲中。");
@@ -47,7 +47,7 @@ namespace TewiMP.Background
             musicPathResult = await GetCachePath(data);
             if (musicPathResult != null)
             {
-                App.logManager.Log("CacheManager", $"已存在缓存 \"{musicPathResult}\"！");
+                LogManager.Log("CacheManager", $"已存在缓存 \"{musicPathResult}\"！");
                 CachedMusicData?.Invoke(data, null);
                 return musicPathResult; // 当检测到已缓存时返回
             }
@@ -75,7 +75,7 @@ namespace TewiMP.Background
                 throw new WebException($"无法获取歌曲链接。");
             }
 
-            App.logManager.Log("CacheManager", "正在下载缓存文件...");
+            LogManager.Log("CacheManager", "正在下载缓存文件...");
             musicPathResult = @$"{DataFolderBase.AudioCacheFolder}\{data.PluginInfo}{data.ID}";
             await Task.Run(() => File.Create(musicPathResult).Close()); // 创建缓存文件
 
@@ -118,7 +118,7 @@ namespace TewiMP.Background
 
             InCachingMusicData.Remove(data);
             CachedMusicData?.Invoke(data, null);
-            App.logManager.Log("CacheManager", $"缓存完成：\"{musicPathResult}\"");
+            LogManager.Log("CacheManager", $"缓存完成：\"{musicPathResult}\"");
             return musicPathResult;
         }
     }

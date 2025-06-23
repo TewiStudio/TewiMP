@@ -5,6 +5,7 @@ using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
 using TewiMP.Helpers;
+using TewiMP.Background;
 
 namespace TewiMP.Media
 {
@@ -95,24 +96,24 @@ namespace TewiMP.Media
                     if (!cueFile)
                     {
                         readerStream = new FlakeNAudioAdapter.FlakeFileReader(fileName);
-                        App.logManager.Log("AudioFileReader", "正在使用 FlakeFlac 解码器");
+                        LogManager.Log("AudioFileReader", "正在使用 FlakeFlac 解码器");
                     }
                     else
                     {
                         readerStream = new NAudio.Flac.FlacReader(fileName);
-                        App.logManager.Log("AudioFileReader", "正在使用 NAudio.Flac 解码器（CUE文件兼容性）");
+                        LogManager.Log("AudioFileReader", "正在使用 NAudio.Flac 解码器（CUE文件兼容性）");
                     }
-                    DecodeName = $"{App.AppName} built-in FLAC Decoder";
+                    DecodeName = $"{App.Instance.AppName} built-in FLAC Decoder";
                     break;
                 case "79103":
                     readerStream = new NAudio.Vorbis.VorbisWaveReader(fileName);
-                    DecodeName = $"{App.AppName} built-in Vorbis Decoder";
-                    App.logManager.Log("AudioFileReader", "正在使用 Vorbis 解码器");
+                    DecodeName = $"{App.Instance.AppName} built-in Vorbis Decoder";
+                    LogManager.Log("AudioFileReader", "正在使用 Vorbis 解码器");
                     break;
                 case "7368":
                     readerStream = new Mp3FileReader(fileName);
                     DecodeName = $"NAudio MP3 Decoder";
-                    App.logManager.Log("AudioFileReader", "正在使用 MP3 解码器");
+                    LogManager.Log("AudioFileReader", "正在使用 MP3 解码器");
                     break;
                 case "8273":
                     readerStream = new WaveFileReader(fileName);
@@ -121,13 +122,13 @@ namespace TewiMP.Media
                     {
                         readerStream = WaveFormatConversionStream.CreatePcmStream(readerStream);
                         readerStream = new BlockAlignReductionStream(readerStream);
-                        App.logManager.Log("AudioFileReader", "正在使用 Wave 解码器");
+                        LogManager.Log("AudioFileReader", "正在使用 Wave 解码器");
                     }
                     break;
                 case "7079":
                     readerStream = new AiffFileReader(fileName);
                     DecodeName = $"NAudio Aiff Decoder";
-                    App.logManager.Log("AudioFileReader", "正在使用 Aiff 解码器");
+                    LogManager.Log("AudioFileReader", "正在使用 Aiff 解码器");
                     break;
                 case "7784":
                     isMidi = true;
@@ -143,13 +144,13 @@ namespace TewiMP.Media
                 return;
             }
 
-            App.logManager.Log("AudioFileReader", $"ffmpeg.exe: {FFmpegPath}");
+            LogManager.Log("AudioFileReader", $"ffmpeg.exe: {FFmpegPath}");
             if (!File.Exists(FFmpegPath))
             {
                 throw new System.Exception("找不到 ffmpeg.exe，请检查 ffmpeg.exe 是否被删除，或者其路径设置是否正确。");
             }
 
-            var tFile = App.audioPlayer.tfile;
+            var tFile = App.Instance.audioPlayer.tfile;
             string codec = tFile.BitDepth switch
             {
                 8 => "u8",
@@ -170,7 +171,7 @@ namespace TewiMP.Media
             _ffmpegProcess = Process.Start(psi);
             if (_ffmpegProcess is not null)
             {
-                App.logManager.Log("AudioFileReader", $"正在使用 FFmpeg 解码器，文件标识符为：{addr}");
+                LogManager.Log("AudioFileReader", $"正在使用 FFmpeg 解码器，文件标识符为：{addr}");
                 _ffmpegProcess.StandardOutput.BaseStream.CopyTo(_ffmpegReadMemory = new());
                 _ffmpegReadMemory.Position = 0;
                 _ffmpegProcess.Kill();
@@ -187,7 +188,7 @@ namespace TewiMP.Media
             }
             else
             {
-                App.logManager.Log("AudioFileReader", $"正在使用 Microsoft MediaFoundationReader 解码器，文件标识符为：{addr}");
+                LogManager.Log("AudioFileReader", $"正在使用 Microsoft MediaFoundationReader 解码器，文件标识符为：{addr}");
                 readerStream = new MediaFoundationReader(fileName);
                 DecodeName = $"Microsoft MediaFoundation Decoder";
             }

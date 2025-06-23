@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
-using System.Diagnostics;
+using WinRT.Interop;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -20,9 +20,9 @@ using Microsoft.UI.Composition;
 using Windows.Storage.Streams;
 using Windows.Graphics.Imaging;
 using Windows.UI.ViewManagement;
-using TewiMP.DataEditor;
-using WinRT.Interop;
 using Windows.System;
+using TewiMP.DataEditor;
+using TewiMP.Background;
 
 namespace TewiMP.Helpers
 {
@@ -243,7 +243,7 @@ namespace TewiMP.Helpers
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.App.logManager.Log(ex.Message);
+                        System.Diagnostics.LogManager.Log(ex.Message);
                     }
 
                     return image;
@@ -361,7 +361,7 @@ namespace TewiMP.Helpers
                 }
                 catch (Exception ex)
                 {
-                    App.logManager.Log("ImageFromBytes", ex.Message, Background.LogLevel.Error);
+                    LogManager.Log("ImageFromBytes", ex.Message, Background.LogLevel.Error);
                 }
             });
             await image.SetSourceAsync(stream);
@@ -506,7 +506,7 @@ namespace TewiMP.Helpers
 
         public static async Task<bool> OpenInBrowser(Uri uri)
         {
-            var result = await MainWindow.ShowDialog("跳转外部链接", $"将会打开浏览器以跳转到外部链接：\n{uri.OriginalString}", "取消", "确认", defaultButton: Microsoft.UI.Xaml.Controls.ContentDialogButton.Close);
+            var result = await App.MainWindowInstance.ShowDialog("跳转外部链接", $"将会打开浏览器以跳转到外部链接：\n{uri.OriginalString}", "取消", "确认", defaultButton: Microsoft.UI.Xaml.Controls.ContentDialogButton.Close);
             if (result == Microsoft.UI.Xaml.Controls.ContentDialogResult.Primary)
                 return await Launcher.LaunchUriAsync(uri);
             else
@@ -639,7 +639,7 @@ namespace TewiMP.Helpers
                     case 1: timeMillsStr += "00"; break;
                     case 2: timeMillsStr += "0"; break;
                     case 3: break;
-                    default: App.logManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Warning); break;
+                    default: LogManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Warning); break;
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
                 return timesb + timeMills;
@@ -662,7 +662,7 @@ namespace TewiMP.Helpers
                         case 1: timeMillsStr += "00"; break;
                         case 2: timeMillsStr += "0"; break;
                         case 3: break;
-                        default: App.logManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Warning); break;
+                        default: LogManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Warning); break;
                     }
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));

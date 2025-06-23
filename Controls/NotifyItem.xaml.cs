@@ -28,7 +28,7 @@ namespace TewiMP.Controls
             var logLevel = notifyItemData.Severity.ToLogLevel();
             if (logLevel is not null)
             {
-                App.logManager.Log(notifyItemData.Title, notifyItemData.Message, (LogLevel)logLevel);
+                LogManager.Log(notifyItemData.Title, notifyItemData.Message, (LogLevel)logLevel);
             }*/
 
             MessageTextBlock.Visibility = string.IsNullOrEmpty(notifyItemData.Message) ?

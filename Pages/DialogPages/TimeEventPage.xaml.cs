@@ -53,7 +53,7 @@ namespace TewiMP.Pages.DialogPages
                 TimingEndEvent = (TimingEndEvent)TimingEndEventComboBox.SelectedIndex;
                 LeftTime = TimingTimePicker.Time;
                 //LeftTime = TimeSpan.FromSeconds(2);
-                //System.Diagnostics.App.logManager.Log(LeftTime);
+                //System.Diagnostics.LogManager.Log(LeftTime);
                 TimingTimer = new()
                 {
                     Interval = TimeSpan.FromSeconds(1)
@@ -95,7 +95,7 @@ namespace TewiMP.Pages.DialogPages
         {
             if (WaitPlayEndCheckBox.IsChecked == true)
             {
-                App.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+                App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
             }
             else
                 TimingEndEventDo();
@@ -109,10 +109,10 @@ namespace TewiMP.Pages.DialogPages
             {
                 case TimingEndEvent.暂停播放:
                     if (WaitPlayEndCheckBox.IsChecked == true) await System.Threading.Tasks.Task.Delay(100);
-                    App.audioPlayer.SetPause();
+                    App.Instance.audioPlayer.SetPause();
                     break;
                 case TimingEndEvent.退出程序:
-                    App.ExitApp();
+                    App.Instance.ExitApp();
                     break;
                 case TimingEndEvent.注销:
                     break;
@@ -123,7 +123,7 @@ namespace TewiMP.Pages.DialogPages
 
         private void CancelTiming()
         {
-            App.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
             if (TimingTimer is not null)
             {
                 TimingTimer.Tick -= TimingTimer_Tick;
@@ -139,7 +139,7 @@ namespace TewiMP.Pages.DialogPages
 
         private void AudioPlayer_SourceChanged(Media.AudioPlayer audioPlayer)
         {
-            App.audioPlayer.PlayEnd -= AudioPlayer_SourceChanged;
+            App.Instance.audioPlayer.PlayEnd -= AudioPlayer_SourceChanged;
             TimingEndEventDo();
         }
     }

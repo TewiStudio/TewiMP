@@ -7,6 +7,7 @@ using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Windowing;
+using TewiMP.Background;
 
 namespace TewiMP.Windowed
 {
@@ -28,40 +29,40 @@ namespace TewiMP.Windowed
             ShowTaskBarButtons();
             //SetTaskbarImage(Path.Combine(localPath, "icon.png"));
 
-            MainWindow.WindowViewStateChanged += MainWindow_WindowViewStateChanged;
-            App.audioPlayer.PlayStateChanged += (_) => SetTaskbarButtonIcon(_.PlaybackState);
-            App.playingList.NowPlayingImageLoaded += (_, __) => IconPath = __;
-            App.audioPlayer.SourceChanged += (_) =>
+            App.MainWindowInstance.WindowViewStateChanged += MainWindow_WindowViewStateChanged;
+            App.Instance.audioPlayer.PlayStateChanged += (_) => SetTaskbarButtonIcon(_.PlaybackState);
+            App.Instance.playingList.NowPlayingImageLoaded += (_, __) => IconPath = __;
+            App.Instance.audioPlayer.SourceChanged += (_) =>
             {
                 if (_.MusicData is null)
-                    Title = App.AppName;
+                    Title = App.Instance.AppName;
                 else
                 {
-                    Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {App.AppName}";
+                    Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {App.Instance.AppName}";
                 }
                 Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetThumbnailTooltip(Handle, $"正在播放：{_.MusicData.Title} - {_.MusicData.ArtistName}");
             };
-            if (App.audioPlayer.MusicData is null)
-                Title = App.AppName;
+            if (App.Instance.audioPlayer.MusicData is null)
+                Title = App.Instance.AppName;
             else
             {
-                Title = $"{App.audioPlayer.MusicData.Title} - {App.audioPlayer.MusicData.ArtistName} · {App.AppName}";
+                Title = $"{App.Instance.audioPlayer.MusicData.Title} - {App.Instance.audioPlayer.MusicData.ArtistName} · {App.Instance.AppName}";
             }
-            IconPath = App.playingList.NowPlayingImagePath;
+            IconPath = App.Instance.playingList.NowPlayingImagePath;
 
             Activated += (_, __) =>
             {
                 __.Handled = true;
-                App.MainWindow.Activate();
+                App.MainWindowInstance.Activate();
             };
             AppWindow.Closing += (_, __) =>
             {
                 __.Cancel = true;
-                MainWindow.AppWindowInstance.Hide();
+                App.MainWindowInstance.AppWindow.Hide();
             };
             AppWindow.Changed += (_, __) =>
             {
-                //App.logManager.Log(__?.DidPresenterChange);
+                //LogManager.Log(__?.DidPresenterChange);
                 // WinUI Bug：设置了窗口不能最大化结果还是能 >:(
                 /*if (__?.DidPresenterChange == true)
                     overlappedPresenter.Minimize();*/
@@ -84,13 +85,13 @@ namespace TewiMP.Windowed
         private void MainWindow_WindowViewStateChanged(bool isView)
         {
             ShowTaskBarButtons();
-            SetTaskbarButtonIcon(App.audioPlayer.PlaybackState);
+            SetTaskbarButtonIcon(App.Instance.audioPlayer.PlaybackState);
             //TryTransparentWindow();
         }
 
         public void InitTaskbarInfo()
         {
-            Title = App.AppName;
+            Title = App.Instance.AppName;
             AppWindow.Hide();
 
             int attributeTrue = (int)NativeMethods.TRUE;
@@ -102,8 +103,8 @@ namespace TewiMP.Windowed
                 throw Marshal.GetExceptionForHR(hresult);
 
             Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.HrInit();
-            Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.RegisterTab(Handle, MainWindow.Handle);
-            Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetTabOrder(Handle, MainWindow.Handle);
+            Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.RegisterTab(Handle, App.MainWindowInstance.Handle);
+            Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetTabOrder(Handle, App.MainWindowInstance.Handle);
         }
 
         private void InitCallBack()
@@ -151,7 +152,7 @@ namespace TewiMP.Windowed
             }
             catch(Exception ex)
             {
-                DataEditor.LogHelper.WriteLog(nameof(ex), ex.ToString());
+                LogManager.Error("SetTaskbarButtonIcon", ex.ToString());
             }
         }
 
@@ -165,7 +166,7 @@ namespace TewiMP.Windowed
             Helpers.SDKs.TaskbarProgress.THUMBBUTTON[] taskbarInfoButtonPauseStyle = new[]
             {
                 new Helpers.SDKs.TaskbarProgress.THUMBBUTTON(){ iId = 1, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = perviousPlayIconHandle, szTip = "上一首" },
-                new Helpers.SDKs.TaskbarProgress.THUMBBUTTON(){ iId = 2, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = App.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing ? pauseIconHandle : playIconHandle, szTip = "播放" },
+                new Helpers.SDKs.TaskbarProgress.THUMBBUTTON(){ iId = 2, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing ? pauseIconHandle : playIconHandle, szTip = "播放" },
                 new Helpers.SDKs.TaskbarProgress.THUMBBUTTON(){ iId = 3, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = nextPlayIconHandle, szTip = "下一首" },
             };
             Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.ThumbBarAddButtons(Handle, 3, taskbarInfoButtonPauseStyle);
@@ -174,7 +175,7 @@ namespace TewiMP.Windowed
 
         public async void SetTaskbarImage(string filePath)
         {
-            App.logManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail updated to \"{filePath}\".");
+            LogManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail updated to \"{filePath}\".");
             if (string.IsNullOrEmpty(filePath))
             {
                 filePath = Path.Combine(localPath, "icon.png");
@@ -194,13 +195,13 @@ namespace TewiMP.Windowed
                     var a = await Task.Run(() => NativeMethods.DwmSetIconicThumbnail(Handle, hBitmapNint, NativeMethods.DWM_SIT.None));
                     if (a != 0)
                     {
-                        //App.logManager.Log($"{size}x{size} failed.");
+                        //LogManager.Log($"{size}x{size} failed.");
                         size -= 2;
                         canBreak = false;
                     }
                     else
                     {
-                        App.logManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail {size}x{size} completed.");
+                        LogManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail {size}x{size} completed.");
                         IconPathUsing = filePath;
                         canBreak = true;
                     }
@@ -228,7 +229,7 @@ namespace TewiMP.Windowed
             Windows.Win32.Foundation.WPARAM wParam,
             Windows.Win32.Foundation.LPARAM lParam)
         {
-            //App.logManager.Log($"Get system message: {uMsg}\n    {wParam.Value}");
+            //LogManager.Log($"Get system message: {uMsg}\n    {wParam.Value}");
             if (uMsg == 806)
             {
                 // 到了屏幕外面就看不见了 :-)
@@ -266,24 +267,24 @@ namespace TewiMP.Windowed
             switch (wParam.Value)
             {
                 case 402653185:
-                    await App.playingList.PlayPrevious();
+                    await App.Instance.playingList.PlayPrevious();
                     break;
                 case 402653186:
-                    if (App.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
-                        App.audioPlayer.SetPause();
+                    if (App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                        App.Instance.audioPlayer.SetPause();
                     else
-                        App.audioPlayer.SetPlay();
+                        App.Instance.audioPlayer.SetPlay();
                     break;
                 case 402653187:
-                    await App.playingList.PlayNext();
+                    await App.Instance.playingList.PlayNext();
                     break;
             }
-            App.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+            App.Instance.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
         }
 
         private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string path)
         {
-            App.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
             SetTaskbarImage(path);
         }
 

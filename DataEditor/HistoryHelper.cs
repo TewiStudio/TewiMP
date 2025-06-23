@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
+using TewiMP.Background;
 
 namespace TewiMP.DataEditor
 {
@@ -67,7 +68,7 @@ namespace TewiMP.DataEditor
             }
             catch (Exception ex)
             {
-                App.logManager.Log("DataFolderBase", ex.Message, Background.LogLevel.Error);
+                LogManager.Log("DataFolderBase", ex.Message, Background.LogLevel.Error);
             }
         }
         

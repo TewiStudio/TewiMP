@@ -20,6 +20,7 @@ using TewiMP.Helpers;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 using TewiMP.WindowHelpers;
+using WinUIEx;
 
 namespace TewiMP.Windowed
 {
@@ -32,9 +33,9 @@ namespace TewiMP.Windowed
             set
             {
                 isVisible = value;
-                if (App.NotifyIconWindow != null)
+                if (App.Instance.NotifyIconWindow != null)
                 {
-                    App.NotifyIconWindow.notifyIcon.Visible = value;
+                    App.Instance.NotifyIconWindow.notifyIcon.Visible = value;
                 }
             }
         }
@@ -52,7 +53,7 @@ namespace TewiMP.Windowed
             InitializeComponent();
 
             notifyIcon = new System.Windows.Forms.NotifyIcon();
-            notifyIcon.Text = App.AppName;
+            notifyIcon.Text = App.Instance.AppName;
             notifyIcon.Icon = new(Path.Combine(Directory.GetCurrentDirectory(), "Images", "Icons", "icon.ico"));
             notifyIcon.Visible = isVisible;
 
@@ -108,17 +109,17 @@ namespace TewiMP.Windowed
         public void UpdateDatas()
         {
             UpdateWindowDisplay();
-            AudioPlayer_SourceChanged(App.audioPlayer);
-            AudioPlayer_PlayStateChanged(App.audioPlayer);
-            AudioPlayer_TimingChanged(App.audioPlayer);
-            AudioPlayer_VolumeChanged(App.audioPlayer, App.audioPlayer.Volume);
-            PlayingList_NowPlayingImageLoaded(App.playingList.NowPlayingImage, null);
-            App.audioPlayer.ReCallTiming();
-            TB_OutputSelector_Name.Text = $"{App.audioPlayer.NowOutDevice.DeviceType} - {App.audioPlayer.NowOutDevice.DeviceName}";
-            SetPlayModeIconAndName(App.playingList.PlayBehavior);
+            AudioPlayer_SourceChanged(App.Instance.audioPlayer);
+            AudioPlayer_PlayStateChanged(App.Instance.audioPlayer);
+            AudioPlayer_TimingChanged(App.Instance.audioPlayer);
+            AudioPlayer_VolumeChanged(App.Instance.audioPlayer, App.Instance.audioPlayer.Volume);
+            PlayingList_NowPlayingImageLoaded(App.Instance.playingList.NowPlayingImage, null);
+            App.Instance.audioPlayer.ReCallTiming();
+            TB_OutputSelector_Name.Text = $"{App.Instance.audioPlayer.NowOutDevice.DeviceType} - {App.Instance.audioPlayer.NowOutDevice.DeviceName}";
+            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
 
             isCodeChangedDesktopLyricWindow = true;
-            TB_Lyric.IsChecked = MainWindow.DesktopLyricWindow != null;
+            TB_Lyric.IsChecked = App.MainWindowInstance.DesktopLyricWindow != null;
             isCodeChangedDesktopLyricWindow = false;
         }
 
@@ -129,36 +130,36 @@ namespace TewiMP.Windowed
 #if !DEBUG
                 AppWindow.Hide();
 #endif
-                App.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
-                App.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
-                App.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
-                App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-                App.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
-                App.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
-                App.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-                MainWindow.DesktopLyricWindowOpenedEvent -= MainWindow_DesktopLyricWindowOpenedEvent;
-                MainWindow.DesktopLyricWindowClosedEvent -= MainWindow_DesktopLyricWindowClosedEvent;
+                App.Instance.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
+                App.Instance.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
+                App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+                App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+                App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+                App.Instance.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
+                App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+                App.MainWindowInstance.DesktopLyricWindowOpenedEvent -= MainWindow_DesktopLyricWindowOpenedEvent;
+                App.MainWindowInstance.DesktopLyricWindowClosedEvent -= MainWindow_DesktopLyricWindowClosedEvent;
                 TitleTBBase.Pause = true;
                 ArtistTBBase.Pause = true;
                 AlbumTBBase.Pause = true;
-                App.logManager.Log("NotifyIconWindow", "Removed Events");
+                LogManager.Log("NotifyIconWindow", "Removed Events");
             }
             else
             {
-                App.audioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
-                App.audioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
-                App.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-                App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-                App.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
-                App.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
-                App.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
-                MainWindow.DesktopLyricWindowOpenedEvent += MainWindow_DesktopLyricWindowOpenedEvent;
-                MainWindow.DesktopLyricWindowClosedEvent += MainWindow_DesktopLyricWindowClosedEvent;
+                App.Instance.audioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
+                App.Instance.audioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
+                App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+                App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+                App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+                App.Instance.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
+                App.Instance.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+                App.MainWindowInstance.DesktopLyricWindowOpenedEvent += MainWindow_DesktopLyricWindowOpenedEvent;
+                App.MainWindowInstance.DesktopLyricWindowClosedEvent += MainWindow_DesktopLyricWindowClosedEvent;
                 TitleTBBase.Pause = false;
                 ArtistTBBase.Pause = false;
                 AlbumTBBase.Pause = false;
                 UpdateDatas();
-                App.logManager.Log("NotifyIconWindow", "Added Events");
+                LogManager.Log("NotifyIconWindow", "Added Events");
             }
         }
 
@@ -171,17 +172,17 @@ namespace TewiMP.Windowed
 
             if (audioPlayer.MusicData is null || true)
             {
-                notifyIcon.Text = App.AppName;
+                notifyIcon.Text = App.Instance.AppName;
             }
             else
             {
                 try
                 {
-                    notifyIcon.Text = $"{App.AppName}\n正在播放：{audioPlayer.MusicData.Title}\n · 艺术家：{audioPlayer.MusicData.ArtistName}\n · 专辑：{audioPlayer.MusicData.Album.Title}";
+                    notifyIcon.Text = $"{App.Instance.AppName}\n正在播放：{audioPlayer.MusicData.Title}\n · 艺术家：{audioPlayer.MusicData.ArtistName}\n · 专辑：{audioPlayer.MusicData.Album.Title}";
                 }
                 catch
                 {
-                    notifyIcon.Text = App.AppName;
+                    notifyIcon.Text = App.Instance.AppName;
                 }
             }
         }
@@ -315,9 +316,8 @@ namespace TewiMP.Windowed
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            MainWindow.AppWindowInstance.Show();
-            MainWindow.SOverlappedPresenter.Restore();
-            PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
+            App.MainWindowInstance.Restore();
+            App.MainWindowInstance.SetForegroundWindow();
         }
 
         private async void NotifyIcon_Click(object sender, EventArgs e)
@@ -340,9 +340,8 @@ namespace TewiMP.Windowed
             }
             else
             {
-                MainWindow.AppWindowInstance.Show();
-                MainWindow.SOverlappedPresenter.Restore();
-                PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
+                App.MainWindowInstance.Restore();
+                App.MainWindowInstance.SetForegroundWindow();
             }
         }
         #endregion
@@ -514,19 +513,18 @@ namespace TewiMP.Windowed
             switch ((sender as FrameworkElement).Tag)
             {
                 case "setting":
-                    MainWindow.AppWindowInstance.Show();
-                    MainWindow.SOverlappedPresenter.Restore();
-                    PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
-                    MainWindow.SetNavViewContent(typeof(SettingPage));
+                    App.MainWindowInstance.Restore();
+                    App.MainWindowInstance.SetForegroundWindow();
+                    App.MainWindowInstance.SetNavViewContent(typeof(SettingPage));
                     break;
                 case "off":
                     notifyIcon.Visible = false;
-                    App.ExitApp();
+                    App.Instance.ExitApp();
                     break;
                 case "returnBack":
-                    MainWindow.AppWindowInstance.Show();
-                    MainWindow.SOverlappedPresenter.Restore();
-                    PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
+                    App.MainWindowInstance.Restore();
+                    App.MainWindowInstance.SetForegroundWindow();
+                    PInvoke.User32.SetForegroundWindow(App.MainWindowInstance.Handle);
                     break;
             }
         }
@@ -542,40 +540,40 @@ namespace TewiMP.Windowed
             switch ((sender as Button).Tag)
             {
                 case "0":
-                    App.playingList.PlayPrevious();
+                    App.Instance.playingList.PlayPrevious();
                     break;
                 case "1":
-                    if (App.audioPlayer.PlaybackState == PlaybackState.Playing)
+                    if (App.Instance.audioPlayer.PlaybackState == PlaybackState.Playing)
                     {
-                        App.audioPlayer.SetPause();
+                        App.Instance.audioPlayer.SetPause();
                     }
                     else
                     {
-                        App.audioPlayer.SetPlay();
+                        App.Instance.audioPlayer.SetPlay();
                     }
                     break;
                 case "2":
-                    App.playingList.PlayNext();
+                    App.Instance.playingList.PlayNext();
                     break;
             }
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            MainWindow.MuteOrUnmuteVolume();
+            App.MainWindowInstance.MuteOrUnmuteVolume();
         }
 
         private void VolumeSD_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (!isCodeChangedVolumeValue)
-                App.audioPlayer.Volume = (float)VolumeSD.Value;
+                App.Instance.audioPlayer.Volume = (float)VolumeSD.Value;
         }
 
         private void TimeSD_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (!isCodeChangedSliderValue)
             {
-                App.audioPlayer.CurrentTime = TimeSpan.FromTicks((long)TimeSD.Value);
+                App.Instance.audioPlayer.CurrentTime = TimeSpan.FromTicks((long)TimeSD.Value);
             }
         }
 
@@ -588,14 +586,14 @@ namespace TewiMP.Windowed
         private void MainWindow_DesktopLyricWindowClosedEvent()
         {
             isCodeChangedDesktopLyricWindow = true;
-            TB_Lyric.IsChecked = MainWindow.DesktopLyricWindow is null;
+            TB_Lyric.IsChecked = App.MainWindowInstance.DesktopLyricWindow is null;
             isCodeChangedDesktopLyricWindow = false;
         }
 
         private void MainWindow_DesktopLyricWindowOpenedEvent()
         {
             isCodeChangedDesktopLyricWindow = true;
-            TB_Lyric.IsChecked = MainWindow.DesktopLyricWindow != null;
+            TB_Lyric.IsChecked = App.MainWindowInstance.DesktopLyricWindow != null;
             isCodeChangedDesktopLyricWindow = false;
         }
         
@@ -603,7 +601,7 @@ namespace TewiMP.Windowed
         {
             if (!isCodeChangedDesktopLyricWindow)
             {
-                MainWindow.OpenDesktopLyricWindow();
+                App.MainWindowInstance.OpenDesktopLyricWindow();
             }
         }
 
@@ -618,10 +616,10 @@ namespace TewiMP.Windowed
         private void C_Click(object sender, RoutedEventArgs e)
         {
             var a = (OutDevice)(sender as MenuFlyoutItem).Tag;
-            App.audioPlayer.NowOutDevice = a;
-            TB_OutputSelector_Name.Text = $"{App.audioPlayer.NowOutDevice.DeviceType} - {App.audioPlayer.NowOutDevice.DeviceName}";
+            App.Instance.audioPlayer.NowOutDevice = a;
+            TB_OutputSelector_Name.Text = $"{App.Instance.audioPlayer.NowOutDevice.DeviceType} - {App.Instance.audioPlayer.NowOutDevice.DeviceName}";
 
-            App.audioPlayer.SetReloadAsync();
+            App.Instance.audioPlayer.SetReloadAsync();
         }
         
         private async void AddOutDeviceToFlyOut()
@@ -649,8 +647,8 @@ namespace TewiMP.Windowed
         private void B_Click(object sender, RoutedEventArgs e)
         {
             var a = (PlayBehavior)(sender as MenuFlyoutItem).Tag;
-            App.playingList.PlayBehavior = a;
-            SetPlayModeIconAndName(App.playingList.PlayBehavior);
+            App.Instance.playingList.PlayBehavior = a;
+            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
         }
 
         private void SetPlayModeIconAndName(PlayBehavior playBehavior)
@@ -687,7 +685,7 @@ namespace TewiMP.Windowed
 
         private void TB_PlayModeSelector_Base_Loaded(object sender, RoutedEventArgs e)
         {
-            SetPlayModeIconAndName(App.playingList.PlayBehavior);
+            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
         }
     }
 

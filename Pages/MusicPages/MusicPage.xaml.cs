@@ -15,6 +15,7 @@ using NAudio.Wave;
 using TewiMP.Helpers;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
+using TewiMP.Background;
 
 namespace TewiMP.Pages.MusicPages
 {
@@ -25,7 +26,7 @@ namespace TewiMP.Pages.MusicPages
 
         public string Title
         {
-            get => App.audioPlayer.MusicData.Title;
+            get => App.Instance.audioPlayer.MusicData.Title;
         }
 
         private bool _showLrcPage = true;
@@ -86,17 +87,17 @@ namespace TewiMP.Pages.MusicPages
         private void UpdateWhenDataLated()
         {
             isCodeChangedLrcItem = true;
-            AudioPlayer_SourceChanged(App.audioPlayer);
-            AudioPlayer_PlayStateChanged(App.audioPlayer);
-            AudioPlayer_CacheLoadedChanged(App.audioPlayer);
-            AudioPlayer_TimingChanged(App.audioPlayer);
-            AudioPlayer_VolumeChanged(App.audioPlayer, App.audioPlayer.Volume);
-            PlayingList_NowPlayingImageLoaded(App.playingList.NowPlayingImage, null);
-            LyricManager_PlayingLyricSelectedChange1(App.lyricManager.NowLyricsData);
+            AudioPlayer_SourceChanged(App.Instance.audioPlayer);
+            AudioPlayer_PlayStateChanged(App.Instance.audioPlayer);
+            AudioPlayer_CacheLoadedChanged(App.Instance.audioPlayer);
+            AudioPlayer_TimingChanged(App.Instance.audioPlayer);
+            AudioPlayer_VolumeChanged(App.Instance.audioPlayer, App.Instance.audioPlayer.Volume);
+            PlayingList_NowPlayingImageLoaded(App.Instance.playingList.NowPlayingImage, null);
+            LyricManager_PlayingLyricSelectedChange1(App.Instance.lyricManager.NowLyricsData);
             SelectedChangedDo(true);
             isCodeChangedLrcItem = false;
-            App.audioPlayer.ReCallTiming();
-            //App.logManager.Log("MusicPage Updateed Events.");
+            App.Instance.audioPlayer.ReCallTiming();
+            //LogManager.Log("MusicPage Updateed Events.");
         }
 
         bool isAddEvents = false;
@@ -106,35 +107,35 @@ namespace TewiMP.Pages.MusicPages
             AutoScrollViewer1.Pause = false; AutoScrollViewer2.Pause = false;
             AutoScrollViewer3.Pause = false; AutoScrollViewer4.Pause = false;
             AutoScrollViewer5.Pause = false;
-            App.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
-            App.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-            App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-            App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-            App.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
-            App.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
-            App.audioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
-            App.audioPlayer.PlayEnd += AudioPlayer_PlayEnd;
-            App.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
-            App.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
-            App.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
-            App.audioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
-            App.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
-            App.audioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
-            App.playingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
-            App.playingList.NowPlayingImageLoading += PlayingList_NowPlayingImageLoading;
-            App.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-            App.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
-            App.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
-            App.lyricManager.PlayingLyricSourceChanged += LyricManager_PlayingLyricSourceChange;
-            App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange1;
-            App.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange1;
+            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+            App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+            App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+            App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+            App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+            App.Instance.audioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
+            App.Instance.audioPlayer.PlayEnd += AudioPlayer_PlayEnd;
+            App.Instance.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
+            App.Instance.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
+            App.Instance.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
+            App.Instance.audioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
+            App.Instance.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
+            App.Instance.audioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
+            App.Instance.playingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
+            App.Instance.playingList.NowPlayingImageLoading += PlayingList_NowPlayingImageLoading;
+            App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+            App.Instance.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
+            App.Instance.lyricManager.PlayingLyricSourceChanged += LyricManager_PlayingLyricSourceChange;
+            App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange1;
+            App.Instance.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange1;
 #if DEBUG
-            App.lyricManager.LyricTimingChanged -= LyricManager_LyricTimingChanged;
-            App.lyricManager.LyricTimingChanged += LyricManager_LyricTimingChanged;
+            App.Instance.lyricManager.LyricTimingChanged -= LyricManager_LyricTimingChanged;
+            App.Instance.lyricManager.LyricTimingChanged += LyricManager_LyricTimingChanged;
 #endif
             isAddEvents = true;
             UpdateWhenDataLated();
-            //App.logManager.Log("MusicPage Added Events.");
+            //LogManager.Log("MusicPage Added Events.");
         }
 
         private void RemoveEvents()
@@ -142,22 +143,22 @@ namespace TewiMP.Pages.MusicPages
             AutoScrollViewer1.Pause = true; AutoScrollViewer2.Pause = true;
             AutoScrollViewer3.Pause = true; AutoScrollViewer4.Pause = true;
             AutoScrollViewer5.Pause = true;
-            App.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
-            App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-            App.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
-            App.audioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
-            App.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
-            App.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
-            App.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
-            App.playingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
-            App.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-            App.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
-            App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange1;
+            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+            App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+            App.Instance.audioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
+            App.Instance.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
+            App.Instance.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
+            App.Instance.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
+            App.Instance.playingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
+            App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
+            App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange1;
 #if DEBUG
-            App.lyricManager.LyricTimingChanged -= LyricManager_LyricTimingChanged;
+            App.Instance.lyricManager.LyricTimingChanged -= LyricManager_LyricTimingChanged;
 #endif
             isAddEvents = false;
-            //App.logManager.Log("MusicPage Removed Events.");
+            //LogManager.Log("MusicPage Removed Events.");
         }
 
         public MusicPageViewState ViewState = MusicPageViewState.Hidden;
@@ -166,7 +167,7 @@ namespace TewiMP.Pages.MusicPages
             ViewState = musicPageViewState;
             if (ViewState == MusicPageViewState.View)
             {
-                LrcBaseListView.ItemsSource = App.lyricManager.NowPlayingLyrics;
+                LrcBaseListView.ItemsSource = App.Instance.lyricManager.NowPlayingLyrics;
                 AddEvents();
                 UpdateInterfaceDesign();
             }
@@ -181,7 +182,7 @@ namespace TewiMP.Pages.MusicPages
                 ConnectedAnimation canimation2 =
                     ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("upAnimation2", ArtistRunText);
                 canimation2.Configuration = new BasicConnectedAnimationConfiguration();
-                if (App.lyricManager.NowPlayingLyrics.Any())
+                if (App.Instance.lyricManager.NowPlayingLyrics.Any())
                 {
                     var e = (isMiniPage ? LrcSecondListView : LrcBaseListView).ContainerFromIndex(LrcBaseListView.SelectedIndex) as UIElement;
                     if (e != null)
@@ -195,7 +196,7 @@ namespace TewiMP.Pages.MusicPages
                 RemoveEvents();
                 RemoveLyricListItemSourceAsync();
             }
-            App.logManager.Log("MusicPage", $"ViewState 已被设置为 {musicPageViewState}.");
+            LogManager.Log("MusicPage", $"ViewState 已被设置为 {musicPageViewState}.");
         }
 
         private async void RemoveLyricListItemSourceAsync()
@@ -204,13 +205,13 @@ namespace TewiMP.Pages.MusicPages
             if (ViewState == MusicPageViewState.Hidden)
             {
                 LrcBaseListView.ItemsSource = null;
-                App.logManager.Log("MusicPage", $"LrcBaseListView.ItemSource 已被设置为 null.");
+                LogManager.Log("MusicPage", $"LrcBaseListView.ItemSource 已被设置为 null.");
             }
         }
 
         private void PlayingList_NowPlayingImageLoading(ImageSource imageSource, string _)
         {
-            /*if (App.audioPlayer.MusicData?.AlbumID != MusicData?.AlbumID)
+            /*if (App.Instance.audioPlayer.MusicData?.AlbumID != MusicData?.AlbumID)
             {
                 if (BackgroundBaseImage.Source != null)
                     BackgroundBaseImageAnimate.Source = null;
@@ -235,7 +236,7 @@ namespace TewiMP.Pages.MusicPages
             AlbumImageBase.Source = imageSource;
             AlbumImageBase.SaveName = $"{MusicData.Title} · {MusicData.Album.Title}";
             //BackgroundFillBase.Opacity = 1;
-            App.logManager.Log("MusicPage", $"图片已被更改.");
+            LogManager.Log("MusicPage", $"图片已被更改.");
         }
 
         private void BackgroundBaseImage_Loaded(object sender, RoutedEventArgs e)
@@ -326,16 +327,16 @@ namespace TewiMP.Pages.MusicPages
 
         public async void SelectedChangedDo(bool disableAnimation = false)
         {
-            if (App.lyricManager is null) return;
-            if (App.lyricManager.NowLyricsData is null) return;
+            if (App.Instance.lyricManager is null) return;
+            if (App.Instance.lyricManager.NowLyricsData is null) return;
 
             isCodeChangedLrcItem = true;
-            LrcBaseListView.SelectedItem = App.lyricManager.NowLyricsData;
-            LrcSecondListView.SelectedItem = App.lyricManager.NowLyricsData;
+            LrcBaseListView.SelectedItem = App.Instance.lyricManager.NowLyricsData;
+            LrcSecondListView.SelectedItem = App.Instance.lyricManager.NowLyricsData;
             isCodeChangedLrcItem = false;
 
             var sv = isMiniPage ? scrollViewer1 : scrollViewer;
-            if (sv != null && !inScroll && App.lyricManager.NowLyricsData.Lyric != null)
+            if (sv != null && !inScroll && App.Instance.lyricManager.NowLyricsData.Lyric != null)
             {
                 var c = isMiniPage ?
                     LrcSecondListView.ContainerFromIndex(LrcBaseListView.SelectedIndex) as UIElement :
@@ -344,15 +345,15 @@ namespace TewiMP.Pages.MusicPages
                 {
                     if (!isMiniPage)
                     {
-                        LrcBaseListView.ScrollIntoView(App.lyricManager.NowLyricsData, ScrollIntoViewAlignment.Default);
+                        LrcBaseListView.ScrollIntoView(App.Instance.lyricManager.NowLyricsData, ScrollIntoViewAlignment.Default);
                         c = LrcBaseListView.ContainerFromIndex(LrcBaseListView.SelectedIndex) as UIElement;
-                        LrcBaseListView.ScrollIntoView(App.lyricManager.NowLyricsData, ScrollIntoViewAlignment.Default);
+                        LrcBaseListView.ScrollIntoView(App.Instance.lyricManager.NowLyricsData, ScrollIntoViewAlignment.Default);
                     }
                     else
                     {
-                        LrcSecondListView.ScrollIntoView(App.lyricManager.NowLyricsData, ScrollIntoViewAlignment.Default);
+                        LrcSecondListView.ScrollIntoView(App.Instance.lyricManager.NowLyricsData, ScrollIntoViewAlignment.Default);
                         c = LrcSecondListView.ContainerFromIndex(LrcSecondListView.SelectedIndex) as UIElement;
-                        LrcSecondListView.ScrollIntoView(App.lyricManager.NowLyricsData, ScrollIntoViewAlignment.Default);
+                        LrcSecondListView.ScrollIntoView(App.Instance.lyricManager.NowLyricsData, ScrollIntoViewAlignment.Default);
                     }
                 }
                 if (c != null)
@@ -366,21 +367,21 @@ namespace TewiMP.Pages.MusicPages
                         /*
                         else
                             sv.ChangeView(null, c.ActualOffset.Y + c.ActualSize.Y / 2, null);*/
-                        //await LrcBaseListView.SmoothScrollIntoViewWithItemAsync(App.lyricManager.NowLyricsData, ScrollItemPlacement.Center);
+                        //await LrcBaseListView.SmoothScrollIntoViewWithItemAsync(App.Instance.lyricManager.NowLyricsData, ScrollItemPlacement.Center);
                     }
                     else
                     {
                         if (isMiniPageLyricCenter)
-                            //await LrcSecondListView.SmoothScrollIntoViewWithItemAsync(App.lyricManager.NowLyricsData, ScrollItemPlacement.Center, disableAnimation);
+                            //await LrcSecondListView.SmoothScrollIntoViewWithItemAsync(App.Instance.lyricManager.NowLyricsData, ScrollItemPlacement.Center, disableAnimation);
                             sv.ChangeView(null, c.ActualOffset.Y + c.ActualSize.Y / 2, null, disableAnimation);
                         else
-                            await LrcSecondListView.SmoothScrollIntoViewWithItemAsync(App.lyricManager.NowLyricsData, ScrollItemPlacement.Top, disableAnimation);
+                            await LrcSecondListView.SmoothScrollIntoViewWithItemAsync(App.Instance.lyricManager.NowLyricsData, ScrollItemPlacement.Top, disableAnimation);
                             //sv.ChangeView(null, c.ActualOffset.Y - c.ActualSize.Y, null, disableAnimation);
                     }
                 }
             }
 #if DEBUG
-            //App.logManager.Log($"MusicPage: 选中歌词已被更改为: {App.lyricManager.NowLyricsData?.Lyric[0]}");
+            //LogManager.Log($"MusicPage: 选中歌词已被更改为: {App.Instance.lyricManager.NowLyricsData?.Lyric[0]}");
 #endif
         }
 
@@ -389,7 +390,7 @@ namespace TewiMP.Pages.MusicPages
         {
             if (ShowLrcPage)
             {
-                if (nowLyricsData != null) App.lyricManager.StartTimer();
+                if (nowLyricsData != null) App.Instance.lyricManager.StartTimer();
                 SelectedChangedDo();
             }
         }
@@ -423,7 +424,7 @@ namespace TewiMP.Pages.MusicPages
         {
             UpdateInterfaceDesign();
 
-            CloseMusicPageButton.Width = MainWindow.SNavView.DisplayMode == NavigationViewDisplayMode.Minimal ? 86 : 44;
+            CloseMusicPageButton.Width = App.MainWindowInstance.NavView.DisplayMode == NavigationViewDisplayMode.Minimal ? 86 : 44;
         }
 
         private void LyricManager_LyricTimingChanged(LyricData nowLyricsData)
@@ -461,13 +462,13 @@ namespace TewiMP.Pages.MusicPages
 /*
             if (audioPlayer.PlaybackState == PlaybackState.Playing)
             {
-                App.lyricManager.PlayingLyricSourceChanged += LyricManager_PlayingLyricSourceChange;
-                App.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange1;
+                App.Instance.lyricManager.PlayingLyricSourceChanged += LyricManager_PlayingLyricSourceChange;
+                App.Instance.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange1;
             }
             else
             {
-                App.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
-                App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange1;
+                App.Instance.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
+                App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange1;
             }*/
         }
 
@@ -494,7 +495,7 @@ namespace TewiMP.Pages.MusicPages
         {
             if (audioPlayer.FileReader is null) return;
 #if DEBUG
-            Debug_NowPlayingDurationText.Text = $"{audioPlayer.CurrentTime} - {App.lyricManager.UpdateInterval}ms";
+            Debug_NowPlayingDurationText.Text = $"{audioPlayer.CurrentTime} - {App.Instance.lyricManager.UpdateInterval}ms";
 #endif
 
             isCodeChangedSliderValue = true;
@@ -530,34 +531,34 @@ namespace TewiMP.Pages.MusicPages
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.OpenOrCloseMusicPage();
+            App.MainWindowInstance.OpenOrCloseMusicPage();
         }
 
         private async void BeforeButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.playingList.PlayPrevious();
+            await App.Instance.playingList.PlayPrevious();
         }
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            if (App.audioPlayer.PlaybackState == PlaybackState.Playing)
+            if (App.Instance.audioPlayer.PlaybackState == PlaybackState.Playing)
             {
-                App.audioPlayer.SetPause();
+                App.Instance.audioPlayer.SetPause();
             }
             else
             {
-                App.audioPlayer.SetPlay();
+                App.Instance.audioPlayer.SetPlay();
             }
         }
 
         private async void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.playingList.PlayNext();
+            await App.Instance.playingList.PlayNext();
         }
 
         private void PlayListButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.OpenOrClosePlayingList(
+            App.MainWindowInstance.OpenOrClosePlayingList(
                 HorizontalAlignment.Left,
                 flyoutPlacementMode: Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.RightEdgeAlignedBottom,
                 placementMargin: new(30, 0, 0, ControlBar.ActualHeight - PlaySlider.ActualHeight + 8));
@@ -565,7 +566,7 @@ namespace TewiMP.Pages.MusicPages
 
         private void VolumeButton_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.OpenOrCloseVolume(
+            App.MainWindowInstance.OpenOrCloseVolume(
                 HorizontalAlignment.Left,
                 flyoutPlacementMode: Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.RightEdgeAlignedBottom,
                 placementMargin: new(30, 0, 0, ControlBar.ActualHeight - PlaySlider.ActualHeight + 8));
@@ -580,7 +581,7 @@ namespace TewiMP.Pages.MusicPages
 
         private void Recognizer_ManipulationUpdated(GestureRecognizer sender, ManipulationUpdatedEventArgs args)
         {
-            //System.Diagnostics.App.logManager.Log("U");
+            //System.Diagnostics.LogManager.Log("U");
             /*double destY = (PlaybackDetailFrame.RenderTransform as CompositeTransform).TranslateY + args.Delta.Translation.Y;
             if (destY <= 0) destY = 0;
             if (destY >= ActualHeight) destY = ActualHeight;
@@ -589,7 +590,7 @@ namespace TewiMP.Pages.MusicPages
 
         private void Recognizer_ManipulationCompleted(GestureRecognizer sender, ManipulationCompletedEventArgs args)
         {
-            //System.Diagnostics.App.logManager.Log("C");
+            //System.Diagnostics.LogManager.Log("C");
             /*
             double destY = (PlaybackDetailFrame.RenderTransform as CompositeTransform).TranslateY;
             SetPlaybackDetailFrameVisibility(destY <= ActualHeight * 0.4);*/
@@ -611,8 +612,8 @@ namespace TewiMP.Pages.MusicPages
             {
                 if (lrcItem.Lyric is null) return;
                 // 加1ms，否则会短时间判定到上一句歌词
-                App.audioPlayer.CurrentTime = lrcItem.LyricTimeSpan + TimeSpan.FromMilliseconds(App.audioPlayer.Latency + 1);
-                App.logManager.Log("MusicPage", "Changed AudioPlayer current time.");
+                App.Instance.audioPlayer.CurrentTime = lrcItem.LyricTimeSpan + TimeSpan.FromMilliseconds(App.Instance.audioPlayer.Latency + 1);
+                LogManager.Log("MusicPage", "Changed AudioPlayer current time.");
             }
         }
 
@@ -675,39 +676,39 @@ namespace TewiMP.Pages.MusicPages
                 isFirstChangeValue = false;
                 return;
             }
-            if (!isCodeChangedSliderValue && !isCodeChangedLrcItem && App.audioPlayer.FileReader != null)
+            if (!isCodeChangedSliderValue && !isCodeChangedLrcItem && App.Instance.audioPlayer.FileReader != null)
             {
-                App.audioPlayer.CurrentTime = TimeSpan.FromTicks((long)PlaySlider.Value);
+                App.Instance.audioPlayer.CurrentTime = TimeSpan.FromTicks((long)PlaySlider.Value);
             }
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.OpenOrCloseMusicPage();
+            App.MainWindowInstance.OpenOrCloseMusicPage();
         }
 
         private void FullScreenButton_Click(object sender, RoutedEventArgs e)
         {
-            if (MainWindow.AppWindowInstance.Presenter.Kind == AppWindowPresenterKind.FullScreen)
+            if (App.MainWindowInstance.AppWindow.Presenter.Kind == AppWindowPresenterKind.FullScreen)
             {
                 FullScreenIcon.Glyph = "\xE1D9";
-                MainWindow.AppWindowInstance.SetPresenter(AppWindowPresenterKind.Default);
+                App.MainWindowInstance.PresenterKind = AppWindowPresenterKind.Default;
             }
             else
             {
                 FullScreenIcon.Glyph = "\xE1D8";
-                MainWindow.AppWindowInstance.SetPresenter(AppWindowPresenterKind.FullScreen);
+                App.MainWindowInstance.PresenterKind = AppWindowPresenterKind.FullScreen;
             }
         }
 
         private async void EqButton_Click(object sender, RoutedEventArgs e)
         {
-            await MainWindow.ShowEqualizerDialog();
+            await App.MainWindowInstance.ShowEqualizerDialog();
         }
 
         private void InfoBaseTitle_Loaded(object sender, RoutedEventArgs e)
         {/*
-            foreach (var data in App.audioPlayer.MusicData.Artists)
+            foreach (var data in App.Instance.audioPlayer.MusicData.Artists)
             {
                 var item = new MenuFlyoutItem()
                 {
@@ -717,7 +718,7 @@ namespace TewiMP.Pages.MusicPages
                 item.Click += (sender, e) =>
                 {
                     ListViewPages.ListViewPage.SetPageToListViewPage<ItemListViewArtist>((sender as MenuFlyoutItem).Tag);
-                    MainWindow.OpenOrCloseMusicPage();
+                    App.MainWindowInstance.OpenOrCloseMusicPage();
                 };
                 ArtistFlyout.Items.Add(item);
             }*/
@@ -726,7 +727,7 @@ namespace TewiMP.Pages.MusicPages
         private void ArtistFlyout_Opening(object sender, object e)
         {
             ArtistFlyout.Items.Clear();
-            foreach (var data in App.audioPlayer.MusicData.Artists)
+            foreach (var data in App.Instance.audioPlayer.MusicData.Artists)
             {
                 var item = new MenuFlyoutItem()
                 {
@@ -736,7 +737,7 @@ namespace TewiMP.Pages.MusicPages
                 item.Click += (sender, e) =>
                 {
                     ListViewPages.ListViewPage.SetPageToListViewPage(new() { PageType = ListViewPages.PageType.Artist, Param = (sender as MenuFlyoutItem).Tag });
-                    MainWindow.OpenOrCloseMusicPage();
+                    App.MainWindowInstance.OpenOrCloseMusicPage();
                 };
                 ArtistFlyout.Items.Add(item);
             }
@@ -775,8 +776,8 @@ namespace TewiMP.Pages.MusicPages
 
         private void TitleSearchMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.SetNavViewContent(typeof(SearchPage), MusicData.Title);
-            MainWindow.OpenOrCloseMusicPage();
+            App.MainWindowInstance.SetNavViewContent(typeof(SearchPage), MusicData.Title);
+            App.MainWindowInstance.OpenOrCloseMusicPage();
         }
 
         private void CopyMenuItem_Click(object sender, RoutedEventArgs e)
@@ -790,12 +791,12 @@ namespace TewiMP.Pages.MusicPages
         private async void AlbumMenuItem_Click(object sender, RoutedEventArgs e)
         {
             ListViewPages.ListViewPage.SetPageToListViewPage(new() { PageType = ListViewPages.PageType.Album, Param = MusicData.Album });
-            MainWindow.OpenOrCloseMusicPage();
+            App.MainWindowInstance.OpenOrCloseMusicPage();
         }
 
         private async void AudioInfoButton_Click(object sender, RoutedEventArgs e)
         {
-            await MainWindow.ShowDialog("播放信息", new DialogPages.AudioInfoPage());
+            await App.MainWindowInstance.ShowDialog("播放信息", new DialogPages.AudioInfoPage());
         }
 
         private void TitleFlyout_Opening(object sender, object e)
@@ -832,7 +833,7 @@ namespace TewiMP.Pages.MusicPages
                 else
                 {
                     ListViewPages.ListViewPage.SetPageToListViewPage(new() { PageType = ListViewPages.PageType.Album, Param = MusicData.Album });
-                    MainWindow.OpenOrCloseMusicPage();
+                    App.MainWindowInstance.OpenOrCloseMusicPage();
                 }
             }
         }

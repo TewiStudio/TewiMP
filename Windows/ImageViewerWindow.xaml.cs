@@ -15,6 +15,7 @@ using Windows.Storage;
 using TewiMP.DataEditor;
 using WinRT.Interop;
 using Windows.UI;
+using TewiMP.Background;
 
 namespace TewiMP.Windowed
 {
@@ -126,7 +127,7 @@ namespace TewiMP.Windowed
                 }
                 catch (Exception err)
                 {
-                    LogHelper.WriteLog("ImageEx MenuFlyoutItem_Click", err.ToString(), false);
+                    LogManager.Error("ImageEx MenuFlyoutItem_Click", err.ToString());
                     await ShowDialog("保存图片失败", $"保存图片时出现错误：\n{err.Message}");
                 }
             }

@@ -23,19 +23,19 @@ namespace TewiMP.Controls
 
         private void DownloadCard_Loaded(object sender, RoutedEventArgs e)
         {
-            App.downloadManager.OnDownloading += DownloadManager_OnDownloading;
-            App.downloadManager.OnDownloadedSaving += DownloadManager_OnDownloadedSaving;
-            App.downloadManager.OnDownloadedPreview += DownloadManager_OnDownloadedPreview;
-            App.downloadManager.OnDownloaded += DownloadManager_OnDownloaded;
-            App.downloadManager.OnDownloadError += DownloadManager_OnDownloadError;
+            App.Instance.downloadManager.OnDownloading += DownloadManager_OnDownloading;
+            App.Instance.downloadManager.OnDownloadedSaving += DownloadManager_OnDownloadedSaving;
+            App.Instance.downloadManager.OnDownloadedPreview += DownloadManager_OnDownloadedPreview;
+            App.Instance.downloadManager.OnDownloaded += DownloadManager_OnDownloaded;
+            App.Instance.downloadManager.OnDownloadError += DownloadManager_OnDownloadError;
         }
 
         private void DownloadCard_Unloaded(object sender, RoutedEventArgs e)
         {
-            App.downloadManager.OnDownloading -= DownloadManager_OnDownloading;
-            App.downloadManager.OnDownloadedPreview -= DownloadManager_OnDownloadedPreview;
-            App.downloadManager.OnDownloaded -= DownloadManager_OnDownloaded;
-            App.downloadManager.OnDownloadError -= DownloadManager_OnDownloadError;
+            App.Instance.downloadManager.OnDownloading -= DownloadManager_OnDownloading;
+            App.Instance.downloadManager.OnDownloadedPreview -= DownloadManager_OnDownloadedPreview;
+            App.Instance.downloadManager.OnDownloaded -= DownloadManager_OnDownloaded;
+            App.Instance.downloadManager.OnDownloadError -= DownloadManager_OnDownloadError;
         }
 
         private void DownloadManager_OnDownloaded(DownloadData data)
@@ -253,9 +253,9 @@ namespace TewiMP.Controls
                             if (File.Exists(downloadData.Path)) File.Delete(downloadData.Path);
                             if (File.Exists(downloadData.LrcPath)) File.Delete(downloadData.LrcPath);
                         });
-                        App.downloadManager.WaitingDownloadData.Remove(downloadData);
-                        App.downloadManager.DownloadedData.Remove(downloadData);
-                        App.downloadManager.NowDownloadPage.DownloadDatas.Remove(downloadData);
+                        App.Instance.downloadManager.WaitingDownloadData.Remove(downloadData);
+                        App.Instance.downloadManager.DownloadedData.Remove(downloadData);
+                        App.Instance.downloadManager.NowDownloadPage.DownloadDatas.Remove(downloadData);
                     }
                 }
             }

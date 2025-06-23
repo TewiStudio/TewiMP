@@ -24,7 +24,7 @@ namespace TewiMP.Pages.ListViewPages
                 PageType.Search => typeof(ItemListViewSearch),
                 _ => null
             };
-            MainWindow.SetNavViewContent(
+            App.MainWindowInstance.SetNavViewContent(
                 pageType,
                 pageData,
                 new SlideNavigationTransitionInfo() { Effect = SlideNavigationTransitionEffect.FromRight });

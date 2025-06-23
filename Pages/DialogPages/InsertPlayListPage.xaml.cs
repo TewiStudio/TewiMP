@@ -24,14 +24,14 @@ namespace TewiMP.Pages.DialogPages
             bindingMusicListData = new();
             ListBaseViewer.ItemsSource = bindingMusicListData;
 
-            foreach (var l in App.playListReader.NowMusicListData) bindingMusicListData.Add(l);
+            foreach (var l in App.Instance.playListReader.NowMusicListData) bindingMusicListData.Add(l);
         }
 
         private async void InsertPlayListPage_ResultEvent(ContentDialogResult contentDialogResult)
         {
             ResultEvent -= InsertPlayListPage_ResultEvent;
             if (contentDialogResult != ContentDialogResult.Primary) return;
-            MainWindow.AddNotify("正在更改歌单排序...", null);
+            App.MainWindowInstance.AddNotify("正在更改歌单排序...", null);
 
             JObject data = await Task.Run(() =>
             {
@@ -44,13 +44,13 @@ namespace TewiMP.Pages.DialogPages
             });
 
             await PlayListHelper.SaveData(data);
-            await App.playListReader.Refresh();
-            MainWindow.AddNotify("歌单排序更改成功。", null, NotifySeverity.Complete);
+            await App.Instance.playListReader.Refresh();
+            App.MainWindowInstance.AddNotify("歌单排序更改成功。", null, NotifySeverity.Complete);
         }
 
         public static async Task ShowDialog()
         {
-            var a = await MainWindow.ShowDialog($"排序播放列表", new InsertPlayListPage(), "取消", "确定", defaultButton: ContentDialogButton.Primary);
+            var a = await App.MainWindowInstance.ShowDialog($"排序播放列表", new InsertPlayListPage(), "取消", "确定", defaultButton: ContentDialogButton.Primary);
             ResultEvent?.Invoke(a);
         }
 

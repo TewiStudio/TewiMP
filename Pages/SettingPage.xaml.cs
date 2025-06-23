@@ -94,16 +94,16 @@ namespace TewiMP.Pages
             LyricCachePath = DataFolderBase.LyricCacheFolder;
             DownloadPath = DataFolderBase.DownloadFolder;
 
-            //System.Diagnostics.App.logManager.Log(App.downloadManager.br);
+            //System.Diagnostics.LogManager.Log(App.Instance.downloadManager.br);
             /*
-            switch (App.downloadManager.br)
+            switch (App.Instance.downloadManager.br)
             {
                 case 128: DownloadFormatCb.SelectedIndex = 0; break;
                 case 192: DownloadFormatCb.SelectedIndex = 1; break;
                 case 320: DownloadFormatCb.SelectedIndex = 2; break;
                 case 960: DownloadFormatCb.SelectedIndex = 3; break;
             }
-            DownloadMaximumNb.Value = App.downloadManager.DownloadingMaxium;
+            DownloadMaximumNb.Value = App.Instance.downloadManager.DownloadingMaxium;
             */
         }
 
@@ -191,7 +191,7 @@ namespace TewiMP.Pages
             else
             {
                 var tbox = new TextBox() { PlaceholderText = "请输入媒体文件地址" };
-                var res = await MainWindow.ShowDialog("输入地址", tbox, "取消", "确定");
+                var res = await App.MainWindowInstance.ShowDialog("输入地址", tbox, "取消", "确定");
                 if (res == ContentDialogResult.Primary)
                 {
                     new MediaPlayerWindow(tbox.Text);
@@ -290,7 +290,7 @@ namespace TewiMP.Pages
         {
             if (sender is Button button)
             {
-                var result = await MainWindow.ShowDialog(
+                var result = await App.MainWindowInstance.ShowDialog(
                     "删除缓存",
                     "此操作会将缓存路径中的文件全部删除，\n如果缓存路径中存在其它文件数据，也会一并删除。\n是否确定删除？",
                     "取消", "确定删除", null, ContentDialogButton.Primary);
@@ -338,7 +338,7 @@ namespace TewiMP.Pages
             combo0loading = true;
             var combo = sender as ComboBox;
             int index = 0;
-            switch (App.downloadManager.DownloadQuality)
+            switch (App.Instance.downloadManager.DownloadQuality)
             {
                 case DataFolderBase.DownloadQuality.lossless: index = 0; break;
                 case DataFolderBase.DownloadQuality.lossy_high: index = 1; break;
@@ -356,16 +356,16 @@ namespace TewiMP.Pages
             switch (combo.SelectedIndex)
             {
                 case 0:
-                    App.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossless;
+                    App.Instance.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossless;
                     break;
                 case 1:
-                    App.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_high;
+                    App.Instance.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_high;
                     break;
                 case 2:
-                    App.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_mid;
+                    App.Instance.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_mid;
                     break;
                 case 3:
-                    App.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_low;
+                    App.Instance.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_low;
                     break;
             }
         }
@@ -374,28 +374,28 @@ namespace TewiMP.Pages
         private void DownloadMaximumBaseGrid_Loaded(object sender, RoutedEventArgs e)
         {
             downloadMaximumLoading = true;
-            (sender as NumberBox).Value = App.downloadManager.DownloadingMaximum;
+            (sender as NumberBox).Value = App.Instance.downloadManager.DownloadingMaximum;
             downloadMaximumLoading = false;
         }
 
         private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
         {
             if (downloadMaximumLoading) return;
-            App.downloadManager.DownloadingMaximum = (int)sender.Value;
+            App.Instance.downloadManager.DownloadingMaximum = (int)sender.Value;
         }
 
         bool downloadNamedLoading = false;
         private void Download_NamedRadioButtons_Loaded(object sender, RoutedEventArgs e)
         {
             downloadNamedLoading = true;
-            (sender as ComboBox).SelectedIndex = (int)App.downloadManager.DownloadNamedMethod;
+            (sender as ComboBox).SelectedIndex = (int)App.Instance.downloadManager.DownloadNamedMethod;
             downloadNamedLoading = false;
         }
 
         private void Download_NamedRadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (downloadNamedLoading) return;
-            App.downloadManager.DownloadNamedMethod = (DataFolderBase.DownloadNamedMethod)(sender as ComboBox).SelectedIndex;
+            App.Instance.downloadManager.DownloadNamedMethod = (DataFolderBase.DownloadNamedMethod)(sender as ComboBox).SelectedIndex;
         }
 
         bool downloadOptionsLoading = false;
@@ -403,10 +403,10 @@ namespace TewiMP.Pages
         {
             downloadOptionsLoading = true;
             var root = sender as StackPanel;
-            (root.Children[0] as CheckBox).IsChecked = App.downloadManager.IDv3WriteImage;
-            (root.Children[1] as CheckBox).IsChecked = App.downloadManager.IDv3WriteArtistImage;
-            (root.Children[2] as CheckBox).IsChecked = App.downloadManager.IDv3WriteLyric;
-            (root.Children[3] as CheckBox).IsChecked = App.downloadManager.SaveLyricToLrcFile;
+            (root.Children[0] as CheckBox).IsChecked = App.Instance.downloadManager.IDv3WriteImage;
+            (root.Children[1] as CheckBox).IsChecked = App.Instance.downloadManager.IDv3WriteArtistImage;
+            (root.Children[2] as CheckBox).IsChecked = App.Instance.downloadManager.IDv3WriteLyric;
+            (root.Children[3] as CheckBox).IsChecked = App.Instance.downloadManager.SaveLyricToLrcFile;
             downloadOptionsLoading = false;
         }
 
@@ -417,16 +417,16 @@ namespace TewiMP.Pages
             switch (checkBox.Tag)
             {
                 case "0":
-                    App.downloadManager.IDv3WriteImage = (bool)checkBox.IsChecked;
+                    App.Instance.downloadManager.IDv3WriteImage = (bool)checkBox.IsChecked;
                     break;
                 case "1":
-                    App.downloadManager.IDv3WriteArtistImage = (bool)checkBox.IsChecked;
+                    App.Instance.downloadManager.IDv3WriteArtistImage = (bool)checkBox.IsChecked;
                     break;
                 case "2":
-                    App.downloadManager.IDv3WriteLyric = (bool)checkBox.IsChecked;
+                    App.Instance.downloadManager.IDv3WriteLyric = (bool)checkBox.IsChecked;
                     break;
                 case "3":
-                    App.downloadManager.SaveLyricToLrcFile = (bool)checkBox.IsChecked;
+                    App.Instance.downloadManager.SaveLyricToLrcFile = (bool)checkBox.IsChecked;
                     break;
             }
         }
@@ -437,22 +437,22 @@ namespace TewiMP.Pages
         private void ComboBox_Loaded_1(object sender, RoutedEventArgs e)
         {
             combo1Loading = true;
-            (sender as ComboBox).SelectedIndex = (int)App.playingList.PlayBehavior;
+            (sender as ComboBox).SelectedIndex = (int)App.Instance.playingList.PlayBehavior;
             combo1Loading = false;
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (combo1Loading) return;
-            App.playingList.PlayBehavior = (PlayBehavior)(sender as ComboBox).SelectedIndex;
+            App.Instance.playingList.PlayBehavior = (PlayBehavior)(sender as ComboBox).SelectedIndex;
         }
 
         private void StackPanel_Loaded(object sender, RoutedEventArgs e)
         {
             var sp = sender as StackPanel;
-            (sp.Children[0] as CheckBox).IsChecked = App.playingList.PauseWhenPreviousPause;
-            (sp.Children[1] as CheckBox).IsChecked = App.playingList.NextWhenPlayError;
-            (sp.Children[2] as CheckBox).IsChecked = App.LoadLastExitPlayingSongAndSongList;
+            (sp.Children[0] as CheckBox).IsChecked = App.Instance.playingList.PauseWhenPreviousPause;
+            (sp.Children[1] as CheckBox).IsChecked = App.Instance.playingList.NextWhenPlayError;
+            (sp.Children[2] as CheckBox).IsChecked = App.Instance.LoadLastExitPlayingSongAndSongList;
         }
 
         private void CheckBox_Checked(object sender, RoutedEventArgs e)
@@ -461,13 +461,13 @@ namespace TewiMP.Pages
             switch (checkBox.Tag)
             {
                 case "0":
-                    App.playingList.PauseWhenPreviousPause = (bool)checkBox.IsChecked;
+                    App.Instance.playingList.PauseWhenPreviousPause = (bool)checkBox.IsChecked;
                     break;
                 case "1":
-                    App.playingList.NextWhenPlayError = (bool)checkBox.IsChecked;
+                    App.Instance.playingList.NextWhenPlayError = (bool)checkBox.IsChecked;
                     break;
                 case "2":
-                    App.LoadLastExitPlayingSongAndSongList = (bool)checkBox.IsChecked;
+                    App.Instance.LoadLastExitPlayingSongAndSongList = (bool)checkBox.IsChecked;
                     break;
             }
         }
@@ -479,7 +479,7 @@ namespace TewiMP.Pages
         {
             themeloading = true;
             var themeCombo = sender as ComboBox;
-            switch (MainWindow.SWindowGridBaseTop.RequestedTheme)
+            switch (App.MainWindowInstance.WindowGridBase.RequestedTheme)
             {
                 case ElementTheme.Default:
                     themeCombo.SelectedIndex = 0;
@@ -501,23 +501,22 @@ namespace TewiMP.Pages
             switch (themeCombo.SelectedIndex)
             {
                 case 0:
-                    MainWindow.SWindowGridBaseTop.RequestedTheme = ElementTheme.Default;
+                    App.MainWindowInstance.WindowGridBase.RequestedTheme = ElementTheme.Default;
                     break;
                 case 1:
-                    MainWindow.SWindowGridBaseTop.RequestedTheme = ElementTheme.Light;
+                    App.MainWindowInstance.WindowGridBase.RequestedTheme = ElementTheme.Light;
                     break;
                 case 2:
-                    MainWindow.SWindowGridBaseTop.RequestedTheme = ElementTheme.Dark;
+                    App.MainWindowInstance.WindowGridBase.RequestedTheme = ElementTheme.Dark;
                     break;
             }
-            MainWindow.UpdateWindowBackdropTheme();
         }
 
         bool musicpageThemeLoading = false;
         private void ComboBox_Loaded_3(object sender, RoutedEventArgs e)
         {
             musicpageThemeLoading = true;
-            (sender as ComboBox).SelectedIndex = (int)MainWindow.SMusicPage.pageRoot.RequestedTheme;
+            (sender as ComboBox).SelectedIndex = (int)App.MainWindowInstance.SMusicPage.pageRoot.RequestedTheme;
             musicpageThemeLoading = false;
         }
 
@@ -528,13 +527,13 @@ namespace TewiMP.Pages
             switch (combo.SelectedIndex)
             {
                 case 0:
-                    MainWindow.SMusicPage.pageRoot.RequestedTheme = ElementTheme.Default;
+                    App.MainWindowInstance.SMusicPage.pageRoot.RequestedTheme = ElementTheme.Default;
                     break;
                 case 1:
-                    MainWindow.SMusicPage.pageRoot.RequestedTheme = ElementTheme.Light;
+                    App.MainWindowInstance.SMusicPage.pageRoot.RequestedTheme = ElementTheme.Light;
                     break;
                 case 2:
-                    MainWindow.SMusicPage.pageRoot.RequestedTheme = ElementTheme.Dark;
+                    App.MainWindowInstance.SMusicPage.pageRoot.RequestedTheme = ElementTheme.Dark;
                     break;
             }
         }
@@ -569,21 +568,21 @@ namespace TewiMP.Pages
 
         private void accentcolor_applysettings_button_Click(object sender, RoutedEventArgs e)
         {
-            //App.AccentColor = accentcolor_colorpicker.Color;
+            //App.Instance.AccentColor = accentcolor_colorpicker.Color;
         }
 
         bool backgroundTypeLoading = false;
         private void ComboBox_Loaded_5(object sender, RoutedEventArgs e)
         {
             backgroundTypeLoading = true;
-            (sender as ComboBox).SelectedIndex = (int)MainWindow.m_currentBackdrop;
+            (sender as ComboBox).SelectedIndex = (int)App.MainWindowInstance.CurrentBackdrop;
             backgroundTypeLoading = false;
         }
 
         private void ComboBox_SelectionChanged_7(object sender, SelectionChangedEventArgs e)
         {
             int index = (sender as ComboBox).SelectedIndex;
-            if (index == 3)
+            if (index == 3 || index == 4 || index == 5)
             {
                 imageselect_root.Visibility = Visibility.Visible;
             }
@@ -595,19 +594,25 @@ namespace TewiMP.Pages
             switch (index)
             {
                 case 0:
-                    MainWindow.SetBackdrop(MainWindow.BackdropType.Mica);
+                    App.MainWindowInstance.SetBackdrop(BackdropType.Mica);
                     break;
                 case 1:
-                    MainWindow.SetBackdrop(MainWindow.BackdropType.MicaAlt);
+                    App.MainWindowInstance.SetBackdrop(BackdropType.MicaAlt);
                     break;
                 case 2:
-                    MainWindow.SetBackdrop(MainWindow.BackdropType.DesktopAcrylic);
+                    App.MainWindowInstance.SetBackdrop(BackdropType.DesktopAcrylic);
                     break;
                 case 3:
-                    MainWindow.SetBackdrop(MainWindow.BackdropType.Image);
+                    App.MainWindowInstance.SetBackdrop(BackdropType.Blur);
                     break;
                 case 4:
-                    MainWindow.SetBackdrop(MainWindow.BackdropType.DefaultColor);
+                    App.MainWindowInstance.SetBackdrop(BackdropType.Transparent);
+                    break;
+                case 5:
+                    App.MainWindowInstance.SetBackdrop(BackdropType.Image);
+                    break;
+                case 6:
+                    App.MainWindowInstance.SetBackdrop(BackdropType.DefaultColor);
                     break;
             }
         }
@@ -617,7 +622,7 @@ namespace TewiMP.Pages
         {
             imageSelectLoading = true;
             StackPanel stackPanel = sender as StackPanel;
-            (stackPanel.Children[1] as Slider).Value = MainWindow.SBackgroundMass.Opacity * 100;
+            (stackPanel.Children[1] as Slider).Value = App.MainWindowInstance.BackgroundMass.Opacity * 100;
             imageSelectLoading = false;
         }
 
@@ -625,14 +630,14 @@ namespace TewiMP.Pages
         {
             var path = await FileHelper.UserSelectFile(Windows.Storage.Pickers.PickerViewMode.Thumbnail, Windows.Storage.Pickers.PickerLocationId.PicturesLibrary);
             if (path is null) return;
-            MainWindow.ImagePath = path.Path;
-            MainWindow.SetBackdrop(MainWindow.BackdropType.Image);
+            App.MainWindowInstance.ImagePath = path.Path;
+            App.MainWindowInstance.SetBackdrop(BackdropType.Image);
         }
 
         private void Slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (imageSelectLoading) return;
-            MainWindow.SBackgroundMass.Opacity = (sender as Slider).Value / 100;
+            App.MainWindowInstance.BackgroundMass.Opacity = (sender as Slider).Value / 100;
         }
         #endregion
 
@@ -734,23 +739,23 @@ namespace TewiMP.Pages
 
         private async void Button_Click_7(object sender, RoutedEventArgs e)
         {
-            var result = await MainWindow.ShowDialog(
+            var result = await App.MainWindowInstance.ShowDialog(
                 "恢复默认设置",
                 "确定恢复默认设置吗？此操作会使你的设置数据全部恢复到程序初始设置，但不会影响歌单数据、历史记录等数据。",
                 "取消", "恢复",
                 defaultButton: ContentDialogButton.Primary);
             if (result != ContentDialogResult.Primary) return;
             DataFolderBase.JSettingData = DataFolderBase.SettingDefault;
-            App.LoadSettings();
-            MainWindow.AddNotify("恢复成功", "已将设置恢复到默认。", NotifySeverity.Complete);
-            MainWindow.SetNavViewContent(typeof(SearchPage));
+            App.Instance.LoadSettings();
+            App.MainWindowInstance.AddNotify("恢复成功", "已将设置恢复到默认。", NotifySeverity.Complete);
+            App.MainWindowInstance.SetNavViewContent(typeof(SearchPage));
         }
 
         private void NumberBox_ValueChanged_1(NumberBox sender, NumberBoxValueChangedEventArgs args)
         {
-            ScrollViewer a = (ScrollViewer)VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(MainWindow.SWindowGridBaseTop)))));
+            ScrollViewer a = (ScrollViewer)VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(App.MainWindowInstance.WindowGridBase)))));
             a.RasterizationScale = sender.Value;
-            MainWindow.AsyncDialog.RasterizationScale = sender.Value;
+            App.MainWindowInstance.AsyncDialog.RasterizationScale = sender.Value;
         }
 
         private void ToggleSwitch_Toggled_1(object sender, RoutedEventArgs e)
@@ -758,7 +763,7 @@ namespace TewiMP.Pages
             var ts = sender as ToggleSwitch;
             if (ts.Tag as string == "0")
             {
-                ScrollViewer b = (ScrollViewer)VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(MainWindow.SWindowGridBaseTop)))));
+                ScrollViewer b = (ScrollViewer)VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(App.MainWindowInstance.WindowGridBase)))));
                 if (ts.IsOn)
                 {
                     b.ZoomMode = ZoomMode.Enabled;
@@ -780,7 +785,7 @@ namespace TewiMP.Pages
             }
             else
             {
-                App.SetFramePerSecondViewer(ts.IsOn);
+                App.Instance.SetFramePerSecondViewer(ts.IsOn);
             }
         }
 
@@ -790,13 +795,13 @@ namespace TewiMP.Pages
             switch (toggleSwitch.Tag as string)
             {
                 case "0":
-                    toggleSwitch.IsOn = MainWindow.SNavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top;
+                    toggleSwitch.IsOn = App.MainWindowInstance.NavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top;
                     break;
                 case "1":
                     toggleSwitch.IsOn = NotifyIconWindow.IsVisible;
                     break;
                 case "2":
-                    toggleSwitch.IsOn = MainWindow.RunInBackground;
+                    toggleSwitch.IsOn = App.MainWindowInstance.RunInBackground;
                     break;
                 case "3":
                     toggleSwitch.IsOn = File.Exists(DataFolderBase.StartupShortcutPath);
@@ -813,16 +818,16 @@ namespace TewiMP.Pages
             switch (toggleSwitch.Tag as string)
             {
                 case "0":
-                    MainWindow.SNavView.PaneDisplayMode = toggleSwitch.IsOn ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;
+                    App.MainWindowInstance.NavView.PaneDisplayMode = toggleSwitch.IsOn ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;
                     break;
                 case "1":
                     NotifyIconWindow.IsVisible = toggleSwitch.IsOn;
                     break;
                 case "2":
-                    MainWindow.RunInBackground = toggleSwitch.IsOn;
+                    App.MainWindowInstance.RunInBackground = toggleSwitch.IsOn;
                     break;
                 case "3":
-                    App.SetStartupWithWindows(toggleSwitch.IsOn);
+                    App.Instance.SetStartupWithWindows(toggleSwitch.IsOn);
                     break;
                 case "4":
                     LyricManager.UseRomajiLyric = toggleSwitch.IsOn;
@@ -832,7 +837,7 @@ namespace TewiMP.Pages
 
         private void Button_Click_8(object sender, RoutedEventArgs e)
         {
-            App.ExitApp();
+            App.Instance.ExitApp();
         }
 
         private void ToggleSwitch_Loaded_1(object sender, RoutedEventArgs e)
@@ -840,7 +845,7 @@ namespace TewiMP.Pages
             var toggleSwitch = sender as ToggleSwitch;
             if (toggleSwitch.Tag as string == "0")
             {
-                toggleSwitch.IsOn = MainWindow.SNavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top;
+                toggleSwitch.IsOn = App.MainWindowInstance.NavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top;
             }
             else
             {
@@ -854,7 +859,7 @@ namespace TewiMP.Pages
             if (toggleSwitch is null) return;
             if (toggleSwitch.Tag as string == "0")
             {
-                MainWindow.SNavView.PaneDisplayMode = toggleSwitch.IsOn ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;
+                App.MainWindowInstance.NavView.PaneDisplayMode = toggleSwitch.IsOn ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;
             }
             else 
             {
@@ -872,15 +877,15 @@ namespace TewiMP.Pages
 
         private async void Button_Click_9(object sender, RoutedEventArgs e)
         {
-            App.SaveSettings();
-            MainWindow.AddNotify("保存设置成功", "已将设置数据写入设置文件中。", NotifySeverity.Complete);
+            App.Instance.SaveSettings();
+            App.MainWindowInstance.AddNotify("保存设置成功", "已将设置数据写入设置文件中。", NotifySeverity.Complete);
         }
 
         private async void Button_Click_10(object sender, RoutedEventArgs e)
         {
-            App.LoadSettings();
-            MainWindow.AddNotify("读取设置成功", "已从设置文件中读取设置。", NotifySeverity.Complete);
-            MainWindow.SetNavViewContent(typeof(SearchPage));
+            App.Instance.LoadSettings();
+            App.MainWindowInstance.AddNotify("读取设置成功", "已从设置文件中读取设置。", NotifySeverity.Complete);
+            App.MainWindowInstance.SetNavViewContent(typeof(SearchPage));
         }
 
         private void StackPanel_Loaded_4(object sender, RoutedEventArgs e)
@@ -891,23 +896,23 @@ namespace TewiMP.Pages
         private void desktoplyric_opacity_slider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             DesktopLyricWindow.LyricOpacity = e.NewValue / 100;
-            if (MainWindow.DesktopLyricWindow != null) MainWindow.DesktopLyricWindow.SetLyricOpacity(DesktopLyricWindow.LyricOpacity);
+            if (App.MainWindowInstance.DesktopLyricWindow != null) App.MainWindowInstance.DesktopLyricWindow.SetLyricOpacity(DesktopLyricWindow.LyricOpacity);
         }
 
         private void HotKeySettings_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.SetNavViewContent(typeof(SettingHotKeyPage));
+            App.MainWindowInstance.SetNavViewContent(typeof(SettingHotKeyPage));
         }
 
         private void PluginSettings_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.SetNavViewContent(typeof(SettingPlugin));
+            App.MainWindowInstance.SetNavViewContent(typeof(SettingPlugin));
         }
 
         private void SettingsCard_Click(object sender, RoutedEventArgs e)
         {
-            //await MainWindow.ShowEqualizerDialog();
-            MainWindow.SetNavViewContent(typeof(SettingEqPage));
+            //await App.MainWindowInstance.ShowEqualizerDialog();
+            App.MainWindowInstance.SetNavViewContent(typeof(SettingEqPage));
         }
 
         private void TimeEventCard_Loaded(object sender, RoutedEventArgs e)
@@ -936,7 +941,7 @@ namespace TewiMP.Pages
         public static DialogPages.TimeEventPage TimeEventPage = new DialogPages.TimeEventPage();
         private async void SettingsCard_Click_1(object sender, RoutedEventArgs e)
         {
-            await MainWindow.ShowDialog("播放定时", TimeEventPage, "返回");
+            await App.MainWindowInstance.ShowDialog("播放定时", TimeEventPage, "返回");
 
             if (TimeEventPage.TimingTimer is null)
             {

@@ -19,7 +19,7 @@ namespace TewiMP.Pages
         public AboutPage()
         {
             InitializeComponent();
-            VersionRun.Text = $"v{App.AppVersion} {App.NowVersion.SuffixType}";
+            VersionRun.Text = $"v{App.Instance.AppVersion} {App.Instance.NowVersion.SuffixType}";
             waveOut = new WaveOut();
             bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat());
             waveOut.Init(bufferedWaveProvider);
@@ -62,14 +62,14 @@ namespace TewiMP.Pages
         //int a = 0;
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            //await App.playingList.Play(App.playListReader.NowMusicListDatas[0].Songs[0]);
+            //await App.Instance.playingList.Play(App.Instance.playListReader.NowMusicListDatas[0].Songs[0]);
 
             //CueSharp.CueSheet cueSheet = new CueSharp.CueSheet("E:\\vedio\\anime\\[170816] TVアニメ「Fate／Apocrypha」OPテーマ「英雄 運命の詩」／EGOIST [通常盤] [FLAC+CUE]\\VVCL-1080.cue");
 
             try
             {
-                if (App.playingList.NowPlayingList.Any())
-                    abcd.Source = (await ImageManage.GetImageSource(App.playingList.NowPlayingList[new Random().Next(0, App.playingList.NowPlayingList.Count - 1)])).Item1;
+                if (App.Instance.playingList.NowPlayingList.Any())
+                    abcd.Source = (await ImageManage.GetImageSource(App.Instance.playingList.NowPlayingList[new Random().Next(0, App.Instance.playingList.NowPlayingList.Count - 1)])).Item1;
             }
             catch { }
             GC.Collect();/*
@@ -77,30 +77,30 @@ namespace TewiMP.Pages
             Play(f.Path);
             try
             {
-                if (App.playingList.NowPlayingList.Any())
-                    abcd.Source = App.playingList.NowPlayingList[new Random().Next(0, App.playingList.NowPlayingList.Count - 1)].Album.PicturePath;
+                if (App.Instance.playingList.NowPlayingList.Any())
+                    abcd.Source = App.Instance.playingList.NowPlayingList[new Random().Next(0, App.Instance.playingList.NowPlayingList.Count - 1)].Album.PicturePath;
             }
             catch { }
 */
             return;
-            //App.audioPlayerBass.LoadAudio();
-            //System.Diagnostics.App.logManager.Log(a[0].ListName);
-            //MainWindow.SetBackdrop(MainWindow.BackdropType.DesktopAcrylic);
-            //await App.audioPlayer.Reload();
+            //App.Instance.audioPlayerBass.LoadAudio();
+            //System.Diagnostics.LogManager.Log(a[0].ListName);
+            //App.MainWindowInstance.SetBackdrop(BackdropType.DesktopAcrylic);
+            //await App.Instance.audioPlayer.Reload();
             /*
             if (a == 0)
             {
-                MainWindow.SetBackdrop(MainWindow.BackdropType.Mica);
+                App.MainWindowInstance.SetBackdrop(BackdropType.Mica);
                 a++;
             }
             else if (a == 1)
             {
-                MainWindow.SetBackdrop(MainWindow.BackdropType.DesktopAcrylic);
+                App.MainWindowInstance.SetBackdrop(BackdropType.DesktopAcrylic);
                 a++;
             }
             else if (a == 2)
             {
-                MainWindow.SetBackdrop(MainWindow.BackdropType.DefaultColor);
+                App.MainWindowInstance.SetBackdrop(BackdropType.DefaultColor);
                 a = 0;
             }
             */
@@ -153,8 +153,8 @@ namespace TewiMP.Pages
 
         private void CheckUpdate()
         {
-            var newestVersion = App.GetNewVersionByReleaseData(App.NowVersion.SuffixType);
-            if (App.AppVersionIsNewest())
+            var newestVersion = App.Instance.GetNewVersionByReleaseData(App.Instance.NowVersion.SuffixType);
+            if (App.Instance.AppVersionIsNewest())
             {
                 UpdateExpander.Description = "当前版本是最新版本";
                 NewestVersion.Visibility = Visibility.Collapsed;
@@ -168,20 +168,20 @@ namespace TewiMP.Pages
             NewestVersionRun.Text = $"{newestVersion.Version} {newestVersion.SuffixType}";
             NewestVersion.Description = $"时间：{newestVersion.ReleaseTime}";
 
-            NowVersionRun.Text = $"{App.AppVersion} {App.NowVersion.SuffixType}";
-            NowVersion.Description = $"时间：{App.AppVersionReleaseDate}";
+            NowVersionRun.Text = $"{App.Instance.AppVersion} {App.Instance.NowVersion.SuffixType}";
+            NowVersion.Description = $"时间：{App.Instance.AppVersionReleaseDate}";
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             UpdateExpander.Description = "检查更新中......";
-            await App.CheckUpdate(false);
+            await App.Instance.CheckUpdate(false);
             CheckUpdate();
         }
 
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            var newestVersion = App.GetNewVersionByReleaseData(App.NowVersion.SuffixType);
+            var newestVersion = App.Instance.GetNewVersionByReleaseData(App.Instance.NowVersion.SuffixType);
             await CodeHelper.OpenInBrowser(newestVersion.Url);
         }
 

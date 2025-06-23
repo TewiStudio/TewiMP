@@ -136,7 +136,7 @@ namespace TewiMP.Helpers
 
         public static async Task<ImageSource> GetImageSource(string filePath, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
         {
-            //System.Diagnostics.App.logManager.Log(filePath);
+            //System.Diagnostics.LogManager.Log(filePath);
             if (string.IsNullOrEmpty(filePath))
             {
                 filePath = @"ms-appx:///Images/icon.png";
@@ -190,7 +190,7 @@ namespace TewiMP.Helpers
                 picker.FileTypeFilter.Add(i);
             }
 
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, MainWindow.Handle);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, App.MainWindowInstance.Handle);
             var files = await picker.PickMultipleFilesAsync();
             return files;
         }
@@ -210,7 +210,7 @@ namespace TewiMP.Helpers
                 picker.FileTypeFilter.Add(i);
             }
 
-            WinRT.Interop.InitializeWithWindow.Initialize(picker, MainWindow.Handle);
+            WinRT.Interop.InitializeWithWindow.Initialize(picker, App.MainWindowInstance.Handle);
             var files = await picker.PickSingleFileAsync();
             return files;
         }
@@ -220,7 +220,7 @@ namespace TewiMP.Helpers
             var folderPicker = new FolderPicker();
             folderPicker.SuggestedStartLocation = suggestedStartLocation;
 
-            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, MainWindow.Handle);
+            WinRT.Interop.InitializeWithWindow.Initialize(folderPicker, App.MainWindowInstance.Handle);
             StorageFolder folder = await folderPicker.PickSingleFolderAsync();
             return folder;
         }
@@ -245,7 +245,7 @@ namespace TewiMP.Helpers
             saveFile.FileTypeChoices.Add(fileTypeFilterKey, fileTypeFilter);
             saveFile.SuggestedFileName = suggestedFileName;
 
-            WinRT.Interop.InitializeWithWindow.Initialize(saveFile, windowHandle == 0 ? MainWindow.Handle : windowHandle);
+            WinRT.Interop.InitializeWithWindow.Initialize(saveFile, windowHandle == 0 ? App.MainWindowInstance.Handle : windowHandle);
             StorageFile sFile = await saveFile.PickSaveFileAsync();
 
             return sFile;

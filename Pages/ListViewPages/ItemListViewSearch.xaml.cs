@@ -16,6 +16,7 @@ using TewiMP.Plugin;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
 using TewiMP.Pages.ListViewPages;
+using TewiMP.Background;
 
 namespace TewiMP.Pages
 {
@@ -107,19 +108,19 @@ namespace TewiMP.Pages
             }
             catch (ArgumentOutOfRangeException)
             {
-                MainWindow.AddNotify("不支持的平台", "当前不支持此平台搜索。", NotifySeverity.Error);
+                App.MainWindowInstance.AddNotify("不支持的平台", "当前不支持此平台搜索。", NotifySeverity.Error);
                 searchDatas = null;
             }
             catch (NullReferenceException)
             {
-                MainWindow.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);
+                App.MainWindowInstance.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);
                 searchDatas = null;
             }
             catch (Exception ex)
             {
-                LogHelper.WriteLog("SearchError", ex.ToString(), false);
+                LogManager.Error("SearchError", ex.ToString());
                 string errString = $"搜索时出现错误：\n{ex.Message}";
-                var d = await MainWindow.ShowDialog("搜索失败", errString, "重试", "确定", defaultButton: ContentDialogButton.Primary);
+                var d = await App.MainWindowInstance.ShowDialog("搜索失败", errString, "重试", "确定", defaultButton: ContentDialogButton.Primary);
                 if (d == ContentDialogResult.Primary)
                 {
                     searchDatas = null;
@@ -133,7 +134,7 @@ namespace TewiMP.Pages
                 MusicDataList.Clear();
                 SearchList.Clear();
 
-                var dpi = CodeHelper.GetScaleAdjustment(App.MainWindow);
+                var dpi = CodeHelper.GetScaleAdjustment(App.Instance.MainWindow);
 
                 var count = pageNumber * pageSize - pageSize;
                 switch (NowSearchMode)
@@ -199,7 +200,7 @@ namespace TewiMP.Pages
             }
             else
             {
-                MainWindow.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);
+                App.MainWindowInstance.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);
             }
 
             LoadingTipControl.UnShowLoading();
@@ -267,7 +268,7 @@ namespace TewiMP.Pages
                 case ScrollFootButton.ButtonType.NowPlaying:
                     foreach (var i in MusicDataList)
                     {
-                        if (i.MusicData != App.audioPlayer.MusicData) continue;
+                        if (i.MusicData != App.Instance.audioPlayer.MusicData) continue;
                         await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                         await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
                         MusicDataItem.TryHighlightPlayingItem();
@@ -327,16 +328,16 @@ namespace TewiMP.Pages
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (!Children.Items.Any()) return;
-            if (App.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
+            if (App.Instance.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
             {
-                App.playingList.ClearAll();
+                App.Instance.playingList.ClearAll();
             }
             foreach (var songItem in MusicDataList)
             {
-                App.playingList.Add(songItem.MusicData, false);
+                App.Instance.playingList.Add(songItem.MusicData, false);
             }
-            await App.playingList.Play(MusicDataList.First().MusicData, true);
-            App.playingList.SetRandomPlay(App.playingList.PlayBehavior);
+            await App.Instance.playingList.Play(MusicDataList.First().MusicData, true);
+            App.Instance.playingList.SetRandomPlay(App.Instance.playingList.PlayBehavior);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -388,7 +389,7 @@ namespace TewiMP.Pages
                 Children.CanReorderItems = false;
             }
             MusicDataItem.SetIsCloseMouseEvent(SelectItemButton.IsChecked == true);
-            MainWindow.AllowDragEvents = SelectItemButton.IsChecked == false;
+            App.MainWindowInstance.AllowDragEvents = SelectItemButton.IsChecked == false;
             UpdateCommandToolBarWidth();
         }
 
@@ -437,7 +438,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase item in Children.SelectedItems)
                 {
-                    App.playingList.Add(item.MusicData);
+                    App.Instance.playingList.Add(item.MusicData);
                 }
             }
         }
@@ -489,7 +490,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase songItem in Children.Items)
                 {
-                    App.downloadManager.Add(songItem.MusicData);
+                    App.Instance.downloadManager.Add(songItem.MusicData);
                 }
             }
         }
@@ -512,18 +513,18 @@ namespace TewiMP.Pages
 
         private async void A_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.ShowLoadingDialog();
+            App.MainWindowInstance.ShowLoadingDialog();
             var text = await PlayListHelper.ReadData();
             foreach (SongItemBindBase item in Children.SelectedItems)
             {
-                MainWindow.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
+                App.MainWindowInstance.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
                 
                 text = PlayListHelper.AddMusicDataToPlayList(
                     ((sender as MenuFlyoutItem).Tag as MusicListData).ListName,
                     item.MusicData, text);
             }
             await PlayListHelper.SaveData(text);
-            MainWindow.HideDialog();
+            App.MainWindowInstance.HideDialog();
         }
 
         private void AddToPlayListFlyout_Closed(object sender, object e)
@@ -543,14 +544,14 @@ namespace TewiMP.Pages
                 case "2":
                     foreach (var i in MusicDataList)
                     {
-                        if (i.MusicData == App.audioPlayer.MusicData)
+                        if (i.MusicData == App.Instance.audioPlayer.MusicData)
                         {
                             await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                             await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, true);
                             foreach (var j in SongItem.StaticSongItems)
                             {
                                 if (j != null)
-                                    if (j.MusicData == App.audioPlayer.MusicData)
+                                    if (j.MusicData == App.Instance.audioPlayer.MusicData)
                                         j.AnimateStroke();
                             }
                         }

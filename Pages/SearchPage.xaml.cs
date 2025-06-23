@@ -16,6 +16,10 @@ namespace TewiMP.Pages
             var navToString = e.Parameter as string;
             if (string.IsNullOrEmpty(navToString)) return;
             SearchTextBox.Text = navToString;
+            var b = Enum.GetNames(typeof(SearchDataType)).ToList();
+            b.RemoveAt(b.IndexOf(b.Last()));
+            SearchTypeComboBox.ItemsSource = b;
+            SearchTypeComboBox.SelectedIndex = 0;
         }
 
         public SearchPage()
@@ -79,11 +83,11 @@ namespace TewiMP.Pages
         {
             if (string.IsNullOrEmpty(SearchTextBox.Text))
             {
-                MainWindow.CanKeyDownBack = true;
+                App.MainWindowInstance.CanKeyDownBack = true;
             }
             else
             {
-                MainWindow.CanKeyDownBack = false;
+                App.MainWindowInstance.CanKeyDownBack = false;
             }
         }
 
@@ -95,10 +99,6 @@ namespace TewiMP.Pages
                 SearchSourceComboBox.SelectedIndex = 0;
 #endif
 
-            var b = Enum.GetNames(typeof(SearchDataType)).ToList();
-            b.RemoveAt(b.IndexOf(b.Last()));
-            SearchTypeComboBox.ItemsSource = b;
-            SearchTypeComboBox.SelectedIndex = 0;
             SearchTextBox.Focus(FocusState.Keyboard);
         }
 

@@ -1,12 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
+using Newtonsoft.Json.Linq;
 using TewiMP.DataEditor;
+using TewiMP.Background;
 
 namespace TewiMP.Plugin
 {
@@ -27,7 +27,7 @@ namespace TewiMP.Plugin
 
             DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
             var dllFiles = directoryInfo.GetFiles();
-            App.logManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}");
+            LogManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}");
 
             for (int i = 0; i < dllFiles.Length; i++)
             {
@@ -51,8 +51,8 @@ namespace TewiMP.Plugin
                 }
                 else
                 {
-                    MainWindow.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 Plugin 类。");
-                    App.logManager.Log("PluginManager", $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
+                    App.MainWindowInstance.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 Plugin 类。");
+                    LogManager.Log("PluginManager", $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
                     continue;
                 }
 
@@ -83,8 +83,8 @@ namespace TewiMP.Plugin
                 }
                 else
                 {
-                    MainWindow.AddNotify("加载插件失败", $"\"{type}\" 加载失败：未继承 IPlugin 接口。");
-                    App.logManager.Log("PluginManager", $"Load plugin failed: {type} does not inherit the IPlugin interface.");
+                    App.MainWindowInstance.AddNotify("加载插件失败", $"\"{type}\" 加载失败：未继承 IPlugin 接口。");
+                    LogManager.Log("PluginManager", $"Load plugin failed: {type} does not inherit the IPlugin interface.");
                     continue;
                 }
                 if (isMusicSourcePlugin)
@@ -116,27 +116,27 @@ namespace TewiMP.Plugin
         public static void AddPlugin(Plugin plugin)
         {
             Plugins.Add(plugin);
-            App.logManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}.");
+            LogManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}.");
         }
 
         public static void AddPlugin(MusicSourcePlugin plugin)
         {
             MusicSourcePlugins.Add(plugin);
-            App.logManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}.");
+            LogManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}.");
         }
 
         public static void RemovePlugin(Plugin plugin)
         {
             DisablePlugin(plugin);
             Plugins.Remove(plugin);
-            App.logManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}.");
+            LogManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}.");
         }
 
         public static void RemovePlugin(MusicSourcePlugin plugin)
         {
             DisablePlugin(plugin);
             MusicSourcePlugins.Remove(plugin);
-            App.logManager.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}.");
+            LogManager.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}.");
         }
 
         public static void EnablePlugin(Plugin plugin)

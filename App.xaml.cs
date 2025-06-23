@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using NAudio.Wave;
-using WinRT.Interop;
 using Windows.Media;
 using Windows.Media.Playback;
 using Windows.Storage;
@@ -14,6 +13,9 @@ using Windows.UI.Popups;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json.Linq;
+using WinRT.Interop;
+using WinUIEx;
+using NAudio.Wave;
 using TewiMP.Pages;
 using TewiMP.Media;
 using TewiMP.Helpers;
@@ -22,7 +24,6 @@ using TewiMP.Windowed;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
-using System.Reflection;
 
 namespace TewiMP
 {
@@ -31,22 +32,27 @@ namespace TewiMP
     /// </summary>
     public partial class App : Application
     {
+        /// <summary>
+        /// <see cref="App"/> 的单例实例。
+        /// </summary>
         public static App Instance => (App)Application.Current;
-
-        public static MediaPlayer BMP { get; private set; } = null;
-        public static SystemMediaTransportControls SMTC { get; private set; } = null;
-        public static CacheManager cacheManager { get; private set; } = null;
-        public static AudioPlayer audioPlayer { get; private set; } = null;
-        public static PlayingList playingList { get; private set; } = null;
-        public static LyricManager lyricManager { get; private set; } = null;
-        public static DownloadManager downloadManager { get; private set; } = null;
-        public static PlayListReader playListReader { get; private set; } = null;
-        public static LocalMusicManager localMusicManager { get; private set; } = null;
-        public static HotKeyManager hotKeyManager { get; private set; } = null;
-        public static LogManager logManager { get; private set; } = null;
-        public static App AppStatic { get; private set; } = null;
-        public static string AppName { get; } = "TewiMP";
-        public static VersionData StableVersion { get; set; } = new()
+        /// <summary>
+        /// 从 <see cref="App.Instance"/> 获取 <see cref="MainWindow"/> 的实例。"
+        /// </summary>
+        public static MainWindow MainWindowInstance => (MainWindow)Instance.MainWindow;
+        public MediaPlayer BMP { get; private set; } = null;
+        public SystemMediaTransportControls SMTC { get; private set; } = null;
+        public CacheManager cacheManager { get; private set; } = null;
+        public AudioPlayer audioPlayer { get; private set; } = null;
+        public PlayingList playingList { get; private set; } = null;
+        public LyricManager lyricManager { get; private set; } = null;
+        public DownloadManager downloadManager { get; private set; } = null;
+        public PlayListReader playListReader { get; private set; } = null;
+        public LocalMusicManager localMusicManager { get; private set; } = null;
+        public HotKeyManager hotKeyManager { get; private set; } = null;
+        public LogManager logManager { get; private set; } = null;
+        public string AppName { get; } = "TewiMP";
+        public VersionData StableVersion { get; set; } = new()
         {
             Available = false,
             SuffixType = SuffixType.Stable,
@@ -54,7 +60,7 @@ namespace TewiMP
             ReleaseTime = DateTime.MinValue,
             ExtendMessage = null
         };
-        public static VersionData PreviewVersion { get; set; } = new()
+        public VersionData PreviewVersion { get; set; } = new()
         {
             Available = false,
             SuffixType = SuffixType.Preview,
@@ -62,7 +68,7 @@ namespace TewiMP
             ReleaseTime = DateTime.MinValue,
             ExtendMessage = null
         };
-        public static VersionData BetaVersion { get; set; } = new()
+        public VersionData BetaVersion { get; set; } = new()
         {
             Available = false,
             SuffixType = SuffixType.Beta,
@@ -70,7 +76,7 @@ namespace TewiMP
             ReleaseTime = DateTime.MinValue,
             ExtendMessage = null
         };
-        public static VersionData NowVersion { get; set; } = new()
+        public VersionData NowVersion { get; set; } = new()
         {
             Available = true,
             SuffixType = SuffixType.Beta,
@@ -78,12 +84,12 @@ namespace TewiMP
             ReleaseTime = 1749638422L.ToDateTime(),
             ExtendMessage = null
         };
-        public static Version AppVersion => NowVersion.Version;
-        public static DateTime AppVersionReleaseDate => NowVersion.ReleaseTime;
+        public Version AppVersion => NowVersion.Version;
+        public DateTime AppVersionReleaseDate => NowVersion.ReleaseTime;
 
-        public static Window MainWindow;
-        public static NotifyIconWindow NotifyIconWindow;
-        public static TaskBarInfoWindow taskBarInfoWindow;
+        public Window MainWindow;
+        public NotifyIconWindow NotifyIconWindow;
+        public TaskBarInfoWindow taskBarInfoWindow;
 
 
         /// <summary>
@@ -93,29 +99,21 @@ namespace TewiMP
         public App()
         {
             InitializeComponent();
-            AppStatic = this;
             UnhandledException += App_UnhandledException;
-            TaskScheduler.UnobservedTaskException +=
-                (object sender, UnobservedTaskExceptionEventArgs excArgs) =>
-                {
-                    LogHelper.WriteLog("UnobservedTaskError", excArgs.Exception.ToString(), false);
-    #if DEBUG
-                    App.logManager.Log("App", "UnobservedTaskError: " + excArgs.Exception.ToString(), LogLevel.Error);
-    #endif
-                };
+            TaskScheduler.UnobservedTaskException += (s, e) =>
+            {
+                LogManager.Log("App", "UnobservedTaskError: " + e.Exception.ToString(), LogLevel.Error);
+            };
         }
 
         private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             e.Handled = true;
-            LogHelper.WriteLog("UnhandledError", e.Exception.ToString(), false);
-#if DEBUG
-            App.logManager.Log("App", "UnhandledError: " + e.ToString(), LogLevel.Error);
-#endif
+            LogManager.Log("App", "UnhandledError: " + e.Exception.ToString(), LogLevel.Error);
         }
 
-        public static List<string> LaunchArgs = null;
-        public static JObject StartingSettings = null;
+        public List<string> LaunchArgs = null;
+        public JObject StartingSettings = null;
         /// <summary>
         /// Invoked when the application is launched normally by the end user.  Other entry points
         /// will be used such as when the application is launched to open settingData specific file.
@@ -125,6 +123,10 @@ namespace TewiMP
         {
             base.OnLaunched(args);
             logManager = new();
+
+            m_window = new MainWindow();
+            MainWindow = m_window;
+
             DataFolderBase.InitFiles();
             LogManager.InitNowLog();
             cacheManager = new();
@@ -162,13 +164,13 @@ namespace TewiMP
                 if (_.MusicData is null)
                 {
                     SMTC.DisplayUpdater.MusicProperties.Title = _.FileReader?.FileName;
-                    TewiMP.MainWindow.AppWindowInstance.Title = AppName;
+                    MainWindowInstance.AppWindow.Title = AppName;
                 }
                 else
                 {
                     SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData.Title;
                     SMTC.DisplayUpdater.MusicProperties.Artist = _.MusicData.ButtonName;
-                    TewiMP.MainWindow.AppWindowInstance.Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {AppName}";
+                    MainWindowInstance.AppWindow.Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {AppName}";
                 }
                 SMTC.DisplayUpdater.Update();
             };
@@ -214,16 +216,15 @@ namespace TewiMP
                 Current.Resources["SystemAccentColorLight2"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
                 Current.Resources["SystemAccentColorDark1"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);*/
 
-                //App.logManager.Log(Current.Resources["SystemAccentColorLight2"].GetType());
+                //LogManager.Log(Current.Resources["SystemAccentColorLight2"].GetType());
             }
+            LoadSettings();
 
             // WinUI Bug: 获取不到启动参数
             //LAE = args;
             LaunchArgs = [.. Environment.GetCommandLineArgs()];
             LaunchArgs.Remove(LaunchArgs.First());
 
-            m_window = new MainWindow();
-            MainWindow = m_window;
             hotKeyManager.Init(MainWindow);
             if (loadFailed)
             {
@@ -248,26 +249,26 @@ namespace TewiMP
             taskBarInfoWindow = new();
         }
 
-        public static void ExitApp()
+        public void ExitApp()
         {
             SaveSettings();
-            TewiMP.MainWindow.SetBackdrop(TewiMP.MainWindow.BackdropType.DefaultColor); // 在App.Exit前将MainWindow的Backdrop释放，否则会报错
-            TewiMP.MainWindow.SaveNowPlaying();
-            TewiMP.MainWindow.DesktopLyricWindow?.Close();
+            MainWindowInstance.SetBackdrop(BackdropType.DefaultColor); // 在App.Instance.Exit前将MainWindow的Backdrop释放，否则会报错
+            MainWindowInstance.SaveNowPlaying();
+            MainWindowInstance.DesktopLyricWindow?.Close();
             NotifyIconWindow.HideIcon();
             NotifyIconWindow.Close();
             taskBarInfoWindow.Close();
-            TewiMP.MainWindow.SWindow.Close();
+            MainWindowInstance.Close();
             SMTC.DisplayUpdater.ClearAll();
             SMTC.DisplayUpdater.Update();
             audioPlayer.DisposeAll();
             hotKeyManager.UnregisterHotKeys([.. hotKeyManager.RegisteredHotKeys]);
-            logManager.Log("App", "正在退出程序...");
+            LogManager.Log("App", "正在退出程序...");
             LogManager.DisposeNowLogStream();
             Current.Exit();
         }
 
-        public static async void ShowErrorDialog()
+        public async void ShowErrorDialog()
         {
             MessageDialog messageDialog = new("设置文件出现了一些错误，且程序尝试 5 次后也无法恢复默认配置。\n" +
                 $"请尝试删除 文档->{AppName}->UserData 里的 Setting 文件。\n" +
@@ -277,11 +278,11 @@ namespace TewiMP
             await messageDialog.ShowAsync();
         }
 
-        static bool loadFailed = false;
-        static int retryCount = 0;
-        public static void LoadSettings(bool loadDefaultSettings = false)
+        bool loadFailed = false;
+        int retryCount = 0;
+        public void LoadSettings(bool loadDefaultSettings = false)
         {
-            logManager.Log("App", "正在读取设置...");
+            LogManager.Log("App", "正在读取设置...");
             try
             {
                 JObject settingData = loadDefaultSettings ? DataFolderBase.SettingDefault : DataFolderBase.JSettingData;
@@ -302,7 +303,7 @@ namespace TewiMP
 
                 audioPlayer.Volume = SettingEditHelper.GetSetting<float>(settingData, DataFolderBase.SettingParams.Volume);
                 audioPlayer.EqEnabled = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.EqualizerEnable);
-                TewiMP.MainWindow.SMusicPage.ShowLrcPage = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.MusicPageShowLyricPage);
+                //MainWindowInstance.SMusicPage.ShowLrcPage = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.MusicPageShowLyricPage);
 
                 downloadManager.DownloadQuality = (DataFolderBase.DownloadQuality)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.DownloadQuality);
                 downloadManager.DownloadingMaximum = SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.DownloadMaximum);
@@ -314,11 +315,11 @@ namespace TewiMP
                 playingList.PlayBehavior = (PlayBehavior)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.PlayBehavior);
                 playingList.PauseWhenPreviousPause = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.PlayPauseWhenPreviousPause);
                 playingList.NextWhenPlayError = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.PlayNextWhenPlayError);
-                TewiMP.MainWindow.SWindowGridBaseTop.RequestedTheme = (ElementTheme)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.ThemeColorMode);
-                TewiMP.MainWindow.SMusicPage.RequestedTheme = (ElementTheme)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.ThemeMusicPageColorMode);
-                TewiMP.MainWindow.m_currentBackdrop = (MainWindow.BackdropType)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.ThemeBackdropEffect);
-                TewiMP.MainWindow.ImagePath = SettingEditHelper.GetSetting<string>(settingData, DataFolderBase.SettingParams.ThemeBackdropImagePath);
-                TewiMP.MainWindow.SBackgroundMass.Opacity = SettingEditHelper.GetSetting<double>(settingData, DataFolderBase.SettingParams.ThemeBackdropImageMassOpacity);
+                MainWindowInstance.WindowGridBase.RequestedTheme = (ElementTheme)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.ThemeColorMode);
+                MainWindowInstance.SMusicPage.RequestedTheme = (ElementTheme)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.ThemeMusicPageColorMode);
+                MainWindowInstance.CurrentBackdrop = (BackdropType)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.ThemeBackdropEffect);
+                MainWindowInstance.ImagePath = SettingEditHelper.GetSetting<string>(settingData, DataFolderBase.SettingParams.ThemeBackdropImagePath);
+                MainWindowInstance.BackgroundMass.Opacity = SettingEditHelper.GetSetting<double>(settingData, DataFolderBase.SettingParams.ThemeBackdropImageMassOpacity);
                 //Accent Color
                 DesktopLyricWindow.PauseButtonVisible = (bool)SettingEditHelper.GetSetting<JArray>(settingData, DataFolderBase.SettingParams.DesktopLyricOptions)[0];
                 DesktopLyricWindow.ProgressUIVisible = (bool)SettingEditHelper.GetSetting<JArray>(settingData, DataFolderBase.SettingParams.DesktopLyricOptions)[1];
@@ -330,10 +331,10 @@ namespace TewiMP
                 DesktopLyricWindow.LyricTranslateTextPosition = (LyricTranslateTextPosition)(int)SettingEditHelper.GetSetting<JArray>(settingData, DataFolderBase.SettingParams.DesktopLyricTranslateText)[1];
                 DesktopLyricWindow.LyricOpacity = SettingEditHelper.GetSetting<double>(settingData, DataFolderBase.SettingParams.DesktopLyricOpacity);
                 NotifyIconWindow.IsVisible = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.TaskbarShowIcon);
-                TewiMP.MainWindow.RunInBackground = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.BackgroundRun);
+                MainWindowInstance.RunInBackground = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.BackgroundRun);
                 Controls.ImageEx.ImageDarkMass = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.ImageDarkMass);
                 LoadLastExitPlayingSongAndSongList = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.LoadLastExitPlayingSongAndSongList);
-                TewiMP.MainWindow.SNavView.PaneDisplayMode = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.TopNavigationStyle) ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;
+                MainWindowInstance.NavView.PaneDisplayMode = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.TopNavigationStyle) ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;
                 LocalAudioPage.ItemSortBy = SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.LocalMusicPageItemSortBy);
                 JArray hkd = SettingEditHelper.GetSetting<JArray>(settingData, DataFolderBase.SettingParams.HotKeySettings);
                 HotKeyManager.WillRegisterHotKeysList = hkd.ToObject<List<HotKey>>();
@@ -359,7 +360,7 @@ namespace TewiMP
             }
             catch (Exception e)
             {
-                LogHelper.WriteLog("SettingError", e.ToString(), false);
+                LogManager.Log("SettingError", e.ToString());
                 if (retryCount >= 5)
                 {
                     loadFailed = true;
@@ -369,20 +370,20 @@ namespace TewiMP
                 DataFolderBase.JSettingData = DataFolderBase.SettingDefault;
                 LoadSettings(true);
             }
-            logManager.Log("App", "读取设置完成。");
+            LogManager.Log("App", "读取设置完成。");
         }
 
-        public static Windows.UI.Color AccentColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
-        public static void SaveSettings()
+        public Windows.UI.Color AccentColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+        public void SaveSettings()
         {
-            logManager.Log("App", "正在保存设置...");
+            LogManager.Log("App", "正在保存设置...");
             var settingData = DataFolderBase.JSettingData;
             var audioEffectData = DataFolderBase.JAudioEffectData;
             if (DataFolderBase.CacheFolder != DataFolderBase.DefaultCacheFolder)
             {
                 SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.CacheFolderPath, DataFolderBase.CacheFolder);
             }
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.Volume, audioPlayer.Volume == 0 ? TewiMP.MainWindow.NoVolumeValue : audioPlayer.Volume);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.Volume, audioPlayer.Volume == 0 ? MainWindowInstance.NoVolumeValue : audioPlayer.Volume);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.DownloadFolderPath, DataFolderBase.DownloadFolder);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.AudioCacheFolderPath, DataFolderBase.AudioCacheFolder);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ImageCacheFolderPath, DataFolderBase.ImageCacheFolder);
@@ -405,12 +406,12 @@ namespace TewiMP
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.EqualizerString, AudioEqualizerBands.GetNameFromBands(audioPlayer.EqualizerBand));
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.WasapiOnly, audioPlayer.WasapiOnly);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.AudioLatency, audioPlayer.Latency < 50 ? 50 : audioPlayer.Latency);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.MusicPageShowLyricPage, TewiMP.MainWindow.SMusicPage.ShowLrcPage);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeColorMode, (int)TewiMP.MainWindow.SWindowGridBaseTop.RequestedTheme);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeMusicPageColorMode, (int)TewiMP.MainWindow.SMusicPage.pageRoot.RequestedTheme);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropEffect, (int)TewiMP.MainWindow.m_currentBackdrop);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropImagePath, TewiMP.MainWindow.ImagePath);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropImageMassOpacity, TewiMP.MainWindow.SBackgroundMass.Opacity);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.MusicPageShowLyricPage, MainWindowInstance.SMusicPage.ShowLrcPage);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeColorMode, (int)MainWindowInstance.WindowGridBase.RequestedTheme);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeMusicPageColorMode, (int)MainWindowInstance.SMusicPage.pageRoot.RequestedTheme);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropEffect, (int)MainWindowInstance.CurrentBackdrop);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropImagePath, MainWindowInstance.ImagePath);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropImageMassOpacity, MainWindowInstance.BackgroundMass.Opacity);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeAccentColor, AccentColor == Windows.UI.Color.FromArgb(0,0,0,0) ? null : AccentColor.ToString());
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.DesktopLyricOptions, new JArray()
             {
@@ -429,12 +430,12 @@ namespace TewiMP
             });
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.DesktopLyricOpacity, DesktopLyricWindow.LyricOpacity);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.TaskbarShowIcon, NotifyIconWindow.IsVisible);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.BackgroundRun, TewiMP.MainWindow.RunInBackground);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.BackgroundRun, MainWindowInstance.RunInBackground);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ImageDarkMass, Controls.ImageEx.ImageDarkMass);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.LoadLastExitPlayingSongAndSongList, LoadLastExitPlayingSongAndSongList);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeyEnable, hotKeyManager.EnableHotKey);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeySettings, JArray.FromObject(App.hotKeyManager.RegisteredHotKeys));
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.TopNavigationStyle, TewiMP.MainWindow.SNavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeySettings, JArray.FromObject(App.Instance.hotKeyManager.RegisteredHotKeys));
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.TopNavigationStyle, MainWindowInstance.NavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.LocalMusicPageItemSortBy, LocalAudioPage.ItemSortBy);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.UseRomajiLyric, LyricManager.UseRomajiLyric);
             
@@ -457,21 +458,21 @@ namespace TewiMP
             DataFolderBase.JAudioEffectData = audioEffectData;
             PluginManager.SavePluginInfoSettings();
 
-            logManager.Log("App", "设置配置已存储。");
+            LogManager.Log("App", "设置配置已存储。");
         }
 
-        public static bool LoadLastExitPlayingSongAndSongList = true;
+        public bool LoadLastExitPlayingSongAndSongList = true;
 
-        public static void SetFramePerSecondViewer(bool visible = false)
+        public void SetFramePerSecondViewer(bool visible = false)
         {
-            AppStatic.DebugSettings.EnableFrameRateCounter = visible;
+            DebugSettings.EnableFrameRateCounter = visible;
         }
 
-        public static async Task CheckUpdate(bool addNotify = true)
+        public async Task CheckUpdate(bool addNotify = true)
         {
             var data = await WebHelper.GetStringAsync("https://data.tewi.top/datas/TewiMP/update.json");
             if (string.IsNullOrEmpty(data)) return;
-            logManager.Log("App", $"Update datas: {data}");
+            LogManager.Log("App", $"Update datas: {data}");
             var json = JArray.Parse(data);
 
             StableVersion = json[0].ToObject<VersionData>();
@@ -483,7 +484,7 @@ namespace TewiMP
 
             if (addNotify)
             {
-                TewiMP.MainWindow.AddNotify(
+                MainWindowInstance.AddNotify(
                     "有新版本！",
                     $"可更新到版本 {newestVersion.Version} {newestVersion.SuffixType}，当前版本为 {NowVersion.Version} {NowVersion.SuffixType}。" +
                         (string.IsNullOrEmpty(newestVersion.ExtendMessage) ? "" : $"\n{newestVersion.ExtendMessage}"),
@@ -500,7 +501,7 @@ namespace TewiMP
         /// </summary>
         /// <param name="releaseType"></param>
         /// <returns>此版本类型的最新版本 <see cref="VersionData"/></returns>
-        public static VersionData GetNewVersionByReleaseData(SuffixType releaseType) => releaseType switch
+        public VersionData GetNewVersionByReleaseData(SuffixType releaseType) => releaseType switch
         {
             SuffixType.Stable => StableVersion,
             SuffixType.Preview => PreviewVersion,
@@ -508,14 +509,14 @@ namespace TewiMP
             _ => NowVersion
         };
 
-        public static bool AppVersionIsNewest()
+        public bool AppVersionIsNewest()
         {
             var newestVersion = GetNewVersionByReleaseData(NowVersion.SuffixType);
             if (!newestVersion.Available) return false;
             return newestVersion.Version <= NowVersion.Version;
         }
 
-        public static async void SetStartupWithWindows(bool startup)
+        public async void SetStartupWithWindows(bool startup)
         {
             await Task.Run(() =>
             {

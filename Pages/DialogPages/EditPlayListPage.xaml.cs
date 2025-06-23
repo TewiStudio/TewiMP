@@ -27,15 +27,15 @@ namespace TewiMP.Pages.DialogPages
                 data[MusicListData.ListName]["ListShowName"] = Name_TB.Text;
                 data[MusicListData.ListName]["PicturePath"] = ImagePath_TB.Text;
                 await PlayListHelper.SaveData(data);
-                await App.playListReader.Refresh();
-                MainWindow.AddNotify("编辑列表成功。", null, NotifySeverity.Complete);
+                await App.Instance.playListReader.Refresh();
+                App.MainWindowInstance.AddNotify("编辑列表成功。", null, NotifySeverity.Complete);
             }
             ResultEvent -= AddPlayListPage_ResultEvent;
         }
 
         public static async Task ShowDialog(MusicListData musicListData)
         {
-            var a = await MainWindow.ShowDialog($"编辑 \"{musicListData.ListShowName}\"", new EditPlayListPage() { MusicListData = musicListData }, "取消", "更改", defaultButton: ContentDialogButton.Primary);
+            var a = await App.MainWindowInstance.ShowDialog($"编辑 \"{musicListData.ListShowName}\"", new EditPlayListPage() { MusicListData = musicListData }, "取消", "更改", defaultButton: ContentDialogButton.Primary);
             ResultEvent?.Invoke(a);
         }
 

@@ -13,13 +13,9 @@ namespace TewiMP.Windowed.WindowHelper;
 public static class Window
 {
     public static IntPtr hWnd;
-    public static AppWindow App => AppWindow.GetFromWindowId(Win32Interop.GetWindowIdFromWindow(hWnd));
-    public static OverlappedPresenter Presenter => (OverlappedPresenter)App.Presenter;
-
 
     public static IntPtr GetHWnd(Microsoft.UI.Xaml.Window Window) =>
         WindowNative.GetWindowHandle(Window);
-
 
     public static void MakeTransparent()
     {

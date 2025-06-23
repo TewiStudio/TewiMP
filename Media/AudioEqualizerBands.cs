@@ -19,7 +19,7 @@ namespace TewiMP.Media
             set
             {
                 centreFrequency = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -30,7 +30,7 @@ namespace TewiMP.Media
             set
             {
                 q = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -41,7 +41,7 @@ namespace TewiMP.Media
             set
             {
                 gain = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -52,7 +52,7 @@ namespace TewiMP.Media
             set
             {
                 channel = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -63,7 +63,7 @@ namespace TewiMP.Media
             set
             {
                 isEnable = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -79,7 +79,7 @@ namespace TewiMP.Media
             set
             {
                 passFilterType = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
         
@@ -90,7 +90,7 @@ namespace TewiMP.Media
             set
             {
                 centreFrequency = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -101,7 +101,7 @@ namespace TewiMP.Media
             set
             {
                 q = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -113,7 +113,7 @@ namespace TewiMP.Media
             set
             {
                 gain = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -124,7 +124,7 @@ namespace TewiMP.Media
             set
             {
                 channel = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 
@@ -135,7 +135,7 @@ namespace TewiMP.Media
             set
             {
                 isEnable = value;
-                App.audioPlayer.UpdateEqualizer();
+                App.Instance.audioPlayer.UpdateEqualizer();
             }
         }
 

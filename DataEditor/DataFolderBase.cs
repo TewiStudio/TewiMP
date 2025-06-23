@@ -25,12 +25,12 @@ namespace TewiMP.DataEditor
         /// <summary>
         /// 程序数据文件夹路径（Roaming）
         /// </summary>
-        public static string BaseFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), App.AppName);
+        public static string BaseFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), App.Instance.AppName);
 
         /// <summary>
         /// 程序缓存数据文件夹路径（Local）
         /// </summary>
-        public static string BaseLocalFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.AppName);
+        public static string BaseLocalFolder { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), App.Instance.AppName);
 
         /// <summary>
         /// 数据文件夹路径
@@ -131,7 +131,7 @@ namespace TewiMP.DataEditor
         /// <summary>
         /// 开机启动快捷方式
         /// </summary>
-        public static string StartupShortcutPath { get; set; } = Path.Combine(StartupFolder, $"{App.AppName}.lnk");
+        public static string StartupShortcutPath { get; set; } = Path.Combine(StartupFolder, $"{App.Instance.AppName}.lnk");
 
         /// <summary>
         /// 默认播放列表数据
@@ -165,7 +165,7 @@ namespace TewiMP.DataEditor
             { SettingParams.ThemeColorMode.ToString(), (int)ElementTheme.Default },
             { SettingParams.ThemeMusicPageColorMode.ToString(), (int)ElementTheme.Default },
             { SettingParams.ThemeAccentColor.ToString(), null },
-            { SettingParams.ThemeBackdropEffect.ToString(), (int)MainWindow.BackdropType.Mica },
+            { SettingParams.ThemeBackdropEffect.ToString(), (int)BackdropType.Mica },
             { SettingParams.ThemeBackdropImagePath.ToString(), null },
             { SettingParams.ThemeBackdropImageMassOpacity.ToString(), 0.5 },
             { 
@@ -306,7 +306,7 @@ namespace TewiMP.DataEditor
         /// </summary>
         public static void InitFiles()
         {
-            App.logManager.Log("DataFolderBase", "初始化文件目录中...");
+            LogManager.Log("DataFolderBase", "初始化文件目录中...");
             Directory.CreateDirectory(PluginFolder);
             Directory.CreateDirectory(BaseFolder);
             Directory.CreateDirectory(BaseLocalFolder);
@@ -363,7 +363,7 @@ namespace TewiMP.DataEditor
             }
             
             Directory.CreateDirectory(StartupFolder);
-            App.logManager.Log("DataFolderBase", "初始化文件目录完成。");
+            LogManager.Log("DataFolderBase", "初始化文件目录完成。");
         }
 
         public static void InitCacheFolder()

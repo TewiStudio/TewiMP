@@ -37,7 +37,7 @@ namespace TewiMP.Controls
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            await App.playingList.Play(songHistoryData.MusicData);
+            await App.Instance.playingList.Play(songHistoryData.MusicData);
         }
     }
 }

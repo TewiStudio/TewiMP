@@ -83,7 +83,7 @@ namespace TewiMP.Controls
         private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
             AudioFilterStatic.ParametricEqDatas.Remove(DataContext);
-            App.audioPlayer.UpdateEqualizer();
+            App.Instance.audioPlayer.UpdateEqualizer();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -113,7 +113,7 @@ namespace TewiMP.Controls
                     "Gain" => "增益",
                     _ => "未知"
                 };
-                var result = await MainWindow.ShowDialog($"设置 \"{chineseName}（{btn.Tag}）\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
+                var result = await App.MainWindowInstance.ShowDialog($"设置 \"{chineseName}（{btn.Tag}）\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
                 if (result != ContentDialogResult.Primary) return;
                 switch (btn.Tag)
                 {

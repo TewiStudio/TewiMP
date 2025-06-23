@@ -82,7 +82,7 @@ namespace TewiMP.Controls
                 if ((bool)lastValue == value) return;
             lastValue = value;
 
-            if (MainWindow.DriveInType != Microsoft.UI.Input.PointerDeviceType.Mouse)
+            if (App.MainWindowInstance.DriveInType != Microsoft.UI.Input.PointerDeviceType.Mouse)
             {
                 InfoButton.Visibility = Visibility.Collapsed;
                 RightToolBar.Opacity = 1;
@@ -101,8 +101,8 @@ namespace TewiMP.Controls
 
             if (value)
             {
-                SetPlayingIcon(App.audioPlayer.PlaybackState);
-                App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+                SetPlayingIcon(App.Instance.audioPlayer.PlaybackState);
+                App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
                 PlayingThemeRectangle.Opacity = 1;
                 ShowRightToolBar();
                 AnimatedMouseEnterBackground();
@@ -111,13 +111,13 @@ namespace TewiMP.Controls
             else
             {
                 SetPlayingIcon(NAudio.Wave.PlaybackState.Paused);
-                App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+                App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
                 PlayingThemeRectangle.Opacity = 0;
                 backgroundBaseGridVisual.Opacity = 0;
                 RightToolBar.Visibility = Visibility.Collapsed;
             }
 
-            if (MainWindow.DriveInType != Microsoft.UI.Input.PointerDeviceType.Mouse)
+            if (App.MainWindowInstance.DriveInType != Microsoft.UI.Input.PointerDeviceType.Mouse)
                 RightToolBar.Visibility = Visibility.Visible;
 
             /*
@@ -163,7 +163,7 @@ namespace TewiMP.Controls
 /*
         ~SongItem()
         {
-            //System.Diagnostics.App.logManager.Log($"[SongItem] Disposed by Finalizer.");
+            //System.Diagnostics.LogManager.Log($"[SongItem] Disposed by Finalizer.");
             Dispose();
         }
 */
@@ -217,7 +217,7 @@ namespace TewiMP.Controls
                 ButtonNameTextBlock.Text = bindBase.MusicData.ArtistName;
             }
 
-            IsMusicDataPlaying = App.audioPlayer.MusicData == MusicData;
+            IsMusicDataPlaying = App.Instance.audioPlayer.MusicData == MusicData;
         }
 
         public async void TestFileExists()
@@ -282,7 +282,7 @@ namespace TewiMP.Controls
             if (MusicListData?.ListDataType == DataType.专辑)
             {
                 ShowImage = false;
-                MainWindow_DriveInTypeEvent(MainWindow.DriveInType);
+                MainWindow_DriveInTypeEvent(App.MainWindowInstance.DriveInType);
                 return;
             }
 
@@ -320,7 +320,7 @@ namespace TewiMP.Controls
                     ShowImage = false;
                 }
             }
-            MainWindow_DriveInTypeEvent(MainWindow.DriveInType);
+            MainWindow_DriveInTypeEvent(App.MainWindowInstance.DriveInType);
         }
 
         public static void OnMusicDataChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -338,8 +338,8 @@ namespace TewiMP.Controls
         {
             Pages.ListViewPages.ListViewPage.SetPageToListViewPage(new() { PageType = Pages.ListViewPages.PageType.Artist, Param = (sender as MenuFlyoutItem).Tag });
 
-            //var artist = await App.metingServices.NeteaseServices.GetArtist(((Artist)(sender as MenuFlyoutItem).Tag).ID);
-            //await MainWindow.ShowDialog("result", $"{artist.Name}\n{artist.PicturePath}\n{artist.Describe}\n{artist.HotSongs.Songs.Count}");
+            //var artist = await App.Instance.metingServices.NeteaseServices.GetArtist(((Artist)(sender as MenuFlyoutItem).Tag).ID);
+            //await App.MainWindowInstance.ShowDialog("result", $"{artist.Name}\n{artist.PicturePath}\n{artist.Describe}\n{artist.HotSongs.Songs.Count}");
         }
 
         bool isDisposed = false;
@@ -347,7 +347,7 @@ namespace TewiMP.Controls
         {
             try
             {
-                App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+                App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
                 if (!isDisposed)
                 {
                     DataContext = null;
@@ -359,7 +359,7 @@ namespace TewiMP.Controls
                 DisposeVisualsAnimation();
                 UnloadObject(this);
                 isDisposed = true;
-                //System.Diagnostics.App.logManager.Log($"[SongItem] Disposed: {StaticSongItems.Count}");
+                //System.Diagnostics.LogManager.Log($"[SongItem] Disposed: {StaticSongItems.Count}");
             }
             catch
             {
@@ -526,31 +526,31 @@ namespace TewiMP.Controls
             if (!CanClickPlay) return;
             if (IsMusicDataPlaying)
             {
-                if (App.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
-                    App.audioPlayer.SetPause();
+                if (App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                    App.Instance.audioPlayer.SetPause();
                 else
-                    App.audioPlayer.SetPlay();
+                    App.Instance.audioPlayer.SetPlay();
             }
             else
-                await App.playingList.Play(MusicData, true);
+                await App.Instance.playingList.Play(MusicData, true);
         }
         
         // 单击添加到播放中列表按钮
         private void AddPlay_Click(object sender, RoutedEventArgs e)
         {
-            App.playingList.Add(MusicData);
+            App.Instance.playingList.Add(MusicData);
         }
         
         // 单击下一首播放按钮
         private void NextPlay_Click(object sender, RoutedEventArgs e)
         {
-            App.playingList.SetNextPlay(App.audioPlayer.MusicData, MusicData);
+            App.Instance.playingList.SetNextPlay(App.Instance.audioPlayer.MusicData, MusicData);
         }
         
         // 单击详细信息按钮
         private async void Info_Click(object sender, RoutedEventArgs e)
         {
-            await MainWindow.ShowDialog($"{MusicData.Title} 的详细信息：", $"标题：{MusicData.Title}\n艺术家&专辑：{MusicData.ButtonName}\nID：{MusicData.ID}\n来源：{MusicData.From}\n图片地址：{MusicData.Album.PicturePath}");
+            await App.MainWindowInstance.ShowDialog($"{MusicData.Title} 的详细信息：", $"标题：{MusicData.Title}\n艺术家&专辑：{MusicData.ButtonName}\nID：{MusicData.ID}\n来源：{MusicData.From}\n图片地址：{MusicData.Album.PicturePath}");
         }
 
         // 双击元素 播放
@@ -573,7 +573,7 @@ namespace TewiMP.Controls
 
         private void Download_Click(object sender, RoutedEventArgs e)
         {
-            App.downloadManager.Add(MusicData);
+            App.Instance.downloadManager.Add(MusicData);
         }
 
         private void rmf_Opened(object sender, object e)
@@ -600,7 +600,7 @@ namespace TewiMP.Controls
                     await Task.Run(() => File.Delete(path));
                 }
                 await PlayListHelper.DeleteMusicDataFromPlayList(MusicListData.ListName, MusicData);
-                await App.playListReader.Refresh();
+                await App.Instance.playListReader.Refresh();
             }
         }
 
@@ -701,7 +701,7 @@ namespace TewiMP.Controls
             switch (tag)
             {
                 case "0":
-                    MainWindow.SetNavViewContent(typeof(SearchPage), MusicData.Title);
+                    App.MainWindowInstance.SetNavViewContent(typeof(SearchPage), MusicData.Title);
                     break;
                 case "1":
                     await CodeHelper.OpenInBrowser(new Uri($"https://www.bing.com/search?q={MusicData.Title}-{MusicData.Album}"));
@@ -732,8 +732,8 @@ namespace TewiMP.Controls
         private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
             var uri = await MusicData.PluginInfo.GetMusicSourcePlugin().GetUrl(MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
-            MainWindow.HideDialog();
-            await MainWindow.ShowDialog("获取到的链接是：", uri);
+            App.MainWindowInstance.HideDialog();
+            await App.MainWindowInstance.ShowDialog("获取到的链接是：", uri);
         }
 
         private async void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
@@ -750,22 +750,22 @@ namespace TewiMP.Controls
 
         private async void MenuFlyoutItem_Click_2(object sender, RoutedEventArgs e)
         {
-            await App.playingList.Play(MusicData, true);
+            await App.Instance.playingList.Play(MusicData, true);
         }
 
         NotifyItem item = null;
         private async void Menuflyout_CacheItem_Click(object sender, RoutedEventArgs e)
         {
-            if (await App.cacheManager.GetCachePath(MusicData) is not null)
+            if (await App.Instance.cacheManager.GetCachePath(MusicData) is not null)
             {
-                MainWindow.AddNotify($"此歌曲已缓存！", null, NotifySeverity.Warning);
+                App.MainWindowInstance.AddNotify($"此歌曲已缓存！", null, NotifySeverity.Warning);
                 return;
             }
 
-            item = MainWindow.AddNotify($"正在缓存：{MusicData.Title}", "加载中...", NotifySeverity.Loading, TimeSpan.MaxValue);
-            App.cacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
-            App.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
-            await App.cacheManager.StartCacheMusic(MusicData);
+            item = App.MainWindowInstance.AddNotify($"正在缓存：{MusicData.Title}", "加载中...", NotifySeverity.Loading, TimeSpan.MaxValue);
+            App.Instance.cacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
+            App.Instance.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
+            await App.Instance.cacheManager.StartCacheMusic(MusicData);
         }
 
         private void CacheManager_CachingStateChangeMusicData(MusicData musicData, object value)
@@ -778,23 +778,23 @@ namespace TewiMP.Controls
         private void CacheManager_CachedMusicData(MusicData musicData, object value)
         {
             if (musicData != MusicData) return;
-            App.cacheManager.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
-            App.cacheManager.CachedMusicData -= CacheManager_CachedMusicData;
+            App.Instance.cacheManager.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
+            App.Instance.cacheManager.CachedMusicData -= CacheManager_CachedMusicData;
             item.SetNotifyItemData(item.GetNotifyItemData().Title, "缓存完成。", NotifySeverity.Complete);
-            MainWindow.NotifyCountDown(item);
+            App.MainWindowInstance.NotifyCountDown(item);
             item = null;
         }
 
         private async void Menuflyout_DeleteCacheItem_Click(object sender, RoutedEventArgs e)
         {
-            var path = await App.cacheManager.GetCachePath(MusicData);
+            var path = await App.Instance.cacheManager.GetCachePath(MusicData);
             if (string.IsNullOrEmpty(path))
             {
-                MainWindow.AddNotify("此歌曲的缓存文件不存在。", null, NotifySeverity.Error);
+                App.MainWindowInstance.AddNotify("此歌曲的缓存文件不存在。", null, NotifySeverity.Error);
                 return;
             }
 
-            var itema = MainWindow.AddNotify($"正在删除：{MusicData.Title}", null, NotifySeverity.Loading, TimeSpan.MaxValue);
+            var itema = App.MainWindowInstance.AddNotify($"正在删除：{MusicData.Title}", null, NotifySeverity.Loading, TimeSpan.MaxValue);
             Exception err = null;
             try
             {
@@ -809,7 +809,7 @@ namespace TewiMP.Controls
             {
                 itema.SetNotifyItemData("删除成功。", null, NotifySeverity.Complete);
             }
-            MainWindow.NotifyCountDown(itema);
+            App.MainWindowInstance.NotifyCountDown(itema);
         }
     }
 }

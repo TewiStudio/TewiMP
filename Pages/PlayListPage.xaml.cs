@@ -71,11 +71,11 @@ namespace TewiMP.Pages
             isInUpdate = true;
             playListCards.Clear();
 
-            if (App.playListReader.NowMusicListData is null)
-                await App.playListReader.Refresh();
+            if (App.Instance.playListReader.NowMusicListData is null)
+                await App.Instance.playListReader.Refresh();
 
             int count = 0;
-            foreach (var item in App.playListReader.NowMusicListData)
+            foreach (var item in App.Instance.playListReader.NowMusicListData)
             {
                 count++;
                 playListCards.Add(item);
@@ -201,10 +201,10 @@ namespace TewiMP.Pages
         void InitEvent()
         {
             if (!IsLoaded) return;
-            App.playListReader.Updated -= PlayListReader_Updated;
-            App.playListReader.Updated += PlayListReader_Updated;
-            MainWindow.MainViewStateChanged -= MainWindow_MainViewStateChanged;
-            MainWindow.MainViewStateChanged += MainWindow_MainViewStateChanged;
+            App.Instance.playListReader.Updated -= PlayListReader_Updated;
+            App.Instance.playListReader.Updated += PlayListReader_Updated;
+            App.MainWindowInstance.MainViewStateChanged -= MainWindow_MainViewStateChanged;
+            App.MainWindowInstance.MainViewStateChanged += MainWindow_MainViewStateChanged;
             BaseGridView_HeaderGrid_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
             BaseGridView_HeaderGrid_Foot_Buttons.PositionToBottom_Button.Click += PositionToButton_Click;
             BaseGridView_HeaderGrid_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
@@ -214,8 +214,8 @@ namespace TewiMP.Pages
         void RemoveEvent()
         {
             if (scrollViewer != null) scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
-            App.playListReader.Updated -= PlayListReader_Updated;
-            MainWindow.MainViewStateChanged -= MainWindow_MainViewStateChanged;
+            App.Instance.playListReader.Updated -= PlayListReader_Updated;
+            App.MainWindowInstance.MainViewStateChanged -= MainWindow_MainViewStateChanged;
             BaseGridView_HeaderGrid_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
             BaseGridView_HeaderGrid_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
         }
@@ -246,7 +246,7 @@ namespace TewiMP.Pages
 
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.playListReader.Refresh();
+            await App.Instance.playListReader.Refresh();
         }
 
         private async void AppBarButton_Click_1(object sender, RoutedEventArgs e)

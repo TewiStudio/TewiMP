@@ -74,7 +74,7 @@ namespace TewiMP.Controls
         bool pauseChanged = false;
         private async void RepeatChangeView()
         {
-            //App.logManager.Log("autoview", $"Repeating. {Content}");
+            //LogManager.Log("autoview", $"Repeating. {Content}");
             if (Content is null) return;
             if (Visibility == Visibility.Collapsed) return;
             if (isAddedVelocity) return;
@@ -133,14 +133,14 @@ namespace TewiMP.Controls
                 (Content as FrameworkElement).Unloaded += AutoScrollViewer_Unloaded;
                 ScrollTo(0, 0, new(ScrollingAnimationMode.Disabled, ScrollingSnapPointsMode.Ignore));
                 Pause = false;
-                //App.logManager.Log("Content Changed.");
+                //LogManager.Log("Content Changed.");
             }
         }
 
         private void AutoScrollViewer_Unloaded(object sender, RoutedEventArgs e)
         {
             Pause = true;
-            //App.logManager.Log("Content Unloaded.");
+            //LogManager.Log("Content Unloaded.");
             (sender as FrameworkElement).Unloaded -= AutoScrollViewer_Unloaded;
             content = null;
             UnloadObject(Content);

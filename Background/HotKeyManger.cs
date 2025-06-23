@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using Vanara.PInvoke;
 using Newtonsoft.Json;
 using Microsoft.UI.Xaml;
+using WinUIEx;
 
 namespace TewiMP.Background.HotKeys
 {
@@ -319,7 +320,7 @@ namespace TewiMP.Background.HotKeys
             Windows.Win32.Foundation.WPARAM wParam,
             Windows.Win32.Foundation.LPARAM lParam)
         {
-            //System.Diagnostics.App.logManager.Log($"System Message: {uMsg}");
+            //System.Diagnostics.LogManager.Log($"System Message: {uMsg}");
             if (uMsg == WM_HOTKEY)
             {
                 nuint id = wParam.Value;
@@ -328,66 +329,65 @@ namespace TewiMP.Background.HotKeys
                 switch (hotKeyID)
                 {
                     case HotKeyID.PreviousSong:
-                        App.playingList.PlayPrevious();
+                        App.Instance.playingList.PlayPrevious();
                         break;
                     case HotKeyID.NextSong:
-                        App.playingList.PlayNext();
+                        App.Instance.playingList.PlayNext();
                         break;
                     case HotKeyID.Pause:
-                        if (App.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                        if (App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
                         {
-                            App.audioPlayer.SetPause();
+                            App.Instance.audioPlayer.SetPause();
                         }
                         else
                         {
-                            App.audioPlayer.SetPlay();
+                            App.Instance.audioPlayer.SetPlay();
                         }
                         break;
                     case HotKeyID.Stop:
-                        App.audioPlayer.CurrentTime = TimeSpan.Zero;
-                        App.audioPlayer.SetStop();
+                        App.Instance.audioPlayer.CurrentTime = TimeSpan.Zero;
+                        App.Instance.audioPlayer.SetStop();
                         break;
                     case HotKeyID.VolumeAdd:
-                        App.audioPlayer.Volume += 1f;
+                        App.Instance.audioPlayer.Volume += 1f;
                         break;
                     case HotKeyID.VolumeRemove:
-                        App.audioPlayer.Volume -= 1f;
+                        App.Instance.audioPlayer.Volume -= 1f;
                         break;
                     case HotKeyID.OpenLyricWindow:
-                        MainWindow.OpenDesktopLyricWindow();
+                        App.MainWindowInstance.OpenDesktopLyricWindow();
                         break;
                     case HotKeyID.RandomPlay:
-                        App.playingList.PlayBehavior = App.playingList.PlayBehavior == Background.PlayBehavior.随机播放 ? Background.PlayBehavior.顺序播放 : Background.PlayBehavior.随机播放;
+                        App.Instance.playingList.PlayBehavior = App.Instance.playingList.PlayBehavior == Background.PlayBehavior.随机播放 ? Background.PlayBehavior.顺序播放 : Background.PlayBehavior.随机播放;
                         break;
                     case HotKeyID.OpenMainWindow:
-                        MainWindow.AppWindowInstance.Show();
-                        MainWindow.SOverlappedPresenter.Restore();
-                        PInvoke.User32.SetForegroundWindow(MainWindow.Handle);
+                        App.MainWindowInstance.Restore();
+                        App.MainWindowInstance.SetForegroundWindow();
                         break;
                     case HotKeyID.TryActivityLyricWindow:
-                        if (MainWindow.DesktopLyricWindow != null)
+                        if (App.MainWindowInstance.DesktopLyricWindow != null)
                         {
-                            MainWindow.DesktopLyricWindow.Activate();
-                            MainWindow.DesktopLyricWindow.overlappedPresenter.Restore();
+                            App.MainWindowInstance.DesktopLyricWindow.Activate();
+                            App.MainWindowInstance.DesktopLyricWindow.overlappedPresenter.Restore();
                         }
                         break;
                     case HotKeyID.ReturnToFirstSong:
-                        if (App.playingList.NowPlayingList.Any())
+                        if (App.Instance.playingList.NowPlayingList.Any())
                         {
-                            App.playingList.Play(App.playingList.NowPlayingList.First());
+                            App.Instance.playingList.Play(App.Instance.playingList.NowPlayingList.First());
                         }
                         break;
                     case HotKeyID.LockLyricWindow:
-                        MainWindow.DesktopLyricWindow?.Lock();/*
-                        if (MainWindow.DesktopLyricWindow != null)
+                        App.MainWindowInstance.DesktopLyricWindow?.Lock();/*
+                        if (App.MainWindowInstance.DesktopLyricWindow != null)
                         {
-                            if (!MainWindow.DesktopLyricWindow.IsLock)
+                            if (!App.MainWindowInstance.DesktopLyricWindow.IsLock)
                             {
                             }
                         }*/
                         break;
                     default:
-                        MainWindow.AddNotify(
+                        App.MainWindowInstance.AddNotify(
                             "未知热键",
                             "未知的热键：\n" +
                                 $"●uMsg：{uMsg}\n" +
@@ -400,7 +400,7 @@ namespace TewiMP.Background.HotKeys
             }
             else if (uMsg == 0x02E0) // window dpi 改变消息，懒得再在MainWindow里再写一个 windows 信息处理了
             {
-                MainWindow.InvokeDpiEvent();
+                App.MainWindowInstance.InvokeDpiEvent();
             }
 
             return Windows.Win32.PInvoke.CallWindowProc(origPrc, hwnd, uMsg, wParam, lParam);

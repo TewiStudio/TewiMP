@@ -24,6 +24,7 @@ using Windows.ApplicationModel.DataTransfer;
 using NAudio.Wave;
 using Newtonsoft.Json.Linq;
 using CommunityToolkit.WinUI;
+using WinUIEx;
 using TewiMP.Pages;
 using TewiMP.Pages.MusicPages;
 using TewiMP.Helpers;
@@ -38,170 +39,123 @@ using TewiMP.Background.HotKeys;
 
 namespace TewiMP
 {
-    public sealed partial class MainWindow : Window
+    public enum BackdropType
     {
-        public static bool RunInBackground = false;
+        Mica,
+        MicaAlt,
+        DesktopAcrylic,
+        Blur,
+        Transparent,
+        Image,
+        DefaultColor
+    }
 
-        public static AppWindow AppWindowInstance;
-        public static OverlappedPresenter SOverlappedPresenter;
-        public static FullScreenPresenter SFullScreenPresenter;
-        public static IntPtr Handle;
+    public sealed partial class MainWindow : WindowEx
+    {
+        public bool RunInBackground = false;
+        public string ImagePath = null;
 
-        public static UIElement SContent;
-        public static Window SWindow;
-        public static Rectangle SBackgroundColor;
-        public static Grid SBackgroundImageRoot;
-        public static Rectangle SBackgroundMass;
-        public static Image SBackgroundImage;
-        public static MusicPage SMusicPage = new();
-        public static Grid STopControlsBaseGrid;
-        public static TextBlock SPlayTitle;
-        public static TextBlock SPlayArtist;
-        public static TextBlock SLyricTextBlock;
-        public static Grid SWindowGridBaseTop;
-        public static Grid SWindowGridBase;
-        public static Grid SVolumeBaseGrid;
-        public static Grid SMusicPageBaseGrid;
-        public static ListView SPlayingListBaseView;
-        public static ScrollViewer SPlayingListBaseViewScrollViewer;
-        public static Grid SPlayingListBaseGrid;
-        public static Frame SMusicPageBaseFrame;
-        public static Frame SPlayContent;
-        public static Flyout teachingTipVolume;
-        public static Flyout teachingTipPlayingList;
-        public static StackPanel SNotifyStackPanel;
-        public static ListView SNotifyListView;
-        public static ScrollViewer SNotifyListViewScrollViewer;
-        public static ScrollFootButton SPlayingListScrollControl;
-        public static DropDownButton SPlayModeSelector;
-        public static FontIcon SPlayModeSelector_Icon;
-        public static TextBlock SPlayModeSelector_Name;
-        public static ContentDialog AsyncDialog { get; set; } = null;
-
-        public static double NowDPI { get; set; } = 1.0;
-        public static void InvokeDpiEvent()
+        public IntPtr Handle;
+        public BackdropType CurrentBackdrop;
+        public MusicPage SMusicPage = new();
+        public ScrollViewer PlayingListBaseViewScrollViewer;
+        public  ContentDialog AsyncDialog = null;
+        public double NowDPI
         {
-            NowDPI = CodeHelper.GetScaleAdjustment(App.MainWindow);
+            get
+            {
+                return this.GetDpiForWindow() / 100.0;
+            }
+        }
+        public void InvokeDpiEvent()
+        {
             WindowDpiChanged?.Invoke(NowDPI);
         }
         public delegate void WindowDpiChangedDelegate(double newDPI);
-        public static event WindowDpiChangedDelegate WindowDpiChanged;
+        public event WindowDpiChangedDelegate WindowDpiChanged;
         
         public delegate void WindowViewStateChangedDelegate(bool isView);
-        public static event WindowViewStateChangedDelegate WindowViewStateChanged;
+        public event WindowViewStateChangedDelegate WindowViewStateChanged;
 
         public delegate void MainViewStateChangedDelegate(bool isView);
-        public static event MainViewStateChangedDelegate MainViewStateChanged;
+        public event MainViewStateChangedDelegate MainViewStateChanged;
 
         public delegate void MusicPageViewStateChangedDelegate(MusicPageViewState musicPageViewState);
-        public static event MusicPageViewStateChangedDelegate MusicPageViewStateChanged;
+        public event MusicPageViewStateChangedDelegate MusicPageViewStateChanged;
 
         public MainWindow()
         {
-            SWindow = this;
+            LogManager.Info("MainWindow", "Initing");
             InitializeComponent();
 
-            Handle = WindowHelpers.WindowHelper.GetWindowHandle(this);
-            SOverlappedPresenter = OverlappedPresenter.Create();
-            AppWindow.SetPresenter(SOverlappedPresenter);
-            AppWindowInstance = AppWindow;
-            //SOverlappedPresenter.PreferredMinimumHeight = 132;
-            //SOverlappedPresenter.PreferredMinimumWidth = 320;
-            //SFullScreenPresenter = SFullScreenPresenter.Create();
-
-            NowDPI = CodeHelper.GetScaleAdjustment(this);
+            Handle = this.GetWindowHandle();
             WindowGridBase.DataContext = this;
-            SContent = Content;
-            SBackgroundColor = BackgroundColor;
-            SBackgroundImageRoot = BackgroundImageRoot;
-            SBackgroundMass = BackgroundMass;
-            SBackgroundImage = BackgroundImage;
-            SNavView = NavView;
-            SContentFrame = ContentFrame;
-            SPlayTitle = PlayTitle;
-            SPlayArtist = PlayArtist;
-            SLyricTextBlock = LyricTextBlock;
-            STopControlsBaseGrid = TopControlsBaseGrid;
-            SWindowGridBaseTop = WindowGridBase;
-            SWindowGridBase = GridBase;
-            SVolumeBaseGrid = VolumeBaseGrid;
-            SMusicPageBaseGrid = MusicPageBaseGrid;
-            SPlayingListBaseGrid = PlayingListBaseGrid;
-            SPlayingListBaseView = PlayingListBaseView;
-            SMusicPageBaseFrame = MusicPageBaseFrame;
-            teachingTipPlayingList = PlayingListBasePopup;
-            SPlayingListScrollControl = PlayingListScrollControl;
-            teachingTipVolume = VolumeBasePopup;
-            SPlayContent = PlayContent;
-            SPlayModeSelector = PlayModeSelector;
-            SPlayModeSelector_Icon = PlayModeSelector_Icon;
-            SPlayModeSelector_Name = PlayModeSelector_Name;
 
-            SNotifyStackPanel = NotifyStackPanel;
-            //SNotifyListView = NotifyListView;
+            Activated += MainWindow_Activated;
+            WindowGridBase.ActualThemeChanged += WindowGridBase_ActualThemeChanged;
+            MusicPageViewStateChanged += MainWindow_MusicPageViewStateChanged;
+            AppWindow.Closing += AppWindow_Closing;
+            loadingst.Children.Add(loadingprogress);
+            loadingst.Children.Add(loadingtextBlock);
+
             InitDialog();
             equalizerPage = new Pages.DialogPages.EqualizerPage();
             //SubClassing();
 
-            AppWindow.Title = App.AppName;
+            AppWindow.Title = App.Instance.AppName;
             AppWindow.SetIcon(System.IO.Path.Combine("Images", "Icons", "icon.ico"));
 
-            InitializeTitleBar(SWindowGridBaseTop.RequestedTheme);
+            InitializeTitleBar(WindowGridBase.RequestedTheme);
+            SetDragRegionForCustomTitleBar();
 
-            m_wsdqHelper = new WindowHelpers.WindowsSystemDispatcherQueueHelper();
-            m_wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
-            SetDragRegionForCustomTitleBar(AppWindow);
+            LogManager.Info("MainWindow", "Inited");
+        }
 
-            Activated += MainWindow_Activated;
-            SWindowGridBaseTop.ActualThemeChanged += WindowGridBase_ActualThemeChanged;
-            App.SMTC.ButtonPressed += SMTC_ButtonPressed;
-            App.playListReader.Updated += () => UpdatePlayListButtonUI();
-            App.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
-            MusicPageViewStateChanged += MainWindow_MusicPageViewStateChanged;
-            PlayingListScrollControl.PositionToNowPlaying_Button.Click += async (_, __) =>
+        internal static MicaBackdrop micaBackdrop = new();
+        internal static MicaBackdrop micaAltBackdrop = new() { Kind = MicaKind.BaseAlt };
+        private static DesktopAcrylicBackdrop acrylicBackdrop = new();
+        private static BlurredBackdrop blurBackdrop = new();
+        private static TransparentTintBackdrop transparentTintBackdrop = new();
+        public void SetBackdrop(BackdropType backdropType)
+        {
+            CurrentBackdrop = backdropType;
+            BackgroundImageRoot.Visibility = Visibility.Collapsed;
+            BackgroundColor.Visibility = Visibility.Collapsed;
+            BackgroundMass.Visibility = Visibility.Collapsed;
+            switch (backdropType)
             {
-                if (SPlayingListBaseView.Items.Contains(App.audioPlayer.MusicData))
-                {
-                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
-                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
-                }
-            };
-            PlayingListScrollControl.PositionToTop_Button.Click += (_, __) =>
-            {
-                if (SPlayingListBaseViewScrollViewer is null)
-                    SPlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
-                SPlayingListBaseViewScrollViewer.ChangeView(null, 0, null);
-            };
-            PlayingListScrollControl.PositionToBottom_Button.Click += (_, __) =>
-            {
-                if (SPlayingListBaseViewScrollViewer is null)
-                    SPlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
-                SPlayingListBaseViewScrollViewer.ChangeView(null, SPlayingListBaseViewScrollViewer.ScrollableHeight, null);
-            };
-
-            AppWindow.Closing += AppWindow_Closing;
-
-            loadingst.Children.Add(loadingprogress);
-            loadingst.Children.Add(loadingtextBlock);
-
-            App.LoadSettings();
-            SetBackdrop(m_currentBackdrop);
-
-            Canvas.SetZIndex(AppTitleBar, 1);
-
-            StaringPrepare();
-            LoadLastPlaying();
-            //NotifyListView.ItemsSource = NotifyList;
-            //PlayingListBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
-            //VolumeBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
+                case BackdropType.Mica: SystemBackdrop = micaBackdrop; break;
+                case BackdropType.MicaAlt: SystemBackdrop = micaAltBackdrop; break;
+                case BackdropType.DesktopAcrylic: SystemBackdrop = acrylicBackdrop; break;
+                case BackdropType.Blur:
+                    SystemBackdrop = blurBackdrop;
+                    BackgroundMass.Visibility = Visibility.Visible;
+                    break;
+                case BackdropType.Transparent:
+                    SystemBackdrop = transparentTintBackdrop;
+                    BackgroundMass.Visibility = Visibility.Visible;
+                    break;
+                case BackdropType.Image:
+                    BackgroundImageRoot.Visibility = Visibility.Visible;
+                    BackgroundColor.Visibility = Visibility.Visible;
+                    BackgroundMass.Visibility = Visibility.Visible;
+                    if (ImagePath is not null) BackgroundImage.Source = FileHelper.GetImageSource(new Uri(ImagePath));
+                    SystemBackdrop = null;
+                    break;
+                case BackdropType.DefaultColor:
+                    BackgroundColor.Visibility = Visibility.Visible;
+                    SystemBackdrop = null;
+                    break;
+                default: SystemBackdrop = micaBackdrop; break;
+            }
         }
 
         bool isBackground = false;
         static bool isShowClosingDialog = false;
         public void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
         {
-            App.logManager.Log("MainWindow", "Closing...");
-            App.SaveSettings();
+            LogManager.Log("MainWindow", "Closing...");
+            App.Instance.SaveSettings();
             SaveNowPlaying();
 
             if (RunInBackground)
@@ -219,15 +173,7 @@ namespace TewiMP
             if (isShowClosingDialog) return;
             isShowClosingDialog = true;
             HideDialog();
-            //var result = await ShowDialog("再确认一次", "你真的要退出程序吗？", "取消", "确定", null, ContentDialogButton.Primary);
-            //if (result == ContentDialogResult.Primary)
-            //{
-            App.ExitApp();
-            //}
-            //else
-            //{
-            //    HideDialog();
-            //}
+            App.Instance.ExitApp();
             isShowClosingDialog = false;
         }
 
@@ -242,11 +188,11 @@ namespace TewiMP
             var windowPositionX = displayArea.WorkArea.Width / 2 - windowWidth / 2;
             var windowPositionY = displayArea.WorkArea.Height / 2 - windowHeight / 2;
 
-            if (App.LaunchArgs != null)
+            if (App.Instance.LaunchArgs != null)
             {
-                //AddNotify("Args", string.Join(" ||| ", App.LaunchArgs), NotifySeverity.Warning, TimeSpan.FromSeconds(10));
+                //AddNotify("Args", string.Join(" ||| ", App.Instance.LaunchArgs), NotifySeverity.Warning, TimeSpan.FromSeconds(10));
                 List<string> openFiles = [];
-                foreach (var str in App.LaunchArgs)
+                foreach (var str in App.Instance.LaunchArgs)
                 {
                     if (str.Contains(@":\"))
                     {
@@ -255,14 +201,14 @@ namespace TewiMP
                 }
                 foreach (var str in openFiles)
                 {
-                    if (App.LaunchArgs.Contains(str))
+                    if (App.Instance.LaunchArgs.Contains(str))
                     {
-                        App.LaunchArgs.Remove(str);
+                        App.Instance.LaunchArgs.Remove(str);
                     }
                 }
                 AddOpeningMusic(openFiles.ToArray());
 
-                var lagsString = string.Join(" ", App.LaunchArgs);
+                var lagsString = string.Join(" ", App.Instance.LaunchArgs);
                 var lags = lagsString.Split('-');
 
                 var list = lags.ToList();
@@ -330,7 +276,7 @@ namespace TewiMP
                 screenHeight<= windowHeight)
             {
                 if (isPreparedActivate)
-                    SOverlappedPresenter.Maximize();
+                    this.Maximize();
             }
             else
             {
@@ -342,8 +288,9 @@ namespace TewiMP
             if (isPreparedActivate) Activate();
 
             await Task.Delay(500);
+
             List<string> hotKeyUsed = new();
-            foreach (var hotKey in App.hotKeyManager.RegisteredHotKeys)
+            foreach (var hotKey in App.Instance.hotKeyManager.RegisteredHotKeys)
             {
                 if (hotKey.IsUsed)
                 {
@@ -367,21 +314,21 @@ namespace TewiMP
             {
                 foreach (var musicData in await MusicData.FromFile(str))
                 {
-                    App.playingList.Add(musicData); mlist.Add(musicData);
+                    App.Instance.playingList.Add(musicData); mlist.Add(musicData);
                 }
             }
             if (mlist.Count > 0)
             {
-                await App.playingList.Play(mlist.First());
+                await App.Instance.playingList.Play(mlist.First());
             }
         }
 
-        public static async void SaveNowPlaying()
+        public async void SaveNowPlaying()
         {
-            if (App.audioPlayer.MusicData is null) return;
+            if (App.Instance.audioPlayer.MusicData is null) return;
 
             var path = System.IO.Path.Combine(DataFolderBase.UserDataFolder, "LastPlaying");
-            if (!App.LoadLastExitPlayingSongAndSongList)
+            if (!App.Instance.LoadLastExitPlayingSongAndSongList)
             {
                 await Task.Run(() => System.IO.File.Delete(path));
                 return;
@@ -393,56 +340,89 @@ namespace TewiMP
             await Task.Run(() =>
             {
                 JArray array = new JArray();
-                foreach (var a in App.playingList.PlayBehavior == PlayBehavior.随机播放 ? App.playingList.RandomSavePlayingList : App.playingList.NowPlayingList)
+                foreach (var a in App.Instance.playingList.PlayBehavior == PlayBehavior.随机播放 ? App.Instance.playingList.RandomSavePlayingList : App.Instance.playingList.NowPlayingList)
                     array.Add(JObject.FromObject(a));
                 jObject = new JObject() {
-                    { "music", JObject.FromObject(App.audioPlayer.MusicData) },
+                    { "music", JObject.FromObject(App.Instance.audioPlayer.MusicData) },
                     { "list", array }
                 };
             });
             if (jObject is null) return;
             await System.IO.File.WriteAllTextAsync(path, jObject.ToString());
-            App.logManager.Log("SaveNowPlaying", "正在播放列表已保存！");
+            LogManager.Log("SaveNowPlaying", "正在播放列表已保存！");
         }
 
-        public static async void LoadLastPlaying()
+        public async void LoadLastPlaying()
         {
-            if (!App.LoadLastExitPlayingSongAndSongList) return;
+            if (!App.Instance.LoadLastExitPlayingSongAndSongList) return;
             if (isOpeningMusicLoaded) return;
 
             var path = System.IO.Path.Combine(DataFolderBase.UserDataFolder, "LastPlaying");
             if (!System.IO.File.Exists(path)) return;
 
             MusicData musicData = null;
+            JObject jobject = null;
             await Task.Run(() =>
             {
                 var texts = System.IO.File.ReadAllText(path);
-                JObject jobject = JObject.Parse(texts);
+                jobject = JObject.Parse(texts);
                 musicData = JsonNewtonsoft.FromJSON<MusicData>(jobject["music"].ToString());
-
-                foreach (var m in jobject["list"])
-                {
-                    var md = JsonNewtonsoft.FromJSON<MusicData>(m.ToString());
-                    App.playingList.NowPlayingList.Add(md);
-                }
             });
+            foreach (var m in jobject["list"])
+            {
+                var md = JsonNewtonsoft.FromJSON<MusicData>(m.ToString());
+                App.Instance.playingList.NowPlayingList.Add(md);
+            }
 
             if (musicData is null) return;
-            if (App.playingList.PlayBehavior == PlayBehavior.随机播放)
+            if (App.Instance.playingList.PlayBehavior == PlayBehavior.随机播放)
             {
-                App.playingList.SetRandomPlay(PlayBehavior.随机播放);
+                App.Instance.playingList.SetRandomPlay(PlayBehavior.随机播放);
             }
-            await App.playingList.Play(musicData, false);
-            App.audioPlayer.SetPause();
+            await App.Instance.playingList.Play(musicData, false);
+            App.Instance.audioPlayer.SetPause();
         }
 
         #region Window Events
         private void WindowGridBase_Loaded(object sender, RoutedEventArgs e)
         {
+            SetBackdrop(CurrentBackdrop);
+            App.Instance.SMTC.ButtonPressed += SMTC_ButtonPressed;
+            App.Instance.playListReader.Updated += UpdatePlayListButtonUI;
+            App.Instance.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
+            PlayingListScrollControl.PositionToNowPlaying_Button.Click += async (_, __) =>
+            {
+                if (PlayingListBaseView.Items.Contains(App.Instance.audioPlayer.MusicData))
+                {
+                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.audioPlayer.MusicData, ScrollItemPlacement.Center);
+                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
+                }
+            };
+            PlayingListScrollControl.PositionToTop_Button.Click += (_, __) =>
+            {
+                if (PlayingListBaseViewScrollViewer is null)
+                    PlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
+                PlayingListBaseViewScrollViewer.ChangeView(null, 0, null);
+            };
+            PlayingListScrollControl.PositionToBottom_Button.Click += (_, __) =>
+            {
+                if (PlayingListBaseViewScrollViewer is null)
+                    PlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
+                PlayingListBaseViewScrollViewer.ChangeView(null, PlayingListBaseViewScrollViewer.ScrollableHeight, null);
+            };
+
+            Canvas.SetZIndex(AppTitleBar, 1);
+
+            StaringPrepare();
+            LoadLastPlaying();
+            //NotifyListView.ItemsSource = NotifyList;
+            //PlayingListBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
+            //VolumeBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
+
             NavView.SelectedItem = NavView.MenuItems[1];
             NavView.IsBackEnabled = false;
 
-            PlayingListBaseView.ItemsSource = App.playingList.NowPlayingList;
+            PlayingListBaseView.ItemsSource = App.Instance.playingList.NowPlayingList;
             //SystemNavigationManager.GetForCurrentView().BackRequested += (_, __) => { TryGoBack(); };
 #if DEBUG
             DebugViewPopup.XamlRoot = WindowGridBase.XamlRoot;
@@ -452,26 +432,27 @@ namespace TewiMP
 
         private void WindowGridBase_ActualThemeChanged(FrameworkElement sender, object args)
         {
-            if (MainWindow.m_currentBackdrop == BackdropType.DesktopAcrylic)
+            if (CurrentBackdrop == BackdropType.DesktopAcrylic)
             {
-                SetBackdrop(BackdropType.DesktopAcrylic);
+                // TODO
+                //acrylicBackdrop
             }
-            InitializeTitleBar(SWindowGridBaseTop.RequestedTheme);
+            InitializeTitleBar(WindowGridBase.RequestedTheme);
         }
 
         private void UpdateWhenDataLated()
         {
-            AudioPlayer_SourceChanged(App.audioPlayer);
-            AudioPlayer_PlayStateChanged(App.audioPlayer);
-            AudioPlayer_CacheLoadedChanged(App.audioPlayer);
-            AudioPlayer_TimingChanged(App.audioPlayer);
-            AudioPlayer_VolumeChanged(App.audioPlayer, App.audioPlayer.Volume);
-            PlayingList_NowPlayingImageLoaded(App.playingList.NowPlayingImage, null);
-            LyricManager_PlayingLyricSelectedChange(App.lyricManager.NowLyricsData);
-            PlayingList_PlayingListItemChange(App.playingList.NowPlayingList);
+            AudioPlayer_SourceChanged(App.Instance.audioPlayer);
+            AudioPlayer_PlayStateChanged(App.Instance.audioPlayer);
+            AudioPlayer_CacheLoadedChanged(App.Instance.audioPlayer);
+            AudioPlayer_TimingChanged(App.Instance.audioPlayer);
+            AudioPlayer_VolumeChanged(App.Instance.audioPlayer, App.Instance.audioPlayer.Volume);
+            PlayingList_NowPlayingImageLoaded(App.Instance.playingList.NowPlayingImage, null);
+            LyricManager_PlayingLyricSelectedChange(App.Instance.lyricManager.NowLyricsData);
+            PlayingList_PlayingListItemChange(App.Instance.playingList.NowPlayingList);
             UpdataDownloadPageButtonInfoBadgeText();
-            App.audioPlayer.ReCallTiming();
-            App.logManager.Log("MainWindow", "Data Updated.");
+            App.Instance.audioPlayer.ReCallTiming();
+            LogManager.Log("MainWindow", "Data Updated.");
         }
 
         bool isFirstWindowActivity = true;
@@ -482,61 +463,60 @@ namespace TewiMP
             if (isFirstWindowActivity)
             {
                 isFirstWindowActivity = false;
-                App.CheckUpdate();
+                App.Instance.CheckUpdate();
             }
             if (isAddEvents) return;
             //AutoScrollViewerFirst.Pause = false;
             //AutoScrollViewerSecond.Pause = false;
-            App.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-            App.audioPlayer.PlayEnd += AudioPlayer_PlayEnd;
-            App.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-            App.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
-            App.audioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
-            App.audioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
-            App.playingList.NowPlayingImageLoading += PlayingList_NowPlayingImageLoading;
-            App.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
-            App.playingList.PlayingListItemChange += PlayingList_PlayingListItemChange;
+            App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+            App.Instance.audioPlayer.PlayEnd += AudioPlayer_PlayEnd;
+            App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+            App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+            App.Instance.audioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
+            App.Instance.audioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
+            App.Instance.playingList.NowPlayingImageLoading += PlayingList_NowPlayingImageLoading;
+            App.Instance.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+            App.Instance.playingList.PlayingListItemChange += PlayingList_PlayingListItemChange;
 
-            App.downloadManager.AddDownload += DownloadManager_AddDownload;
-            App.downloadManager.OnDownloadedSaving += DownloadManager_AddDownload;
-            App.downloadManager.OnDownloadedPreview += DownloadManager_AddDownload;
-            App.downloadManager.OnDownloaded += DownloadManager_AddDownload;
-            App.downloadManager.OnDownloadError += DownloadManager_AddDownload;
+            App.Instance.downloadManager.AddDownload += DownloadManager_AddDownload;
+            App.Instance.downloadManager.OnDownloadedSaving += DownloadManager_AddDownload;
+            App.Instance.downloadManager.OnDownloadedPreview += DownloadManager_AddDownload;
+            App.Instance.downloadManager.OnDownloaded += DownloadManager_AddDownload;
+            App.Instance.downloadManager.OnDownloadError += DownloadManager_AddDownload;
 
             isAddEvents = true;
             UpdateWhenDataLated();
             MainViewStateChanged?.Invoke(true);
-            App.logManager.Log("MainWindow", "Added Events.");
+            LogManager.Log("MainWindow", "Added Events.");
         }
 
         private void RemoveEvents()
         {
             //AutoScrollViewerFirst.Pause = true;
             //AutoScrollViewerSecond.Pause = true;
-            App.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
-            App.audioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
-            App.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-            App.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
-            App.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
-            App.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
-            App.playingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
-            App.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-            App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
-            App.playingList.PlayingListItemChange -= PlayingList_PlayingListItemChange;
+            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            App.Instance.audioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
+            App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+            App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+            App.Instance.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
+            App.Instance.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
+            App.Instance.playingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
+            App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
+            App.Instance.playingList.PlayingListItemChange -= PlayingList_PlayingListItemChange;
 
-            App.downloadManager.AddDownload -= DownloadManager_AddDownload;
-            App.downloadManager.OnDownloadedSaving -= DownloadManager_AddDownload;
-            App.downloadManager.OnDownloadedPreview -= DownloadManager_AddDownload;
-            App.downloadManager.OnDownloaded -= DownloadManager_AddDownload;
-            App.downloadManager.OnDownloadError -= DownloadManager_AddDownload;
+            App.Instance.downloadManager.AddDownload -= DownloadManager_AddDownload;
+            App.Instance.downloadManager.OnDownloadedSaving -= DownloadManager_AddDownload;
+            App.Instance.downloadManager.OnDownloadedPreview -= DownloadManager_AddDownload;
+            App.Instance.downloadManager.OnDownloaded -= DownloadManager_AddDownload;
+            App.Instance.downloadManager.OnDownloadError -= DownloadManager_AddDownload;
 
             isAddEvents = false;
             MainViewStateChanged?.Invoke(false);
-            App.logManager.Log("MainWindow", "Removed Events.");
+            LogManager.Log("MainWindow", "Removed Events.");
         }
 
-        static ApplicationTheme applicationTheme = App.Current.RequestedTheme;
-        public static bool isMinSize = false;
+        public bool isMinSize = false;
         private void MainWindow_Activated(object sender, WindowActivatedEventArgs args)
         {
             if (isBackground)
@@ -565,7 +545,7 @@ namespace TewiMP
                 if (CodeHelper.IsIconic(Handle))
                 {
                     SaveNowPlaying();
-                    App.SaveSettings();
+                    App.Instance.SaveSettings();
 
                     isMinSize = true;
                     WindowViewStateChanged?.Invoke(false);
@@ -590,47 +570,17 @@ namespace TewiMP
             {
                 AddEvents();
             }
-            SetDragRegionForCustomTitleBar(MainWindow.AppWindowInstance);
-        }
-
-        private static void Window_Activated(object sender, WindowActivatedEventArgs args)
-        {
-            //SetBackdrop(BackdropType.DesktopAcrylic);
-            if (!isAcrylicBackdrop) UpdateWindowBackdropTheme();
-            if (m_currentBackdrop != BackdropType.DefaultColor)
-            {
-                m_configurationSource.IsInputActive = args.WindowActivationState != WindowActivationState.Deactivated;
-            }
-        }
-
-        public static void UpdateWindowBackdropTheme()
-        {
-            if (m_configurationSource is null) return;
-            switch (SWindowGridBaseTop.RequestedTheme)
-            {
-                case ElementTheme.Light:
-                    m_configurationSource.Theme = SystemBackdropTheme.Light; break;
-                case ElementTheme.Dark:
-                    m_configurationSource.Theme = SystemBackdropTheme.Dark; break;
-                default:
-                    m_configurationSource.Theme = SystemBackdropTheme.Default; break;
-            }
-            m_micaController?.SetSystemBackdropConfiguration(m_configurationSource);
-            //m_micaController.Kind = MicaKind.BaseAlt;
-        }
-
-        private static void Window_Closed(object sender, WindowEventArgs args)
-        {
+            SetDragRegionForCustomTitleBar();
         }
 
         private async void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            SetDragRegionForCustomTitleBar(MainWindow.AppWindowInstance);
+            SetDragRegionForCustomTitleBar();
 #if DEBUG
             DebugView_Detail_WindowSizeRun.Text = $"{WindowGridBase.ActualWidth}x{WindowGridBase.ActualHeight}";
             DebugViewPopup.VerticalOffset = AppWindow.Size.Height;
 #endif
-            //NotifyListView.Padding = new(0, SWindowGridBase.ActualHeight, 0, 12);
+            //NotifyListView.Padding = new(0, GridBase.ActualHeight, 0, 12);
             /*
             if (NotifyList.Any())
             {
@@ -639,25 +589,20 @@ namespace TewiMP
             }*/
         }
 
-        private void ContentFrame_Loaded(object sender, RoutedEventArgs e)
-        {
-            SContentFrame = ContentFrame;
-        }
-
         private void NotifyArea_Loaded(object sender, RoutedEventArgs e)
         {
             //SNotifyListViewScrollViewer = (VisualTreeHelper.GetChild(NotifyListView, 0) as Border).Child as ScrollViewer;
             //AddNotify("测试版本", "此应用程序是一份内测版本。", NotifySeverity.Warning, TimeSpan.MaxValue);
         }
         
-        public static void UpdatePlayListFlyoutHeight()
+        public void UpdatePlayListFlyoutHeight()
         {
             try
             {
                 if (InOpenMusicPage)
-                    SPlayingListBaseGrid.Height = SWindowGridBaseTop.ActualHeight - 130;
+                    PlayingListBaseGrid.Height = WindowGridBase.ActualHeight - 130;
                 else
-                    SPlayingListBaseGrid.Height = SWindowGridBaseTop.ActualHeight - 155;
+                    PlayingListBaseGrid.Height = WindowGridBase.ActualHeight - 155;
             }
             catch { }
         }
@@ -668,7 +613,7 @@ namespace TewiMP
         {
             if (AppWindowTitleBar.IsCustomizationSupported())
             {
-                InitializeTitleBar(AppWindowInstance.TitleBar, theme);
+                InitializeTitleBar(AppWindow.TitleBar, theme);
             }
             else
             {
@@ -698,7 +643,7 @@ namespace TewiMP
 
             bool defaultLightTheme = false;
             bool defaultDarkTheme = false;
-            AppWindowInstance.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
+            bar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             if (theme == ElementTheme.Default)
             {
                 defaultLightTheme = App.Current.RequestedTheme == ApplicationTheme.Light;
@@ -736,18 +681,18 @@ namespace TewiMP
         {
             AsyncDialog = new ContentDialog()
             {
-                XamlRoot = SContent.XamlRoot,
+                XamlRoot = Content.XamlRoot,
                 CloseButtonCommand = null
             };
             //ShowDialog("Initing Dialog...", "");
             HideDialog();
         }
 
-        static bool isFirstDialogShow = true;
-        static ScrollViewer dialogScrollViewer = new() { HorizontalScrollMode = ScrollMode.Disabled };
-        static bool dialogShow = false;
-        static List<object[]> dialogShowObjects = new();
-        public static async Task<ContentDialogResult> ShowDialog(
+        bool isFirstDialogShow = true;
+        ScrollViewer dialogScrollViewer = new() { HorizontalScrollMode = ScrollMode.Disabled };
+        bool dialogShow = false;
+        List<object[]> dialogShowObjects = new();
+        public async Task<ContentDialogResult> ShowDialog(
             object title, object content,
             string closeButtonText = "确定", string primaryButtonText = null, string secondaryButtonText = null,
             ContentDialogButton defaultButton = ContentDialogButton.None,
@@ -773,8 +718,8 @@ namespace TewiMP
                     AsyncDialog.SecondaryButtonText = secondaryButtonText;
                     AsyncDialog.FullSizeDesired = fullSizeDesired;
                     AsyncDialog.CloseButtonCommand = null;
-                    AsyncDialog.XamlRoot = SContent.XamlRoot;
-                    AsyncDialog.RequestedTheme = SWindowGridBaseTop.RequestedTheme;
+                    AsyncDialog.XamlRoot = Content.XamlRoot;
+                    AsyncDialog.RequestedTheme = WindowGridBase.RequestedTheme;
                     AsyncDialog.DefaultButton = defaultButton;
                     result = await AsyncDialog.ShowAsync();
                     dialogShow = false;
@@ -798,28 +743,28 @@ namespace TewiMP
             }
         }
 
-        static Pages.DialogPages.EqualizerPage equalizerPage { get; set; }
-        public static async Task ShowEqualizerDialog()
+        Pages.DialogPages.EqualizerPage equalizerPage { get; set; }
+        public async Task ShowEqualizerDialog()
         {
             await ShowDialog("音频设置", new Pages.DialogPages.EqualizerPage());
         }
 
-        static StackPanel loadingst = new();
-        static ProgressRing loadingprogress = new() { IsIndeterminate = true, Width = 50, Height = 50 };
-        static TextBlock loadingtextBlock = new() { Text = "", HorizontalAlignment = HorizontalAlignment.Center, TextWrapping = TextWrapping.Wrap };
-        public static async void ShowLoadingDialog(string title = "正在加载")
+        StackPanel loadingst = new();
+        ProgressRing loadingprogress = new() { IsIndeterminate = true, Width = 50, Height = 50 };
+        TextBlock loadingtextBlock = new() { Text = "", HorizontalAlignment = HorizontalAlignment.Center, TextWrapping = TextWrapping.Wrap };
+        public async void ShowLoadingDialog(string title = "正在加载")
         {
             SetLoadingText("");
             SetLoadingProgressRingValue(100, 0);
             await ShowDialog(title, loadingst, "后台", null);
         }
 
-        public static void SetLoadingText(string text)
+        public void SetLoadingText(string text)
         {
             loadingtextBlock.Text = text;
         }
 
-        public static void SetLoadingProgressRingValue(int maximum, int value)
+        public void SetLoadingProgressRingValue(int maximum, int value)
         {
             if (value == 0) loadingprogress.IsIndeterminate = true;
             else loadingprogress.IsIndeterminate = false;
@@ -827,17 +772,17 @@ namespace TewiMP
             loadingprogress.Value = value;
         }
 
-        public static void HideDialog()
+        public void HideDialog()
         {
             AsyncDialog.Hide();
         }
 
-        public static NotifyItem AddNotify(string title, string message, NotifySeverity severity = NotifySeverity.Info, TimeSpan? residenceTime = null, string buttonMessage = null, Action buttonAction = null)
+        public NotifyItem AddNotify(string title, string message, NotifySeverity severity = NotifySeverity.Info, TimeSpan? residenceTime = null, string buttonMessage = null, Action buttonAction = null)
         {
             return AddNotify(new(title, message, severity, residenceTime, buttonMessage, buttonAction));
         }
 
-        public static NotifyItem AddNotify(NotifyItemData notifyItemData)
+        public NotifyItem AddNotify(NotifyItemData notifyItemData)
         {
             var notifyItem = new NotifyItem();
             notifyItem.SetNotifyItemData(notifyItemData);
@@ -851,28 +796,28 @@ namespace TewiMP
                 BorderBrush = App.Current.Resources["ControlElevationBorderBrush"] as Brush,
                 CornerRadius = new(8)
             };*/
-            SNotifyStackPanel.Children.Add(notifyItem);
+            NotifyStackPanel.Children.Add(notifyItem);
             if (notifyItemData.ResidenceTime != TimeSpan.MaxValue)
                 NotifyCountDown(notifyItem);
             return notifyItem;
         }
 
-        public static void RemoveNotifyItem(NotifyItem notifyItem)
+        public void RemoveNotifyItem(NotifyItem notifyItem)
         {
-            if (SNotifyStackPanel.Children.Contains(notifyItem))
-                SNotifyStackPanel.Children.Remove(notifyItem);
+            if (NotifyStackPanel.Children.Contains(notifyItem))
+                NotifyStackPanel.Children.Remove(notifyItem);
         }
 
-        public static void NotifyCountDown(NotifyItem notifyItem)
+        public void NotifyCountDown(NotifyItem notifyItem)
         {
             NotifyCountDown(notifyItem.GetNotifyItemData(), notifyItem);
         }
 
-        public static async void NotifyCountDown(NotifyItemData notifyItemData, NotifyItem notifyItem)
+        public async void NotifyCountDown(NotifyItemData notifyItemData, NotifyItem notifyItem)
         {
             if (notifyItemData.ResidenceTime == TimeSpan.MaxValue) return;
             await Task.Delay(notifyItemData.ResidenceTime);
-            SNotifyStackPanel.Children.Remove(notifyItem);
+            NotifyStackPanel.Children.Remove(notifyItem);
         }
         #endregion
 
@@ -884,12 +829,12 @@ namespace TewiMP
 
         private void UpdataDownloadPageButtonInfoBadgeText()
         {
-            if (App.downloadManager.AllDownloadData.Any())
+            if (App.Instance.downloadManager.AllDownloadData.Any())
             {
-                if (App.downloadManager.DownloadingData.Any())
+                if (App.Instance.downloadManager.DownloadingData.Any())
                 {
                     DownloadPageButtonInfoBadge.Opacity = 1;
-                    DownloadPageButtonInfoBadge.Value = App.downloadManager.AllDownloadData.Count - App.downloadManager.DownloadedData.Count;
+                    DownloadPageButtonInfoBadge.Value = App.Instance.downloadManager.AllDownloadData.Count - App.Instance.downloadManager.DownloadedData.Count;
                 }
                 else
                 {
@@ -907,7 +852,7 @@ namespace TewiMP
 
         private void SetLyricToNormal()
         {
-            AppTitleTextBlock.Text = $"{App.AppName}";
+            AppTitleTextBlock.Text = $"{App.Instance.AppName}";
             LyricTextBlock.Text = null;
         }
 
@@ -920,10 +865,10 @@ namespace TewiMP
                 if (!_.Lyric.Any()) { SetLyricToNormal(); return; }
 
                 int tcount = 1;
-                int num = App.lyricManager.NowPlayingLyrics.IndexOf(_);
+                int num = App.Instance.lyricManager.NowPlayingLyrics.IndexOf(_);
                 try
                 {
-                    while (_?.Lyric?.FirstOrDefault() == App.lyricManager.NowPlayingLyrics[num + tcount]?.Lyric?.FirstOrDefault())
+                    while (_?.Lyric?.FirstOrDefault() == App.Instance.lyricManager.NowPlayingLyrics[num + tcount]?.Lyric?.FirstOrDefault())
                     {
                         tcount++;
                     }
@@ -934,20 +879,20 @@ namespace TewiMP
                     ? _?.Lyric?.FirstOrDefault()
                     : $"{_?.Lyric?.FirstOrDefault()} (x{tcount})";
 
-                AppTitleTextBlock.Text = $"{App.AppName} -";
+                AppTitleTextBlock.Text = $"{App.Instance.AppName} -";
                 LyricTextBlock.Text = $" {t1text}";
             }
             catch (Exception err)
             {
-                App.logManager.Log("MainWindow", "LyricManager_PlayingLyricSelectedChange: " + err.Message);
+                LogManager.Log("MainWindow", "LyricManager_PlayingLyricSelectedChange: " + err.Message);
             }
         }
 
-        public static void Invoke(Action action)
+        public void Invoke(Action action)
         {
-            if (SWindowGridBase is not null)
+            if (GridBase is not null)
             {
-                if (SWindowGridBase.DispatcherQueue is not null) SWindowGridBase.DispatcherQueue?.TryEnqueue(() => action());
+                if (GridBase.DispatcherQueue is not null) GridBase.DispatcherQueue?.TryEnqueue(() => action());
                 else action();
             }
             else action();
@@ -960,10 +905,10 @@ namespace TewiMP
                 switch (args.Button)
                 {
                     case Windows.Media.SystemMediaTransportControlsButton.Play:
-                        App.audioPlayer.SetPlay();
+                        App.Instance.audioPlayer.SetPlay();
                         break;
                     case Windows.Media.SystemMediaTransportControlsButton.Pause:
-                        App.audioPlayer.SetPause();
+                        App.Instance.audioPlayer.SetPause();
                         break;
                     case Windows.Media.SystemMediaTransportControlsButton.Previous:
                         PlayBeforeButton_Click(null, null);
@@ -972,7 +917,7 @@ namespace TewiMP
                         PlayNextButton_Click(null, null);
                         break;
                     case Windows.Media.SystemMediaTransportControlsButton.Stop:
-                        App.audioPlayer.SetStop();
+                        App.Instance.audioPlayer.SetStop();
                         break;
                 }
             });
@@ -980,7 +925,7 @@ namespace TewiMP
 
         private void PlayingList_PlayingListItemChange(ObservableCollection<MusicData> nowPlayingList)
         {
-            //PlayingListBaseView.SelectedItem = App.audioPlayer.MusicData;
+            //PlayingListBaseView.SelectedItem = App.Instance.audioPlayer.MusicData;
         }
 
         private void AudioPlayer_VolumeChanged(Media.AudioPlayer audioPlayer, object data)
@@ -991,15 +936,25 @@ namespace TewiMP
             if (volume == 0)
             {
                 VolumeIconBase.Glyph = "\xE198";
+                VolumeIconBase1.Glyph = "\xE198";
             }
             else
             {
                 if (volume <= 100 && volume > 67)
+                {
                     VolumeIconBase.Glyph = "\xE995";
+                    VolumeIconBase1.Glyph = "\xE995";
+                }
                 else if (volume <= 67 && volume > 33)
+                {
                     VolumeIconBase.Glyph = "\xE994";
+                    VolumeIconBase1.Glyph = "\xE994";
+                }
                 else if (volume <= 33)
+                {
                     VolumeIconBase.Glyph = "\xE993";
+                    VolumeIconBase1.Glyph = "\xE993";
+                }
             }
         }
 
@@ -1046,9 +1001,9 @@ namespace TewiMP
 
         }
 
-        public static void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
+        public void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
         {
-            var im = SPlayContent.Content as ImageEx;
+            var im = PlayContent.Content as ImageEx;
             if (im is null) return;
             if (imageSource is null)
             {
@@ -1059,7 +1014,7 @@ namespace TewiMP
             if (imageSource != im.Source)
             {
                 im.Source = imageSource;
-                im.SaveName = $"{App.audioPlayer.MusicData.Title} · {App.audioPlayer.MusicData.Album.Title}";
+                im.SaveName = $"{App.Instance.audioPlayer.MusicData.Title} · {App.Instance.audioPlayer.MusicData.Album.Title}";
                 im.BorderThickness = new(1);
             }
 
@@ -1090,7 +1045,7 @@ namespace TewiMP
                         if (animation != null)
                         {
                             animation.Completed += (_, __) => i.InfoRoot.Opacity = 1;
-                            animation.TryStart(VisualTreeHelper.GetParent(SPlayContent) as UIElement);
+                            animation.TryStart(VisualTreeHelper.GetParent(PlayContent) as UIElement);
                         }
 
                         ConnectedAnimation canimation1 =
@@ -1122,13 +1077,13 @@ namespace TewiMP
             if (audioPlayer.PlaybackState == PlaybackState.Playing)
             {
                 PlayRing.Foreground = App.Current.Resources["AccentAAFillColorDefaultBrush"] as SolidColorBrush;
-                App.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
-                App.lyricManager.StartTimer();
+                App.Instance.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
+                App.Instance.lyricManager.StartTimer();
             }
             else
             {
                 PlayRing.Foreground = App.Current.Resources["SystemFillColorCautionBrush"] as SolidColorBrush;
-                App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
+                App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
             }
 
             MediaPlayStateViewer.PlaybackState = audioPlayer.PlaybackState;
@@ -1144,228 +1099,6 @@ namespace TewiMP
         }
         #endregion
 
-        #region Enable Window Backdrop
-        public enum BackdropType
-        {
-            Mica,
-            MicaAlt,
-            DesktopAcrylic,
-            Image,
-            DefaultColor
-        }
-
-        static WindowHelpers.WindowsSystemDispatcherQueueHelper m_wsdqHelper;
-        public static BackdropType m_currentBackdrop;
-        static MicaController m_micaController;
-        static DesktopAcrylicController m_acrylicController;
-        static SystemBackdropConfiguration m_configurationSource;
-        public static string ImagePath = null;
-
-
-        public static void SetBackdrop(BackdropType type, bool disappearDo = false)
-        {
-            m_currentBackdrop = BackdropType.DefaultColor;
-            if (m_micaController != null)
-            {
-                m_micaController.Dispose();
-                m_micaController = null;
-            }
-            if (m_acrylicController != null)
-            {
-                m_acrylicController.Dispose();
-                m_acrylicController = null;
-            }
-            SWindow.Activated -= Window_Activated;
-            SWindow.Closed -= Window_Closed;
-            m_configurationSource = null;
-
-            if (type == BackdropType.Mica)
-            {
-                if (TrySetMicaBackdrop())
-                {
-                    m_currentBackdrop = type;
-                }
-                else
-                {
-                    type = BackdropType.DesktopAcrylic;
-                }
-            }
-            if (type == BackdropType.MicaAlt)
-            {
-                if (TrySetMicaBackdrop(true))
-                {
-                    m_currentBackdrop = type;
-                }
-                else
-                {
-                    type = BackdropType.DesktopAcrylic;
-                }
-            }
-            if (type == BackdropType.DesktopAcrylic)
-            {
-                if (TrySetAcrylicBackdrop())
-                {
-                    m_currentBackdrop = type;
-                }
-            }
-            if (type == BackdropType.DefaultColor)
-                m_currentBackdrop = BackdropType.DefaultColor;
-            if (type == BackdropType.DefaultColor || type == BackdropType.Image)
-            {
-                SBackgroundColor.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                SBackgroundColor.Visibility = Visibility.Collapsed;
-            }
-            if (type == BackdropType.Image)
-            {
-                m_currentBackdrop = BackdropType.Image;
-                SBackgroundImageRoot.Visibility = Visibility.Visible;
-                var image = new BitmapImage();
-                if (ImagePath != null)
-                    image.UriSource = new Uri(ImagePath);
-                SBackgroundImage.Source = image;
-            }
-            else
-            {
-                SBackgroundImageRoot.Visibility = Visibility.Collapsed;
-                SBackgroundImage.Source = null;
-            }
-        }
-
-        static bool TrySetMicaBackdrop(bool alt = false)
-        {
-            if (MicaController.IsSupported())
-            {
-                m_configurationSource = new SystemBackdropConfiguration();
-                SWindow.Activated += Window_Activated;
-                SWindow.Closed += Window_Closed;
-
-                m_configurationSource.IsInputActive = true;
-                switch (SWindowGridBaseTop.RequestedTheme)
-                {
-                    case ElementTheme.Dark: m_configurationSource.Theme = SystemBackdropTheme.Dark; break;
-                    case ElementTheme.Light: m_configurationSource.Theme = SystemBackdropTheme.Light; break;
-                    case ElementTheme.Default: m_configurationSource.Theme = SystemBackdropTheme.Default; break;
-                }
-
-                m_micaController = new MicaController() { Kind = alt ? MicaKind.BaseAlt : MicaKind.Base };
-                m_micaController.AddSystemBackdropTarget(SWindow.As<ICompositionSupportsSystemBackdrop>());
-                m_micaController.SetSystemBackdropConfiguration(m_configurationSource);
-                isAcrylicBackdrop = false;
-                return true;
-            }
-
-            return false;
-        }
-
-        static bool isAcrylicBackdrop = false;
-        static bool TrySetAcrylicBackdrop()
-        {
-            if (DesktopAcrylicController.IsSupported())
-            {
-                m_configurationSource = new SystemBackdropConfiguration();
-                SWindow.Activated += Window_Activated;
-                SWindow.Closed += Window_Closed;
-
-                m_configurationSource.IsInputActive = true;
-                switch (SWindowGridBaseTop.RequestedTheme)
-                {
-                    case ElementTheme.Dark: m_configurationSource.Theme = SystemBackdropTheme.Dark; break;
-                    case ElementTheme.Light: m_configurationSource.Theme = SystemBackdropTheme.Light; break;
-                    case ElementTheme.Default: m_configurationSource.Theme = SystemBackdropTheme.Default; break;
-                }
-
-                m_acrylicController = new DesktopAcrylicController();
-
-                ElementTheme elementTheme = SWindowGridBaseTop.RequestedTheme;
-                if (elementTheme == ElementTheme.Default)
-                {
-                    elementTheme = App.Current.RequestedTheme == ApplicationTheme.Light ? ElementTheme.Light : ElementTheme.Dark;
-                }
-
-                if (elementTheme == ElementTheme.Dark)
-                {
-                    m_acrylicController.LuminosityOpacity = 1f;
-                    m_acrylicController.TintOpacity = 0.5f;
-                    m_acrylicController.TintColor = Color.FromArgb(255, 32, 32, 32);
-                }
-                else if (elementTheme == ElementTheme.Light)
-                {
-                    m_acrylicController.LuminosityOpacity = 1f;
-                    m_acrylicController.TintOpacity = 0.5f;
-                    m_acrylicController.TintColor = Color.FromArgb(255, 245, 245, 245);
-                }
-
-                m_acrylicController.AddSystemBackdropTarget(SWindow.As<ICompositionSupportsSystemBackdrop>());
-                m_acrylicController.SetSystemBackdropConfiguration(m_configurationSource);
-                isAcrylicBackdrop = true;
-                return true;
-            }
-
-            return false;
-        }
-        #endregion
-
-        #region Window MinSize Setter
-        private delegate IntPtr WinProc(IntPtr hWnd, PInvoke.User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
-        private WinProc newWndProc = null;
-        private IntPtr oldWndProc = IntPtr.Zero;
-        [DllImport("user32")]
-        private static extern IntPtr SetWindowLong(IntPtr hWnd, PInvoke.User32.WindowLongIndexFlags nIndex, WinProc newProc);
-        [DllImport("user32.dll")]
-        static extern IntPtr CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, PInvoke.User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam);
-
-        private void SubClassing()
-        {
-            //Get the Window's HWND
-            var hwnd = this.As<IWindowNative>().WindowHandle;
-
-            newWndProc = new WinProc(NewWindowProc);
-            oldWndProc = SetWindowLong(hwnd, PInvoke.User32.WindowLongIndexFlags.GWL_WNDPROC, newWndProc);
-        }
-
-        int MinWidth = 460;
-        int MinHeight = 460;
-
-        [StructLayout(LayoutKind.Sequential)]
-        struct MINMAXINFO
-        {
-            public PInvoke.POINT ptReserved;
-            public PInvoke.POINT ptMaxSize;
-            public PInvoke.POINT ptMaxPosition;
-            public PInvoke.POINT ptMinTrackSize;
-            public PInvoke.POINT ptMaxTrackSize;
-        }
-
-        private IntPtr NewWindowProc(IntPtr hWnd, PInvoke.User32.WindowMessage Msg, IntPtr wParam, IntPtr lParam)
-        {
-            switch (Msg)
-            {
-                case PInvoke.User32.WindowMessage.WM_GETMINMAXINFO:
-                    var dpi = PInvoke.User32.GetDpiForWindow(hWnd);
-                    float scalingFactor = (float)dpi / 96;
-
-                    MINMAXINFO minMaxInfo = Marshal.PtrToStructure<MINMAXINFO>(lParam);
-                    minMaxInfo.ptMinTrackSize.x = (int)(MinWidth * scalingFactor);
-                    minMaxInfo.ptMinTrackSize.y = (int)(MinHeight * scalingFactor);
-                    Marshal.StructureToPtr(minMaxInfo, lParam, true);
-                    break;
-
-            }
-            return CallWindowProc(oldWndProc, hWnd, Msg, wParam, lParam);
-        }
-
-        [ComImport]
-        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
-        [Guid("EECDBF0E-BAE9-4CB6-A68E-9598E1CB57BB")]
-        internal interface IWindowNative
-        {
-            IntPtr WindowHandle { get; }
-        }
-        #endregion
-
         #region Animate Icon Events
         private void Button_PointerEntered(object sender, PointerRoutedEventArgs e)
         {
@@ -1377,19 +1110,19 @@ namespace TewiMP
             //AnimatedIcon.SetState(this.BackAnimatedIcon, "Normal");
         }
 
-        private void SetDragRegionForCustomTitleBar(AppWindow appWindow)
+        private void SetDragRegionForCustomTitleBar()
         {
             // Check to see if customization is supported.
             // Currently only supported on Windows 11.
             if (AppWindowTitleBar.IsCustomizationSupported()
-                && appWindow.TitleBar.ExtendsContentIntoTitleBar)
+                && AppWindow.TitleBar.ExtendsContentIntoTitleBar)
             {
                 double scaleAdjustment = CodeHelper.GetScaleAdjustment(this);
-                double rpc = appWindow.TitleBar.RightInset / scaleAdjustment;
-                double lpc = appWindow.TitleBar.LeftInset / scaleAdjustment;
+                double rpc = AppWindow.TitleBar.RightInset / scaleAdjustment;
+                double lpc = AppWindow.TitleBar.LeftInset / scaleAdjustment;
 
-                //RightPaddingColumn.Width = new GridLength(appWindow.TitleBar.RightInset / scaleAdjustment);
-                //LeftPaddingColumn.Width = new GridLength(appWindow.TitleBar.LeftInset / scaleAdjustment);
+                //RightPaddingColumn.Width = new GridLength(AppWindow.TitleBar.RightInset / scaleAdjustment);
+                //LeftPaddingColumn.Width = new GridLength(AppWindow.TitleBar.LeftInset / scaleAdjustment);
 
                 List<RectInt32> dragRectsList = new();
 
@@ -1405,12 +1138,12 @@ namespace TewiMP
                 dragRectR.X = (int)((NavView.DisplayMode == NavigationViewDisplayMode.Minimal ? 84 * scaleAdjustment : 44 * scaleAdjustment));
                 dragRectR.Y = 0;
                 dragRectR.Height = (int)(AppTitleBar.ActualHeight * scaleAdjustment);
-                dragRectR.Width = (int)(scaleAdjustment * AppWindowInstance.Size.Width);
+                dragRectR.Width = (int)(scaleAdjustment * AppWindow.Size.Width);
                 dragRectsList.Add(dragRectR);
 
                 RectInt32[] dragRects = dragRectsList.ToArray();
 
-                appWindow.TitleBar.SetDragRectangles(dragRects);
+                AppWindow.TitleBar.SetDragRectangles(dragRects);
             }
         }
         #endregion
@@ -1418,7 +1151,7 @@ namespace TewiMP
         #region NavView Events
         public async void OpenPlayListNavView()
         {
-            await App.playListReader.Refresh();
+            await App.Instance.playListReader.Refresh();
             if (NavView.DisplayMode == NavigationViewDisplayMode.Expanded)
             {
                 MusicPlayListButton.IsExpanded = true;
@@ -1432,7 +1165,7 @@ namespace TewiMP
                 nvi.Tag = null;
             }
             MusicPlayListButton.MenuItems.Clear();
-            foreach (var i in App.playListReader.NowMusicListData)
+            foreach (var i in App.Instance.playListReader.NowMusicListData)
             {
                 var nvi = new NavigationViewItem() { Content = i.ListShowName, Tag = i };
                 MusicPlayListButton.MenuItems.Add(nvi);
@@ -1443,24 +1176,22 @@ namespace TewiMP
         {
             NavViewContentBase_RGClip.Rect = new Windows.Foundation.Rect(0, 0,
                 NavViewContentBase.ActualWidth,
-                AppWindowInstance.Size.Height - AppTitleBar.ActualHeight);
+                AppWindow.Size.Height - AppTitleBar.ActualHeight);
         }
 
-        public static void SetNavViewContent(Type type, object param = null, NavigationTransitionInfo navigationTransitionInfo = null)
+        public void SetNavViewContent(Type type, object param = null, NavigationTransitionInfo navigationTransitionInfo = null)
         {
             if (navigationTransitionInfo is null) navigationTransitionInfo = new EntranceNavigationTransitionInfo();
-            SContentFrame.Navigate(type, param, navigationTransitionInfo);
-            SNavView.IsBackEnabled = SContentFrame.CanGoBack;
+            ContentFrame.Navigate(type, param, navigationTransitionInfo);
+            NavView.IsBackEnabled = ContentFrame.CanGoBack;
             UpdateNavViewSelectedItem(true);
             /*if (type == typeof(ItemListView))
             {
-                SNavView.SelectedItem = null;
+                NavView.SelectedItem = null;
             }*/
         }
 
-        public static NavigationView SNavView;
-        public static Frame SContentFrame;
-        public static bool IsBackRequest = false;
+        public bool IsBackRequest = false;
         private async void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (IsBackRequest || sender.SelectedItem is null || IsJustUpdate)
@@ -1471,26 +1202,26 @@ namespace TewiMP
             NavigationViewItem item = sender.SelectedItem as NavigationViewItem;
             if (item is null) return;
             
-            if (item == SNavView.MenuItems[1] as NavigationViewItem)
+            if (item == NavView.MenuItems[1] as NavigationViewItem)
                 SetNavViewContent(typeof(SearchPage));
-            else if (item == SNavView.MenuItems[2] as NavigationViewItem)
+            else if (item == NavView.MenuItems[2] as NavigationViewItem)
                 SetNavViewContent(typeof(BrowsePage));
-            else if (item == SNavView.MenuItems[3] as NavigationViewItem)
+            else if (item == NavView.MenuItems[3] as NavigationViewItem)
                 SetNavViewContent(typeof(DownloadPage));
-            else if (item == SNavView.MenuItems[5] as NavigationViewItem)
+            else if (item == NavView.MenuItems[5] as NavigationViewItem)
                 SetNavViewContent(typeof(LocalAudioPage));
-            else if (item == SNavView.MenuItems[6] as NavigationViewItem)
+            else if (item == NavView.MenuItems[6] as NavigationViewItem)
                 SetNavViewContent(typeof(PlayListPage));
-            else if (item == SNavView.MenuItems[7] as NavigationViewItem)
+            else if (item == NavView.MenuItems[7] as NavigationViewItem)
                 SetNavViewContent(typeof(HistoryPage));
-            else if (item == SNavView.FooterMenuItems[0] as NavigationViewItem)
+            else if (item == NavView.FooterMenuItems[0] as NavigationViewItem)
                 SetNavViewContent(typeof(AboutPage));
             else
             {
                 // TOFIX: 快速切换到 PlayList 页面会导致 SelectedItem 为 null
                 if (sender.SelectedItem is null)
                 {
-                    App.logManager.Log("MainWindow", "NavigationSelectionChanged: SelectedItem 为 null");
+                    LogManager.Log("MainWindow", "NavigationSelectionChanged: SelectedItem 为 null");
                 }
                 else if ((sender.SelectedItem as NavigationViewItem)?.Tag.GetType() == typeof(MusicListData))
                 {
@@ -1509,83 +1240,83 @@ namespace TewiMP
             else NavView.IsBackEnabled = false;
         }
 
-        static bool IsJustUpdate = false;
-        public static void UpdateNavViewSelectedItem(bool justUpdate = false)
+        bool IsJustUpdate = false;
+        public void UpdateNavViewSelectedItem(bool justUpdate = false)
         {
             if (justUpdate) IsJustUpdate = true;
-            Type type = (SContentFrame.Content as Page).GetType();
+            Type type = (ContentFrame.Content as Page).GetType();
             if (type == typeof(SearchPage))
-                SNavView.SelectedItem = SNavView.MenuItems[1];
+                NavView.SelectedItem = NavView.MenuItems[1];
             else if (type == typeof(BrowsePage))
-                SNavView.SelectedItem = SNavView.MenuItems[2];
+                NavView.SelectedItem = NavView.MenuItems[2];
             else if (type == typeof(DownloadPage))
-                SNavView.SelectedItem = SNavView.MenuItems[3];
+                NavView.SelectedItem = NavView.MenuItems[3];
             else if (type == typeof(LocalAudioPage))
-                SNavView.SelectedItem = SNavView.MenuItems[5];
+                NavView.SelectedItem = NavView.MenuItems[5];
             else if (type == typeof(PlayListPage))
-                SNavView.SelectedItem = SNavView.MenuItems[6];
+                NavView.SelectedItem = NavView.MenuItems[6];
             else if (type == typeof(HistoryPage))
-                SNavView.SelectedItem = SNavView.MenuItems[7];
+                NavView.SelectedItem = NavView.MenuItems[7];
             else if (type == typeof(AboutPage))
-                SNavView.SelectedItem = SNavView.FooterMenuItems[0];
+                NavView.SelectedItem = NavView.FooterMenuItems[0];
             else if (type == typeof(SettingPage))
-                SNavView.SelectedItem = SNavView.SettingsItem;
+                NavView.SelectedItem = NavView.SettingsItem;
             else if (type == typeof(ItemListViewPlayList))
             {
                 //TODO:优化写法
-                foreach (NavigationViewItem item in (SNavView.MenuItems[6] as NavigationViewItem).MenuItems)
+                foreach (NavigationViewItem item in (NavView.MenuItems[6] as NavigationViewItem).MenuItems)
                 {
-                    if ((SContentFrame.Content as ItemListViewPlayList).NavToObj == item.Tag as MusicListData)
+                    if ((ContentFrame.Content as ItemListViewPlayList).NavToObj == item.Tag as MusicListData)
                     {
-                        SNavView.SelectedItem = item;
+                        NavView.SelectedItem = item;
                         break;
                     }
                 }
             }
             else if (type == typeof(Pages.ListViewPages.PlayListPage))
             {
-                foreach (NavigationViewItem item in (SNavView.MenuItems[6] as NavigationViewItem).MenuItems)
+                foreach (NavigationViewItem item in (NavView.MenuItems[6] as NavigationViewItem).MenuItems)
                 {
-                    if ((SContentFrame.Content as Pages.ListViewPages.PlayListPage).md5 == (item.Tag as MusicListData).MD5)
+                    if ((ContentFrame.Content as Pages.ListViewPages.PlayListPage).md5 == (item.Tag as MusicListData).MD5)
                     {
-                        SNavView.SelectedItem = item;
+                        NavView.SelectedItem = item;
                         break;
                     }
                 }
             }
             else if (type == typeof(ItemListViewSearch) || type == typeof(ItemListViewArtist) || type == typeof(ItemListViewAlbum))
-                SNavView.SelectedItem = null;
+                NavView.SelectedItem = null;
             IsJustUpdate = false;
         }
 
-        public static bool TryGoBack()
+        public bool TryGoBack()
         {
             if (InOpenMusicPage)
             {
                 OpenOrCloseMusicPage();
-                return SContentFrame.CanGoBack;
+                return ContentFrame.CanGoBack;
             }
 
-            if (!SContentFrame.CanGoBack)
+            if (!ContentFrame.CanGoBack)
                 return false;
 
             IsBackRequest = true;
-            SContentFrame.GoBack();
+            ContentFrame.GoBack();
             UpdateNavViewSelectedItem();
-            SNavView.IsBackEnabled = SContentFrame.CanGoBack;
+            NavView.IsBackEnabled = ContentFrame.CanGoBack;
 
             IsBackRequest = false;
             return true;
         }
 
-        public static void TryGoForward()
+        public void TryGoForward()
         {
-            if (SContentFrame.CanGoForward)
+            if (ContentFrame.CanGoForward)
             {
                 IsBackRequest = true;
-                SContentFrame.GoForward();
+                ContentFrame.GoForward();
                 UpdateNavViewSelectedItem();
-                SNavView.IsBackEnabled = SContentFrame.CanGoBack;
+                NavView.IsBackEnabled = ContentFrame.CanGoBack;
                 IsBackRequest = false;
             }
         }
@@ -1608,7 +1339,7 @@ namespace TewiMP
                 NavView_LocalTextItem.Margin = new(0);
                 AppTitleBar.Height = 32;
                 sender.Margin = new(0, 32, 0, 0);
-                SetDragRegionForCustomTitleBar(MainWindow.AppWindowInstance);
+                SetDragRegionForCustomTitleBar();
                 return;
             }
             else
@@ -1629,7 +1360,7 @@ namespace TewiMP
                 NavigationViewMinSizeTopColorRectangle.Visibility = Visibility.Collapsed;
             }
 
-            SetDragRegionForCustomTitleBar(AppWindowInstance);
+            SetDragRegionForCustomTitleBar();
         }
 
         private void NavViewContentBase_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -1651,24 +1382,24 @@ namespace TewiMP
         #region Bottom Buttons Events
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            if (App.audioPlayer.PlaybackState == PlaybackState.Playing)
+            if (App.Instance.audioPlayer.PlaybackState == PlaybackState.Playing)
             {
-                App.audioPlayer.SetPause();
+                App.Instance.audioPlayer.SetPause();
             }
             else
             {
-                App.audioPlayer.SetPlay();
+                App.Instance.audioPlayer.SetPlay();
             }
         }
 
         private async void PlayBeforeButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.playingList.PlayPrevious();
+            await App.Instance.playingList.PlayPrevious();
         }
 
         private async void PlayNextButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.playingList.PlayNext();
+            await App.Instance.playingList.PlayNext();
         }
 
         // VolumeButton
@@ -1688,26 +1419,26 @@ namespace TewiMP
             OpenOrCloseMusicPage();
         }
 
-        public static void OpenOrCloseVolume(
+        public void OpenOrCloseVolume(
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment verticalAlignment = VerticalAlignment.Bottom,
             FlyoutPlacementMode flyoutPlacementMode = FlyoutPlacementMode.LeftEdgeAlignedBottom,
             Thickness placementMargin = default)
         {
-            if (teachingTipVolume.IsOpen)
+            if (VolumeBasePopup.IsOpen)
             {
-                teachingTipVolume.Hide();
+                VolumeBasePopup.Hide();
                 return;
             }
-            STopControlsBaseGrid.HorizontalAlignment = horizontalAlignment;
-            STopControlsBaseGrid.VerticalAlignment = verticalAlignment;
-            STopControlsBaseGrid.Margin = placementMargin == default ? new(0, 0, 12, 96) : placementMargin;
-            teachingTipVolume.LightDismissOverlayMode = LightDismissOverlayMode.Off;
-            teachingTipVolume.Placement = flyoutPlacementMode;
-            teachingTipVolume.ShowAt(STopControlsBaseGrid);
+            TopControlsBaseGrid.HorizontalAlignment = horizontalAlignment;
+            TopControlsBaseGrid.VerticalAlignment = verticalAlignment;
+            TopControlsBaseGrid.Margin = placementMargin == default ? new(0, 0, 12, 96) : placementMargin;
+            VolumeBasePopup.LightDismissOverlayMode = LightDismissOverlayMode.Off;
+            VolumeBasePopup.Placement = flyoutPlacementMode;
+            VolumeBasePopup.ShowAt(TopControlsBaseGrid);
         }
 
-        public static async void OpenOrClosePlayingList(
+        public async void OpenOrClosePlayingList(
             HorizontalAlignment horizontalAlignment = HorizontalAlignment.Right,
             VerticalAlignment verticalAlignment = VerticalAlignment.Bottom,
             FlyoutPlacementMode flyoutPlacementMode = FlyoutPlacementMode.LeftEdgeAlignedBottom,
@@ -1715,49 +1446,49 @@ namespace TewiMP
         {
             UpdatePlayListFlyoutHeight();
             AddPlayingListPopupEvents();
-            STopControlsBaseGrid.HorizontalAlignment = horizontalAlignment;
-            STopControlsBaseGrid.VerticalAlignment = verticalAlignment;
-            STopControlsBaseGrid.Margin = placementMargin == default ? new(4, 0, 12, 96) : placementMargin;
-            teachingTipPlayingList.LightDismissOverlayMode = LightDismissOverlayMode.Off;
-            teachingTipPlayingList.Placement = flyoutPlacementMode;
-            teachingTipPlayingList.ShowAt(STopControlsBaseGrid);
+            TopControlsBaseGrid.HorizontalAlignment = horizontalAlignment;
+            TopControlsBaseGrid.VerticalAlignment = verticalAlignment;
+            TopControlsBaseGrid.Margin = placementMargin == default ? new(4, 0, 12, 96) : placementMargin;
+            PlayingListBasePopup.LightDismissOverlayMode = LightDismissOverlayMode.Off;
+            PlayingListBasePopup.Placement = flyoutPlacementMode;
+            PlayingListBasePopup.ShowAt(TopControlsBaseGrid);
             try
             {
-                await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center);
-                await SPlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
-                SPlayingListBaseView.SelectedItem = App.audioPlayer.MusicData;
+                await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.audioPlayer.MusicData, ScrollItemPlacement.Center);
+                await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
+                PlayingListBaseView.SelectedItem = App.Instance.audioPlayer.MusicData;
             }
             catch { }
         }
 
-        private static void AddPlayingListPopupEvents()
+        private void AddPlayingListPopupEvents()
         {
-            teachingTipPlayingList.Opened -= TeachingTipPlayingList_Opened;
-            teachingTipPlayingList.Closed -= TeachingTipPlayingList_Closed;
-            teachingTipPlayingList.Opened += TeachingTipPlayingList_Opened;
-            teachingTipPlayingList.Closed += TeachingTipPlayingList_Closed;
+            PlayingListBasePopup.Opened -= TeachingTipPlayingList_Opened;
+            PlayingListBasePopup.Closed -= TeachingTipPlayingList_Closed;
+            PlayingListBasePopup.Opened += TeachingTipPlayingList_Opened;
+            PlayingListBasePopup.Closed += TeachingTipPlayingList_Closed;
         }
 
-        private static void TeachingTipPlayingList_Opened(object sender, object e)
+        private void TeachingTipPlayingList_Opened(object sender, object e)
         {
-            ToolTipService.SetToolTip(SPlayModeSelector, $"当前播放模式：{App.playingList.PlayBehavior}");
-            SetPlayModeIconAndName(App.playingList.PlayBehavior);
-            SPlayingListScrollControl.Translation = new(
+            ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{App.Instance.playingList.PlayBehavior}");
+            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
+            PlayingListScrollControl.Translation = new(
                 -16,
-                (float)(SPlayingListBaseView.ActualHeight - SPlayingListScrollControl.ActualHeight - 20 - 16),
+                (float)(PlayingListBaseView.ActualHeight - PlayingListScrollControl.ActualHeight - 20 - 16),
                 0);
         }
 
-        private static void TeachingTipPlayingList_Closed(object sender, object e)
+        private void TeachingTipPlayingList_Closed(object sender, object e)
         {
-            teachingTipPlayingList.Opened -= TeachingTipPlayingList_Opened;
-            teachingTipPlayingList.Closed -= TeachingTipPlayingList_Closed;
+            PlayingListBasePopup.Opened -= TeachingTipPlayingList_Opened;
+            PlayingListBasePopup.Closed -= TeachingTipPlayingList_Closed;
         }
 
-        private static void SetPlayModeIconAndName(PlayBehavior playBehavior)
+        private void SetPlayModeIconAndName(PlayBehavior playBehavior)
         {
-            SPlayModeSelector_Icon.Glyph = playBehavior.GetIcon();
-            SPlayModeSelector_Name.Text = playBehavior.ToString();
+            PlayModeSelector_Icon.Glyph = playBehavior.GetIcon();
+            PlayModeSelector_Name.Text = playBehavior.ToString();
         }
 
         private void PlayModeSelector_Click(object sender, RoutedEventArgs e)
@@ -1780,8 +1511,8 @@ namespace TewiMP
         private void B_Click(object sender, RoutedEventArgs e)
         {
             var a = (PlayBehavior)(sender as MenuFlyoutItem).Tag;
-            App.playingList.PlayBehavior = a;
-            SetPlayModeIconAndName(App.playingList.PlayBehavior);
+            App.Instance.playingList.PlayBehavior = a;
+            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
             ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{a}");
         }
 
@@ -1794,54 +1525,54 @@ namespace TewiMP
             }
         }
 
-        static Visual musicPageVisual;
-        static Vector3KeyFrameAnimation musicPageVisualClosingAnimation;
-        static Vector3KeyFrameAnimation musicPageVisualOpeningAnimation;
-        static void InitMusicPageVisuals(bool onlyUpdateOffset = false)
+        Visual musicPageVisual;
+        Vector3KeyFrameAnimation musicPageVisualClosingAnimation;
+        Vector3KeyFrameAnimation musicPageVisualOpeningAnimation;
+        void InitMusicPageVisuals(bool onlyUpdateOffset = false)
         {
             musicPageVisualClosingAnimation?.Dispose();
             musicPageVisualOpeningAnimation?.Dispose();
             AnimateHelper.AnimateOffset(
-                SMusicPageBaseFrame,
-                0, (float)SMusicPageBaseGrid.ActualHeight, 0,
+                MusicPageBaseFrame,
+                0, (float)MusicPageBaseGrid.ActualHeight, 0,
                 0.22,
                 0.5f, 0, 0.75f, 0,
                 out musicPageVisual, out Compositor compositor, out musicPageVisualClosingAnimation);
 
             AnimateHelper.AnimateOffset(
-                SMusicPageBaseFrame,
+                MusicPageBaseFrame,
                 0, 0, 0,
                 0.5,
                 0.16f, 1, 0.3f, 1,
                 out musicPageVisual, out Compositor compositor1, out musicPageVisualOpeningAnimation);
 
             if (onlyUpdateOffset) return;
-            musicPageVisual.Offset = new(0, (float)SMusicPageBaseGrid.ActualHeight, 0);
-            SMusicPageBaseFrame.Visibility = Visibility.Collapsed;
+            musicPageVisual.Offset = new(0, (float)MusicPageBaseGrid.ActualHeight, 0);
+            MusicPageBaseFrame.Visibility = Visibility.Collapsed;
         }
-        public static bool InOpenMusicPage { get; set; } = false;
-        static bool isFirstInMusicPage = true;
-        static bool isHiddenMusicPageAnimationNotCompleted = false;
-        public static void OpenOrCloseMusicPage()
+        public bool InOpenMusicPage { get; set; } = false;
+        bool isFirstInMusicPage = true;
+        bool isHiddenMusicPageAnimationNotCompleted = false;
+        public void OpenOrCloseMusicPage()
         {
-            if (App.audioPlayer.MusicData is null) return;
+            if (App.Instance.audioPlayer.MusicData is null) return;
             if (musicPageVisual is null) InitMusicPageVisuals();
             else InitMusicPageVisuals(true);
 
-            SMusicPageBaseFrame.Content = SMusicPage;
+            MusicPageBaseFrame.Content = SMusicPage;
             if (InOpenMusicPage)
             {
                 InOpenMusicPage = false;
                 isHiddenMusicPageAnimationNotCompleted = true;
 
-                App.logManager.Log("MainWindow", "主界面被显示。");
-                SWindowGridBase.Visibility = Visibility.Visible;
+                LogManager.Log("MainWindow", "主界面被显示。");
+                GridBase.Visibility = Visibility.Visible;
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualClosingAnimation);
                 musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
                 {
                     if (!InOpenMusicPage)
                     {
-                        SMusicPageBaseFrame.Visibility = Visibility.Collapsed;
+                        MusicPageBaseFrame.Visibility = Visibility.Collapsed;
                         isHiddenMusicPageAnimationNotCompleted = false;
                     }
                 };
@@ -1853,28 +1584,28 @@ namespace TewiMP
                     ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation");
                 if (canimation != null)
                 {
-                    canimation.TryStart(VisualTreeHelper.GetParent(SPlayContent) as UIElement);
+                    canimation.TryStart(VisualTreeHelper.GetParent(PlayContent) as UIElement);
                 }
                 ConnectedAnimation canimation1 =
                     ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation1");
                 if (canimation1 != null)
                 {
-                    canimation1.TryStart(SPlayTitle);
+                    canimation1.TryStart(PlayTitle);
                 }
                 ConnectedAnimation canimation2 =
                     ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation2");
                 if (canimation2 != null)
                 {
-                    canimation2.TryStart(SPlayArtist);
+                    canimation2.TryStart(PlayArtist);
                 }
 
-                if (App.lyricManager.NowPlayingLyrics.Any())
+                if (App.Instance.lyricManager.NowPlayingLyrics.Any())
                 {
                     ConnectedAnimation canimation3 =
                     ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation3");
                     if (canimation3 != null)
                     {
-                        canimation3.TryStart(SLyricTextBlock);
+                        canimation3.TryStart(LyricTextBlock);
                     }
                 }
             }
@@ -1882,16 +1613,16 @@ namespace TewiMP
             {
                 InOpenMusicPage = true;
 
-                SMusicPageBaseFrame.Visibility = Visibility.Visible;
-                musicPageVisual.Offset = new(0, (float)SMusicPageBaseGrid.ActualHeight, 0);
+                MusicPageBaseFrame.Visibility = Visibility.Visible;
+                musicPageVisual.Offset = new(0, (float)MusicPageBaseGrid.ActualHeight, 0);
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualOpeningAnimation);
                 musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
                 {
                     if (InOpenMusicPage && !isHiddenMusicPageAnimationNotCompleted)
                     {
-                        SWindowGridBase.Visibility = Visibility.Collapsed;
+                        GridBase.Visibility = Visibility.Collapsed;
 #if DEBUG
-                        App.logManager.Log("MainWindow", "主界面被隐藏。");
+                        LogManager.Log("MainWindow", "主界面被隐藏。");
 #endif
                     }
                 };
@@ -1901,24 +1632,24 @@ namespace TewiMP
             }
         }
 
-        private static async void SetMainPageVisibility(bool visibility)
+        private async void SetMainPageVisibility(bool visibility)
         {
             if (visibility)
             {
-                SWindowGridBase.Visibility = Visibility.Visible;
-                App.logManager.Log("MainWindow", "主界面被显示。");
+                GridBase.Visibility = Visibility.Visible;
+                LogManager.Log("MainWindow", "主界面被显示。");
                 await Task.Delay(220);
                 if (!InOpenMusicPage)
-                    SMusicPageBaseFrame.Visibility = Visibility.Collapsed;
+                    MusicPageBaseFrame.Visibility = Visibility.Collapsed;
             }
             else
             {
-                SMusicPageBaseFrame.Visibility = Visibility.Visible;
+                MusicPageBaseFrame.Visibility = Visibility.Visible;
                 await Task.Delay(500);
                 if (InOpenMusicPage)
                 {
-                    SWindowGridBase.Visibility = Visibility.Collapsed;
-                    App.logManager.Log("MainWindow", "主界面被隐藏。");
+                    GridBase.Visibility = Visibility.Collapsed;
+                    LogManager.Log("MainWindow", "主界面被隐藏。");
                 }
             }
         }
@@ -1928,11 +1659,11 @@ namespace TewiMP
         {
             if (e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta > 0)
                 //VolumeSlider.Value += 1.1f;
-                App.audioPlayer.Volume += 1f;
+                App.Instance.audioPlayer.Volume += 1f;
             else
-                App.audioPlayer.Volume -= 1f;
+                App.Instance.audioPlayer.Volume -= 1f;
 
-            (VolumePopup.Content as TextBlock).Text = $"音量：{App.audioPlayer.Volume}";
+            (VolumePopup.Content as TextBlock).Text = $"音量：{App.Instance.audioPlayer.Volume}";
             VolumePopup.ShowAt(sender as DependencyObject, new() { Placement = FlyoutPlacementMode.Top, ShowMode = FlyoutShowMode.Transient });
             volumePopupCounter++;
             await Task.Delay(3000);
@@ -1950,13 +1681,13 @@ namespace TewiMP
 
         #region Key Events
         public delegate void InKeyDown(Windows.System.VirtualKey key);
-        public static event InKeyDown InKeyDownEvent;
-        public static event InKeyDown InKeyUpEvent;
+        public event InKeyDown InKeyDownEvent;
+        public event InKeyDown InKeyUpEvent;
 
-        public static bool isAltDown = false;
-        public static bool isControlDown = false;
-        public static bool isShiftDown = false;
-        public static bool CanKeyDownBack = true;
+        public bool isAltDown = false;
+        public bool isControlDown = false;
+        public bool isShiftDown = false;
+        public bool CanKeyDownBack = true;
         private void Grid_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             switch (e.Key)
@@ -2022,8 +1753,8 @@ namespace TewiMP
         }
 
         public delegate void DriveInTypeDelegate(Microsoft.UI.Input.PointerDeviceType deviceType);
-        public static event DriveInTypeDelegate DriveInTypeEvent;
-        public static Microsoft.UI.Input.PointerDeviceType DriveInType = Microsoft.UI.Input.PointerDeviceType.Mouse;
+        public event DriveInTypeDelegate DriveInTypeEvent;
+        public Microsoft.UI.Input.PointerDeviceType DriveInType = Microsoft.UI.Input.PointerDeviceType.Mouse;
         private void Grid_Tapped(object sender, TappedRoutedEventArgs e)
         {
             bool a = false;
@@ -2054,16 +1785,16 @@ namespace TewiMP
         {
             if (e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta > 0)
                 //VolumeSlider.Value += 1.1f;
-                App.audioPlayer.Volume += 1f;
+                App.Instance.audioPlayer.Volume += 1f;
             else
-                App.audioPlayer.Volume -= 1f;
+                App.Instance.audioPlayer.Volume -= 1f;
         }
 
         private void VolumeSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (willChangeVolume)
             {
-                App.audioPlayer.Volume = (float)(sender as Slider).Value;
+                App.Instance.audioPlayer.Volume = (float)(sender as Slider).Value;
             }
         }
         #endregion
@@ -2076,23 +1807,23 @@ namespace TewiMP
             await ShowEqualizerDialog();
         }
 
-        public static float NoVolumeValue = 0;
+        public float NoVolumeValue = 0;
         // 静音按钮点击事件
         private void Button_Click_3(object sender, RoutedEventArgs e)
         {
             MuteOrUnmuteVolume();
         }
 
-        public static void MuteOrUnmuteVolume()
+        public void MuteOrUnmuteVolume()
         {
-            if (App.audioPlayer.Volume != 0)
+            if (App.Instance.audioPlayer.Volume != 0)
             {
-                NoVolumeValue = App.audioPlayer.Volume;
-                App.audioPlayer.Volume = 0;
+                NoVolumeValue = App.Instance.audioPlayer.Volume;
+                App.Instance.audioPlayer.Volume = 0;
             }
             else
             {
-                App.audioPlayer.Volume = NoVolumeValue;
+                App.Instance.audioPlayer.Volume = NoVolumeValue;
             }
         }
         #endregion
@@ -2105,24 +1836,24 @@ namespace TewiMP
             if (PlayingListBaseView.SelectedItem != null)
             {
                 MusicData data = (MusicData)PlayingListBaseView.SelectedItem;
-                if (App.audioPlayer.MusicData != data)
-                    await App.playingList.Play(data);
+                if (App.Instance.audioPlayer.MusicData != data)
+                    await App.Instance.playingList.Play(data);
             }
             inSelectionChange = false;*/
         }
 
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
-            App.playingList.ClearAll();
+            App.Instance.playingList.ClearAll();
         }
 
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
             var name = $"{DateTime.Now} 时的播放列表";
             var musicPlayList = new MusicListData(
-                name, name, "", MusicFrom.localMusic, null, [.. App.playingList.NowPlayingList], DataType.本地歌单);
+                name, name, "", MusicFrom.localMusic, null, [.. App.Instance.playingList.NowPlayingList], DataType.本地歌单);
             await PlayListHelper.AddPlayList(musicPlayList);
-            await App.playListReader.Refresh();
+            await App.Instance.playListReader.Refresh();
             AddNotify("播放列表已添加！", $"播放列表 \"{name}\" 已添加。", buttonMessage: "打开播放列表", buttonAction: () =>
             {
                 Pages.ListViewPages.ListViewPage.SetPageToListViewPage(new()
@@ -2200,13 +1931,13 @@ namespace TewiMP
 
         #region Desktop Lyric Window Events
         public delegate void DesktopLyricDelegate();
-        public static event DesktopLyricDelegate DesktopLyricWindowOpenedEvent;
-        public static event DesktopLyricDelegate DesktopLyricWindowClosedEvent;
-        public static bool IsDesktopLyricWindowOpen = false;
-        public static DesktopLyricWindow DesktopLyricWindow = null;
-        static bool isInChangingLyricWindow = false;
+        public event DesktopLyricDelegate DesktopLyricWindowOpenedEvent;
+        public event DesktopLyricDelegate DesktopLyricWindowClosedEvent;
+        public bool IsDesktopLyricWindowOpen = false;
+        public DesktopLyricWindow DesktopLyricWindow = null;
+        bool isInChangingLyricWindow = false;
 
-        public static async void OpenDesktopLyricWindow(bool timeDelay = true)
+        public async void OpenDesktopLyricWindow(bool timeDelay = true)
         {
             if (!isInChangingLyricWindow)
             {
@@ -2240,7 +1971,7 @@ namespace TewiMP
             OpenDesktopLyricWindow();
         }
 
-        private static void DesktopLyricWindow_Closed(object sender, WindowEventArgs args)
+        private void DesktopLyricWindow_Closed(object sender, WindowEventArgs args)
         {
             DesktopLyricWindow = null;
             IsDesktopLyricWindowOpen = false;
@@ -2264,14 +1995,14 @@ namespace TewiMP
             PlayTimeSliderBasePopup.IsOpen = !PlayTimeSliderBasePopup.IsOpen;
             PlayTimeSliderBasePopup.IsLightDismissEnabled = true;
             PlayTimeSliderBasePopup.Closed += PlayTimeSliderBasePopup_Closed;
-            App.audioPlayer.TimingChanged += AudioPlayer_TimingChanged1;
+            App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged1;
             PlayTimeSlider.ValueChanged += PlayTimeSlider_ValueChanged;
         }
 
         private void PlayTimeSliderBasePopup_Closed(TeachingTip sender, TeachingTipClosedEventArgs args)
         {
             PlayTimeSliderBasePopup.Closed -= PlayTimeSliderBasePopup_Closed;
-            App.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged1;
+            App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged1;
             PlayTimeSlider.ValueChanged -= PlayTimeSlider_ValueChanged;
         }
 
@@ -2293,9 +2024,9 @@ namespace TewiMP
         bool isCodeChangedSilderValue = false;
         private void PlayTimeSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
-            if (!isCodeChangedSilderValue && App.audioPlayer.FileReader != null)
+            if (!isCodeChangedSilderValue && App.Instance.audioPlayer.FileReader != null)
             {
-                App.audioPlayer.CurrentTime = TimeSpan.FromTicks((long)PlayTimeSlider.Value);
+                App.Instance.audioPlayer.CurrentTime = TimeSpan.FromTicks((long)PlayTimeSlider.Value);
             }
         }
         #endregion
@@ -2376,7 +2107,7 @@ namespace TewiMP
                 DropInfo_Root.Visibility = Visibility.Collapsed;
         }
 
-        public static bool AllowDragEvents = true;
+        public bool AllowDragEvents = true;
         private void WindowGridBase_DragOver(object sender, DragEventArgs e)
         {
             if (!AllowDragEvents) return;
@@ -2413,16 +2144,22 @@ namespace TewiMP
 
         private void Button_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            MusicDataFlyout.SongItemBind = new() { MusicData = App.audioPlayer.MusicData };
+            MusicDataFlyout.SongItemBind = new() { MusicData = App.Instance.audioPlayer.MusicData };
             MusicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
         }
 
         private void Button_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            MusicDataFlyout.SongItemBind = new() { MusicData = App.audioPlayer.MusicData };
+            MusicDataFlyout.SongItemBind = new() { MusicData = App.Instance.audioPlayer.MusicData };
             MusicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
         }
         #endregion
+
+        private partial class BlurredBackdrop : CompositionBrushBackdrop
+        {
+            protected override Windows.UI.Composition.CompositionBrush CreateBrush(Windows.UI.Composition.Compositor compositor)
+                => compositor.CreateHostBackdropBrush();
+        }
     }
 
     public enum NotifySeverity { Info, Error, Warning, Complete, Loading }

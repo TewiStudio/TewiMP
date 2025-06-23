@@ -51,7 +51,7 @@ namespace TewiMP.Helpers
 
             skey = Bcdechex(skey);
             skey.PadLeft(256, '0');
-            //App.logManager.Log(skey);
+            //LogManager.Log(skey);
 
             return $"params={body}&encSecKey={skey}";
         }
@@ -103,7 +103,7 @@ namespace TewiMP.Helpers
                 var a2 = BigInteger.Parse(BigInteger.Pow(16, len - i).ToString());
                 var a3 = a1 * a2;
                 dec += a3;
-                //App.logManager.Log($"[{a1} / {a2} / {a3} / {dec}]");
+                //LogManager.Log($"[{a1} / {a2} / {a3} / {dec}]");
             }
 
             return dec.ToString();

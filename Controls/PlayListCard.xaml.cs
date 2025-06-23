@@ -12,6 +12,7 @@ using TewiMP.Media;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
 using TewiMP.Pages.ListViewPages;
+using TewiMP.Background;
 
 namespace TewiMP.Controls
 {
@@ -43,7 +44,7 @@ namespace TewiMP.Controls
 
         public async Task Init(MusicFrom musicFrom, string id)
         {/*
-            MusicListData = await App.metingServices.NeteaseServices.GetPlayList(id);
+            MusicListData = await App.Instance.metingServices.NeteaseServices.GetPlayList(id);
             Init(MusicListData);
             UILoaded(null, null);*/
         }
@@ -109,7 +110,7 @@ namespace TewiMP.Controls
 
         private async void UILoaded(object sender, RoutedEventArgs e)
         {
-            //System.Diagnostics.App.logManager.Log(MusicListData.PicturePath);
+            //System.Diagnostics.LogManager.Log(MusicListData.PicturePath);
         }
 
         private void UIUnloaded(object sender, RoutedEventArgs e)
@@ -126,7 +127,7 @@ namespace TewiMP.Controls
             MusicListData = null;
             DataContext = null;
             //PlayListImage = null;
-            //System.Diagnostics.App.logManager.Log("[PlayListCard]: Disposed.");
+            //System.Diagnostics.LogManager.Log("[PlayListCard]: Disposed.");
         }
 
         private void Grid_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
@@ -232,19 +233,19 @@ namespace TewiMP.Controls
 
         private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var isDelete = await MainWindow.ShowDialog("确认删除列表", $"真的要删除列表 \"{MusicListData.ListShowName}\" 吗？\n此操作不可逆。", "取消", "确定", defaultButton: ContentDialogButton.Close);
+            var isDelete = await App.MainWindowInstance.ShowDialog("确认删除列表", $"真的要删除列表 \"{MusicListData.ListShowName}\" 吗？\n此操作不可逆。", "取消", "确定", defaultButton: ContentDialogButton.Close);
             if (isDelete == ContentDialogResult.Primary)
             {
-                MainWindow.AddNotify("正在删除", $"正在删除列表 \"{MusicListData.ListShowName}\"。");
+                App.MainWindowInstance.AddNotify("正在删除", $"正在删除列表 \"{MusicListData.ListShowName}\"。");
                 await PlayListHelper.DeletePlayList(MusicListData);
-                await App.playListReader.Refresh();
-                MainWindow.AddNotify("删除列表成功。", null, NotifySeverity.Complete);
+                await App.Instance.playListReader.Refresh();
+                App.MainWindowInstance.AddNotify("删除列表成功。", null, NotifySeverity.Complete);
             }
         }
 
         private static async void UpdateMusicList(MusicListData musicListData)
         {
-            MainWindow.AddNotify("正在更新歌单...", null);
+            App.MainWindowInstance.AddNotify("正在更新歌单...", null);
 
             try
             {
@@ -266,13 +267,13 @@ namespace TewiMP.Controls
                 data[musicListData.ListName] = JObject.FromObject(playlist);
                 await PlayListHelper.SaveData(data);
 
-                await App.playListReader.Refresh();
-                MainWindow.AddNotify("更新歌单成功。", null, NotifySeverity.Complete);
+                await App.Instance.playListReader.Refresh();
+                App.MainWindowInstance.AddNotify("更新歌单成功。", null, NotifySeverity.Complete);
             }
             catch (Exception ex)
             {
-                LogHelper.WriteLog("PlayingList Update Error", ex.ToString(), false);
-                MainWindow.AddNotify("更新歌单失败", $"更新歌单时遇到错误，请重试。\n错误信息：{ex}", NotifySeverity.Error);
+                LogManager.Error("PlayingList Update Error", ex.ToString());
+                App.MainWindowInstance.AddNotify("更新歌单失败", $"更新歌单时遇到错误，请重试。\n错误信息：{ex}", NotifySeverity.Error);
             }
         }
 
@@ -294,7 +295,7 @@ namespace TewiMP.Controls
 
         private async void InsertButton_Click(object sender, RoutedEventArgs e)
         {
-            await MainWindow.ShowDialog("排序播放列表", "");
+            await App.MainWindowInstance.ShowDialog("排序播放列表", "");
         }
 
         private async void MusicSourceBtn_Click(object sender, RoutedEventArgs e)

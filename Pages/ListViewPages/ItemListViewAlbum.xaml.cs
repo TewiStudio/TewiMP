@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Numerics;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Microsoft.UI;
@@ -12,12 +11,13 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Composition;
+using CommunityToolkit.WinUI;
 using TewiMP.Media;
 using TewiMP.Helpers;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
+using TewiMP.Background;
 using TewiMP.Pages.ListViewPages;
-using CommunityToolkit.WinUI;
 
 namespace TewiMP.Pages
 {
@@ -32,7 +32,7 @@ namespace TewiMP.Pages
         {
             InitializeComponent();
             DataContext = this;
-            MainWindow.InKeyDownEvent += MainWindow_InKeyDownEvent;
+            App.MainWindowInstance.InKeyDownEvent += MainWindow_InKeyDownEvent;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -44,7 +44,7 @@ namespace TewiMP.Pages
             NavToObj = a;
             musicListData = new() { ListDataType = DataType.专辑 };
             InitData();
-            MainWindow.MainViewStateChanged += MainWindow_MainViewStateChanged;
+            App.MainWindowInstance.MainViewStateChanged += MainWindow_MainViewStateChanged;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
@@ -62,8 +62,8 @@ namespace TewiMP.Pages
             SearchBox.SearchingAItem -= SearchBox_SearchingAItem;
             SearchBox.IsOpenChanged -= SearchBox_IsOpenChanged;
             await Task.Delay(500);
-            MainWindow.InKeyDownEvent -= MainWindow_InKeyDownEvent;
-            MainWindow.MainViewStateChanged -= MainWindow_MainViewStateChanged;
+            App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
+            App.MainWindowInstance.MainViewStateChanged -= MainWindow_MainViewStateChanged;
 
             MusicDataList?.Clear();
 
@@ -126,7 +126,7 @@ namespace TewiMP.Pages
             if (IsNavigatedOutFromPage) return;
             if (obj is null)
             {
-                MainWindow.AddNotify("加载专辑信息时出现错误", "无法加载专辑信息，请重试。",
+                App.MainWindowInstance.AddNotify("加载专辑信息时出现错误", "无法加载专辑信息，请重试。",
                     NotifySeverity.Error);
                 return;
             }
@@ -144,7 +144,7 @@ namespace TewiMP.Pages
                 LoadImage();
                 DescribeeText.Text = obj.Describe;
                 await Task.Delay(100);
-                var dpi = CodeHelper.GetScaleAdjustment(App.MainWindow);
+                var dpi = CodeHelper.GetScaleAdjustment(App.Instance.MainWindow);
 
                 MusicDataList.Clear();
                 int count = 0;
@@ -156,7 +156,7 @@ namespace TewiMP.Pages
                 }
             }
             LoadingTipControl.UnShowLoading();
-            App.logManager.Log("ItemListViewAlbum", "加载完成");
+            LogManager.Log("ItemListViewAlbum", "加载完成");
             await Task.Delay(1000);
             UpdateShyHeader();
         }
@@ -181,7 +181,7 @@ namespace TewiMP.Pages
             AlbumLogo.Source = Album_Image.Source;
             AlbumLogo.SaveName = NavToObj.Title;
             AlbumLogo.BorderThickness = new(1);
-            App.logManager.Log("ItemListViewAlbum", "图片加载完成");
+            LogManager.Log("ItemListViewAlbum", "图片加载完成");
             UpdateShyHeader();
             await Task.Delay(10);
             UpdateShyHeader();
@@ -365,16 +365,16 @@ namespace TewiMP.Pages
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (!Children.Items.Any()) return;
-            if (App.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
+            if (App.Instance.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
             {
-                App.playingList.ClearAll();
+                App.Instance.playingList.ClearAll();
             }
             foreach (var songItem in MusicDataList)
             {
-                App.playingList.Add(songItem.MusicData, false);
+                App.Instance.playingList.Add(songItem.MusicData, false);
             }
-            await App.playingList.Play(MusicDataList.First().MusicData, true);
-            App.playingList.SetRandomPlay(App.playingList.PlayBehavior);
+            await App.Instance.playingList.Play(MusicDataList.First().MusicData, true);
+            App.Instance.playingList.SetRandomPlay(App.Instance.playingList.PlayBehavior);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -420,7 +420,7 @@ namespace TewiMP.Pages
                 Children.CanReorderItems = false;
             }
             MusicDataItem.SetIsCloseMouseEvent(SelectItemButton.IsChecked == true);
-            MainWindow.AllowDragEvents = SelectItemButton.IsChecked == false;
+            App.MainWindowInstance.AllowDragEvents = SelectItemButton.IsChecked == false;
             UpdateCommandToolBarWidth();
         }
 
@@ -451,7 +451,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase item in Children.SelectedItems)
                 {
-                    App.playingList.Add(item.MusicData);
+                    App.Instance.playingList.Add(item.MusicData);
                 }
             }
         }
@@ -499,7 +499,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase songItem in Children.SelectedItems)
                 {
-                    App.downloadManager.Add(songItem.MusicData);
+                    App.Instance.downloadManager.Add(songItem.MusicData);
                 }
             }
         }
@@ -522,18 +522,18 @@ namespace TewiMP.Pages
 
         private async void A_Click(object sender, RoutedEventArgs e)
         {
-            MainWindow.ShowLoadingDialog();
+            App.MainWindowInstance.ShowLoadingDialog();
             var text = await PlayListHelper.ReadData();
             foreach (SongItemBindBase item in Children.SelectedItems)
             {
-                MainWindow.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
+                App.MainWindowInstance.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
                 
                 text = PlayListHelper.AddMusicDataToPlayList(
                     ((sender as MenuFlyoutItem).Tag as MusicListData).ListName,
                     item.MusicData, text);
             }
             await PlayListHelper.SaveData(text);
-            MainWindow.HideDialog();
+            App.MainWindowInstance.HideDialog();
         }
 
         private void AddToPlayListFlyout_Closed(object sender, object e)
@@ -581,7 +581,7 @@ namespace TewiMP.Pages
 
         private void MainWindow_InKeyDownEvent(Windows.System.VirtualKey key)
         {
-            if (MainWindow.isControlDown)
+            if (App.MainWindowInstance.isControlDown)
             {
                 if (key == Windows.System.VirtualKey.F)
                 {
@@ -600,7 +600,7 @@ namespace TewiMP.Pages
                 case ScrollFootButton.ButtonType.NowPlaying:
                     foreach (var i in MusicDataList)
                     {
-                        if (i.MusicData != App.audioPlayer.MusicData) continue;
+                        if (i.MusicData != App.Instance.audioPlayer.MusicData) continue;
                         await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                         await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
                         MusicDataItem.TryHighlightPlayingItem();

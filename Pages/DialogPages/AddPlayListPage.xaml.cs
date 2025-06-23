@@ -5,6 +5,7 @@ using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
 using TewiMP.Plugin;
+using TewiMP.Background;
 
 namespace TewiMP.Pages.DialogPages
 {
@@ -27,7 +28,7 @@ namespace TewiMP.Pages.DialogPages
         {
             if (contentDialogResult == ContentDialogResult.Primary)
             {
-                MainWindow.AddNotify("正在添加列表...", null);
+                App.MainWindowInstance.AddNotify("正在添加列表...", null);
                 MusicListData musicListData = null;
 
                 if (PivotList.SelectedIndex == 0)
@@ -58,20 +59,20 @@ namespace TewiMP.Pages.DialogPages
                     try
                     {
                         await PlayListHelper.AddPlayList(musicListData);
-                        await App.playListReader.Refresh();
-                        MainWindow.AddNotify("添加列表成功", null, NotifySeverity.Complete);
+                        await App.Instance.playListReader.Refresh();
+                        App.MainWindowInstance.AddNotify("添加列表成功", null, NotifySeverity.Complete);
                     }
                     catch (ArgumentException)
                     {
-                        MainWindow.AddNotify(
+                        App.MainWindowInstance.AddNotify(
                             "已存在一个同名的列表",
                             "无法添加这个播放列表，因为填写的属性已被其它播放列表占用。\n请尝试换一个播放列表名称或图片地址试试。",
                             NotifySeverity.Error);
                     }
                     catch (Exception err)
                     {
-                        LogHelper.WriteLog("AddPlayListPage", err.ToString(), false);
-                        var b = await MainWindow.ShowDialog("添加播放列表时出现错误", err.Message, "确定", "重试", defaultButton: ContentDialogButton.Primary);
+                        LogManager.Error("AddPlayListPage", err.ToString());
+                        var b = await App.MainWindowInstance.ShowDialog("添加播放列表时出现错误", err.Message, "确定", "重试", defaultButton: ContentDialogButton.Primary);
                         if (b == ContentDialogResult.Primary)
                         {
                             AddPlayListPage_ResultEvent(contentDialogResult);
@@ -84,7 +85,7 @@ namespace TewiMP.Pages.DialogPages
 
         public static async Task ShowDialog()
         {
-            var a = await MainWindow.ShowDialog("", new AddPlayListPage(), "取消", "创建", defaultButton: ContentDialogButton.Primary);
+            var a = await App.MainWindowInstance.ShowDialog("", new AddPlayListPage(), "取消", "创建", defaultButton: ContentDialogButton.Primary);
             ResultEvent?.Invoke(a);
         }
 

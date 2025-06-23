@@ -217,7 +217,7 @@
                                 </Grid.ColumnDefinitions>
                                 <FontIcon Glyph="&#xF120;"/>
                                 <controls:AutoScrollViewer x:Name="AutoScrollViewer5" Grid.Column="1">
-                                    <TextBlock x:Name="AudioInfoRunText" Text="{Binding App.audioPlayer}"/>
+                                    <TextBlock x:Name="AudioInfoRunText" Text="{Binding App.Instance.audioPlayer}"/>
                                 </controls:AutoScrollViewer>
                             </Grid>
                         </Button>

@@ -22,7 +22,7 @@ namespace TewiMP.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             isInLoading = true;
-            HotkeyEnableToggleSwitch.IsOn = App.hotKeyManager.EnableHotKey;
+            HotkeyEnableToggleSwitch.IsOn = App.Instance.hotKeyManager.EnableHotKey;
             isInLoading = false;
         }
 
@@ -33,18 +33,18 @@ namespace TewiMP.Pages
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var list = App.hotKeyManager.RegisteredHotKeys.ToList();
-            App.hotKeyManager.UnregisterHotKeys(list);
+            var list = App.Instance.hotKeyManager.RegisteredHotKeys.ToList();
+            App.Instance.hotKeyManager.UnregisterHotKeys(list);
             await Task.Delay(200);
-            App.hotKeyManager.RegisterHotKeys(list);
+            App.Instance.hotKeyManager.RegisterHotKeys(list);
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var list = App.hotKeyManager.RegisteredHotKeys.ToList();
-            App.hotKeyManager.UnregisterHotKeys(list);
+            var list = App.Instance.hotKeyManager.RegisteredHotKeys.ToList();
+            App.Instance.hotKeyManager.UnregisterHotKeys(list);
             await Task.Delay(200);
-            App.hotKeyManager.RegisterHotKeys(HotKeyManager.DefaultRegisterHotKeysList);
+            App.Instance.hotKeyManager.RegisterHotKeys(HotKeyManager.DefaultRegisterHotKeysList);
         }
 
         private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
@@ -52,7 +52,7 @@ namespace TewiMP.Pages
             if (isInLoading) return;
             if (sender is ToggleSwitch toggleSwitch)
             {
-                App.hotKeyManager.EnableHotKey = toggleSwitch.IsOn;
+                App.Instance.hotKeyManager.EnableHotKey = toggleSwitch.IsOn;
             }
         }
 

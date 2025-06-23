@@ -1,12 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
+﻿using System;
 using System.IO;
+using System.Diagnostics;
 using System.Threading.Tasks;
-using System.Xml.Linq;
+using System.Collections.ObjectModel;
 using TewiMP.DataEditor;
-using TewiMP.Helpers;
 
 namespace TewiMP.Background
 {
@@ -21,22 +18,31 @@ namespace TewiMP.Background
 
     public class LogManager
     {
+        public static void Log(string name, string content, LogLevel logLevel = LogLevel.Information)
+        {
+            App.Instance.logManager.LogInstance(name, content, logLevel);
+        }
+
+        public static void LogIf(bool b, string name, string content, LogLevel logLevel = LogLevel.Information)
+        {
+            if (b) Log(name, content, logLevel);
+        }
+
+        public static void Info(string name, string content) => Log(name, content, LogLevel.Information);
+        public static void Warning(string name, string content) => Log(name, content, LogLevel.Warning);
+        public static void Error(string name, string content) => Log(name, content, LogLevel.Error);
+
         public ObservableCollection<LogData> LogDatas { get; set; } = [];
 
-        public void Log(string name, string content, LogLevel logLevel = LogLevel.Information)
+        public void LogInstance(string name, string content, LogLevel logLevel = LogLevel.Information)
         {
-            MainWindow.Invoke(() =>
+            App.MainWindowInstance?.Invoke(() =>
             {
                 LogDatas.Add(new LogData { LogTime = DateTime.Now, LogName = name, LogContent = content, LogLevel = logLevel });
             });
             var str = $"[{DateTime.Now}][{logLevel}][{name}]: {content}";
             Debug.WriteLine(str);
             WriteToLogStream(str);
-        }
-
-        public void LogIf(bool b, string name, string content, LogLevel logLevel = LogLevel.Information)
-        {
-            if (b) Log(name, content, logLevel);
         }
 
         public static string NowLogFilePath { get; private set; }
@@ -50,12 +56,12 @@ namespace TewiMP.Background
             NowLogFilePath = Path.Combine(DataFolderBase.RunLogFolder, DateTime.Now.ToFileTime().ToString());
             NowLog = new FileStream(NowLogFilePath, FileMode.CreateNew, FileAccess.Write);
             NowLogWriter = new StreamWriter(NowLog);
-            WriteToLogStream($"{App.AppName} launched on {StartTime}");
-            WriteToLogStream($"Version: {App.NowVersion}, built time: {App.NowVersion.ReleaseTime}");
+            WriteToLogStream($"{App.Instance.AppName} launched on {StartTime}");
+            WriteToLogStream($"Version: {App.Instance.NowVersion}, built time: {App.Instance.NowVersion.ReleaseTime}");
             WriteToLogStream($"System: {Environment.OSVersion}\n");
-            if (App.logManager is not null)
+            if (App.Instance.logManager is not null)
             {
-                foreach (var l in App.logManager.LogDatas)
+                foreach (var l in App.Instance.logManager.LogDatas)
                 {
                     WriteToLogStream($"[{l.LogTime}][{l.LogLevel}][{l.LogName}]: {l.LogContent}");
                 }

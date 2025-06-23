@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TewiMP.Background;
 
 namespace TewiMP.Plugin.BuildInPlugins.BuildInPluginSample
 {
@@ -21,19 +22,19 @@ namespace TewiMP.Plugin.BuildInPlugins.BuildInPluginSample
         public override void OnEnable()
         {
             base.OnEnable();
-            App.logManager.Log("BuildIn Plugin Sample", "I have been enabled!");
+            LogManager.Log("BuildIn Plugin Sample", "I have been enabled!");
         }
 
         public override void OnDisable()
         {
             base.OnDisable();
-            App.logManager.Log("BuildIn Plugin Sample", "I have been disabled!");
+            LogManager.Log("BuildIn Plugin Sample", "I have been disabled!");
         }
 
         protected override void OnSettingsChanged(string key, object value)
         {
             base.OnSettingsChanged(key, value);
-            App.logManager.Log("BuildIn Plugin Sample", $"Settings \"{key}\" has been changed to {value}!");
+            LogManager.Log("BuildIn Plugin Sample", $"Settings \"{key}\" has been changed to {value}!");
         }
     }
 }

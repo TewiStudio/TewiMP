@@ -112,19 +112,19 @@ namespace TewiMP.Controls
             switch (menuFlyoutItem.Tag as string)
             {
                 case "play":
-                    await App.playingList.Play(songItemBind.MusicData, true);
+                    await App.Instance.playingList.Play(songItemBind.MusicData, true);
                     break;
                 case "addToPlayingList":
-                    App.playingList.Add(songItemBind.MusicData);
+                    App.Instance.playingList.Add(songItemBind.MusicData);
                     break;
                 case "setToNextPlay":
-                    App.playingList.SetNextPlay(App.audioPlayer.MusicData, songItemBind.MusicData);
+                    App.Instance.playingList.SetNextPlay(App.Instance.audioPlayer.MusicData, songItemBind.MusicData);
                     break;
                 case "deleteFromPlaylist":
                     if (songItemBind.MusicListData.ListDataType == DataType.本地歌单 || songItemBind.MusicListData.ListDataType == DataType.歌单)
                     {
                         await PlayListHelper.DeleteMusicDataFromPlayList(songItemBind.MusicListData.ListName, songItemBind.MusicData);
-                        await App.playListReader.Refresh();
+                        await App.Instance.playListReader.Refresh();
                     }
                     break;
                 case "deleteFile":
@@ -133,17 +133,17 @@ namespace TewiMP.Controls
                         string deletePath = songItemBind.MusicData.InLocal;
                         await Task.Run(() => File.Delete(deletePath));
                         await PlayListHelper.DeleteMusicDataFromPlayList(songItemBind.MusicListData.ListName, songItemBind.MusicData);
-                        await App.playListReader.Refresh();
+                        await App.Instance.playListReader.Refresh();
                     }
                     break;
                 case "album":
                     Pages.ListViewPages.ListViewPage.SetPageToListViewPage(new() { PageType = Pages.ListViewPages.PageType.Album, Param = songItemBind.MusicData.Album });
                     break;
                 case "download":
-                    App.downloadManager.Add(songItemBind.MusicData);
+                    App.Instance.downloadManager.Add(songItemBind.MusicData);
                     break;
                 case "search_software":
-                    MainWindow.SetNavViewContent(typeof(SearchPage), songItemBind.MusicData.Title);
+                    App.MainWindowInstance.SetNavViewContent(typeof(SearchPage), songItemBind.MusicData.Title);
                     break;
                 case "search_websiteSearch":
                     await CodeHelper.OpenInBrowser($"https://www.bing.com/search?q={songItemBind.MusicData.Title}-{songItemBind.MusicData.Album}");
@@ -170,8 +170,8 @@ namespace TewiMP.Controls
                     break;
                 case "link":
                     var link = await songItemBind.MusicData.PluginInfo.GetMusicSourcePlugin().GetUrl(songItemBind.MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
-                    MainWindow.HideDialog();
-                    await MainWindow.ShowDialog("获取到的链接是：", link);
+                    App.MainWindowInstance.HideDialog();
+                    await App.MainWindowInstance.ShowDialog("获取到的链接是：", link);
                     break;
                 case "exploreLocalFile":
                     await FileHelper.ExploreFile(songItemBind.MusicData.InLocal);
@@ -180,27 +180,27 @@ namespace TewiMP.Controls
                     await FileHelper.OpenInOtherSoftware(new Uri(songItemBind.MusicData.InLocal), new() { DisplayApplicationPicker = true });
                     break;
                 case "cache":
-                    if (await App.cacheManager.GetCachePath(songItemBind.MusicData) is not null)
+                    if (await App.Instance.cacheManager.GetCachePath(songItemBind.MusicData) is not null)
                     {
-                        MainWindow.AddNotify($"此歌曲已缓存！", null, NotifySeverity.Warning);
+                        App.MainWindowInstance.AddNotify($"此歌曲已缓存！", null, NotifySeverity.Warning);
                         return;
                     }
-                    item = MainWindow.AddNotify($"正在缓存：{songItemBind.MusicData.Title}", "加载中...", NotifySeverity.Loading, TimeSpan.MaxValue);
-                    App.cacheManager.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
-                    App.cacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
-                    App.cacheManager.CachedMusicData -= CacheManager_CachedMusicData;
-                    App.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
-                    await App.cacheManager.StartCacheMusic(songItemBind.MusicData);
+                    item = App.MainWindowInstance.AddNotify($"正在缓存：{songItemBind.MusicData.Title}", "加载中...", NotifySeverity.Loading, TimeSpan.MaxValue);
+                    App.Instance.cacheManager.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
+                    App.Instance.cacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
+                    App.Instance.cacheManager.CachedMusicData -= CacheManager_CachedMusicData;
+                    App.Instance.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
+                    await App.Instance.cacheManager.StartCacheMusic(songItemBind.MusicData);
                     break;
                 case "cacheDelete":
-                    var path = await App.cacheManager.GetCachePath(songItemBind.MusicData);
+                    var path = await App.Instance.cacheManager.GetCachePath(songItemBind.MusicData);
                     if (string.IsNullOrEmpty(path))
                     {
-                        MainWindow.AddNotify("此歌曲的缓存文件不存在。", null, NotifySeverity.Error);
+                        App.MainWindowInstance.AddNotify("此歌曲的缓存文件不存在。", null, NotifySeverity.Error);
                         return;
                     }
 
-                    var itema = MainWindow.AddNotify($"正在删除：{songItemBind.MusicData.Title}", null, NotifySeverity.Loading, TimeSpan.MaxValue);
+                    var itema = App.MainWindowInstance.AddNotify($"正在删除：{songItemBind.MusicData.Title}", null, NotifySeverity.Loading, TimeSpan.MaxValue);
                     Exception err = null;
                     try
                     {
@@ -215,10 +215,10 @@ namespace TewiMP.Controls
                     {
                         itema.SetNotifyItemData("删除成功。", null, NotifySeverity.Complete);
                     }
-                    MainWindow.NotifyCountDown(itema);
+                    App.MainWindowInstance.NotifyCountDown(itema);
                     break;
                 case "info":
-                    await MainWindow.ShowDialog(
+                    await App.MainWindowInstance.ShowDialog(
                         $"{songItemBind.MusicData.Title} 的详细信息：",
                         $"标题：{songItemBind.MusicData.Title}\n" +
                             $"艺术家&专辑：{songItemBind.MusicData.ButtonName}\n" +
@@ -241,10 +241,10 @@ namespace TewiMP.Controls
         private void CacheManager_CachedMusicData(MusicData musicData, object value)
         {
             if (musicData != songItemBind?.MusicData) return;
-            App.cacheManager.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
-            App.cacheManager.CachedMusicData -= CacheManager_CachedMusicData;
+            App.Instance.cacheManager.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
+            App.Instance.cacheManager.CachedMusicData -= CacheManager_CachedMusicData;
             item.SetNotifyItemData(item.GetNotifyItemData().Title, "缓存完成。", NotifySeverity.Complete);
-            MainWindow.NotifyCountDown(item);
+            App.MainWindowInstance.NotifyCountDown(item);
             item = null;
         }
 

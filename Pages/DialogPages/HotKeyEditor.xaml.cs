@@ -47,11 +47,11 @@ namespace TewiMP.Pages.DialogPages
 
             if (hotKeyModifiers == User32.HotKeyModifiers.MOD_NONE)
             {
-                MainWindow.AsyncDialog.IsPrimaryButtonEnabled = false;
+                App.MainWindowInstance.AsyncDialog.IsPrimaryButtonEnabled = false;
             }
             else
             {
-                MainWindow.AsyncDialog.IsPrimaryButtonEnabled = true;
+                App.MainWindowInstance.AsyncDialog.IsPrimaryButtonEnabled = true;
             }
         }
 
@@ -76,11 +76,11 @@ namespace TewiMP.Pages.DialogPages
 
             if (hotKey.HotKeyModifiers == User32.HotKeyModifiers.MOD_NONE)
             {
-                MainWindow.AsyncDialog.IsPrimaryButtonEnabled = false;
+                App.MainWindowInstance.AsyncDialog.IsPrimaryButtonEnabled = false;
             }
             else
             {
-                MainWindow.AsyncDialog.IsPrimaryButtonEnabled = true;
+                App.MainWindowInstance.AsyncDialog.IsPrimaryButtonEnabled = true;
             }
         }
 
@@ -100,16 +100,16 @@ namespace TewiMP.Pages.DialogPages
         private async void ShowDialog1()
         {
             if (changedHotKey is null) return;
-            MainWindow.AsyncDialog.PreviewKeyDown += HotKeyEditor_KeyDown;
-            MainWindow.AsyncDialog.PreviewKeyUp += AsyncDialog_PreviewKeyUp;
-            MainWindow.AsyncDialog.IsPrimaryButtonEnabled = false;
-            var r = await MainWindow.ShowDialog("设置热键", this, "取消", "确定", "重置", ContentDialogButton.Primary);
+            App.MainWindowInstance.AsyncDialog.PreviewKeyDown += HotKeyEditor_KeyDown;
+            App.MainWindowInstance.AsyncDialog.PreviewKeyUp += AsyncDialog_PreviewKeyUp;
+            App.MainWindowInstance.AsyncDialog.IsPrimaryButtonEnabled = false;
+            var r = await App.MainWindowInstance.ShowDialog("设置热键", this, "取消", "确定", "重置", ContentDialogButton.Primary);
             if (r == ContentDialogResult.Primary)
             {
                 if (hotKey != null)
                 {
                     hotKey.HotKeyID = changedHotKey.HotKeyID;
-                    App.hotKeyManager.ChangeHotKey(hotKey);
+                    App.Instance.hotKeyManager.ChangeHotKey(hotKey);
                 }
             }
             else if (r == ContentDialogResult.Secondary)
@@ -118,14 +118,14 @@ namespace TewiMP.Pages.DialogPages
                 {
                     if (k.HotKeyID == changedHotKey.HotKeyID)
                     {
-                        App.hotKeyManager.ChangeHotKey(k);
+                        App.Instance.hotKeyManager.ChangeHotKey(k);
                         break;
                     }
                 }
             }
-            MainWindow.AsyncDialog.PreviewKeyDown -= HotKeyEditor_KeyDown;
-            MainWindow.AsyncDialog.PreviewKeyUp -= AsyncDialog_PreviewKeyUp;
-            MainWindow.AsyncDialog.IsPrimaryButtonEnabled = true;
+            App.MainWindowInstance.AsyncDialog.PreviewKeyDown -= HotKeyEditor_KeyDown;
+            App.MainWindowInstance.AsyncDialog.PreviewKeyUp -= AsyncDialog_PreviewKeyUp;
+            App.MainWindowInstance.AsyncDialog.IsPrimaryButtonEnabled = true;
         }
     }
 }

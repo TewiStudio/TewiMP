@@ -11,16 +11,16 @@ namespace TewiMP.Pages
 {
     public partial class SettingEqPage : Page
     {
-        public AudioPlayer AudioPlayer => App.audioPlayer;
+        public AudioPlayer AudioPlayer => App.Instance.audioPlayer;
         public bool EqEnabled
         {
             get
             {
-                return App.audioPlayer.EqEnabled;
+                return App.Instance.audioPlayer.EqEnabled;
             }
             set
             {
-                App.audioPlayer.EqEnabled = value;
+                App.Instance.audioPlayer.EqEnabled = value;
             }
         }
 
@@ -143,7 +143,7 @@ namespace TewiMP.Pages
             AudioPlayer.EqBandChanged -= AudioPlayer_EqualizerBandChanged;
             EQList.ItemsSource = null;
             PassFilterList.ItemsSource = null;
-            App.SaveSettings();
+            App.Instance.SaveSettings();
         }
 
         private void C_Click(object sender, RoutedEventArgs e)
@@ -280,21 +280,21 @@ namespace TewiMP.Pages
         {
             if (isInLoaded) return;
             AudioFilterStatic.PassFilterEqEnable = PassFilterToggleButton.IsOn;
-            App.audioPlayer.UpdateEqualizer();
+            App.Instance.audioPlayer.UpdateEqualizer();
         }
 
         private void GraphicEqToggleButton_Toggled(object sender, RoutedEventArgs e)
         {
             if (isInLoaded) return;
             AudioFilterStatic.GraphicEqEnable = GraphicEqToggleButton.IsOn;
-            App.audioPlayer.UpdateEqualizer();
+            App.Instance.audioPlayer.UpdateEqualizer();
         }
 
         private void ParametricToggleButton_Toggled(object sender, RoutedEventArgs e)
         {
             if (isInLoaded) return;
             AudioFilterStatic.ParametricEqEnable = ParametricToggleButton.IsOn;
-            App.audioPlayer.UpdateEqualizer();
+            App.Instance.audioPlayer.UpdateEqualizer();
         }
     }
 

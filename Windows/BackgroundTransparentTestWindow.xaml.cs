@@ -1,10 +1,10 @@
-﻿using Microsoft.UI.Xaml;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
-using TewiMP.Helpers.TransparentWindowHelper;
+using Microsoft.UI.Xaml;
 using Vanara.PInvoke;
-using Windows.UI;
 using WinUIEx;
+using TewiMP.Background;
+using TewiMP.Helpers.TransparentWindowHelper;
 
 namespace TewiMP.Windowed
 {
@@ -28,8 +28,8 @@ namespace TewiMP.Windowed
             SetWindowSubclass(handle, sUBCLASSPROC, 0, 0);
             var result = User32.SetLayeredWindowAttributes(handle, new COLORREF(255, 255, 255), 255, User32.LayeredWindowAttributes.LWA_COLORKEY);
             TransparentHelper.SetTransparent(this);
-            App.logManager.Log("Test", $"{result}");
-            App.logManager.Log("Test", $"{((App)Application.Current)}");
+            LogManager.Log("Test", $"{result}");
+            LogManager.Log("Test", $"{((App)Application.Current)}");
         }
 
         private IntPtr SubClassWndProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, uint dwRefData)

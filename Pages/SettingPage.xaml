@@ -348,6 +348,8 @@
                                 <x:String>云母</x:String>
                                 <x:String>云母 Alt</x:String>
                                 <x:String>亚克力</x:String>
+                                <x:String>模糊</x:String>
+                                <x:String>透明</x:String>
                                 <x:String>图片</x:String>
                                 <x:String>纯色</x:String>
                             </ComboBox>

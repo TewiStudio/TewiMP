@@ -12,6 +12,7 @@ using Melanchall.DryWetMidi.Multimedia;
 using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using TewiMP.DataEditor;
+using TewiMP.Background;
 using static TewiMP.Media.AudioPlayer;
 
 namespace TewiMP.Media
@@ -165,10 +166,10 @@ namespace TewiMP.Media
             switch (outDevice.DeviceType)
             {
                 case OutApi.WaveOut:
-                    result = outDevices[outDevices.IndexOf(App.audioPlayer.NowOutDevice) + audioOutDeviceCount * 2];
+                    result = outDevices[outDevices.IndexOf(App.Instance.audioPlayer.NowOutDevice) + audioOutDeviceCount * 2];
                     break;
                 case OutApi.DirectSound:
-                    result = outDevices[outDevices.IndexOf(App.audioPlayer.NowOutDevice) + audioOutDeviceCount];
+                    result = outDevices[outDevices.IndexOf(App.Instance.audioPlayer.NowOutDevice) + audioOutDeviceCount];
                     break;
             }
             return result;
@@ -200,31 +201,31 @@ namespace TewiMP.Media
             defaultDeviceChangedCounter--;
             if (defaultDeviceChangedCounter != 0) return;
 
-            App.logManager.Log("DeviceManager", $"系统默认设备已变更为：\"{defaultDeviceId}\"");
+            LogManager.Log("DeviceManager", $"系统默认设备已变更为：\"{defaultDeviceId}\"");
             OnDefaultDeviceChangedEvent?.Invoke(dataFlow, deviceRole, defaultDeviceId);
         }
 
         public void OnDeviceAdded(string deviceId)
         {
-            App.logManager.Log("DeviceManager", $"新增设备：\"{deviceId}\"");
+            LogManager.Log("DeviceManager", $"新增设备：\"{deviceId}\"");
             OnDeviceAddedEvent?.Invoke(deviceId);
         }
 
         public void OnDeviceRemoved(string deviceId)
         {
-            App.logManager.Log("DeviceManager", $"已移除设备：\"{deviceId}\"");
+            LogManager.Log("DeviceManager", $"已移除设备：\"{deviceId}\"");
             OnDeviceRemovedEvent?.Invoke(deviceId);
         }
 
         public void OnDeviceStateChanged(string deviceId, DeviceState newState)
         {
-            App.logManager.Log("DeviceManager", $"设备状态已更新。deviceId:{deviceId} / newState:{newState}");
+            LogManager.Log("DeviceManager", $"设备状态已更新。deviceId:{deviceId} / newState:{newState}");
             OnDeviceStateChangedEvent?.Invoke(deviceId, newState);
         }
 
         public void OnPropertyValueChanged(string deviceId, PropertyKey propertyKey)
         {
-            App.logManager.Log("DeviceManager", $"设备属性已更新。deviceId: {deviceId} / propertyKey:{propertyKey.formatId.ToString()}");
+            LogManager.Log("DeviceManager", $"设备属性已更新。deviceId: {deviceId} / propertyKey:{propertyKey.formatId.ToString()}");
             OnPropertyValueChangedEvent?.Invoke(deviceId, propertyKey);
         }
 
@@ -368,7 +369,7 @@ namespace TewiMP.Media
                     {
                         if (MusicData.CUETrackData != null)
                         {
-                            //App.logManager.Log($"{FileReader.CurrentTime}  --  {MusicData.CUETrackData.EndDuration}");
+                            //LogManager.Log($"{FileReader.CurrentTime}  --  {MusicData.CUETrackData.EndDuration}");
                             return FileReader.CurrentTime - MusicData.CUETrackData.StartDuration - TimeSpan.FromMilliseconds(Latency);
                         }
                         else
@@ -544,9 +545,9 @@ namespace TewiMP.Media
             timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(200) };
             timer.Tick += (_, __) => ReCallTiming();
 
-            App.cacheManager.AddingCacheMusicData += CacheManager_AddingCacheMusicData;
-            App.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
-            App.cacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
+            App.Instance.cacheManager.AddingCacheMusicData += CacheManager_AddingCacheMusicData;
+            App.Instance.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
+            App.Instance.cacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
             ClientDeviceEvents.notificationClient.OnDefaultDeviceChangedEvent += NotificationClient_OnDefaultDeviceChangedEvent;
             ClientDeviceEvents.notificationClient.OnDeviceStateChangedEvent += NotificationClient_OnDeviceStateChangedEvent;
             ClientDeviceEvents.notificationClient.OnDeviceRemovedEvent += NotificationClient_OnDeviceRemovedEvent;
@@ -587,9 +588,9 @@ namespace TewiMP.Media
             }
             if (devices.First().DeviceType == OutApi.None)
             {
-                MainWindow.Invoke(() =>
+                App.MainWindowInstance.Invoke(() =>
                 {
-                    MainWindow.AddNotify("无音频输出设备", "似乎所有音频输出设备都已被拔出，程序找不到音频输出设备。\n" +
+                    App.MainWindowInstance.AddNotify("无音频输出设备", "似乎所有音频输出设备都已被拔出，程序找不到音频输出设备。\n" +
                         "请检查音频驱动是否正常工作，或检查音频输出设备的接口是否松动或拔出。\n" +
                         "如果检查完毕后仍然无法正常播放，请到 GitHub 里向项目提出 Issues。",
                         NotifySeverity.Error, TimeSpan.FromSeconds(10));
@@ -603,7 +604,7 @@ namespace TewiMP.Media
                 else NowOutDevice = devices.First();
             }
 
-            MainWindow.Invoke(() =>
+            App.MainWindowInstance.Invoke(() =>
             {
                 if (isPlaying) SetPlay();
                 else SetPause();
@@ -613,7 +614,7 @@ namespace TewiMP.Media
 
             if (NowOutObj.GetType() == typeof(WasapiOut)) NowOutDevice = OutDevice.GetWasapiDefaultDevice();
             else if (NowOutObj.GetType() == typeof(DirectSoundOut)) NowOutDevice = OutDevice.GetDirectSoundOutDefaultDevice();
-            MainWindow.Invoke(() =>
+            App.MainWindowInstance.Invoke(() =>
             {
                 SetReloadAsync(isPlaying);
             });
@@ -628,16 +629,16 @@ namespace TewiMP.Media
 
         private void NotificationClient_OnDeviceRemovedEvent(string deviceId)
         {
-            App.logManager.Log("DeviceManager", "Device Removed.");
+            LogManager.Log("DeviceManager", "Device Removed.");
         }
 
         bool isInSetSource = false;
         public async Task SetSourceAsync(MusicData musicData)
         {
             isInSetSource = true;
-            App.logManager.Log("AudioPlayer", $"正在加载：\"{musicData}\"");
+            LogManager.Log("AudioPlayer", $"正在加载：\"{musicData}\"");
             await SetSource(musicData);
-            App.logManager.Log("AudioPlayer", $"加载完成：\"{musicData}\"");
+            LogManager.Log("AudioPlayer", $"加载完成：\"{musicData}\"");
             isInSetSource = false;
         }
 
@@ -658,7 +659,7 @@ namespace TewiMP.Media
             }
 
             if (MusicData is not null)
-                App.logManager.Log("AudioPlayer", $"当前播放：{MusicData.Title}, Time: {CurrentTime}/{TotalTime}, IsMIDI: {FileReader.isMidi}, IsCUE: {MusicData.CUETrackData != null}");
+                LogManager.Log("AudioPlayer", $"当前播放：{MusicData.Title}, Time: {CurrentTime}/{TotalTime}, IsMIDI: {FileReader.isMidi}, IsCUE: {MusicData.CUETrackData != null}");
 
             if (musicData == MusicData)
             {
@@ -675,7 +676,7 @@ namespace TewiMP.Media
             {
                 try
                 {
-                    resultPath = await App.cacheManager.StartCacheMusic(musicData);
+                    resultPath = await App.Instance.cacheManager.StartCacheMusic(musicData);
                 }
                 catch (Exception e) { throw; }
             }
@@ -691,7 +692,7 @@ namespace TewiMP.Media
                 MusicData = musicData;
                 Exception exception = null;
                 _filePath = resultPath;
-                App.logManager.Log("AudioPlayer", $"正在加载 \"{resultPath}\".");
+                LogManager.Log("AudioPlayer", $"正在加载 \"{resultPath}\".");
                 try
                 {
                     CacheLoadingChanged?.Invoke(this, null);
@@ -701,7 +702,7 @@ namespace TewiMP.Media
                 {
                     MusicData = m;
                     exception = err;
-                    App.logManager.Log("AudioPlayer", $"{err}", Background.LogLevel.Error);
+                    LogManager.Log("AudioPlayer", $"{err}", Background.LogLevel.Error);
                 }
                 finally
                 {
@@ -783,7 +784,7 @@ namespace TewiMP.Media
             await Task.Run(DisposeAll);
             FileReader = fileReader;
             FileProvider = fileProvider;
-            App.logManager.Log("AudioPlayer", $"FileReader filePath \"{fileReader.FileName}\".");
+            LogManager.Log("AudioPlayer", $"FileReader filePath \"{fileReader.FileName}\".");
             if (EqEnabled && !fileReader.isMidi)
             {
                 EqualizerBand = EqualizerBand;
@@ -806,7 +807,7 @@ namespace TewiMP.Media
                     InvalidChunkSizePolicy = InvalidChunkSizePolicy.Ignore
                 });
                 MidiPlayback = MidiFile.GetPlayback(MidiOutputDevice);
-                MidiPlayback.Finished += (_, __) => MainWindow.Invoke(() => AudioPlayer_PlaybackStopped(null, null));
+                MidiPlayback.Finished += (_, __) => App.MainWindowInstance.Invoke(() => AudioPlayer_PlaybackStopped(null, null));
                 MidiPlayback.Speed = Tempo;
             }
             else
@@ -820,7 +821,7 @@ namespace TewiMP.Media
                 switch (NowOutDevice.DeviceType)
                 {
                     case OutApi.WaveOut:
-                        App.logManager.Log("AudioPlayer", "Using WaveOut.");
+                        LogManager.Log("AudioPlayer", "Using WaveOut.");
                         await Task.Run(() => NowOutObj = new WaveOutEvent());
                         (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
                         (NowOutObj as WaveOutEvent).NumberOfBuffers = Latency;
@@ -828,7 +829,7 @@ namespace TewiMP.Media
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                     case OutApi.DirectSound:
-                        App.logManager.Log("AudioPlayer", "Using DirectSound.");
+                        LogManager.Log("AudioPlayer", "Using DirectSound.");
                         if (NowOutDevice.Device is null)
                         {
                             await Task.Run(() => NowOutObj = new DirectSoundOut(Latency));
@@ -841,7 +842,7 @@ namespace TewiMP.Media
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                     case OutApi.Wasapi:
-                        App.logManager.Log("AudioPlayer", "Using Wasapi.");
+                        LogManager.Log("AudioPlayer", "Using Wasapi.");
                         MMDevice device = null;
                         await Task.Run(() =>
                         {
@@ -866,7 +867,7 @@ namespace TewiMP.Media
                         device.Dispose();
                         break;
                     case OutApi.Asio:
-                        App.logManager.Log("AudioPlayer", "Using Asio.");
+                        LogManager.Log("AudioPlayer", "Using Asio.");
                         var asioOut = new AsioOut((int)NowOutDevice.Device);
                         asioOut.AutoStop = false;
                         NowOutObj = asioOut;
@@ -875,8 +876,8 @@ namespace TewiMP.Media
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                 }
-                App.logManager.Log("AudioPlayer", $"Inited FileReader filePath \"{fileReader.FileName}\".");
-                App.logManager.Log("AudioPlayer", $"Inited MusicData \"{MusicData}\".");
+                LogManager.Log("AudioPlayer", $"Inited FileReader filePath \"{fileReader.FileName}\".");
+                LogManager.Log("AudioPlayer", $"Inited MusicData \"{MusicData}\".");
             }
 
             SourceChanged?.Invoke(this);
@@ -928,7 +929,7 @@ namespace TewiMP.Media
                     SetPlay();
                 }
             }
-            catch (Exception err) { App.logManager.Log("AudioPlayer", err.ToString(), Background.LogLevel.Error); }
+            catch (Exception err) { LogManager.Log("AudioPlayer", err.ToString(), Background.LogLevel.Error); }
         }
 
         public void UpdateInfo()
@@ -960,7 +961,7 @@ namespace TewiMP.Media
         bool isCUEEndCalled = false;
         private void AudioPlayer_PlaybackStopped(object sender, StoppedEventArgs e)
         {
-            MainWindow.Invoke(() =>
+            App.MainWindowInstance.Invoke(() =>
             {
                 if (FileReader != null)
                 {
