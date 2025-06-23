@@ -181,6 +181,9 @@
 		<None Update="Images\Icons\icon.ico">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="LICENSE">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<Page Update="Pages\ListViewPages\PlayListPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</Page>

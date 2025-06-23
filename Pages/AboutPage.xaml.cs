@@ -8,6 +8,7 @@ using Windows.System;
 using NAudio.Wave;
 using TewiMP.Media;
 using TewiMP.Helpers;
+using System.IO;
 
 namespace TewiMP.Pages
 {
@@ -192,6 +193,21 @@ namespace TewiMP.Pages
         private async void Button_Click_4(object sender, RoutedEventArgs e)
         {
             await CodeHelper.OpenInBrowser("https://afdian.com/a/TewiStudio");
+        }
+
+        private void SettingsCard_Loading(FrameworkElement sender, object args)
+        {
+            var licensePath = Path.Combine(Environment.CurrentDirectory, "LICENSE");
+            if (File.Exists(licensePath))
+            {
+                var licence = File.ReadAllText(licensePath);
+                LicenseTextBlock.Text = licence;
+            }
+            else
+            {
+                LicenseExpander.IsEnabled = false;
+                LicenseExpander.Description = "找不到许可证文件。";
+            }
         }
     }
 }

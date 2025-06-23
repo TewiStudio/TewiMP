@@ -1,9 +1,9 @@
-﻿using NAudio.Dsp;
+﻿using System.IO;
+using System.Diagnostics;
+using System.Collections.Generic;
+using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using TewiMP.Helpers;
 
 namespace TewiMP.Media
