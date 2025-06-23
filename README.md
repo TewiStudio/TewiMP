@@ -25,7 +25,7 @@
 
 此程序处于测试阶段，有尚未实现的功能，以及可能导致程序崩溃的 Bug，并且编码技术非常差，有很多糟糕的实现，还请见谅。
 
-欢迎捐赠：[爱发电](https://afdian.com/a/TewiStudio)
+如果觉得用着还行，不妨到[爱发电](https://afdian.com/a/TewiStudio)给项目一点小小的支持吧！
 
 ## License
 
