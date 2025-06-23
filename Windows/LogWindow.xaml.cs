@@ -21,7 +21,7 @@ namespace TewiMP.Windowed
         public LogWindow()
         {
             InitializeComponent();
-            Handle = WindowHelperzn.WindowHelper.GetWindowHandle(this);
+            Handle = WindowHelpers.WindowHelper.GetWindowHandle(this);
 
             overlappedPresenter = OverlappedPresenter.Create();
 

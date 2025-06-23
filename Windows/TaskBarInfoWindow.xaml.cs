@@ -21,7 +21,7 @@ namespace TewiMP.Windowed
         public TaskBarInfoWindow()
         {
             InitializeComponent();
-            Handle = WindowHelperzn.WindowHelper.GetWindowHandle(this);
+            Handle = WindowHelpers.WindowHelper.GetWindowHandle(this);
 
             InitCallBack();
             InitTaskbarInfo();
@@ -52,7 +52,7 @@ namespace TewiMP.Windowed
             Activated += (_, __) =>
             {
                 __.Handled = true;
-                App.WindowLocal.Activate();
+                App.MainWindow.Activate();
             };
             AppWindow.Closing += (_, __) =>
             {
@@ -306,7 +306,7 @@ namespace TewiMP.Windowed
                     (uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(255, 99, 99, 99)), 255,
                     Vanara.PInvoke.User32.LayeredWindowAttributes.LWA_COLORKEY);
             }
-            Helpers.TransparentWindowHelper.TransparentHelper.SetTransparent(this, true);
+            Helpers.TransparentWindowHelper.TransparentHelper.SetTransparent(this);
         }
 
         private IntPtr SubClassWndProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, uint dwRefData)

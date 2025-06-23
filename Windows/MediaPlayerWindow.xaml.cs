@@ -56,7 +56,7 @@ namespace TewiMP.Windowed
         {
             InitializeComponent();
             Title = "Media Player Window";
-            appWindow = WindowHelperzn.WindowHelper.GetAppWindowForCurrentWindow(this);
+            appWindow = WindowHelpers.WindowHelper.GetAppWindowForCurrentWindow(this);
             appWindow.SetIcon("icon.ico");
 
             overlappedPresenter = OverlappedPresenter.Create();
@@ -103,7 +103,7 @@ namespace TewiMP.Windowed
             DefaultColor,
         }
 
-        static WindowHelperzn.WindowsSystemDispatcherQueueHelper m_wsdqHelper;
+        static WindowHelpers.WindowsSystemDispatcherQueueHelper m_wsdqHelper;
         static BackdropType m_currentBackdrop;
         static MicaController m_micaController;
         static DesktopAcrylicController m_acrylicController;

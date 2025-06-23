@@ -220,6 +220,14 @@
                                          Header="taglib-sharp"
                                          Description="Library for reading and writing metadata in media files."/>
                         
+                        
+                        <cc:SettingsCard IsClickEnabled="True"
+                                         ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
+                                         Click="SettingsCard_Click"
+                                         Tag="https://github.com/Zeugma440/atldotnet"
+                                         Header="atldotnet"
+                                         Description="Fully managed, portable and easy-to-use C# library to read and edit audio data and metadata (tags) from various audio formats, playlists and CUE sheets"/>
+                        
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
                                          Click="SettingsCard_Click"

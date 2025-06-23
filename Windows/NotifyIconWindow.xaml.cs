@@ -19,7 +19,7 @@ using TewiMP.Media;
 using TewiMP.Helpers;
 using TewiMP.DataEditor;
 using TewiMP.Background;
-using static TewiMP.Windowed.RoundWindow;
+using TewiMP.WindowHelpers;
 
 namespace TewiMP.Windowed
 {
@@ -59,14 +59,14 @@ namespace TewiMP.Windowed
             #region others
             if (MicaController.IsSupported()) // 确认系统版本为 win11
             {
-                hwnd = WindowHelperzn.WindowHelper.GetWindowHandle(this);
+                hwnd = WindowHelpers.WindowHelper.GetWindowHandle(this);
                 var preference = DWM_WINDOW_CORNER_PREFERENCE.DWMWCP_ROUND;
-                RoundWindow.DwmSetWindowAttribute(hwnd,
-                    RoundWindow.DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE, ref preference,
+                WindowHelpers.WindowHelper.DwmSetWindowAttribute(hwnd,
+                    DWMWINDOWATTRIBUTE.DWMWA_WINDOW_CORNER_PREFERENCE, ref preference,
                     sizeof(uint));
             }
             
-            presenter = OverlappedPresenter.CreateForDialog();
+            presenter = OverlappedPresenter.CreateForContextMenu(); // FIX: https://github.com/microsoft/microsoft-ui-xaml/issues/9978#issuecomment-2456461855
             AppWindow.SetPresenter(presenter);
             UpdateWindowDisplay();
 
@@ -95,9 +95,9 @@ namespace TewiMP.Windowed
 
             presenter.IsMaximizable = false;
             presenter.IsMinimizable = false;
-            presenter.IsResizable = false;
             presenter.IsAlwaysOnTop = true;
-            presenter.SetBorderAndTitleBar(true, false);
+            presenter.IsResizable = false;
+            presenter.SetBorderAndTitleBar(false, false);
         }
 
         private void Root_ActualThemeChanged(FrameworkElement sender, object args)
@@ -377,7 +377,7 @@ namespace TewiMP.Windowed
             DefaultColor,
         }
 
-        static WindowHelperzn.WindowsSystemDispatcherQueueHelper m_wsdqHelper;
+        static WindowHelpers.WindowsSystemDispatcherQueueHelper m_wsdqHelper;
         static BackdropType m_currentBackdrop;
         static MicaController m_micaController;
         static DesktopAcrylicController m_acrylicController;
@@ -706,27 +706,27 @@ namespace TewiMP.Windowed
             var windowHandle = new IntPtr((long)window.AppWindow.Id.Value);
             SetWindowSubclass(windowHandle, subClassProc, 0, 0);
 
-            var exStyle = Vanara.PInvoke.User32.GetWindowLongAuto(windowHandle, Vanara.PInvoke.User32.WindowLongFlags.GWL_EXSTYLE).ToInt32();
-            if ((exStyle & (int)Vanara.PInvoke.User32.WindowStylesEx.WS_EX_LAYERED) == 0)
+            var exStyle = User32.GetWindowLongAuto(windowHandle, User32.WindowLongFlags.GWL_EXSTYLE).ToInt32();
+            if ((exStyle & (int)User32.WindowStylesEx.WS_EX_LAYERED) == 0)
             {
-                exStyle |= (int)Vanara.PInvoke.User32.WindowStylesEx.WS_EX_LAYERED;
-                Vanara.PInvoke.User32.SetWindowLong(windowHandle, Vanara.PInvoke.User32.WindowLongFlags.GWL_EXSTYLE, exStyle);
-                Vanara.PInvoke.User32.SetLayeredWindowAttributes(
+                exStyle |= (int)User32.WindowStylesEx.WS_EX_LAYERED;
+                User32.SetWindowLong(windowHandle, User32.WindowLongFlags.GWL_EXSTYLE, exStyle);
+                User32.SetLayeredWindowAttributes(
                     windowHandle,
                     (uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(255, 99, 99, 99)), 255,
-                    Vanara.PInvoke.User32.LayeredWindowAttributes.LWA_COLORKEY);
+                    User32.LayeredWindowAttributes.LWA_COLORKEY);
             }
-            Helpers.TransparentWindowHelper.TransparentHelper.SetTransparent(window, true);
+            Helpers.TransparentWindowHelper.TransparentHelper.SetTransparent(window);
         }
 
         private IntPtr SubClassWndProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, uint dwRefData)
         {
-            if (uMsg == (uint)Vanara.PInvoke.User32.WindowMessage.WM_ERASEBKGND)
+            if (uMsg == (uint)User32.WindowMessage.WM_ERASEBKGND)
             {
-                if (Vanara.PInvoke.User32.GetClientRect(hWnd, out var rect))
+                if (User32.GetClientRect(hWnd, out var rect))
                 {
-                    using var brush = Vanara.PInvoke.Gdi32.CreateSolidBrush((uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(255, 99, 99, 99)));
-                    Vanara.PInvoke.User32.FillRect(wParam, rect, brush);
+                    using var brush = Gdi32.CreateSolidBrush((uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(255, 99, 99, 99)));
+                    User32.FillRect(wParam, rect, brush);
                     return new IntPtr(1);
                 }
             }
@@ -741,27 +741,5 @@ namespace TewiMP.Windowed
 
         [DllImport("Comctl32.dll", SetLastError = true)]
         private static extern bool SetWindowSubclass(IntPtr hWnd, SUBCLASSPROC pfnSubclass, uint uIdSubclass, uint dwRefData);
-    }
-
-    public class RoundWindow
-    {
-        public enum DWMWINDOWATTRIBUTE
-        {
-            DWMWA_WINDOW_CORNER_PREFERENCE = 33
-        }
-
-        public enum DWM_WINDOW_CORNER_PREFERENCE
-        {
-            DWMWCP_DEFAULT = 0,
-            DWMWCP_DONOTROUND = 1,
-            DWMWCP_ROUND = 2,
-            DWMWCP_ROUNDSMALL = 3
-        }
-
-        [DllImport("dwmapi.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
-        public static extern void DwmSetWindowAttribute(IntPtr hwnd,
-                                                         DWMWINDOWATTRIBUTE attribute,
-                                                         ref DWM_WINDOW_CORNER_PREFERENCE pvAttribute,
-                                                         uint cbAttribute);
     }
 }

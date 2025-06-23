@@ -221,7 +221,22 @@ namespace TewiMP.Background
             {
                 TheDownloader?.Dispose();
             };
-            var bytes = await TheDownloader.DownloadDataTaskAsync(new Uri(addressPath));
+            var bytes = await TheDownloader.DownloadDataTaskAsync(new Uri(addressPath)); // 下载音频文件
+
+            dm.DownloadState = DownloadStates.DownloadedPreview;
+            OnDownloadedPreview?.Invoke(dm);
+
+            var lyric = await dm.MusicData.PluginInfo.GetMusicSourcePlugin().GetLyric(dm.MusicData.ID); // 下载歌词
+            byte[] picDatas = null; // 图片数据
+            try
+            {
+                picDatas = await WebHelper.Client.GetByteArrayAsync(await WebHelper.GetPicturePathAsync(dm.MusicData)); // 下载图片
+            }
+            catch (Exception err)
+            {
+                App.logManager.Log("DownloadManager", err.ToString(), LogLevel.Error);
+            }
+
             dm.DownloadState = DownloadStates.DownloadedSaving;
             OnDownloadedSaving?.Invoke(dm);
             await Task.Run(() =>
@@ -233,23 +248,10 @@ namespace TewiMP.Background
                 File.WriteAllBytes(downloadPath, bytes);
             });
 
-
-            dm.DownloadState = DownloadStates.DownloadedPreview;
-            OnDownloadedPreview?.Invoke(dm);
-
             List<Tuple<string, byte[]>> artistsPictureData = new();
-            byte[] picDatas = null;
             if (writeImage)
             {
-                try
-                {
-                    picDatas = await WebHelper.Client.GetByteArrayAsync(await WebHelper.GetPicturePathAsync(dm.MusicData));
-                }
-                catch (Exception err)
-                {
-                    App.logManager.Log("DownloadManager", err.ToString(), LogLevel.Error);
-                }
-                if (IDv3WriteArtistImage)
+                if (writeArtistImage)
                 {
                     try
                     {
@@ -323,7 +325,6 @@ namespace TewiMP.Background
                 tag.AlbumArtists = tag.Performers;
             });
 
-            var lyric = await dm.MusicData.PluginInfo.GetMusicSourcePlugin().GetLyric(dm.MusicData.ID);
             if (lyric != null)
             {
                 if (!lyric.Item1.Contains("纯音乐，请欣赏"))

@@ -133,7 +133,7 @@ namespace TewiMP.Pages
                 MusicDataList.Clear();
                 SearchList.Clear();
 
-                var dpi = CodeHelper.GetScaleAdjustment(App.WindowLocal);
+                var dpi = CodeHelper.GetScaleAdjustment(App.MainWindow);
 
                 var count = pageNumber * pageSize - pageSize;
                 switch (NowSearchMode)

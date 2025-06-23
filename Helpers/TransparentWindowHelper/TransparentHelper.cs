@@ -1,24 +1,18 @@
 ﻿using WinRT;
+using Windows.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Composition;
+using Microsoft.UI;
 
 namespace TewiMP.Helpers.TransparentWindowHelper
 {
     public static class TransparentHelper
     {
-        public static void SetTransparent(Window window, bool isTransparent)
+        public static void SetTransparent(Window window, Color? color = null)
         {
             var brushHolder = window.As<ICompositionSupportsSystemBackdrop>();
-
-            if (isTransparent)
-            {
-                var colorBrush = WindowsCompositionHelper.Compositor.CreateColorBrush(Windows.UI.Color.FromArgb(0, 255, 255, 255));
-                brushHolder.SystemBackdrop = colorBrush;
-            }
-            else
-            {
-                brushHolder.SystemBackdrop = null;
-            }
+            var colorBrush = WindowsCompositionHelper.Compositor.CreateColorBrush(color ?? Colors.Transparent);
+            brushHolder.SystemBackdrop = colorBrush;
         }
     }
 }

@@ -952,5 +952,11 @@ namespace TewiMP.Pages
         {
             LogWindow.ShowWindow();
         }
+
+        private void SettingsCard_Click_3(object sender, RoutedEventArgs e)
+        {
+            var window = new BackgroundTransparentTestWindow();
+            window.Activate();
+        }
     }
 }

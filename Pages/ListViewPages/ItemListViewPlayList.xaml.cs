@@ -232,7 +232,7 @@ namespace TewiMP.Pages
                 LoadImage();
 
                 MusicDataList.Clear();
-                var dpi = CodeHelper.GetScaleAdjustment(App.WindowLocal);
+                var dpi = CodeHelper.GetScaleAdjustment(App.MainWindow);
                 MusicData[] array = null;
 
                 SortComboBox.SelectedItem = NavToObj.PlaySort;

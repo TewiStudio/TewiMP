@@ -1,19 +1,25 @@
-﻿using Microsoft.UI.Composition.SystemBackdrops;
-using Microsoft.UI.Composition;
+﻿using System;
+using System.Runtime.InteropServices;
 using Microsoft.UI.Xaml;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
 using WinRT.Interop;
-using WinRT;
 
-namespace TewiMP.WindowHelperzn
+namespace TewiMP.WindowHelpers
 {
+    public enum DWMWINDOWATTRIBUTE
+    {
+        DWMWA_WINDOW_CORNER_PREFERENCE = 33
+    }
+
+    public enum DWM_WINDOW_CORNER_PREFERENCE
+    {
+        DWMWCP_DEFAULT = 0,
+        DWMWCP_DONOTROUND = 1,
+        DWMWCP_ROUND = 2,
+        DWMWCP_ROUNDSMALL = 3
+    }
+
     public static class WindowHelper
     {
         public static AppWindow GetAppWindowForCurrentWindow(Window window)
@@ -37,6 +43,12 @@ namespace TewiMP.WindowHelperzn
 
         [DllImport("user32.dll", SetLastError = true)]
         public static extern uint GetWindowLong(IntPtr hWnd, int nIndex);
+
+        [DllImport("dwmapi.dll", CharSet = CharSet.Unicode, PreserveSig = false)]
+        public static extern void DwmSetWindowAttribute(IntPtr hwnd,
+                                                        DWMWINDOWATTRIBUTE attribute,
+                                                        ref DWM_WINDOW_CORNER_PREFERENCE pvAttribute,
+                                                        uint cbAttribute);
     }
 
     class WindowsSystemDispatcherQueueHelper

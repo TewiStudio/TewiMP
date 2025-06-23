@@ -1,22 +1,23 @@
-﻿using System;
+﻿using WinRT;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 using Microsoft.UI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Composition.SystemBackdrops;
-using Microsoft.UI.Composition;
-using System.Runtime.InteropServices;
-using System.Collections.ObjectModel;
-using TewiMP.DataEditor;
-using TewiMP.Media;
-using TewiMP.Helpers;
-using WinRT;
 using Windows.Graphics;
 using NAudio.Wave;
+using TewiMP.Media;
+using TewiMP.Helpers;
+using TewiMP.DataEditor;
 using Vanara.PInvoke;
-using System.Diagnostics;
+using WinUIEx;
+using Windows.UI;
 
 namespace TewiMP.Windowed
 {
@@ -24,9 +25,10 @@ namespace TewiMP.Windowed
     public enum LyricTranslateTextPosition { Center, Left, Right }
     public enum LyricTextBehavior { Exchange, MainLyric, NextLyric, OnlyMainLyric }
     public enum LyricTranslateTextBehavior { MainLyric, TranslateLyric, OnlyMainLyric, OnlyTranslate }
-    public sealed partial class DesktopLyricWindow : Window
+    public sealed partial class DesktopLyricWindow : WindowEx
     {
         public OverlappedPresenter overlappedPresenter { get; private set; }
+        private IntPtr hWndMain = IntPtr.Zero;
         private SUBCLASSPROC subClassProc;
         bool transparent = true;
         public static double LyricOpacity { get; set; } = 1.0;
@@ -39,6 +41,15 @@ namespace TewiMP.Windowed
         public static LyricTextBehavior LyricTextBehavior { get; set; } = LyricTextBehavior.Exchange;
         public static LyricTranslateTextBehavior LyricTranslateTextBehavior { get; set; } = LyricTranslateTextBehavior.MainLyric;
 
+        private void SetPresenter(bool isLockStyle = false)
+        {
+            IsMaximizable = false;
+            IsMinimizable = false;
+            IsAlwaysOnTop = true;
+            subClassProc = new SUBCLASSPROC(SubClassWndProc);
+            var windowHandle = new IntPtr((long)AppWindow.Id.Value);
+            SetWindowSubclass(windowHandle, subClassProc, 0, 0);
+        }
         public DesktopLyricWindow()
         {
             InitializeComponent();
@@ -49,16 +60,11 @@ namespace TewiMP.Windowed
 
             if (AppWindowTitleBar.IsCustomizationSupported())
             {
-                overlappedPresenter = OverlappedPresenter.Create();
-                overlappedPresenter.IsMaximizable = false;
-                overlappedPresenter.IsMinimizable = false;
-                overlappedPresenter.IsAlwaysOnTop = true;
-                //AppWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay);
-                AppWindow.SetPresenter(overlappedPresenter);
+                SetPresenter();
                 AppWindow.IsShownInSwitchers = false;
+                AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
                 AppWindow.Title = "DesktopLyric Window";
                 AppWindow.SetIcon(System.IO.Path.Combine("Images", "Icons", "icon.ico"));
-                AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
                 AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
                 AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                 AppWindow.TitleBar.ForegroundColor = Colors.Transparent;
@@ -85,8 +91,8 @@ namespace TewiMP.Windowed
                     }
                 }
             }
-            TrySetAcrylicBackdrop();
-            //SystemBackdrop = new DesktopAcrylicBackdrop();
+            SystemBackdrop = transparentTintBackdrop;
+            transparentTintBackdrop.TintColor = Color.FromArgb(100, 0, 0, 0);
             AppWindow.Closing += AppWindow_Closing;
         }
 
@@ -713,31 +719,30 @@ namespace TewiMP.Windowed
         static PointInt32 lastWindowPosition = default;
         static SizeInt32 lastWindowSize = default;
 
+        private DesktopAcrylicBackdrop acrylicBackdrop = new();
+        private TransparentTintBackdrop transparentTintBackdrop = new();
         public bool IsLock = false;
         public void Lock()
         {
             if (IsLock)
             {
                 IsLock = !IsLock;
-                MainWindow.OpenDesktopLyricWindow(false);
-                MainWindow.OpenDesktopLyricWindow();
+
+                this.SetExtendedWindowStyle(this.GetExtendedWindowStyle() & ~(ExtendedWindowStyle.Layered | ExtendedWindowStyle.Transparent));
+                this.SetWindowStyle(this.GetWindowStyle() | WindowStyle.Caption | WindowStyle.ThickFrame | WindowStyle.MinimizeBox | WindowStyle.MaximizeBox);
+                root.Padding = new(0);
+                transparentTintBackdrop.TintColor = Color.FromArgb(100, 0, 0, 0);
+                ToolButtonsBase.Visibility = Visibility.Visible;
             }
             else
             {
                 IsLock = !IsLock;
-                overlappedPresenter.IsResizable = false;
-                overlappedPresenter.SetBorderAndTitleBar(false, false);
-                DisposeAcrylicBackdrop();
-                TryTransparentWindow(); // winUI 1.6 preview 1 透明后会显示经典窗口边框
-                root.Padding = new(8,0,8,8); // 透明窗口后会导致窗口左右下往外增大 8 像素
+
+                this.SetExtendedWindowStyle(this.GetExtendedWindowStyle() | ExtendedWindowStyle.Layered | ExtendedWindowStyle.Transparent);
+                this.SetWindowStyle(this.GetWindowStyle() & ~(WindowStyle.Caption | WindowStyle.ThickFrame | WindowStyle.MinimizeBox | WindowStyle.MaximizeBox));
+                root.Padding = new(8, 0, 8, 8); // 透明窗口后会导致窗口左右下往外增大 8 像素
+                transparentTintBackdrop.TintColor = Color.FromArgb(0, 0, 0, 0);
                 ToolButtonsBase.Visibility = Visibility.Collapsed;
-
-                UpdateDragSize();
-                //SizeInt32 sizeInt32 = new(AppWindow.Size.Width - 1, AppWindow.Size.Height);
-                //SizeInt32 sizeInt32_1 = new(AppWindow.Size.Width + 1, AppWindow.Size.Height);
-                //AppWindow.Resize(sizeInt32);
-                //AppWindow.Resize(sizeInt32_1);
-
                 ShowInfo("使用 锁定桌面歌词 热键可以切换锁定状态");
             }
         }
@@ -771,86 +776,23 @@ namespace TewiMP.Windowed
             AppWindow.TitleBar.SetDragRectangles(rectInt32s);
         }
 
-        #region Enable Window Backdrop
-        SystemBackdropConfiguration m_configurationSource = new SystemBackdropConfiguration();
-        DesktopAcrylicController m_acrylicController = null;
-
-        bool TrySetAcrylicBackdrop()
-        {
-            if (DesktopAcrylicController.IsSupported())
-            {
-                Activated += DesktopLyricWindow_Activated;
-                Closed += DesktopLyricWindow_Closed;
-                
-                m_acrylicController = new DesktopAcrylicController()
-                {
-                    TintColor = Windows.UI.Color.FromArgb(255, 35, 35, 35),
-                    LuminosityOpacity = 0.8f,
-                    TintOpacity = 0f,
-                    FallbackColor = Windows.UI.Color.FromArgb(255, 40, 40, 40)
-                };
-
-                m_configurationSource.IsInputActive = true;
-                m_acrylicController.AddSystemBackdropTarget(this.As<ICompositionSupportsSystemBackdrop>());
-                m_acrylicController.SetSystemBackdropConfiguration(m_configurationSource);
-                return true;
-            }
-
-            return false;
-        }
-
         private void DesktopLyricWindow_Closed(object sender, WindowEventArgs args)
         {
             IsMoved = true;
             lastWindowPosition = AppWindow.Position;
             lastWindowSize = AppWindow.Size;
-            DisposeAcrylicBackdrop();
             App.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
             App.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
         }
 
-        private void DisposeAcrylicBackdrop()
-        {
-            m_acrylicController?.Dispose();
-            m_acrylicController = null;
-        }
-
-        private void DesktopLyricWindow_Activated(object sender, WindowActivatedEventArgs args)
-        {
-
-        }
-        #endregion
-
         #region Enable Transparent Window
-        public void TryTransparentWindow()
-        {
-            subClassProc = new SUBCLASSPROC(SubClassWndProc);
-            var windowHandle = new IntPtr((long)AppWindow.Id.Value);
-            SetWindowSubclass(windowHandle, subClassProc, 0, 0);
-
-            var wStyle = User32.GetWindowLongAuto(windowHandle, User32.WindowLongFlags.GWL_STYLE).ToInt32();
-            var exStyle = User32.GetWindowLongAuto(windowHandle, User32.WindowLongFlags.GWL_EXSTYLE).ToInt32();
-            if ((exStyle & (int)User32.WindowStylesEx.WS_EX_LAYERED) == 0)
-            {
-                exStyle |= (int)User32.WindowStylesEx.WS_EX_LAYERED;
-                exStyle |= (int)User32.WindowStylesEx.WS_EX_TRANSPARENT;
-                User32.SetWindowLong(windowHandle, User32.WindowLongFlags.GWL_STYLE, wStyle);
-                User32.SetWindowLong(windowHandle, User32.WindowLongFlags.GWL_EXSTYLE, exStyle);
-                User32.SetLayeredWindowAttributes(
-                    windowHandle,
-                    (uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(255, 99, 99, 99)), 255,
-                    User32.LayeredWindowAttributes.LWA_COLORKEY);
-            }
-            Helpers.TransparentWindowHelper.TransparentHelper.SetTransparent(this, true);
-        }
-
         private IntPtr SubClassWndProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, uint dwRefData)
         {
             if (uMsg == (uint)User32.WindowMessage.WM_ERASEBKGND)
             {
                 if (User32.GetClientRect(hWnd, out var rect))
                 {
-                    using var brush = Gdi32.CreateSolidBrush((uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(255, 99, 99, 99)));
+                    using var brush = Gdi32.CreateSolidBrush((uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(100, 0, 0, 0)));
                     User32.FillRect(wParam, rect, brush);
                     return new IntPtr(1);
                 }

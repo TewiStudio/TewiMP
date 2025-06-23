@@ -81,7 +81,7 @@ namespace TewiMP
         public static double NowDPI { get; set; } = 1.0;
         public static void InvokeDpiEvent()
         {
-            NowDPI = CodeHelper.GetScaleAdjustment(App.WindowLocal);
+            NowDPI = CodeHelper.GetScaleAdjustment(App.MainWindow);
             WindowDpiChanged?.Invoke(NowDPI);
         }
         public delegate void WindowDpiChangedDelegate(double newDPI);
@@ -101,7 +101,7 @@ namespace TewiMP
             SWindow = this;
             InitializeComponent();
 
-            Handle = WindowHelperzn.WindowHelper.GetWindowHandle(this);
+            Handle = WindowHelpers.WindowHelper.GetWindowHandle(this);
             SOverlappedPresenter = OverlappedPresenter.Create();
             AppWindow.SetPresenter(SOverlappedPresenter);
             AppWindowInstance = AppWindow;
@@ -148,7 +148,7 @@ namespace TewiMP
 
             InitializeTitleBar(SWindowGridBaseTop.RequestedTheme);
 
-            m_wsdqHelper = new WindowHelperzn.WindowsSystemDispatcherQueueHelper();
+            m_wsdqHelper = new WindowHelpers.WindowsSystemDispatcherQueueHelper();
             m_wsdqHelper.EnsureWindowsSystemDispatcherQueueController();
             SetDragRegionForCustomTitleBar(AppWindow);
 
@@ -1154,7 +1154,7 @@ namespace TewiMP
             DefaultColor
         }
 
-        static WindowHelperzn.WindowsSystemDispatcherQueueHelper m_wsdqHelper;
+        static WindowHelpers.WindowsSystemDispatcherQueueHelper m_wsdqHelper;
         public static BackdropType m_currentBackdrop;
         static MicaController m_micaController;
         static DesktopAcrylicController m_acrylicController;

@@ -107,7 +107,7 @@ namespace TewiMP.Pages
             {
                 LoadImage();
                 await Task.Delay(100);
-                var dpi = CodeHelper.GetScaleAdjustment(App.WindowLocal);
+                var dpi = CodeHelper.GetScaleAdjustment(App.MainWindow);
 
                 MusicDataList.Clear();
                 int count = 0;

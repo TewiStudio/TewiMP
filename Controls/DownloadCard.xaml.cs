@@ -148,7 +148,7 @@ namespace TewiMP.Controls
             CoverRectangle.Rect = new(0, 0, CompletedBackgroundBase.ActualWidth, CompletedBackgroundBase.ActualHeight);
             DownloadProgress.Value = 100;
             await Task.Delay(10);
-            MessageTb.Text = $"{CodeHelper.GetAutoSizeString(downloadData.DownloadedSize, 2)} | 下载完成";
+            MessageTb.Text = $"{CodeHelper.GetAutoSizeString((double)downloadData?.DownloadedSize, 2)} | 下载完成";
             FontIconBase.Glyph = "\uE73E";
         }
         
