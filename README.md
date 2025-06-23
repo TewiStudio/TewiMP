@@ -26,3 +26,7 @@
 此程序处于测试阶段，有尚未实现的功能，以及可能导致程序崩溃的 Bug，并且开始编码时作者刚刚接触编程，有很多糟糕的实现，还请见谅。
 
 欢迎捐赠：[爱发电](https://afdian.com/a/TewiStudio)
+
+## License
+
+This project is licensed under the GNU GPLv3 License. See the LICENSE file for details.
