@@ -23,6 +23,10 @@
 
 由于开始编码时 WinUI 仅迭代到 1.0 版本，因此代码里会有很多老旧的实现。
 
-此程序处于测试阶段，有尚未实现的功能，以及可能导致程序崩溃的 Bug，并且开始编码时作者刚刚接触编程，有很多糟糕的实现，还请见谅。
+此程序处于测试阶段，有尚未实现的功能，以及可能导致程序崩溃的 Bug，并且编码技术非常差，有很多糟糕的实现，还请见谅。
 
-欢迎捐赠：[爱发电](https://afdian.com/a/TewiStudio)
+如果觉得用着还行，不妨到[爱发电](https://afdian.com/a/TewiStudio)给项目一点小小的支持吧！
+
+## License
+
+This project is licensed under the GNU GPLv3 License. See the LICENSE file for details.
