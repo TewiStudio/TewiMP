@@ -111,13 +111,16 @@ namespace TewiMP
             LogManager.Info("MainWindow", "Inited");
         }
 
+        internal static SystemBackdropConfiguration systemBackdropConfiguration;
+        internal static DesktopAcrylicController desktopAcrylicController;
         internal static MicaBackdrop micaBackdrop = new();
         internal static MicaBackdrop micaAltBackdrop = new() { Kind = MicaKind.BaseAlt };
-        private static DesktopAcrylicBackdrop acrylicBackdrop = new();
         private static BlurredBackdrop blurBackdrop = new();
         private static TransparentTintBackdrop transparentTintBackdrop = new();
         public void SetBackdrop(BackdropType backdropType)
         {
+            desktopAcrylicController?.Dispose();
+            SystemBackdrop = null;
             CurrentBackdrop = backdropType;
             BackgroundImageRoot.Visibility = Visibility.Collapsed;
             BackgroundColor.Visibility = Visibility.Collapsed;
@@ -126,7 +129,25 @@ namespace TewiMP
             {
                 case BackdropType.Mica: SystemBackdrop = micaBackdrop; break;
                 case BackdropType.MicaAlt: SystemBackdrop = micaAltBackdrop; break;
-                case BackdropType.DesktopAcrylic: SystemBackdrop = acrylicBackdrop; break;
+                case BackdropType.DesktopAcrylic:
+                    ElementTheme elementTheme = WindowGridBase.RequestedTheme;
+                    if (elementTheme == ElementTheme.Default)
+                    {
+                        elementTheme = App.Current.RequestedTheme == ApplicationTheme.Light ? ElementTheme.Light : ElementTheme.Dark;
+                    }
+                    systemBackdropConfiguration = new();
+                    desktopAcrylicController = new()
+                    {
+                        LuminosityOpacity = 1f,
+                        TintOpacity = .5f,
+                        TintColor = elementTheme == ElementTheme.Dark ?
+                            Color.FromArgb(255, 32, 32, 32) :
+                            Color.FromArgb(255, 245, 245, 245)
+                    };
+                    SystemBackdrop = null;
+                    desktopAcrylicController.AddSystemBackdropTarget(this.As<ICompositionSupportsSystemBackdrop>());
+                    desktopAcrylicController.SetSystemBackdropConfiguration(systemBackdropConfiguration);
+                    break;
                 case BackdropType.Blur:
                     SystemBackdrop = blurBackdrop;
                     BackgroundMass.Visibility = Visibility.Visible;
@@ -288,6 +309,7 @@ namespace TewiMP
             if (isPreparedActivate) Activate();
 
             await Task.Delay(500);
+            LoadLastPlaying();
 
             List<string> hotKeyUsed = new();
             foreach (var hotKey in App.Instance.hotKeyManager.RegisteredHotKeys)
@@ -323,7 +345,7 @@ namespace TewiMP
             }
         }
 
-        public async void SaveNowPlaying()
+        public async Task SaveNowPlaying()
         {
             if (App.Instance.audioPlayer.MusicData is null) return;
 
@@ -414,7 +436,6 @@ namespace TewiMP
             Canvas.SetZIndex(AppTitleBar, 1);
 
             StaringPrepare();
-            LoadLastPlaying();
             //NotifyListView.ItemsSource = NotifyList;
             //PlayingListBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
             //VolumeBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
@@ -434,8 +455,7 @@ namespace TewiMP
         {
             if (CurrentBackdrop == BackdropType.DesktopAcrylic)
             {
-                // TODO
-                //acrylicBackdrop
+                SetBackdrop(CurrentBackdrop);
             }
             InitializeTitleBar(WindowGridBase.RequestedTheme);
         }
@@ -1567,6 +1587,7 @@ namespace TewiMP
 
                 LogManager.Log("MainWindow", "主界面被显示。");
                 GridBase.Visibility = Visibility.Visible;
+                InitializeTitleBar(WindowGridBase.RequestedTheme);
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualClosingAnimation);
                 musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
                 {
@@ -1614,6 +1635,7 @@ namespace TewiMP
                 InOpenMusicPage = true;
 
                 MusicPageBaseFrame.Visibility = Visibility.Visible;
+                InitializeTitleBar(SMusicPage.pageRoot.RequestedTheme);
                 musicPageVisual.Offset = new(0, (float)MusicPageBaseGrid.ActualHeight, 0);
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualOpeningAnimation);
                 musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>

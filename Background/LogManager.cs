@@ -20,7 +20,7 @@ namespace TewiMP.Background
     {
         public static void Log(string name, string content, LogLevel logLevel = LogLevel.Information)
         {
-            App.Instance.logManager.LogInstance(name, content, logLevel);
+            App.Instance?.logManager.LogInstance(name, content, logLevel);
         }
 
         public static void LogIf(bool b, string name, string content, LogLevel logLevel = LogLevel.Information)

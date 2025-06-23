@@ -249,21 +249,21 @@ namespace TewiMP
             taskBarInfoWindow = new();
         }
 
-        public void ExitApp()
+        public async Task ExitApp()
         {
+            LogManager.Log("App", "正在退出程序...");
             SaveSettings();
             MainWindowInstance.SetBackdrop(BackdropType.DefaultColor); // 在App.Instance.Exit前将MainWindow的Backdrop释放，否则会报错
-            MainWindowInstance.SaveNowPlaying();
             MainWindowInstance.DesktopLyricWindow?.Close();
             NotifyIconWindow.HideIcon();
             NotifyIconWindow.Close();
             taskBarInfoWindow.Close();
-            MainWindowInstance.Close();
             SMTC.DisplayUpdater.ClearAll();
             SMTC.DisplayUpdater.Update();
             audioPlayer.DisposeAll();
             hotKeyManager.UnregisterHotKeys([.. hotKeyManager.RegisteredHotKeys]);
-            LogManager.Log("App", "正在退出程序...");
+            await MainWindowInstance.SaveNowPlaying();
+            MainWindowInstance.Close();
             LogManager.DisposeNowLogStream();
             Current.Exit();
         }
