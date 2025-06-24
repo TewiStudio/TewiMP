@@ -91,7 +91,7 @@ namespace TewiMP.Windowed
                 }
             }
             SystemBackdrop = transparentTintBackdrop;
-            transparentTintBackdrop.TintColor = Color.FromArgb(100, 0, 0, 0);
+            transparentTintBackdrop.TintColor = Color.FromArgb(0, 0, 0, 0);
             AppWindow.Closing += AppWindow_Closing;
         }
 
@@ -101,7 +101,10 @@ namespace TewiMP.Windowed
         Vector3KeyFrameAnimation tb2Animation;
         private void root_Loaded(object sender, RoutedEventArgs e)
         {
-            AddEvents();/*
+            AddEvents();
+            RestartTimer();
+            SetLyric(App.Instance.lyricManager.NowLyricsData);
+            /*
             AnimateHelper.AnimateOffset(T1BaseViewbox, 0, 0, 0, 0.2, 0, 0, 0, 0,
                 out tb1Visual, out var compositor, out tb1Animation);
             AnimateHelper.AnimateOffset(T2BaseViewbox, 0, 0, 0, 0.2, 0, 0, 0, 0,
@@ -168,6 +171,8 @@ namespace TewiMP.Windowed
             App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
             App.Instance.lyricManager.LyricTimingChanged += LyricManager_LyricTimingChanged;
             AudioPlayer_PlayStateChanged(App.Instance.audioPlayer);
+            AudioPlayer_TimingChanged(App.Instance.audioPlayer);
+            LyricManager_LyricTimingChanged(App.Instance.lyricManager.NowLyricsData);
             App.Instance.audioPlayer.ReCallTiming();
             SetLyricOpacity(LyricOpacity);
         }
@@ -730,7 +735,6 @@ namespace TewiMP.Windowed
                 this.SetExtendedWindowStyle(this.GetExtendedWindowStyle() & ~(ExtendedWindowStyle.Layered | ExtendedWindowStyle.Transparent));
                 this.SetWindowStyle(this.GetWindowStyle() | WindowStyle.Caption | WindowStyle.ThickFrame | WindowStyle.MinimizeBox | WindowStyle.MaximizeBox);
                 root.Padding = new(0);
-                transparentTintBackdrop.TintColor = Color.FromArgb(100, 0, 0, 0);
                 ToolButtonsBase.Visibility = Visibility.Visible;
             }
             else
@@ -740,10 +744,10 @@ namespace TewiMP.Windowed
                 this.SetExtendedWindowStyle(this.GetExtendedWindowStyle() | ExtendedWindowStyle.Layered | ExtendedWindowStyle.Transparent);
                 this.SetWindowStyle(this.GetWindowStyle() & ~(WindowStyle.Caption | WindowStyle.ThickFrame | WindowStyle.MinimizeBox | WindowStyle.MaximizeBox));
                 root.Padding = new(8, 0, 8, 8); // 透明窗口后会导致窗口左右下往外增大 8 像素
-                transparentTintBackdrop.TintColor = Color.FromArgb(0, 0, 0, 0);
                 ToolButtonsBase.Visibility = Visibility.Collapsed;
                 ShowInfo("使用 锁定桌面歌词 热键可以切换锁定状态");
             }
+            RestartTimer();
         }
 
         private void LockButton_Click(object sender, RoutedEventArgs e)
@@ -784,20 +788,73 @@ namespace TewiMP.Windowed
             App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
         }
 
-        #region Enable Transparent Window
+        private void ToolButtonsBase_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+            TestMouseHoverState(true);
+        }
+
+        private void ToolButtonsBase_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        {
+        }
+
+        public bool IsMouseHoverWindow = false;
         private IntPtr SubClassWndProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, uint dwRefData)
         {
-            if (uMsg == (uint)User32.WindowMessage.WM_ERASEBKGND)
+            var msg = (User32.WindowMessage)uMsg;
+            if (msg == User32.WindowMessage.WM_ERASEBKGND)
             {
                 if (User32.GetClientRect(hWnd, out var rect))
                 {
-                    using var brush = Gdi32.CreateSolidBrush((uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(100, 0, 0, 0)));
+                    using var brush = Gdi32.CreateSolidBrush((uint)System.Drawing.ColorTranslator.ToWin32(System.Drawing.Color.FromArgb(0, 0, 0, 0)));
                     User32.FillRect(wParam, rect, brush);
                     return new IntPtr(1);
                 }
             }
+            if (msg is User32.WindowMessage.WM_NCMOUSEMOVE or User32.WindowMessage.WM_SIZE or User32.WindowMessage.WM_MOVE)
+            {
+                IsMouseHoverWindow = true;
+                TestMouseHoverState(true);
+            }
+            if (uMsg == 49900 || msg is User32.WindowMessage.WM_POINTERLEAVE) // mouse leave
+            {
+                IsMouseHoverWindow = false;
+                TestMouseHoverState(false);
+            }
+            //LogManager.Info("message", $"msg: {(User32.WindowMessage)uMsg}, w: {wParam}, l: {lParam}");
 
             return DefSubclassProc(hWnd, uMsg, wParam, lParam);
+        }
+
+        DispatcherTimer hoverTimer;
+        private void TestMouseHoverState(bool isHover)
+        {
+            if (isHover && !IsLock)
+            {
+                //RestartTimer();
+                BackgroundFill.Opacity = 1;
+            }
+            else
+            {
+                BackgroundFill.Opacity = IsLock ? 0 : .5;
+            }
+        }
+
+        private void RestartTimer()
+        {
+            if (hoverTimer is null)
+            {
+                hoverTimer = new();
+                hoverTimer.Interval = TimeSpan.FromSeconds(5);
+                hoverTimer.Tick += HoverTimer_Tick;
+            }
+            hoverTimer.Stop();
+            hoverTimer.Start();
+        }
+
+        private void HoverTimer_Tick(object sender, object e)
+        {
+            BackgroundFill.Opacity = IsLock ? 0 : .5;
+            hoverTimer.Stop();
         }
 
         private delegate IntPtr SUBCLASSPROC(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, uint dwRefData);
@@ -807,7 +864,6 @@ namespace TewiMP.Windowed
 
         [DllImport("Comctl32.dll", SetLastError = true)]
         private static extern bool SetWindowSubclass(IntPtr hWnd, SUBCLASSPROC pfnSubclass, uint uIdSubclass, uint dwRefData);
-        #endregion
 
         private void root_SizeChanged(object sender, SizeChangedEventArgs e)
         {

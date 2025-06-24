@@ -19,7 +19,7 @@ namespace TewiMP.Windowed
             //SystemBackdrop = new TransparentTintBackdrop() { TintColor = Color.FromArgb(50, 255, 0, 0) };
             AppWindow.TitleBar.ExtendsContentIntoTitleBar = true; 
             IsAlwaysOnTop = true;
-            this.CenterOnScreen(800, 600);
+            this.CenterOnScreen(1000, 1000);
             var handle = this.GetWindowHandle();
             var style = this.GetExtendedWindowStyle();
             this.SetExtendedWindowStyle(style | ExtendedWindowStyle.Layered | ExtendedWindowStyle.Transparent);

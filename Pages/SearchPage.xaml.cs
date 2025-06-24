@@ -16,15 +16,15 @@ namespace TewiMP.Pages
             var navToString = e.Parameter as string;
             if (string.IsNullOrEmpty(navToString)) return;
             SearchTextBox.Text = navToString;
-            var b = Enum.GetNames(typeof(SearchDataType)).ToList();
-            b.RemoveAt(b.IndexOf(b.Last()));
-            SearchTypeComboBox.ItemsSource = b;
-            SearchTypeComboBox.SelectedIndex = 0;
         }
 
         public SearchPage()
         {
             InitializeComponent();
+            var b = Enum.GetNames(typeof(SearchDataType)).ToList();
+            b.RemoveAt(b.IndexOf(b.Last()));
+            SearchTypeComboBox.ItemsSource = b;
+            SearchTypeComboBox.SelectedIndex = 0;
         }
 
         public void StartSearch(string title)

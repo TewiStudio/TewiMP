@@ -7,11 +7,11 @@
     xmlns:controls="using:TewiMP.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" SizeChanged="Window_SizeChanged"
+    mc:Ignorable="d" SizeChanged="Window_SizeChanged" Closed="DesktopLyricWindow_Closed"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:media="using:CommunityToolkit.WinUI.Media">
     <Grid x:Name="root" SizeChanged="root_SizeChanged" Loaded="root_Loaded"
-          Padding="0" Background="Transparent">
+          Padding="0" Background="Transparent" RequestedTheme="Dark">
         <Grid.Resources>
             <ResourceDictionary>
                 <SolidColorBrush x:Key="LrcForeground" Color="#DDFFFFFF"/>
@@ -19,7 +19,14 @@
                 <StaticResource x:Key="AccentLrcForeground" ResourceKey="AccentAAFillColorTertiaryBrush"/>
             </ResourceDictionary>
         </Grid.Resources>
-        <Grid Padding="24" Loaded="Grid_Loaded" RequestedTheme="Dark">
+        <Rectangle
+            VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+            Fill="#90000000" x:Name="BackgroundFill">
+            <Rectangle.OpacityTransition>
+                <ScalarTransition/>
+            </Rectangle.OpacityTransition>
+        </Rectangle>
+        <Grid Padding="24" Loaded="Grid_Loaded">
             <Grid.RowDefinitions>
                 <RowDefinition/>
                 <RowDefinition/>
@@ -97,13 +104,15 @@
         <Grid x:Name="ToolButtonsBase"
               VerticalAlignment="Top"
               HorizontalAlignment="Left"
-              RequestedTheme="Dark">
+              RequestedTheme="Dark"
+              PointerEntered="ToolButtonsBase_PointerEntered"
+              PointerExited="ToolButtonsBase_PointerExited">
             <StackPanel Margin="0,0,0,0"
                         x:Name="ToolButtonsStackPanel"
                         VerticalAlignment="Top"
                         HorizontalAlignment="Left"
                         Orientation="Horizontal"
-                        Opacity="0.3">
+                        Opacity="0.7">
                 <StackPanel.Resources>
                     <Style TargetType="FontIcon">
                         <Setter Property="FontSize" Value="16"/>

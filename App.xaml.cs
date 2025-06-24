@@ -14,7 +14,6 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Newtonsoft.Json.Linq;
 using WinRT.Interop;
-using WinUIEx;
 using NAudio.Wave;
 using TewiMP.Pages;
 using TewiMP.Media;
@@ -247,6 +246,8 @@ namespace TewiMP
 
             await Task.Delay(1000);
             taskBarInfoWindow = new();
+
+            //new MainWindow().Activate();
         }
 
         public async Task ExitApp()
