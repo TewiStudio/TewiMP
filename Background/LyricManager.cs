@@ -62,6 +62,8 @@ namespace TewiMP.Background
 
         public LyricManager()
         {
+            LogManager.Log("Starting", "初始化 LyricManager.");
+
             timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(UpdateInterval) };
             timer.Tick += (_, __) =>
             {

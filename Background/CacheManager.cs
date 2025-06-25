@@ -18,7 +18,10 @@ namespace TewiMP.Background
         public event CachingValueMusicData CachingStateChangeMusicData;
         public List<MusicData> InCachingMusicData = new();
 
-        public CacheManager() { }
+        public CacheManager()
+        {
+            LogManager.Log("Starting", "初始化 CacheManager.");
+        }
 
         /// <summary>
         /// 获取歌曲缓存地址
@@ -62,8 +65,8 @@ namespace TewiMP.Background
             if (data.PluginInfo.GetMusicSourcePlugin(false) is null)
             {
                 InCachingMusicData.Remove(data);
-                CachedMusicData?.Invoke(data, "未找到此音乐源插件。");
-                throw new PluginNotFoundException("未找到此音乐源插件。");
+                CachedMusicData?.Invoke(data, $"未找到此音乐源插件：{data.PluginInfo.NameAndAuthor} ({data.PluginInfo.Version})。");
+                throw new PluginNotFoundException($"未找到此音乐源插件：{data.PluginInfo.NameAndAuthor} ({data.PluginInfo.Version})。");
             }
 
             InCachingMusicData.Add(data);

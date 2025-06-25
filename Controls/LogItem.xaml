@@ -11,17 +11,10 @@
     Unloaded="UserControl_Unloaded">
     <Grid
         Padding="12,8,12,8">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="auto"/>
-            <RowDefinition/>
-        </Grid.RowDefinitions>
-        <TextBlock
-            x:Name="t1"
-            FontWeight="SemiBold"/>
         <TextBlock
             x:Name="t2" Grid.Row="1"
             TextWrapping="WrapWholeWords">
-            <Run x:Name="t2_1" FontWeight="Bold"/><Run x:Name="t2_2"/>
+            <Run x:Name="t1" FontWeight="SemiBold"/><Run x:Name="t2_1" FontWeight="Bold"/><Run x:Name="t2_2"/>
         </TextBlock>
     </Grid>
 </UserControl>

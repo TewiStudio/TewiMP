@@ -21,6 +21,8 @@ namespace TewiMP.Windowed
 
         public TaskBarInfoWindow()
         {
+            LogManager.Log("Starting", "初始化 TaskBarInfoWindow.");
+
             InitializeComponent();
             Handle = WindowHelpers.WindowHelper.GetWindowHandle(this);
 

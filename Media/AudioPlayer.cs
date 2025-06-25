@@ -555,6 +555,8 @@ namespace TewiMP.Media
 
         public AudioPlayer()
         {
+            LogManager.Log("Starting", "初始化 AudioPlayer.");
+
             timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(200) };
             timer.Tick += (_, __) => ReCallTiming();
 

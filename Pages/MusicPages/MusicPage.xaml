@@ -16,9 +16,9 @@
     mc:Ignorable="d" Opacity="1" IsHitTestVisible="True">
 
     <Page.Resources>
-        <StaticResource x:Key="TextForeground" ResourceKey="ButtonForegroundThemeBrush"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource SystemAccentColorLight2}"/>
         <DataTemplate x:Key="LyricTemplate" x:DataType="data:LyricData">
-            <controls:LyricItem/>
+        <controls:LyricItem/>
         </DataTemplate>
         <Style TargetType="ListViewItem">
             <Setter Property="Template">
@@ -53,7 +53,7 @@
         </Style>
     </Page.Resources>
 
-    <Grid>
+    <Grid x:Name="_pageRoot">
         <controls:MusicDataFlyout x:Name="MusicDataFlyout"/>
         <controls:ImageEx x:Name="BackgroundBaseImage" IsHitTestVisible="False"
                           VerticalAlignment="Center" HorizontalAlignment="Center"
@@ -278,7 +278,15 @@
                                 IsThumbToolTipEnabled="False"
                                 Padding="12,0,12,0"
                                 Grid.Column="1"
+                                Foreground="{ThemeResource AccentBrush}"
                                 ValueChanged="PlaySlider_ValueChanged">
+                            <Slider.Resources>
+                                <StaticResource x:Key="SliderThumbBackground" ResourceKey="AccentBrush"/>
+                                <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="SystemAccentColorLight1"/>
+                                <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="SystemAccentColorDark1"/>
+
+                                <StaticResource x:Key="SliderTrackFillPointerOver" ResourceKey="AccentBrush"/>
+                            </Slider.Resources>
                             <Slider.Background>
                                 <brush:BackdropGammaTransferBrush RedDisable="True" GreenDisable="True" BlueDisable="True"
                                                                 AlphaAmplitude="1.2" AlphaExponent="1.2" AlphaOffset="1.2"/>
@@ -397,7 +405,7 @@
             <Rectangle
                 x:Name="Debug_NowTimingChangeEventLight"
                 RadiusX="4" RadiusY="4"
-                Fill="{ThemeResource AccentFillColorDefaultBrush}"/>
+                Fill="{ThemeResource AccentBrush}"/>
             <TextBlock
                 x:Name="Debug_NowPlayingDurationText"
                 IsHitTestVisible="False" Margin="8,4"

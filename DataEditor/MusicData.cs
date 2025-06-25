@@ -474,41 +474,4 @@ namespace TewiMP.DataEditor
             return $"{string.Join(' ', Lyric)}{Lyric.Count}{LyricTimeSpan.Ticks}";
         }
     }
-
-    public static class Music
-    {
-        public static List<string> GetArtistStrings(List<Artist> artists)
-        {
-            List<string> a = new();
-            foreach (Artist artist in artists)
-            {
-                a.Add(artist.ToString());
-            }
-            return a;
-        }
-
-        public static MusicFrom MusicFromFromString(this string text)
-        {
-            MusicFrom musicFrom = MusicFrom.localMusic;
-
-            try
-            {
-                switch (text)
-                {
-                    case "localMusic":
-                        musicFrom = MusicFrom.localMusic;
-                        break;
-                    default:
-                        musicFrom = MusicFrom.pluginMusicSource;
-                        break;
-                }
-            }
-            catch
-            {
-                musicFrom = MusicFrom.pluginMusicSource;
-            }
-
-            return musicFrom;
-        }
-    }
 }

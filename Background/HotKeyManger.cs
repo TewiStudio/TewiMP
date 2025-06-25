@@ -183,6 +183,7 @@ namespace TewiMP.Background.HotKeys
 
         public HotKeyManager()
         {
+            LogManager.Log("Starting", "初始化 HotKeyManager.");
         }
 
         public void Init(Window window)
@@ -192,6 +193,7 @@ namespace TewiMP.Background.HotKeys
             RegisteredHotKeys = [.. WillRegisterHotKeysList];
             EnableHotKey = enableHotKey;
             InitCallBack();
+            LogManager.Log("HotKeyManager", $"Window: {RegisteredWindowHandle}, EnableHotKey: {EnableHotKey}, Registered HotKey Count: {RegisteredHotKeys.Count}");
         }
 
         public bool RegisterHotKey(HotKey hotKey, int? insertIndex = null)

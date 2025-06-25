@@ -73,6 +73,8 @@ namespace TewiMP.Background
 
         public PlayingList()
         {
+            LogManager.Log("Starting", "初始化 PlayingList.");
+
             App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
             App.Instance.audioPlayer.PlayEnd += AudioPlayer_PlayEnd;
         }
@@ -218,7 +220,7 @@ namespace TewiMP.Background
         }
 
         int nextErrorCount = 0;
-        public async Task<bool> Play(MusicData musicData, bool isAutoPlay = false, SetPlayInfo isNextPlay = default)
+        public async Task<bool> Play(MusicData musicData, bool isAutoPlay = true, SetPlayInfo isNextPlay = default)
         {
             Add(musicData, true, true);
 
@@ -233,7 +235,7 @@ namespace TewiMP.Background
             }
             else
             {
-                playState = NAudio.Wave.PlaybackState.Playing;
+                playState = NAudio.Wave.PlaybackState.Paused;
             }
 
             if (isAutoPlay)
@@ -325,7 +327,7 @@ namespace TewiMP.Background
             await SongHistoryHelper.AddHistory(new() { MusicData = musicData, Time = DateTime.Now });
         }
 
-        public async Task<bool> PlayNext(bool isAutoPlay = false)
+        public async Task<bool> PlayNext(bool isAutoPlay = true)
         {
             if (NowPlayingList.Any())
             {
@@ -341,7 +343,7 @@ namespace TewiMP.Background
             return true;
         }
 
-        public async Task<bool> PlayPrevious()
+        public async Task<bool> PlayPrevious(bool isAutoPlay = true)
         {
             if (NowPlayingList.Any())
             {
@@ -351,7 +353,7 @@ namespace TewiMP.Background
                     a = NowPlayingList.Count - 1;
                 }
 
-                return await Play(NowPlayingList[a], false, SetPlayInfo.Previous);
+                return await Play(NowPlayingList[a], isAutoPlay, SetPlayInfo.Previous);
             }
 
             return true;

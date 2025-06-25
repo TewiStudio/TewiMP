@@ -212,7 +212,8 @@
                             Click="Button_Click_1"
                             RightTapped="Button_RightTapped"
                             Holding="Button_Holding"
-                            AccessKey="BM">
+                            AccessKey="BM"
+                            ToolTipService.ToolTip="打开音乐界面">
                             <Button.Resources>
                                 <ResourceDictionary>
                                     <ResourceDictionary.ThemeDictionaries>
@@ -334,9 +335,10 @@
                                         Background="Transparent"
                                         Click="PlayButton_Click"
                                         IsHoldingEnabled="True"
-                                        Holding="PlayButton_Holding"
                                         IsRightTapEnabled="True"
-                                        RightTapped="PlayButton_RightTapped">
+                                        Holding="PlayButton_Holding"
+                                        RightTapped="PlayButton_RightTapped"
+                                        ToolTipService.ToolTip="鼠标右键或长按以调整进度">
                                         <Button.Resources>
                                             <TeachingTip
                                                 x:Name="PlayTimeSliderBasePopup"

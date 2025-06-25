@@ -50,6 +50,7 @@ namespace TewiMP.Windowed
         nint hwnd = 0;
         public NotifyIconWindow()
         {
+            LogManager.Log("Starting", "初始化 NotifyIconWindow.");
             InitializeComponent();
 
             notifyIcon = new System.Windows.Forms.NotifyIcon();

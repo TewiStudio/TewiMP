@@ -85,7 +85,7 @@ namespace TewiMP
 
         public MainWindow()
         {
-            LogManager.Info("MainWindow", "Initing");
+            LogManager.Info("Staring", "初始化 MainWindow.");
             InitializeComponent();
 
             Handle = this.GetWindowHandle();
@@ -198,7 +198,7 @@ namespace TewiMP
             isShowClosingDialog = false;
         }
 
-        public async void StaringPrepare()
+        public void StaringPrepare()
         {
             var displayArea = CodeHelper.GetDisplayArea(this);
             var dpi = CodeHelper.GetScaleAdjustment(this);
@@ -308,9 +308,6 @@ namespace TewiMP
 
             if (isPreparedActivate) Activate();
 
-            await Task.Delay(500);
-            LoadLastPlaying();
-
             List<string> hotKeyUsed = new();
             foreach (var hotKey in App.Instance.hotKeyManager.RegisteredHotKeys)
             {
@@ -402,7 +399,6 @@ namespace TewiMP
                 App.Instance.playingList.SetRandomPlay(PlayBehavior.随机播放);
             }
             await App.Instance.playingList.Play(musicData, false);
-            App.Instance.audioPlayer.SetPause();
         }
 
         #region Window Events
@@ -436,6 +432,7 @@ namespace TewiMP
             Canvas.SetZIndex(AppTitleBar, 1);
 
             StaringPrepare();
+            LoadLastPlaying();
             //NotifyListView.ItemsSource = NotifyList;
             //PlayingListBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
             //VolumeBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();

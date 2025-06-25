@@ -62,6 +62,8 @@ namespace TewiMP.Background
 
         public DownloadManager()
         {
+            LogManager.Log("Starting", "初始化 DownloadManager.");
+
             OnDownloaded += (_) =>
             {
                 UpdateDownload();

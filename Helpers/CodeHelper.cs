@@ -496,12 +496,91 @@ namespace TewiMP.Helpers
             return Convert.ToBase64String(encryptData);//将加密后的字节数组转换为加密字符串
         }
 
-        public static bool IsAccentColorDark()
+        public static bool IsAccentColorDark(Windows.UI.Color c)
         {
-            var uiSettings = new UISettings();
-            var c = uiSettings.GetColorValue(UIColorType.Accent);
+            //var uiSettings = new UISettings();
+            //var c = uiSettings.GetColorValue(UIColorType.Accent);
             bool isDark = (5 * c.G + 2 * c.R + c.B) <= 8 * 128;
             return isDark;
+        }
+
+        public static Windows.UI.Color Lighten(this Windows.UI.Color color, float amount)
+        {
+            return Windows.UI.Color.FromArgb(
+                color.A,
+                (byte)(color.R + (255 - color.R) * amount),
+                (byte)(color.G + (255 - color.G) * amount),
+                (byte)(color.B + (255 - color.B) * amount));
+        }
+
+        public static Windows.UI.Color Darken(this Windows.UI.Color color, float amount)
+        {
+            return Windows.UI.Color.FromArgb(
+                color.A,
+                (byte)(color.R * (1 - amount)),
+                (byte)(color.G * (1 - amount)),
+                (byte)(color.B * (1 - amount)));
+        }
+
+        public static Windows.UI.Color ColorFromHSV(double hue, double saturation, double value)
+        {
+            int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
+            double f = hue / 60 - Math.Floor(hue / 60);
+
+            value = value * 255;
+            if (value > 255)
+                value = 255;
+            var v = Convert.ToByte(value);
+            var p = Convert.ToByte(value * (1 - saturation));
+            var q = Convert.ToByte(value * (1 - f * saturation));
+            var t = Convert.ToByte(value * (1 - (1 - f) * saturation));
+
+            if (hi == 0)
+                return Windows.UI.Color.FromArgb(255, v, t, p);
+            else if (hi == 1)
+                return Windows.UI.Color.FromArgb(255, q, v, p);
+            else if (hi == 2)
+                return Windows.UI.Color.FromArgb(255, p, v, t);
+            else if (hi == 3)
+                return Windows.UI.Color.FromArgb(255, p, q, v);
+            else if (hi == 4)
+                return Windows.UI.Color.FromArgb(255, t, p, v);
+            else
+                return Windows.UI.Color.FromArgb(255, v, p, q);
+        }
+
+        public static void ColorToHSV(this Windows.UI.Color color, out double hue, out double saturation, out double value)
+        {
+            int max = Math.Max(color.R, Math.Max(color.G, color.B));
+            int min = Math.Min(color.R, Math.Min(color.G, color.B));
+
+            float hsbB = max / 255.0f;
+            float hsbS = max == 0 ? 0 : (max - min) / (float)max;
+
+            float hsbH = 0;
+            if (max == min)
+            {
+                hsbH = 0;
+            }
+            else if (max == color.R && color.G >= color.B)
+            {
+                hsbH = (color.G - color.B) * 60f / (max - min) + 0;
+            }
+            else if (max == color.R && color.G < color.B)
+            {
+                hsbH = (color.G - color.B) * 60f / (max - min) + 360;
+            }
+            else if (max == color.G)
+            {
+                hsbH = (color.B - color.R) * 60f / (max - min) + 120;
+            }
+            else if (max == color.B)
+            {
+                hsbH = (color.R - color.G) * 60f / (max - min) + 240;
+            }
+            hue = hsbH;
+            saturation = hsbS;
+            value = hsbB;
         }
 
         public static async Task<bool> OpenInBrowser(Uri uri)

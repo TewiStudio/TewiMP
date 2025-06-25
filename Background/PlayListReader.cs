@@ -23,7 +23,10 @@ namespace TewiMP.Background
             }
         }
 
-        public PlayListReader() { }
+        public PlayListReader()
+        {
+            LogManager.Log("Starting", "初始化 PlayListReader.");
+        }
 
         bool inRefresh = false;
         public async Task Refresh()
@@ -49,7 +52,11 @@ namespace TewiMP.Background
 
         public ObservableCollection<SongItemBindBase> LocalMusicItems { get; set; } = [];
 
-        public LocalMusicManager() => Refresh();
+        public LocalMusicManager()
+        {
+            LogManager.Log("Starting", "初始化 LocalMusicManager.");
+            Refresh();
+        }
 
         bool isAnalyzingData = false;
         public async Task ReAnalysisMusicDatas()

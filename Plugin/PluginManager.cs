@@ -19,6 +19,7 @@ namespace TewiMP.Plugin
 
         public static void Init()
         {
+            LogManager.Log("PluginManager", "初始化 PluginManager.");
             RemoveAllPlugin();
             /*
             assemblyLoadContext?.Unload();
@@ -27,7 +28,7 @@ namespace TewiMP.Plugin
 
             DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
             var dllFiles = directoryInfo.GetFiles();
-            LogManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}");
+            LogManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}.");
 
             for (int i = 0; i < dllFiles.Length; i++)
             {
@@ -142,11 +143,13 @@ namespace TewiMP.Plugin
         public static void EnablePlugin(Plugin plugin)
         {
             plugin.OnEnable();
+            LogManager.Log("PluginManager", $"Enabled plugin: {plugin.PluginInfo.Name}.");
         }
 
         public static void DisablePlugin(Plugin plugin)
         {
             plugin.OnDisable();
+            LogManager.Log("PluginManager", $"Disabled plugin: {plugin.PluginInfo.Name}.");
         }
 
         public static void UpdatePluginInfoSettings()

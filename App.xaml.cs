@@ -80,7 +80,7 @@ namespace TewiMP
             Available = true,
             SuffixType = SuffixType.Beta,
             Version = Assembly.GetExecutingAssembly().GetName().Version,
-            ReleaseTime = 1749638422L.ToDateTime(),
+            ReleaseTime = new(2025, 6, 25),
             ExtendMessage = null
         };
         public Version AppVersion => NowVersion.Version;
@@ -118,10 +118,11 @@ namespace TewiMP
         /// will be used such as when the application is launched to open settingData specific file.
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
-        protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
+        protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             base.OnLaunched(args);
             logManager = new();
+            LogManager.Log("Staring", "准备初始化...");
 
             m_window = new MainWindow();
             MainWindow = m_window;
@@ -137,6 +138,7 @@ namespace TewiMP
             playListReader = new();
             hotKeyManager = new();
 
+            LogManager.Log("Starting", "初始化 SystemMediaTransportControls.");
             BMP = BackgroundMediaPlayer.Current;
             BMP.AudioCategory = MediaPlayerAudioCategory.Media;
 
@@ -220,9 +222,10 @@ namespace TewiMP
             LoadSettings();
 
             // WinUI Bug: 获取不到启动参数
-            //LAE = args;
+            //LAE = args;=
             LaunchArgs = [.. Environment.GetCommandLineArgs()];
             LaunchArgs.Remove(LaunchArgs.First());
+            LogManager.Log("Starting", $"启动参数：{string.Join(", ", LaunchArgs)}.");
 
             hotKeyManager.Init(MainWindow);
             if (loadFailed)
@@ -232,19 +235,20 @@ namespace TewiMP
             }
             DelayOpenWindows();
             PluginManager.Init();
+            LogManager.Log("Starting", "初始化完成。");
         }
 
-        public async void DelayOpenWindows()
+        public void DelayOpenWindows()
         {
 #if DEBUG
             //await Task.Delay(2000);
 #endif
             // 在 Windows App SDK 1.4 的版本一直闪退，1.3 则不会
             // 似乎有两个以上的窗口一起启动会导致崩溃，微软你干的好事😡
-            await Task.Delay(1000);
+            // Note: 1.7 已修复
+            //await Task.Delay(1000);
             NotifyIconWindow = new();
-
-            await Task.Delay(1000);
+            //await Task.Delay(1000);
             taskBarInfoWindow = new();
 
             //new MainWindow().Activate();

@@ -1,21 +1,27 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media.Animation;
+﻿using CommunityToolkit.WinUI;
+using Microsoft.UI;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Input;
 using Microsoft.UI.Windowing;
-using Microsoft.UI.Composition;
-using CommunityToolkit.WinUI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
 using NAudio.Wave;
-using TewiMP.Helpers;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using TewiMP.Background;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
-using TewiMP.Background;
+using TewiMP.Helpers;
+using Vanara.PInvoke;
+using Windows.Graphics.Imaging;
+using Windows.UI;
+using Windows.UI.ViewManagement;
 
 namespace TewiMP.Pages.MusicPages
 {
@@ -221,8 +227,10 @@ namespace TewiMP.Pages.MusicPages
             }*/
         }
 
+        string imagePath;
         private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
         {
+            imagePath = _;
             if (imageSource is null)
             {
                 BackgroundBaseImage.Source = null;
@@ -237,6 +245,26 @@ namespace TewiMP.Pages.MusicPages
             AlbumImageBase.SaveName = $"{MusicData.Title} · {MusicData.Album.Title}";
             //BackgroundFillBase.Opacity = 1;
             LogManager.Log("MusicPage", $"图片已被更改.");
+            GetImageColor();
+        }
+
+        private async Task GetImageColor()
+        {
+            if (string.IsNullOrEmpty(imagePath)) return;
+            var themeColor = await GetThemeColorAsync(imagePath);
+            (pageRoot.Resources["AccentBrush"] as SolidColorBrush).Color = themeColor;
+            //(pageRoot.Resources["AccentFillColorDefaultBrush"] as SolidColorBrush).Color = themeColor;
+        }
+
+        public async Task<Color> GetThemeColorAsync(string file)
+        {
+            using var bitmap = new System.Drawing.Bitmap(file);
+            var colorThief = new ColorThiefDotNet.ColorThief();
+            var qColor = await Task.Run(() => colorThief.GetColor(bitmap, 4));
+            var c = qColor.Color;
+            var result = Color.FromArgb(c.A, c.R, c.G, c.B);
+            result.ColorToHSV(out var h, out var s, out var v);
+            return CodeHelper.ColorFromHSV(h, s + .4, v + .4);
         }
 
         private void BackgroundBaseImage_Loaded(object sender, RoutedEventArgs e)

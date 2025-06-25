@@ -49,7 +49,7 @@
                         <StackPanel VerticalAlignment="Bottom"
                                     Grid.Row="1">
                             <TextBlock TextWrapping="Wrap">
-                                Powered by <Hyperlink Click="Hyperlink_Click">.NET 8</Hyperlink> &#x0026; <Hyperlink Click="Hyperlink_Click_1">Windows App SDK 1.6</Hyperlink>
+                                Powered by <Hyperlink Click="Hyperlink_Click">.NET 9</Hyperlink> &#x0026; <Hyperlink Click="Hyperlink_Click_1">Windows App SDK 1.7</Hyperlink>
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">
                                 © 2025 TewiStudio.
@@ -99,28 +99,7 @@
                     <Button Content="检查更新" Click="Button_Click_1"/>
                 </cc:SettingsExpander>
 
-                <cc:SettingsExpander Header="许可证"
-                                     HorizontalAlignment="Stretch"
-                                     Margin="0,-4,0,0"
-                                     x:Name="LicenseExpander">
-                    <cc:SettingsExpander.Transitions>
-                        <TransitionCollection>
-                            <RepositionThemeTransition/>
-                        </TransitionCollection>
-                    </cc:SettingsExpander.Transitions>
-                    <cc:SettingsExpander.Items>
-                        <cc:SettingsCard Loading="SettingsCard_Loading">
-                            <cc:SettingsCard.Header>
-                                <TextBlock x:Name="LicenseHeaderTextBlock"></TextBlock>
-                            </cc:SettingsCard.Header>
-                            <cc:SettingsCard.Description>
-                                <TextBlock x:Name="LicenseTextBlock" IsTextSelectionEnabled="True"></TextBlock>
-                            </cc:SettingsCard.Description>
-                        </cc:SettingsCard>
-                    </cc:SettingsExpander.Items>
-                </cc:SettingsExpander>
-                
-                <cc:SettingsExpander Header="使用的开放源代码库"
+                <cc:SettingsExpander Header="使用的开源代码库、框架或程序"
                                      HorizontalAlignment="Stretch"
                                      Margin="0,-4,0,0">
                     <cc:SettingsExpander.Transitions>
@@ -293,7 +272,28 @@
                                          Description="A C# library for converting Japanese sentence to Hiragana, Katakana or Romaji with furigana and okurigana modes supported. Inspired by project Kuroshiro."/>
                     </cc:SettingsExpander.Items>
                 </cc:SettingsExpander>
-                
+
+                <cc:SettingsExpander Header="许可证"
+                                     HorizontalAlignment="Stretch"
+                                     Margin="0,-4,0,0"
+                                     x:Name="LicenseExpander">
+                    <cc:SettingsExpander.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </cc:SettingsExpander.Transitions>
+                    <cc:SettingsExpander.Items>
+                        <cc:SettingsCard Loading="SettingsCard_Loading">
+                            <cc:SettingsCard.Header>
+                                <TextBlock x:Name="LicenseHeaderTextBlock"></TextBlock>
+                            </cc:SettingsCard.Header>
+                            <cc:SettingsCard.Description>
+                                <TextBlock x:Name="LicenseTextBlock" IsTextSelectionEnabled="True"></TextBlock>
+                            </cc:SettingsCard.Description>
+                        </cc:SettingsCard>
+                    </cc:SettingsExpander.Items>
+                </cc:SettingsExpander>
+
                 <TextBlock HorizontalAlignment="Left">
                     <TextBlock.Transitions>
                         <TransitionCollection>
