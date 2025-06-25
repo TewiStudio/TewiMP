@@ -174,6 +174,7 @@ namespace TewiMP.Background
             ImageSource a = null;
 
             var _ = await ImageManage.GetImageSource(audioPlayer.MusicData);
+            var thumbnail = await ImageManage.GetImageSource(audioPlayer.MusicData);
             a = _.Item1;
             path = _.Item2;
 

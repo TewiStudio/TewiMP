@@ -13,6 +13,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="pageRoot" Loaded="pageRoot_Loaded" x:FieldModifier="Public"
+    ActualThemeChanged="pageRoot_ActualThemeChanged"
     mc:Ignorable="d" Opacity="1" IsHitTestVisible="True">
 
     <Page.Resources>
@@ -28,7 +29,7 @@
                             BorderBrush="Transparent"
                             Background="{x:Null}"
                             Foreground="{ThemeResource MusicPageLrcForeground}"
-                            SelectedForeground="{ThemeResource MusicPageSelectLyricForeground}"
+                            SelectedForeground="{ThemeResource AccentBrush}"
                             ContentTransitions="{TemplateBinding ContentTransitions}"
                             SelectionCheckMarkVisualEnabled="False"
                             PlaceholderBackground="Transparent"
@@ -56,10 +57,10 @@
     <Grid x:Name="_pageRoot">
         <controls:MusicDataFlyout x:Name="MusicDataFlyout"/>
         <controls:ImageEx x:Name="BackgroundBaseImage" IsHitTestVisible="False"
-                          VerticalAlignment="Center" HorizontalAlignment="Center"
+                          VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="1"
                           Stretch="UniformToFill" Loaded="BackgroundBaseImage_Loaded"/>
         <TextBlock x:Name="BridgeTb" TextAlignment="Left" HorizontalAlignment="Left"/>
-        <Grid Name="BackgroundFillBase" Opacity="1" Background="Transparent"
+        <Grid Name="BackgroundFillBase" Background="Transparent"
               RightTapped="BackgroundFillBase_RightTapped">
             <Grid.OpacityTransition>
                 <ScalarTransition/>
@@ -110,7 +111,22 @@
                             </uis:Effects.Shadow>
                         </controls:ImageEx>
                     </Grid>
-                    <Grid x:Name="LyricSecondPlaceGrid" Margin="0,8,0,0" Grid.Row="1" SizeChanged="MusicPage_SizeChanged">
+                    <ui:OpacityMaskView x:Name="LyricSecondPlaceGrid"
+                                        Margin="0,8,0,0" Grid.Row="1"
+                                        HorizontalAlignment="Center"
+                                        SizeChanged="MusicPage_SizeChanged">
+                        <ui:OpacityMaskView.OpacityMask>
+                            <Rectangle>
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Offset="0" Color="Transparent" />
+                                        <GradientStop Offset=".15" Color="White" />
+                                        <GradientStop Offset=".85" Color="White" />
+                                        <GradientStop Offset="1" Color="Transparent" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </ui:OpacityMaskView.OpacityMask>
                         <ListView x:Name="LrcSecondListView"
                                   ItemsSource="{Binding ElementName=LrcBaseListView,Path=ItemsSource}"
                                   ItemTemplate="{ThemeResource LyricTemplate}"
@@ -120,7 +136,7 @@
                                   IsFocusEngagementEnabled="True"
                                   PointerWheelChanged="LrcSecondListView_PointerWheelChanged"
                                   Background="{x:Null}"/>
-                    </Grid>
+                    </ui:OpacityMaskView>
                     <StackPanel x:Name="InfoBaseTitle" Grid.Row="2" Loaded="InfoBaseTitle_Loaded"
                                 Spacing="4" Margin="0,12,0,0">
                         <StackPanel.Resources>
@@ -225,12 +241,20 @@
                 </Grid>
 
                 <Grid x:Name="LyricBaseGrid" Grid.Column="1" Grid.Row="0">
-                    <Grid x:Name="LrcBaseGrid">
-                        <Grid.Transitions>
-                            <TransitionCollection>
-                                <RepositionThemeTransition/>
-                            </TransitionCollection>
-                        </Grid.Transitions>
+                    <ui:OpacityMaskView x:Name="LrcBaseGrid">
+                        <ui:OpacityMaskView.OpacityMask>
+                            <Rectangle>
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Offset="0" Color="Transparent" />
+                                        <GradientStop Offset=".15" Color="White" />
+                                        <GradientStop Offset=".85" Color="White" />
+                                        <GradientStop Offset="1" Color="Transparent" />
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                        </ui:OpacityMaskView.OpacityMask>
+
                         <ListView x:Name="LrcBaseListView"
                                   Loaded="LrcBaseListView_Loaded"
                                   Background="{x:Null}"
@@ -242,7 +266,7 @@
                                   ItemTemplate="{ThemeResource LyricTemplate}"
                                   PointerWheelChanged="LrcSecondListView_PointerWheelChanged">
                         </ListView>
-                    </Grid>
+                    </ui:OpacityMaskView>
                 </Grid>
             </Grid>
 
@@ -278,19 +302,23 @@
                                 IsThumbToolTipEnabled="False"
                                 Padding="12,0,12,0"
                                 Grid.Column="1"
-                                Foreground="{ThemeResource AccentBrush}"
                                 ValueChanged="PlaySlider_ValueChanged">
                             <Slider.Resources>
-                                <StaticResource x:Key="SliderThumbBackground" ResourceKey="AccentBrush"/>
-                                <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="SystemAccentColorLight1"/>
-                                <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="SystemAccentColorDark1"/>
-
-                                <StaticResource x:Key="SliderTrackFillPointerOver" ResourceKey="AccentBrush"/>
-                            </Slider.Resources>
-                            <Slider.Background>
-                                <brush:BackdropGammaTransferBrush RedDisable="True" GreenDisable="True" BlueDisable="True"
+                                <brush:BackdropGammaTransferBrush x:Key="GammaBackground"
+                                                                RedDisable="True" GreenDisable="True" BlueDisable="True"
                                                                 AlphaAmplitude="1.2" AlphaExponent="1.2" AlphaOffset="1.2"/>
-                            </Slider.Background>
+                                <StaticResource x:Key="SliderThumbBackground" ResourceKey="AccentBrush"/>
+                                <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="AccentBrush"/>
+                                <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="AccentBrush"/>
+
+                                <StaticResource x:Key="SliderTrackValueFill" ResourceKey="AccentBrush"/>
+                                <StaticResource x:Key="SliderTrackValueFillPointerOver" ResourceKey="AccentBrush"/>
+                                <StaticResource x:Key="SliderTrackValueFillPressed" ResourceKey="AccentBrush"/>
+
+                                <StaticResource x:Key="SliderTrackFill" ResourceKey="GammaBackground"/>
+                                <StaticResource x:Key="SliderTrackFillPointerOver" ResourceKey="GammaBackground"/>
+                                <StaticResource x:Key="SliderTrackFillPressed" ResourceKey="GammaBackground"/>
+                            </Slider.Resources>
                         </Slider>
                         <TextBlock x:Name="NowAtherTimeTb"
                                    Text="00:00"
@@ -350,8 +378,12 @@
                                             FontWeight="Normal" Click="PlayButton_Click"
                                             ToolTipService.ToolTip="播放/暂停">
                                         <Grid>
-                                            <controls:MediaPlayStateViewer x:Name="MediaPlayStateViewer1" PlaybackState="Paused" Margin="12"/>
-                                            <ProgressRing x:Name="AudioLoadingProressRing" Width="48" Height="48" IsIndeterminate="True"/>
+                                            <controls:MediaPlayStateViewer x:Name="MediaPlayStateViewer1" PlaybackState="Paused" Margin="12">
+                                                <!--<controls:MediaPlayStateViewer.Resources>
+                                                    <StaticResource x:Key="ApplicationForegroundThemeBrush" ResourceKey="AccentBrush"/>
+                                                </controls:MediaPlayStateViewer.Resources>-->
+                                            </controls:MediaPlayStateViewer>
+                                            <ProgressRing x:Name="AudioLoadingProressRing" Width="48" Height="48" IsIndeterminate="True" Foreground="{ThemeResource AccentBrush}"/>
                                         </Grid>
                                     </Button>
                                     <Button x:Name="NextButton" Padding="12" Width="44" Height="44"

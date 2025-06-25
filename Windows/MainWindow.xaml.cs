@@ -130,11 +130,7 @@ namespace TewiMP
                 case BackdropType.Mica: SystemBackdrop = micaBackdrop; break;
                 case BackdropType.MicaAlt: SystemBackdrop = micaAltBackdrop; break;
                 case BackdropType.DesktopAcrylic:
-                    ElementTheme elementTheme = WindowGridBase.RequestedTheme;
-                    if (elementTheme == ElementTheme.Default)
-                    {
-                        elementTheme = App.Current.RequestedTheme == ApplicationTheme.Light ? ElementTheme.Light : ElementTheme.Dark;
-                    }
+                    ElementTheme elementTheme = WindowGridBase.ActualTheme;
                     systemBackdropConfiguration = new();
                     desktopAcrylicController = new()
                     {

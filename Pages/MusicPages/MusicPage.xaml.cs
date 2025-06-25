@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.WinUI;
+using CueSharp;
 using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Input;
@@ -12,7 +13,9 @@ using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.UI.Xaml.Media.Imaging;
 using NAudio.Wave;
 using System;
+using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using TewiMP.Background;
 using TewiMP.Controls;
@@ -20,6 +23,8 @@ using TewiMP.DataEditor;
 using TewiMP.Helpers;
 using Vanara.PInvoke;
 using Windows.Graphics.Imaging;
+using Windows.Storage;
+using Windows.Storage.Streams;
 using Windows.UI;
 using Windows.UI.ViewManagement;
 
@@ -98,7 +103,7 @@ namespace TewiMP.Pages.MusicPages
             AudioPlayer_CacheLoadedChanged(App.Instance.audioPlayer);
             AudioPlayer_TimingChanged(App.Instance.audioPlayer);
             AudioPlayer_VolumeChanged(App.Instance.audioPlayer, App.Instance.audioPlayer.Volume);
-            PlayingList_NowPlayingImageLoaded(App.Instance.playingList.NowPlayingImage, null);
+            PlayingList_NowPlayingImageLoaded(App.Instance.playingList.NowPlayingImage, App.Instance.playingList.NowPlayingImagePath);
             LyricManager_PlayingLyricSelectedChange1(App.Instance.lyricManager.NowLyricsData);
             SelectedChangedDo(true);
             isCodeChangedLrcItem = false;
@@ -206,13 +211,13 @@ namespace TewiMP.Pages.MusicPages
         }
 
         private async void RemoveLyricListItemSourceAsync()
-        {
+        {/*
             await Task.Delay(200);
             if (ViewState == MusicPageViewState.Hidden)
             {
                 LrcBaseListView.ItemsSource = null;
                 LogManager.Log("MusicPage", $"LrcBaseListView.ItemSource 已被设置为 null.");
-            }
+            }*/
         }
 
         private void PlayingList_NowPlayingImageLoading(ImageSource imageSource, string _)
@@ -228,7 +233,7 @@ namespace TewiMP.Pages.MusicPages
         }
 
         string imagePath;
-        private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
+        private async void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
         {
             imagePath = _;
             if (imageSource is null)
@@ -245,26 +250,39 @@ namespace TewiMP.Pages.MusicPages
             AlbumImageBase.SaveName = $"{MusicData.Title} · {MusicData.Album.Title}";
             //BackgroundFillBase.Opacity = 1;
             LogManager.Log("MusicPage", $"图片已被更改.");
-            GetImageColor();
+            await GetImageColor();
         }
 
+        string lastImagePath;
         private async Task GetImageColor()
         {
-            if (string.IsNullOrEmpty(imagePath)) return;
-            var themeColor = await GetThemeColorAsync(imagePath);
+            var nowImagePath = imagePath;
+            if (string.IsNullOrEmpty(nowImagePath)) return;
+            if (nowImagePath == lastImagePath) return;
+            lastImagePath = nowImagePath;
+
+            LogManager.Info("MusicPage", "正在获取专辑封面主题色...");
+            var themeColor = await GetThemeColorAsync(nowImagePath);
+            LogManager.Info("MusicPage", $"专辑封面主题色：{themeColor}");
+            if (nowImagePath != imagePath) return; // 确保图片路径没有被更改
             (pageRoot.Resources["AccentBrush"] as SolidColorBrush).Color = themeColor;
-            //(pageRoot.Resources["AccentFillColorDefaultBrush"] as SolidColorBrush).Color = themeColor;
         }
 
         public async Task<Color> GetThemeColorAsync(string file)
         {
-            using var bitmap = new System.Drawing.Bitmap(file);
+            using var image = System.Drawing.Image.FromFile(file);
+            using var bitmap = new System.Drawing.Bitmap(image.GetThumbnailImage(100, 100, () => false, nint.Zero));
             var colorThief = new ColorThiefDotNet.ColorThief();
             var qColor = await Task.Run(() => colorThief.GetColor(bitmap, 4));
             var c = qColor.Color;
             var result = Color.FromArgb(c.A, c.R, c.G, c.B);
             result.ColorToHSV(out var h, out var s, out var v);
-            return CodeHelper.ColorFromHSV(h, s + .4, v + .4);
+
+            ElementTheme elementTheme = pageRoot.ActualTheme;
+            var saturation = s + (elementTheme == ElementTheme.Dark ? .06 : 1);
+            var value = v + (elementTheme == ElementTheme.Dark ? .8 : -.05);
+            var color1 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
+            return color1;
         }
 
         private void BackgroundBaseImage_Loaded(object sender, RoutedEventArgs e)
@@ -870,6 +888,13 @@ namespace TewiMP.Pages.MusicPages
         {
             MusicDataFlyout.SongItemBind = new() { MusicData = MusicData };
             MusicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
+        }
+
+        private async void pageRoot_ActualThemeChanged(FrameworkElement sender, object args)
+        {
+            lastImagePath = null;
+            LogManager.Info("MusicPage", $"MusicPage theme changed: {pageRoot.ActualTheme}");
+            await GetImageColor();
         }
     }
 }

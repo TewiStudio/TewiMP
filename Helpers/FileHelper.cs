@@ -168,7 +168,9 @@ namespace TewiMP.Helpers
         {
             using IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-            WriteableBitmap image = new WriteableBitmap((int)decoder.PixelWidth, (int)decoder.PixelHeight);
+            var decodePixelWidth = (int)decoder.PixelWidth;
+            var decodePixelHeight = (int)decoder.PixelHeight;
+            WriteableBitmap image = new(decodePixelWidth, decodePixelHeight);
             //pixelWidth == 0 ? (int)decoder.PixelWidth : pixelWidth,
             //pixelHeight == 0 ? (int)decoder.PixelHeight : pixelHeight);
             await image.SetSourceAsync(stream);

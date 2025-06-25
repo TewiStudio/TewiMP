@@ -1,33 +1,58 @@
-﻿using System;
+﻿using Microsoft.UI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Threading.Tasks;
-using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using WinRT.Interop;
-using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Composition;
-using Windows.Storage.Streams;
-using Windows.Graphics.Imaging;
-using Windows.UI.ViewManagement;
-using Windows.System;
-using TewiMP.DataEditor;
+using System.Threading.Tasks;
 using TewiMP.Background;
+using TewiMP.DataEditor;
+using Windows.Graphics.Imaging;
+using Windows.Storage.Streams;
+using Windows.System;
+using WinRT.Interop;
 
 namespace TewiMP.Helpers
 {
     public static class AnimateHelper
     {
+        public static void AnimateColor(UIElement element, Windows.UI.Color color, double TimeSecond,
+                                        float cubicBezierEasing1, float cubicBezierEasing2, float cubicBezierEasing3, float cubicBezierEasing4,
+                                        out Visual elementVisual, out Compositor compositor, out ColorKeyFrameAnimation animation)
+        {
+            elementVisual = ElementCompositionPreview.GetElementVisual(element);
+            compositor = elementVisual.Compositor;
+            AnimateColor(elementVisual, color, TimeSecond, cubicBezierEasing1, cubicBezierEasing2, cubicBezierEasing3, cubicBezierEasing4,
+                out animation);
+        }
+        
+        public static void AnimateColor(Visual visual, Windows.UI.Color color, double TimeSecond,
+                                        float cubicBezierEasing1, float cubicBezierEasing2, float cubicBezierEasing3, float cubicBezierEasing4,
+                                        out ColorKeyFrameAnimation animation)
+        {
+            Visual elementVisual = visual;
+            var compositor = elementVisual.Compositor;
+
+            animation = compositor.CreateColorKeyFrameAnimation();
+            var easing = compositor.CreateCubicBezierEasingFunction(new Vector2(cubicBezierEasing1, cubicBezierEasing2), new Vector2(cubicBezierEasing3, cubicBezierEasing4));
+
+            animation.Duration = TimeSpan.FromSeconds(TimeSecond);
+            animation.InsertKeyFrame(1, color, easing);
+        }
+        
         public static void AnimateScalar(UIElement element, float scalar, double TimeSecond,
                                          float cubicBezierEasing1, float cubicBezierEasing2, float cubicBezierEasing3, float cubicBezierEasing4,
                                          out Visual elementVisual, out Compositor compositor, out ScalarKeyFrameAnimation animation)

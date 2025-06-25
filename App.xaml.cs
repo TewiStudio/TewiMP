@@ -23,6 +23,8 @@ using TewiMP.Windowed;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
+using Microsoft.UI.Dispatching;
+using Windows.ApplicationModel.Core;
 
 namespace TewiMP
 {
@@ -97,18 +99,33 @@ namespace TewiMP
         /// </summary>
         public App()
         {
-            InitializeComponent();
             UnhandledException += App_UnhandledException;
-            TaskScheduler.UnobservedTaskException += (s, e) =>
-            {
-                LogManager.Log("App", "UnobservedTaskError: " + e.Exception.ToString(), LogLevel.Error);
-            };
+            CoreApplication.UnhandledErrorDetected += CoreApplication_UnhandledErrorDetected;
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
+            InitializeComponent();
         }
 
         private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             e.Handled = true;
-            LogManager.Log("App", "UnhandledError: " + e.Exception.ToString(), LogLevel.Error);
+            LogManager.Error("App", $"UnhandledError: {e.Exception}");
+        }
+
+        private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            e.SetObserved();
+            LogManager.Error("App", $"UnobservedTaskError: {e.Exception}");
+        }
+
+        private void CoreApplication_UnhandledErrorDetected(object sender, UnhandledErrorDetectedEventArgs e)
+        {
+            LogManager.Error("App", $"CoreApplication UnhandledErrorDetected: {e}");
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
+        {
+            LogManager.Error("App", $"AppDomain Fatal Error: {e.ExceptionObject}");
         }
 
         public List<string> LaunchArgs = null;

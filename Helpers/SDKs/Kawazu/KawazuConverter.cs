@@ -131,7 +131,9 @@ namespace Kawazu
 
                                     if (isPreviousEndsInTsu)
                                     {
-                                        builder.Append(division.RomaReading.First());
+                                        // Windows App SDK 1.7: crashes
+                                        if (!string.IsNullOrEmpty(division.RomaReading)) // Workaround for the bug in Windows App SDK 1.7
+                                            builder.Append(division.RomaReading.First());
                                         isPreviousEndsInTsu = false;
                                     }
                                     builder.Append(division.RomaReading).Append(" ");
