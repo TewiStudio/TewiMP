@@ -29,6 +29,7 @@
         Tapped="Grid_Tapped"
         Loaded="WindowGridBase_Loaded"
         RequestedTheme="Default"
+        ActualThemeChanged="WindowGridBase_ActualThemeChanged"
         AllowDrop="True"
         DragOver="WindowGridBase_DragOver"
         Drop="WindowGridBase_Drop"

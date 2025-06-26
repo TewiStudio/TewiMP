@@ -36,14 +36,14 @@
         <Rectangle
             x:Name="Background_HighlightRectangle"
             RadiusX="8" RadiusY="8"
-            Stroke="{ThemeResource SystemColorControlAccentBrush}"
+            Stroke="{ThemeResource MusicAlbumAccentBrush}"
             StrokeThickness="2"
             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         <Rectangle
             x:Name="Background_PlayingRectangle"
             HorizontalAlignment="Left"
             Width="3"
-            Fill="{ThemeResource SystemColorControlAccentBrush}"
+            Fill="{ThemeResource MusicAlbumAccentBrush}"
             Margin="3,20"
             RadiusX="1.5" RadiusY="1.5"
             Opacity="0">

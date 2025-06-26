@@ -17,7 +17,9 @@
     mc:Ignorable="d" Opacity="1" IsHitTestVisible="True">
 
     <Page.Resources>
-        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource SystemAccentColorLight2}"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource SystemAccentColor}"/>
+        <StaticResource x:Key="AccentBrushNormal" ResourceKey="MusicAlbumAccentBrush"/>
+        <StaticResource x:Key="AccentBrushReverse" ResourceKey="MusicAlbumAccentBrushReverse"/>
         <DataTemplate x:Key="LyricTemplate" x:DataType="data:LyricData">
         <controls:LyricItem/>
         </DataTemplate>

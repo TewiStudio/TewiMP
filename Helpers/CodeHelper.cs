@@ -608,6 +608,28 @@ namespace TewiMP.Helpers
             value = hsbB;
         }
 
+        public static async Task<(Windows.UI.Color, Windows.UI.Color)> GetThemeColorAsync(string file)
+        {
+            using var image = Image.FromFile(file);
+            using var bitmap = new Bitmap(image.GetThumbnailImage(100, 100, () => false, nint.Zero));
+            var colorThief = new ColorThiefDotNet.ColorThief();
+            var qColor = await Task.Run(() => colorThief.GetColor(bitmap, 4));
+            var c = qColor.Color;
+            var result = Windows.UI.Color.FromArgb(c.A, c.R, c.G, c.B);
+            result.ColorToHSV(out var h, out var s, out var v);
+
+            ElementTheme elementTheme = App.MainWindowInstance.WindowGridBase.ActualTheme;
+            var saturation = s + (elementTheme == ElementTheme.Dark ? .06 : .9);
+            var value = v + (elementTheme == ElementTheme.Dark ? .8 : .1);
+            var color1 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
+
+            elementTheme = App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
+            saturation = s + (elementTheme == ElementTheme.Dark ? .06 : .9);
+            value = v + (elementTheme == ElementTheme.Dark ? .8 : .1);
+            var color2 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
+            return (color1, color2);
+        }
+
         public static async Task<bool> OpenInBrowser(Uri uri)
         {
             var result = await App.MainWindowInstance.ShowDialog("跳转外部链接", $"将会打开浏览器以跳转到外部链接：\n{uri.OriginalString}", "取消", "确认", defaultButton: Microsoft.UI.Xaml.Controls.ContentDialogButton.Close);

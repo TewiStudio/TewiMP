@@ -12,6 +12,9 @@
     mc:Ignorable="d"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded"
     SizeChanged="Page_SizeChanged">
+    <Page.Resources>
+        <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource SystemAccentColor}"/>
+    </Page.Resources>
 
     <Grid x:Name="root">
         <ListView
@@ -147,9 +150,9 @@
                                         </AppBarElementContainer>
                                     </CommandBar.SecondaryCommands>
                                     <AppBarButton
-                                        Background="{ThemeResource AccentFillColorDefaultBrush}"
+                                        x:Name="PlayAllButton"
+                                        Background="{ThemeResource AccentColorBrush}"
                                         BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                                        Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                                         BorderThickness="0,0,0,1"
                                         Label="全部播放（Alt+Q）"
                                         AccessKey="Q"

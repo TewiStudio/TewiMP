@@ -1,13 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Diagnostics;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using TewiMP.Media;
-using TewiMP.DataEditor;
-using NAudio;
+﻿using Melanchall.DryWetMidi.Core;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
-using Melanchall.DryWetMidi.Core;
+using NAudio;
+using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using TewiMP.DataEditor;
+using TewiMP.Helpers;
+using TewiMP.Media;
 
 namespace TewiMP.Background
 {
@@ -181,6 +183,8 @@ namespace TewiMP.Background
             if (a is null) { lastMusicData = null; }
             NowPlayingImage = a;
             NowPlayingImagePath = path;
+            await GetImageColor();
+
             NowPlayingImageLoaded?.Invoke(NowPlayingImage, path);
             //System.Diagnostics.LogManager.Log(NowPlayingImageLoaded.GetInvocationList().Length);
         }
@@ -376,6 +380,31 @@ namespace TewiMP.Background
         public void ClearAll()
         {
             NowPlayingList.Clear();
+        }
+
+        public async Task UpdateImageColor()
+        {
+            lastImagePath = null;
+            await GetImageColor();
+            NowPlayingImageLoaded?.Invoke(NowPlayingImage, NowPlayingImagePath);
+        }
+
+        string lastImagePath;
+        public async Task GetImageColor()
+        {
+            var nowImagePath = NowPlayingImagePath;
+            if (string.IsNullOrEmpty(nowImagePath)) return;
+            if (nowImagePath == lastImagePath) return;
+            lastImagePath = nowImagePath;
+
+            LogManager.Info("MusicPage", "正在获取专辑封面主题色...");
+            var themeColor = await CodeHelper.GetThemeColorAsync(nowImagePath);
+            LogManager.Info("MusicPage", $"专辑封面主题色：{themeColor}");
+            if (nowImagePath != NowPlayingImagePath) return; // 确保图片路径没有被更改
+            (App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush).Color = themeColor.Item1;
+            (App.Current.Resources["MusicAlbumAccentBrushDark1"] as SolidColorBrush).Color = themeColor.Item1.Darken(.1f);
+            (App.Current.Resources["MusicAlbumAccentBrushDark2"] as SolidColorBrush).Color = themeColor.Item1.Darken(.2f);
+            (App.Current.Resources["MusicAlbumAccentBrushReverse"] as SolidColorBrush).Color = themeColor.Item2;
         }
     }
 }

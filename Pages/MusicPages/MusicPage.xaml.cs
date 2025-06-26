@@ -233,8 +233,9 @@ namespace TewiMP.Pages.MusicPages
         }
 
         string imagePath;
-        private async void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
+        private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
         {
+            UpdateAccentColor();
             imagePath = _;
             if (imageSource is null)
             {
@@ -250,39 +251,6 @@ namespace TewiMP.Pages.MusicPages
             AlbumImageBase.SaveName = $"{MusicData.Title} · {MusicData.Album.Title}";
             //BackgroundFillBase.Opacity = 1;
             LogManager.Log("MusicPage", $"图片已被更改.");
-            await GetImageColor();
-        }
-
-        string lastImagePath;
-        private async Task GetImageColor()
-        {
-            var nowImagePath = imagePath;
-            if (string.IsNullOrEmpty(nowImagePath)) return;
-            if (nowImagePath == lastImagePath) return;
-            lastImagePath = nowImagePath;
-
-            LogManager.Info("MusicPage", "正在获取专辑封面主题色...");
-            var themeColor = await GetThemeColorAsync(nowImagePath);
-            LogManager.Info("MusicPage", $"专辑封面主题色：{themeColor}");
-            if (nowImagePath != imagePath) return; // 确保图片路径没有被更改
-            (pageRoot.Resources["AccentBrush"] as SolidColorBrush).Color = themeColor;
-        }
-
-        public async Task<Color> GetThemeColorAsync(string file)
-        {
-            using var image = System.Drawing.Image.FromFile(file);
-            using var bitmap = new System.Drawing.Bitmap(image.GetThumbnailImage(100, 100, () => false, nint.Zero));
-            var colorThief = new ColorThiefDotNet.ColorThief();
-            var qColor = await Task.Run(() => colorThief.GetColor(bitmap, 4));
-            var c = qColor.Color;
-            var result = Color.FromArgb(c.A, c.R, c.G, c.B);
-            result.ColorToHSV(out var h, out var s, out var v);
-
-            ElementTheme elementTheme = pageRoot.ActualTheme;
-            var saturation = s + (elementTheme == ElementTheme.Dark ? .06 : 1);
-            var value = v + (elementTheme == ElementTheme.Dark ? .8 : -.05);
-            var color1 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
-            return color1;
         }
 
         private void BackgroundBaseImage_Loaded(object sender, RoutedEventArgs e)
@@ -890,11 +858,17 @@ namespace TewiMP.Pages.MusicPages
             MusicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
         }
 
-        private async void pageRoot_ActualThemeChanged(FrameworkElement sender, object args)
+        private void pageRoot_ActualThemeChanged(FrameworkElement sender, object args)
         {
-            lastImagePath = null;
             LogManager.Info("MusicPage", $"MusicPage theme changed: {pageRoot.ActualTheme}");
-            await GetImageColor();
+            UpdateAccentColor();
+        }
+
+        private void UpdateAccentColor()
+        {
+            (pageRoot.Resources["AccentBrush"] as SolidColorBrush).Color = App.MainWindowInstance.WindowGridBase.ActualTheme == pageRoot.ActualTheme ?
+                (pageRoot.Resources["AccentBrushNormal"] as SolidColorBrush).Color :
+                (pageRoot.Resources["AccentBrushReverse"] as SolidColorBrush).Color;
         }
     }
 }

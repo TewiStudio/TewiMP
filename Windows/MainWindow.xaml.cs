@@ -1,38 +1,39 @@
-﻿using WinRT;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
+﻿using CommunityToolkit.WinUI;
 using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Shapes;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
-using Windows.UI;
-using Windows.Storage;
-using Windows.Graphics;
-using Windows.ApplicationModel.DataTransfer;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Xaml.Shapes;
 using NAudio.Wave;
 using Newtonsoft.Json.Linq;
-using CommunityToolkit.WinUI;
-using WinUIEx;
-using TewiMP.Pages;
-using TewiMP.Pages.MusicPages;
-using TewiMP.Helpers;
-using TewiMP.Controls;
-using TewiMP.Windowed;
-using TewiMP.DataEditor;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using TewiMP.Background;
 using TewiMP.Background.HotKeys;
+using TewiMP.Controls;
+using TewiMP.DataEditor;
+using TewiMP.Helpers;
+using TewiMP.Media;
+using TewiMP.Pages;
+using TewiMP.Pages.MusicPages;
+using TewiMP.Windowed;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Graphics;
+using Windows.Storage;
+using Windows.UI;
+using WinRT;
+using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -92,7 +93,6 @@ namespace TewiMP
             WindowGridBase.DataContext = this;
 
             Activated += MainWindow_Activated;
-            WindowGridBase.ActualThemeChanged += WindowGridBase_ActualThemeChanged;
             MusicPageViewStateChanged += MainWindow_MusicPageViewStateChanged;
             AppWindow.Closing += AppWindow_Closing;
             loadingst.Children.Add(loadingprogress);
@@ -444,13 +444,14 @@ namespace TewiMP
 #endif
         }
 
-        private void WindowGridBase_ActualThemeChanged(FrameworkElement sender, object args)
+        private async void WindowGridBase_ActualThemeChanged(FrameworkElement sender, object args)
         {
             if (CurrentBackdrop == BackdropType.DesktopAcrylic)
             {
                 SetBackdrop(CurrentBackdrop);
             }
             InitializeTitleBar(WindowGridBase.RequestedTheme);
+            await App.Instance.playingList.UpdateImageColor();
         }
 
         private void UpdateWhenDataLated()
@@ -987,7 +988,7 @@ namespace TewiMP
             PlayingListBaseView.SelectedItem = audioPlayer.MusicData;
             isCodeChangedSilderValue = false;
             doNotChangeTiming = false;
-            PlayRing.Foreground = App.Current.Resources["AccentAAFillColorDefaultBrush"] as SolidColorBrush;
+            PlayRing.Foreground = App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush;
         }
 
         private void AudioPlayer_CacheLoadingChanged(Media.AudioPlayer audioPlayer, object data)
@@ -1031,6 +1032,14 @@ namespace TewiMP
                 im.BorderThickness = new(1);
             }
 
+            if (App.Instance.audioPlayer.PlaybackState == PlaybackState.Playing)
+            {
+                PlayRing.Foreground = App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush;
+            }
+            else
+            {
+                PlayRing.Foreground = App.Current.Resources["SystemFillColorCautionBrush"] as SolidColorBrush;
+            }
         }
 
         MusicData pointConnectAnimationMusicData = null;
@@ -1089,7 +1098,7 @@ namespace TewiMP
         {
             if (audioPlayer.PlaybackState == PlaybackState.Playing)
             {
-                PlayRing.Foreground = App.Current.Resources["AccentAAFillColorDefaultBrush"] as SolidColorBrush;
+                PlayRing.Foreground = App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush;
                 App.Instance.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
                 App.Instance.lyricManager.StartTimer();
             }

@@ -407,6 +407,9 @@ namespace TewiMP.Windowed
                 return;
             }
 
+            var accentBrush = (SolidColorBrush)(App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ?
+                App.Current.Resources["MusicAlbumAccentBrushReverse"] :
+                App.Current.Resources["MusicAlbumAccentBrush"]);
             int nowLyricNum = App.Instance.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
             LyricData nextLyric = null;
             LyricData beforeLyric = null;
@@ -501,8 +504,8 @@ namespace TewiMP.Windowed
 
                 if (!isNext)
                 {
-                    T1.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
-                    T2.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
+                    T1.Foreground = accentBrush;
+                    T2.Foreground = accentBrush;
                 }
                 else
                 {
@@ -596,12 +599,12 @@ namespace TewiMP.Windowed
                         else
                         {
                             IsT1Focus = false;
-                            T1.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
+                            T1.Foreground = accentBrush;
                             T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                         }
 
                         if (nextData.Lyric != null) T2.Text = t2text;
-                        else T2.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
+                        else T2.Foreground = accentBrush;
                     }
                     else
                     {
@@ -622,11 +625,11 @@ namespace TewiMP.Windowed
                         {
                             IsT1Focus = true;
                             T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
-                            T2.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
+                            T2.Foreground = accentBrush;
                         }
 
                         if (nextData.Lyric != null) T1.Text = t2text;
-                        else T1.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
+                        else T1.Foreground = accentBrush;
                     }
                 }
                 else if (LyricTextBehavior == LyricTextBehavior.MainLyric)
@@ -636,7 +639,7 @@ namespace TewiMP.Windowed
                     if (isNext)
                         T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                     else
-                        T1.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
+                        T1.Foreground = accentBrush;
                     T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                 }
                 else if (LyricTextBehavior == LyricTextBehavior.NextLyric)
@@ -646,7 +649,7 @@ namespace TewiMP.Windowed
                     if (isNext)
                         T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                     else
-                        T2.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
+                        T2.Foreground = accentBrush;
                     T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                 }
                 else if (LyricTextBehavior == LyricTextBehavior.OnlyMainLyric)
@@ -656,7 +659,7 @@ namespace TewiMP.Windowed
                     if (isNext)
                         T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                     else
-                        T1.Foreground = root.Resources["AccentLrcForeground"] as SolidColorBrush;
+                        T1.Foreground = accentBrush;
                     T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                 }
 

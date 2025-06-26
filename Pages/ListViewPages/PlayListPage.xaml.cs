@@ -577,19 +577,24 @@ namespace TewiMP.Pages.ListViewPages
             if (musicListData is null) return;
             ItemsList_Header_Image.BorderThickness = thickness0;
             ImageSource imageSource = null;
+            string resultPath = null;
             if (musicListData.ListDataType == DataType.本地歌单)
             {
                 bool isExists = true;
                 await Task.Run(() => { isExists = File.Exists(musicListData.PicturePath); });
                 if (isExists) imageSource = await FileHelper.GetImageSource(musicListData.PicturePath);
+                resultPath = musicListData.PicturePath;
             }
             else if (musicListData.ListDataType == DataType.歌单)
             {
-                imageSource = (await ImageManage.GetImageSource(musicListData)).Item1;
+                var result = await ImageManage.GetImageSource(musicListData);
+                imageSource = result.Item1;
+                resultPath = result.Item2;
             }
             if (imageSource is null)
             {
                 imageSource = await FileHelper.GetImageSource("");
+                resultPath = Path.Combine(Environment.CurrentDirectory, "Images", "icon.png");
             }
 
             if (!IsLoaded || musicListData is null) return;
@@ -597,6 +602,9 @@ namespace TewiMP.Pages.ListViewPages
             ItemsList_Header_Image.Source = imageSource;
             InitShyHeader();
             commandBarVisual.StartAnimation("Opacity", commandBarVisualOpacityAnimation);
+            var color = await CodeHelper.GetThemeColorAsync(resultPath);
+            (Resources["AccentColorBrush"] as SolidColorBrush).Color = color.Item1;
+            PlayAllButton.RequestedTheme = CodeHelper.IsAccentColorDark(color.Item1) ? ElementTheme.Dark : ElementTheme.Light;
         }
 
         void InitEvents()

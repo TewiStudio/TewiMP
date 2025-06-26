@@ -16,7 +16,7 @@
             <ResourceDictionary>
                 <SolidColorBrush x:Key="LrcForeground" Color="#DDFFFFFF"/>
                 <SolidColorBrush x:Key="LrcSecondForeground" Color="#88FFFFFF"/>
-                <StaticResource x:Key="AccentLrcForeground" ResourceKey="AccentAAFillColorTertiaryBrush"/>
+                <StaticResource x:Key="AccentLrcForeground" ResourceKey="MusicAlbumAccentBrush"/>
             </ResourceDictionary>
         </Grid.Resources>
         <Rectangle
@@ -173,7 +173,7 @@
                     <Style TargetType="Rectangle">
                         <Setter Property="Width" Value="15"/>
                         <Setter Property="Height" Value="15"/>
-                        <Setter Property="Fill" Value="{ThemeResource AccentAAFillColorDefaultBrush}"/>
+                        <Setter Property="Fill" Value="{ThemeResource MusicAlbumAccentBrush}"/>
                         <Setter Property="Stroke" Value="{ThemeResource AccentControlElevationBorderBrush}"/>
                         <Setter Property="StrokeThickness" Value="1"/>
                         <Setter Property="RadiusX" Value="7.5"/>

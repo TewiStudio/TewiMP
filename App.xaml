@@ -16,6 +16,7 @@
 
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="Green"/>
                     <StaticResource x:Key="PlayButtonBrush" ResourceKey="AccentFillColorDefaultBrush"/>
                     <SolidColorBrush x:Key="SongHistoryCardBackground" Color="#06FFFFFF"/>
                     <SolidColorBrush x:Key="ArtistInfoBackground" Color="#66000000"/>
@@ -46,6 +47,42 @@
                     <AcrylicBrush x:Key="MusicPageImageAcrylicBrush" TintLuminosityOpacity="0.85" TintOpacity="0.0" FallbackColor="#CADDDDDD" TintColor="#EEEEEE" Opacity="1"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
+            <SolidColorBrush x:Key="MusicAlbumAccentBrush" x:Name="MusicAlbumAccentBrush" Color="{StaticResource SystemAccentColorLight2}"/>
+            <SolidColorBrush x:Key="MusicAlbumAccentBrushDark1" Color="{StaticResource SystemAccentColorLight2}"/>
+            <SolidColorBrush x:Key="MusicAlbumAccentBrushDark2" Color="{StaticResource SystemAccentColorLight2}"/>
+            <SolidColorBrush x:Key="MusicAlbumAccentBrushReverse" Color="{StaticResource SystemAccentColorLight2}"/>
+
+            <!-- Slider -->
+            <StaticResource x:Key="SliderThumbBackground" ResourceKey="MusicAlbumAccentBrush"/>
+            <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1"/>
+            <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2"/>
+            <StaticResource x:Key="SliderTrackValueFill" ResourceKey="MusicAlbumAccentBrush"/>
+            <StaticResource x:Key="SliderTrackValueFillPointerOver" ResourceKey="MusicAlbumAccentBrushDark1"/>
+            <StaticResource x:Key="SliderTrackValueFillPressed" ResourceKey="MusicAlbumAccentBrushDark2"/>
+
+            <!-- ToggleSwitch -->
+            <StaticResource x:Key="ToggleSwitchFillOn" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="ToggleSwitchFillOnPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="ToggleSwitchFillOnPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+            
+            <!-- ToggleButton -->
+            <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+
+            <!-- CheckBox -->
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeChecked" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="CheckBoxCheckBackgroundStrokeCheckedPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+
+            <StaticResource x:Key="ComboBoxItemRevealBorderBrushPointerOver" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="ProgressRingForegroundThemeBrush" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="ProgressBarForeground" ResourceKey="MusicAlbumAccentBrush" />
+
+            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{Binding ElementName=MusicAlbumAccentBrush,Path=Color}" />
 
             <Style x:Key="LeftButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                 <Setter Property="CornerRadius" Value="4,0,0,4"/>
