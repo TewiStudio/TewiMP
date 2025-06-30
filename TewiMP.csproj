@@ -10,6 +10,7 @@
 		<Company>TewiStudio</Company>
 		<Authors>TewiStudio</Authors>
 		<Copyright>© 2025 TewiStudio. All Rights Reserved.</Copyright>
+		<PackageProjectUrl>https://github.com/TewiStudio/TewiMP</PackageProjectUrl>
 	</PropertyGroup>
 	<PropertyGroup>
 		<RootNamespace>TewiMP</RootNamespace>
@@ -33,7 +34,7 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
-		<PackageProjectUrl>https://github.com/TewiStudio/TewiMP</PackageProjectUrl>
+		<PathMap>$(MSBuildProjectDirectory)=.</PathMap>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
 	  <DebugType>embedded</DebugType>
@@ -134,7 +135,7 @@
 			<PrivateAssets>all</PrivateAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.7.250606001" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="1.6.250602001" />
 		<PackageReference Include="NAudio" Version="2.2.1" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 		<PackageReference Include="PInvoke.BCrypt" Version="0.7.124" />
@@ -146,7 +147,7 @@
 		<PackageReference Include="System.Text.Encoding.CodePages" Version="9.0.6" />
 		<PackageReference Include="TagLibSharp" Version="2.3.0" />
 		<PackageReference Include="Vanara.PInvoke.User32" Version="4.1.6" />
-		<PackageReference Include="WinUIEx" Version="2.6.0" />
+		<PackageReference Include="WinUIEx" Version="2.5.1" />
 		<Manifest Include="$(ApplicationManifest)" />
 	</ItemGroup>
 

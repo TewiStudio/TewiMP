@@ -47,11 +47,16 @@
                     <AcrylicBrush x:Key="MusicPageImageAcrylicBrush" TintLuminosityOpacity="0.85" TintOpacity="0.0" FallbackColor="#CADDDDDD" TintColor="#EEEEEE" Opacity="1"/>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
-            <SolidColorBrush x:Key="MusicAlbumAccentBrush" x:Name="MusicAlbumAccentBrush" Color="{StaticResource SystemAccentColorLight2}"/>
+            
+            <SolidColorBrush x:Key="TextOnMusicAlbumAccentForegroundBrush" Color="{StaticResource SystemAccentColorLight2}"/>
+            <SolidColorBrush x:Key="TextOnMusicAlbumAccentForegroundBrushDark1" Color="{StaticResource SystemAccentColorLight2}"/>
+            <SolidColorBrush x:Key="TextOnMusicAlbumAccentForegroundBrushDark2" Color="{StaticResource SystemAccentColorLight2}"/>
+            <SolidColorBrush x:Key="MusicAlbumAccentBrush" Color="{StaticResource SystemAccentColorLight2}"/>
             <SolidColorBrush x:Key="MusicAlbumAccentBrushDark1" Color="{StaticResource SystemAccentColorLight2}"/>
             <SolidColorBrush x:Key="MusicAlbumAccentBrushDark2" Color="{StaticResource SystemAccentColorLight2}"/>
             <SolidColorBrush x:Key="MusicAlbumAccentBrushReverse" Color="{StaticResource SystemAccentColorLight2}"/>
 
+            <!-- 重写控件主题色 -->
             <!-- Slider -->
             <StaticResource x:Key="SliderThumbBackground" ResourceKey="MusicAlbumAccentBrush"/>
             <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1"/>
@@ -69,6 +74,20 @@
             <StaticResource x:Key="ToggleButtonBackgroundChecked" ResourceKey="MusicAlbumAccentBrush" />
             <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
             <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+            <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
+            <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrush2" />
+            <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrush3" />
+            <StaticResource x:Key="AppBarToggleButtonBackgroundChecked" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="AppBarToggleButtonBackgroundCheckedPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="AppBarToggleButtonBackgroundCheckedPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+            <StaticResource x:Key="AppBarToggleButtonForegroundChecked" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
+            <StaticResource x:Key="AppBarToggleButtonForegroundCheckedPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrush2" />
+            <StaticResource x:Key="AppBarToggleButtonForegroundCheckedPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrush3" />
+
+            <!-- AccentButtonStyle -->
+            <StaticResource x:Key="AccentButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="AccentButtonBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="AccentButtonBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
 
             <!-- CheckBox -->
             <StaticResource x:Key="CheckBoxCheckBackgroundStrokeChecked" ResourceKey="MusicAlbumAccentBrush" />
@@ -77,12 +96,31 @@
             <StaticResource x:Key="CheckBoxCheckBackgroundFillChecked" ResourceKey="MusicAlbumAccentBrush" />
             <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
             <StaticResource x:Key="CheckBoxCheckBackgroundFillCheckedPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+            <StaticResource x:Key="ListViewItemCheckBoxSelectedBrush" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="ListViewItemCheckBoxSelectedPointerOverBrush" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="ListViewItemCheckBoxSelectedPressedBrush" ResourceKey="MusicAlbumAccentBrushDark2" />
+            <StaticResource x:Key="GridViewItemCheckBoxSelectedBrush" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="GridViewItemCheckBoxSelectedPointerOverBrush" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="GridViewItemCheckBoxSelectedPressedBrush" ResourceKey="MusicAlbumAccentBrushDark2" />
 
-            <StaticResource x:Key="ComboBoxItemRevealBorderBrushPointerOver" ResourceKey="MusicAlbumAccentBrush" />
+            <!-- TextBox -->
+            <LinearGradientBrush x:Key="TextControlElevationBorderMusicAlbumAccentColorFocusedBrush" MappingMode="Absolute" StartPoint="0,0" EndPoint="0,2">
+                <LinearGradientBrush.RelativeTransform>
+                    <ScaleTransform ScaleY="-1" CenterY="0.5" />
+                </LinearGradientBrush.RelativeTransform>
+                <LinearGradientBrush.GradientStops>
+                    <GradientStop Offset="1.0" Color="{StaticResource SystemAccentColor}" x:FieldModifier="public"/>
+                    <GradientStop Offset="1.0" Color="{StaticResource ControlStrokeColorDefault}" />
+                </LinearGradientBrush.GradientStops>
+            </LinearGradientBrush>
+            <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="TextControlElevationBorderMusicAlbumAccentColorFocusedBrush" />
+            <StaticResource x:Key="TextControlSelectionHighlightColor" ResourceKey="MusicAlbumAccentBrush" />
+            
+            <!-- Other -->
+            <StaticResource x:Key="NavigationViewSelectionIndicatorForeground" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="ComboBoxItemPillFillBrush" ResourceKey="MusicAlbumAccentBrush" />
             <StaticResource x:Key="ProgressRingForegroundThemeBrush" ResourceKey="MusicAlbumAccentBrush" />
             <StaticResource x:Key="ProgressBarForeground" ResourceKey="MusicAlbumAccentBrush" />
-
-            <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="{Binding ElementName=MusicAlbumAccentBrush,Path=Color}" />
 
             <Style x:Key="LeftButtonStyle" TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                 <Setter Property="CornerRadius" Value="4,0,0,4"/>

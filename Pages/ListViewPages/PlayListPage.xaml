@@ -11,9 +11,14 @@
     xmlns:local="using:TewiMP.Pages.ListViewPages"
     mc:Ignorable="d"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded"
-    SizeChanged="Page_SizeChanged">
+    SizeChanged="Page_SizeChanged" ActualThemeChanged="Page_ActualThemeChanged">
     <Page.Resources>
         <SolidColorBrush x:Key="AccentColorBrush" Color="{StaticResource SystemAccentColor}"/>
+        <SolidColorBrush x:Key="AccentColorBrushDark1" Color="{StaticResource SystemAccentColor}"/>
+        <SolidColorBrush x:Key="AccentColorBrushDark2" Color="{StaticResource SystemAccentColor}"/>
+        <SolidColorBrush x:Key="TextOnAccentColorBrush" Color="{StaticResource SystemAccentColor}"/>
+        <SolidColorBrush x:Key="TextOnAccentColorBrushDark1" Color="{StaticResource SystemAccentColor}"/>
+        <SolidColorBrush x:Key="TextOnAccentColorBrushDark2" Color="{StaticResource SystemAccentColor}"/>
     </Page.Resources>
 
     <Grid x:Name="root">
@@ -151,13 +156,20 @@
                                     </CommandBar.SecondaryCommands>
                                     <AppBarButton
                                         x:Name="PlayAllButton"
-                                        Background="{ThemeResource AccentColorBrush}"
                                         BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                                         BorderThickness="0,0,0,1"
                                         Label="全部播放（Alt+Q）"
                                         AccessKey="Q"
                                         ToolTipService.ToolTip="播放歌单内的所有歌曲"
                                         Click="AppBarButton_Click" Tag="playAll">
+                                        <AppBarButton.Resources>
+                                            <StaticResource x:Key="AppBarButtonBackground" ResourceKey="AccentColorBrush" />
+                                            <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="AccentColorBrushDark1" />
+                                            <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="AccentColorBrushDark2" />
+                                            <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextOnAccentColorBrush" />
+                                            <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextOnAccentColorBrushDark1" />
+                                            <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextOnAccentColorBrushDark2" />
+                                        </AppBarButton.Resources>
                                         <AppBarButton.Icon>
                                             <FontIcon Glyph="&#xEE4A;"/>
                                         </AppBarButton.Icon>

@@ -389,6 +389,8 @@ namespace TewiMP.Background
             NowPlayingImageLoaded?.Invoke(NowPlayingImage, NowPlayingImagePath);
         }
 
+        public Windows.UI.Color AlbumAccentColor { get; set; }
+        public Windows.UI.Color AlbumAccentColorReverse { get; set; }
         string lastImagePath;
         public async Task GetImageColor()
         {
@@ -397,14 +399,23 @@ namespace TewiMP.Background
             if (nowImagePath == lastImagePath) return;
             lastImagePath = nowImagePath;
 
-            LogManager.Info("MusicPage", "正在获取专辑封面主题色...");
+            LogManager.Info("PlayingList", "正在获取专辑封面主题色...");
             var themeColor = await CodeHelper.GetThemeColorAsync(nowImagePath);
-            LogManager.Info("MusicPage", $"专辑封面主题色：{themeColor}");
+            LogManager.Info("PlayingList", $"专辑封面主题色：{themeColor}");
             if (nowImagePath != NowPlayingImagePath) return; // 确保图片路径没有被更改
+            
+            AlbumAccentColor = themeColor.Item1;
+            AlbumAccentColorReverse = themeColor.Item2;
             (App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush).Color = themeColor.Item1;
             (App.Current.Resources["MusicAlbumAccentBrushDark1"] as SolidColorBrush).Color = themeColor.Item1.Darken(.1f);
             (App.Current.Resources["MusicAlbumAccentBrushDark2"] as SolidColorBrush).Color = themeColor.Item1.Darken(.2f);
             (App.Current.Resources["MusicAlbumAccentBrushReverse"] as SolidColorBrush).Color = themeColor.Item2;
+            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrush"] as SolidColorBrush).Color = themeColor.Item3;
+            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrushDark1"] as SolidColorBrush).Color = themeColor.Item3.Darken(.1f);
+            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrushDark2"] as SolidColorBrush).Color = themeColor.Item3.Darken(.2f);
+            // TextBox
+            (App.Current.Resources["TextControlElevationBorderMusicAlbumAccentColorFocusedBrush"] as LinearGradientBrush).GradientStops[0].Color = themeColor.Item1;
+
         }
     }
 }

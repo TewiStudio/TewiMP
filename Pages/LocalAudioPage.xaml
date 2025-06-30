@@ -319,14 +319,21 @@
                         Background="Transparent"
                         OverflowButtonVisibility="Auto" DefaultLabelPosition="Right" Grid.Row="1" AccessKey="Y">
                         <AppBarButton
-                            Background="{ThemeResource AccentFillColorDefaultBrush}"
+                            x:Name="PlayAllButton"
                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                             BorderThickness="0,0,0,1"
                             Label="播放全部（Alt+Q）"
                             Tag="play"
                             AccessKey="Q"
                             Click="AppBarButton_Click">
+                            <AppBarButton.Resources>
+                                <StaticResource x:Key="AppBarButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
+                                <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+                                <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+                                <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
+                                <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
+                                <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
+                            </AppBarButton.Resources>
                             <AppBarButton.Icon>
                                 <FontIcon Glyph="&#xEE4A;"/>
                             </AppBarButton.Icon>

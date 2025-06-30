@@ -608,7 +608,7 @@ namespace TewiMP.Helpers
             value = hsbB;
         }
 
-        public static async Task<(Windows.UI.Color, Windows.UI.Color)> GetThemeColorAsync(string file)
+        public static async Task<(Windows.UI.Color, Windows.UI.Color, Windows.UI.Color)> GetThemeColorAsync(string file)
         {
             using var image = Image.FromFile(file);
             using var bitmap = new Bitmap(image.GetThumbnailImage(100, 100, () => false, nint.Zero));
@@ -627,7 +627,7 @@ namespace TewiMP.Helpers
             saturation = s + (elementTheme == ElementTheme.Dark ? .06 : .9);
             value = v + (elementTheme == ElementTheme.Dark ? .8 : .1);
             var color2 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
-            return (color1, color2);
+            return (color1, color2, IsAccentColorDark(color1) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0));
         }
 
         public static async Task<bool> OpenInBrowser(Uri uri)

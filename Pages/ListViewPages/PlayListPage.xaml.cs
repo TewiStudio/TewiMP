@@ -1,23 +1,24 @@
+using CommunityToolkit.WinUI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using Newtonsoft.Json.Linq;
 using System;
-using System.IO;
-using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Composition;
-using TewiMP.Media;
-using TewiMP.Helpers;
-using TewiMP.DataEditor;
 using TewiMP.Controls;
-using Newtonsoft.Json.Linq;
+using TewiMP.DataEditor;
+using TewiMP.Helpers;
+using TewiMP.Media;
 using Windows.Storage.Pickers;
-using CommunityToolkit.WinUI;
+using static NMeCab.Core.DoubleArray;
 
 namespace TewiMP.Pages.ListViewPages
 {
@@ -569,6 +570,7 @@ namespace TewiMP.Pages.ListViewPages
             ItemsList_Header_Info_OtherTextBlock.Text = $"{musicListData.Songs?.Count} 首歌曲";
         }
 
+        string resultPath;
         static Thickness thickness0 = new(0);
         static Thickness thickness1 = new(1);
         async void InitImage()
@@ -577,7 +579,6 @@ namespace TewiMP.Pages.ListViewPages
             if (musicListData is null) return;
             ItemsList_Header_Image.BorderThickness = thickness0;
             ImageSource imageSource = null;
-            string resultPath = null;
             if (musicListData.ListDataType == DataType.本地歌单)
             {
                 bool isExists = true;
@@ -602,9 +603,8 @@ namespace TewiMP.Pages.ListViewPages
             ItemsList_Header_Image.Source = imageSource;
             InitShyHeader();
             commandBarVisual.StartAnimation("Opacity", commandBarVisualOpacityAnimation);
-            var color = await CodeHelper.GetThemeColorAsync(resultPath);
-            (Resources["AccentColorBrush"] as SolidColorBrush).Color = color.Item1;
-            PlayAllButton.RequestedTheme = CodeHelper.IsAccentColorDark(color.Item1) ? ElementTheme.Dark : ElementTheme.Light;
+            InitAccentColor();
+            //PlayAllButton.RequestedTheme = CodeHelper.IsAccentColorDark(color.Item1) ? ElementTheme.Dark : ElementTheme.Light;
         }
 
         void InitEvents()
@@ -631,6 +631,21 @@ namespace TewiMP.Pages.ListViewPages
             ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToNowPlaying_Button_Click;
             ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToNowPlaying_Button_Click;
             ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToNowPlaying_Button_Click;
+        }
+
+        async void InitAccentColor()
+        {
+            if (string.IsNullOrEmpty(resultPath))
+            {
+                return;
+            }
+            var color = await CodeHelper.GetThemeColorAsync(resultPath);
+            (Resources["AccentColorBrush"] as SolidColorBrush).Color = color.Item1;
+            (Resources["AccentColorBrushDark1"] as SolidColorBrush).Color = color.Item1.Darken(.1f);
+            (Resources["AccentColorBrushDark2"] as SolidColorBrush).Color = color.Item1.Darken(.2f);
+            (Resources["TextOnAccentColorBrush"] as SolidColorBrush).Color = color.Item3;
+            (Resources["TextOnAccentColorBrushDark1"] as SolidColorBrush).Color = color.Item3.Darken(.1f);
+            (Resources["TextOnAccentColorBrushDark2"] as SolidColorBrush).Color = color.Item3.Darken(.2f);
         }
 
         void Init()
@@ -921,6 +936,11 @@ namespace TewiMP.Pages.ListViewPages
                         ItemsList_Header_Info_CommandBar.Focus(FocusState.Programmatic);
                 }
             }
+        }
+
+        private void Page_ActualThemeChanged(FrameworkElement sender, object args)
+        {
+            InitAccentColor();
         }
     }
 }

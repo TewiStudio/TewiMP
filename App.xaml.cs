@@ -120,7 +120,7 @@ namespace TewiMP
 
         private void CoreApplication_UnhandledErrorDetected(object sender, UnhandledErrorDetectedEventArgs e)
         {
-            LogManager.Error("App", $"CoreApplication UnhandledErrorDetected: {e}");
+            LogManager.Error("App", $"CoreApplication UnhandledErrorDetected: {e.UnhandledError}");
         }
 
         private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
