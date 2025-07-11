@@ -398,7 +398,7 @@ namespace TewiMP
         }
 
         #region Window Events
-        private void WindowGridBase_Loaded(object sender, RoutedEventArgs e)
+        private async void WindowGridBase_Loaded(object sender, RoutedEventArgs e)
         {
             SetBackdrop(CurrentBackdrop);
             App.Instance.SMTC.ButtonPressed += SMTC_ButtonPressed;
@@ -429,6 +429,7 @@ namespace TewiMP
 
             StaringPrepare();
             LoadLastPlaying();
+
             //NotifyListView.ItemsSource = NotifyList;
             //PlayingListBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
             //VolumeBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
@@ -442,6 +443,14 @@ namespace TewiMP
             DebugViewPopup.XamlRoot = WindowGridBase.XamlRoot;
             DebugViewPopup.IsOpen = true;
 #endif
+            try
+            {
+                await App.Instance.CheckUpdate();
+            }
+            catch
+            {
+
+            }
         }
 
         private async void WindowGridBase_ActualThemeChanged(FrameworkElement sender, object args)
@@ -477,7 +486,6 @@ namespace TewiMP
             if (isFirstWindowActivity)
             {
                 isFirstWindowActivity = false;
-                App.Instance.CheckUpdate();
             }
             if (isAddEvents) return;
             //AutoScrollViewerFirst.Pause = false;

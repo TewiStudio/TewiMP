@@ -320,16 +320,16 @@
                                              VerticalSpacing="12"
                                              Margin="0,4,0,0">
                             <ComboBox IsEnabled="False" Loaded="ComboBox_Loaded_4" SelectionChanged="ComboBox_SelectionChanged_6">
-                                <x:String>系统默认</x:String>
+                                <x:String>专辑主题色</x:String>
                                 <x:String>自定义</x:String>
                             </ComboBox>
                             <Border Height="32" HorizontalAlignment="Left"
                                     CornerRadius="4" VerticalAlignment="Top"
-                                    Background="{ThemeResource SystemAccentColor}"
+                                    Background="{ThemeResource MusicAlbumAccentBrush}"
                                     x:Name="accentcolor_accentcolor_presenter_root"
                                     Visibility="Visible">
                                 <TextBlock Text="TewiMP"
-                                           Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                                           Foreground="{ThemeResource TextOnMusicAlbumAccentForegroundBrush}"
                                            VerticalAlignment="Center"
                                            HorizontalAlignment="Center"
                                            FontSize="14"

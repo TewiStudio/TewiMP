@@ -75,14 +75,14 @@
             <StaticResource x:Key="ToggleButtonBackgroundCheckedPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
             <StaticResource x:Key="ToggleButtonBackgroundCheckedPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
             <StaticResource x:Key="ToggleButtonForegroundChecked" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
-            <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrush2" />
-            <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrush3" />
+            <StaticResource x:Key="ToggleButtonForegroundCheckedPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
+            <StaticResource x:Key="ToggleButtonForegroundCheckedPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
             <StaticResource x:Key="AppBarToggleButtonBackgroundChecked" ResourceKey="MusicAlbumAccentBrush" />
             <StaticResource x:Key="AppBarToggleButtonBackgroundCheckedPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
             <StaticResource x:Key="AppBarToggleButtonBackgroundCheckedPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
             <StaticResource x:Key="AppBarToggleButtonForegroundChecked" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
-            <StaticResource x:Key="AppBarToggleButtonForegroundCheckedPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrush2" />
-            <StaticResource x:Key="AppBarToggleButtonForegroundCheckedPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrush3" />
+            <StaticResource x:Key="AppBarToggleButtonForegroundCheckedPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
+            <StaticResource x:Key="AppBarToggleButtonForegroundCheckedPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
 
             <!-- AccentButtonStyle -->
             <StaticResource x:Key="AccentButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
@@ -114,7 +114,12 @@
                 </LinearGradientBrush.GradientStops>
             </LinearGradientBrush>
             <StaticResource x:Key="TextControlBorderBrushFocused" ResourceKey="TextControlElevationBorderMusicAlbumAccentColorFocusedBrush" />
+            <StaticResource x:Key="HyperlinkForeground" ResourceKey="MusicAlbumAccentBrush" />
+
+            <!-- Hyperlink -->
             <StaticResource x:Key="TextControlSelectionHighlightColor" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="HyperlinkForegroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+            <StaticResource x:Key="HyperlinkForegroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
             
             <!-- Other -->
             <StaticResource x:Key="NavigationViewSelectionIndicatorForeground" ResourceKey="MusicAlbumAccentBrush" />

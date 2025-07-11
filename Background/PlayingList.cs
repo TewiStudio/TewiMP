@@ -1,4 +1,5 @@
 ﻿using Melanchall.DryWetMidi.Core;
+using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using NAudio;
@@ -391,30 +392,38 @@ namespace TewiMP.Background
 
         public Windows.UI.Color AlbumAccentColor { get; set; }
         public Windows.UI.Color AlbumAccentColorReverse { get; set; }
+        public Windows.UI.Color TextOnAlbumAccentColor { get; set; }
         string lastImagePath;
         public async Task GetImageColor()
         {
             var nowImagePath = NowPlayingImagePath;
-            if (string.IsNullOrEmpty(nowImagePath)) return;
-            if (nowImagePath == lastImagePath) return;
-            lastImagePath = nowImagePath;
+            if (string.IsNullOrEmpty(nowImagePath) || nowImagePath == lastImagePath)
+            {
+                AlbumAccentColor = (App.Current.Resources["SystemControlBackgroundAccentBrush"] as SolidColorBrush).Color;
+                AlbumAccentColorReverse = (App.Current.Resources["SystemControlBackgroundAccentBrush"] as SolidColorBrush).Color;
+                TextOnAlbumAccentColor = CodeHelper.IsAccentColorDark(AlbumAccentColor) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0);
+            }
+            else
+            {
+                lastImagePath = nowImagePath;
+                LogManager.Info("PlayingList", "正在获取专辑封面主题色...");
+                var themeColor = await CodeHelper.GetThemeColorAsync(nowImagePath);
+                LogManager.Info("PlayingList", $"专辑封面主题色：{themeColor}");
+                if (nowImagePath != NowPlayingImagePath) return; // 确保图片路径没有被更改
+                AlbumAccentColor = themeColor.Item1;
+                AlbumAccentColorReverse = themeColor.Item2;
+                TextOnAlbumAccentColor = themeColor.Item3;
+            }
 
-            LogManager.Info("PlayingList", "正在获取专辑封面主题色...");
-            var themeColor = await CodeHelper.GetThemeColorAsync(nowImagePath);
-            LogManager.Info("PlayingList", $"专辑封面主题色：{themeColor}");
-            if (nowImagePath != NowPlayingImagePath) return; // 确保图片路径没有被更改
-            
-            AlbumAccentColor = themeColor.Item1;
-            AlbumAccentColorReverse = themeColor.Item2;
-            (App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush).Color = themeColor.Item1;
-            (App.Current.Resources["MusicAlbumAccentBrushDark1"] as SolidColorBrush).Color = themeColor.Item1.Darken(.1f);
-            (App.Current.Resources["MusicAlbumAccentBrushDark2"] as SolidColorBrush).Color = themeColor.Item1.Darken(.2f);
-            (App.Current.Resources["MusicAlbumAccentBrushReverse"] as SolidColorBrush).Color = themeColor.Item2;
-            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrush"] as SolidColorBrush).Color = themeColor.Item3;
-            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrushDark1"] as SolidColorBrush).Color = themeColor.Item3.Darken(.1f);
-            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrushDark2"] as SolidColorBrush).Color = themeColor.Item3.Darken(.2f);
+            (App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush).Color = AlbumAccentColor;
+            (App.Current.Resources["MusicAlbumAccentBrushDark1"] as SolidColorBrush).Color = AlbumAccentColor.Darken(.1f);
+            (App.Current.Resources["MusicAlbumAccentBrushDark2"] as SolidColorBrush).Color = AlbumAccentColor.Darken(.2f);
+            (App.Current.Resources["MusicAlbumAccentBrushReverse"] as SolidColorBrush).Color = AlbumAccentColorReverse;
+            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrush"] as SolidColorBrush).Color = TextOnAlbumAccentColor;
+            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrushDark1"] as SolidColorBrush).Color = TextOnAlbumAccentColor.Darken(.1f);
+            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrushDark2"] as SolidColorBrush).Color = TextOnAlbumAccentColor.Darken(.2f);
             // TextBox
-            (App.Current.Resources["TextControlElevationBorderMusicAlbumAccentColorFocusedBrush"] as LinearGradientBrush).GradientStops[0].Color = themeColor.Item1;
+            (App.Current.Resources["TextControlElevationBorderMusicAlbumAccentColorFocusedBrush"] as LinearGradientBrush).GradientStops[0].Color = AlbumAccentColor;
 
         }
     }

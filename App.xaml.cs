@@ -534,7 +534,7 @@ namespace TewiMP
         public bool AppVersionIsNewest()
         {
             var newestVersion = GetNewVersionByReleaseData(NowVersion.SuffixType);
-            if (!newestVersion.Available) return false;
+            if (!newestVersion.Available) return true;
             return newestVersion.Version <= NowVersion.Version;
         }
 

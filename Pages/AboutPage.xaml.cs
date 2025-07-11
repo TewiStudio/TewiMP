@@ -151,8 +151,12 @@ namespace TewiMP.Pages
             CheckUpdate();
         }
 
+        bool checkingUpdate = false;
         private void CheckUpdate()
         {
+            if (checkingUpdate) return;
+            checkingUpdate = true;
+
             var newestVersion = App.Instance.GetNewVersionByReleaseData(App.Instance.NowVersion.SuffixType);
             if (App.Instance.AppVersionIsNewest())
             {
@@ -170,12 +174,21 @@ namespace TewiMP.Pages
 
             NowVersionRun.Text = $"{App.Instance.AppVersion} {App.Instance.NowVersion.SuffixType}";
             NowVersion.Description = $"时间：{App.Instance.AppVersionReleaseDate}";
+
+            checkingUpdate = false;
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
             UpdateExpander.Description = "检查更新中......";
-            await App.Instance.CheckUpdate(false);
+            try
+            {
+                await App.Instance.CheckUpdate(false);
+            }
+            catch
+            {
+                App.MainWindowInstance.AddNotify("无法获取到更新信息", "请检查网络设置。", NotifySeverity.Warning);
+            }
             CheckUpdate();
         }
 

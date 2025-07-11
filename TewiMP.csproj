@@ -34,7 +34,6 @@
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
-		<PathMap>$(MSBuildProjectDirectory)=.</PathMap>
 	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
 	  <DebugType>embedded</DebugType>
