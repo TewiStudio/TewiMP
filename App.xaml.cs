@@ -82,7 +82,7 @@ namespace TewiMP
             Available = true,
             SuffixType = SuffixType.Beta,
             Version = Assembly.GetExecutingAssembly().GetName().Version,
-            ReleaseTime = new(2025, 6, 25),
+            ReleaseTime = new(2025, 7, 11, 10, 45, 00),
             ExtendMessage = null
         };
         public Version AppVersion => NowVersion.Version;
