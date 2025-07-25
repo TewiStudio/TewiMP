@@ -1,32 +1,21 @@
-﻿using CommunityToolkit.WinUI;
-using CueSharp;
-using Microsoft.UI;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Input;
-using Microsoft.UI.Windowing;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Media.Imaging;
+using Microsoft.UI.Input;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Composition;
+using CommunityToolkit.WinUI;
 using NAudio.Wave;
-using System;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 using TewiMP.Background;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
 using TewiMP.Helpers;
-using Vanara.PInvoke;
-using Windows.Graphics.Imaging;
-using Windows.Storage;
-using Windows.Storage.Streams;
-using Windows.UI;
-using Windows.UI.ViewManagement;
 
 namespace TewiMP.Pages.MusicPages
 {
@@ -586,8 +575,8 @@ namespace TewiMP.Pages.MusicPages
                 placementMargin: new(30, 0, 0, ControlBar.ActualHeight - PlaySlider.ActualHeight + 8));
         }
 
-        static ScrollViewer scrollViewer = null;
-        static ScrollViewer scrollViewer1 = null;
+        ScrollViewer scrollViewer = null;
+        ScrollViewer scrollViewer1 = null;
         private void LrcBaseListView_Loaded(object sender, RoutedEventArgs e)
         {
 

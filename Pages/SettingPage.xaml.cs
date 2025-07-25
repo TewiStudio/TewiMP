@@ -960,8 +960,10 @@ namespace TewiMP.Pages
 
         private void SettingsCard_Click_3(object sender, RoutedEventArgs e)
         {
-            var window = new BackgroundTransparentTestWindow();
-            window.Activate();
+            /*var window = new BackgroundTransparentTestWindow();
+            window.Activate();*/
+            var mw = new MainWindow();
+            mw.Activate();
         }
     }
 }

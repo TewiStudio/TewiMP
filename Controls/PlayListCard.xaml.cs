@@ -233,7 +233,7 @@ namespace TewiMP.Controls
 
         private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var isDelete = await App.MainWindowInstance.ShowDialog("确认删除列表", $"真的要删除列表 \"{MusicListData.ListShowName}\" 吗？\n此操作不可逆。", "取消", "确定", defaultButton: ContentDialogButton.Close);
+            var isDelete = await App.MainWindowInstance.ShowDialog("确认删除列表", $"真的要删除列表 \"{MusicListData.ListShowName}\" 吗？\n此操作不可恢复。", "取消", "确定", defaultButton: ContentDialogButton.Close);
             if (isDelete == ContentDialogResult.Primary)
             {
                 App.MainWindowInstance.AddNotify("正在删除", $"正在删除列表 \"{MusicListData.ListShowName}\"。");

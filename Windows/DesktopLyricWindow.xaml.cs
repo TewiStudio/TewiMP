@@ -406,10 +406,12 @@ namespace TewiMP.Windowed
                 }
                 return;
             }
-
+/*
             var accentBrush = (SolidColorBrush)(App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ?
                 App.Current.Resources["MusicAlbumAccentBrushReverse"] :
                 App.Current.Resources["MusicAlbumAccentBrush"]);
+*/
+            var accentBrush = (SolidColorBrush)App.Current.Resources["MusicAlbumAccentBrush"];
             int nowLyricNum = App.Instance.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
             LyricData nextLyric = null;
             LyricData beforeLyric = null;

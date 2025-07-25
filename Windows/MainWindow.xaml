@@ -763,7 +763,7 @@
                         </TextBlock>
                     </cc:WrapPanel>
                     <cc:WrapPanel HorizontalSpacing="4">
-                        <Button Content="GC Collect" Click="Button_Click_8"/>
+                        <Button Content="GC Collect" Tag="GC"  Click="Button_Click_8"/>
                         <Button Content="显示加载的程序集">
                             <Button.Flyout>
                                 <Flyout ShouldConstrainToRootBounds="False">
@@ -781,6 +781,7 @@
                                 </Flyout>
                             </Button.Flyout>
                         </Button>
+                        <Button Content="Log窗口" Tag="Log" Click="Button_Click_8"/>
                     </cc:WrapPanel>
                 </StackPanel>
             </Grid>

@@ -11,17 +11,17 @@
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:media="using:CommunityToolkit.WinUI.Media">
     <Grid x:Name="root" SizeChanged="root_SizeChanged" Loaded="root_Loaded"
-          Padding="0" Background="Transparent" RequestedTheme="Dark">
+          Padding="0" Background="Transparent">
         <Grid.Resources>
             <ResourceDictionary>
-                <SolidColorBrush x:Key="LrcForeground" Color="#DDFFFFFF"/>
-                <SolidColorBrush x:Key="LrcSecondForeground" Color="#88FFFFFF"/>
+                <SolidColorBrush x:Key="LrcForeground" Color="#E0FFFFFF"/>
+                <SolidColorBrush x:Key="LrcSecondForeground" Color="#A0AAAAAA"/>
                 <StaticResource x:Key="AccentLrcForeground" ResourceKey="MusicAlbumAccentBrush"/>
             </ResourceDictionary>
         </Grid.Resources>
         <Rectangle
             VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-            Fill="#90000000" x:Name="BackgroundFill">
+            Fill="{ThemeResource ControlOnImageFillColorDefaultBrush}" x:Name="BackgroundFill">
             <Rectangle.OpacityTransition>
                 <ScalarTransition/>
             </Rectangle.OpacityTransition>
@@ -42,7 +42,7 @@
                         <Border x:Name="T1ShadowTarget"/>
                         <TextBlock x:Name="T1Base">
                             <ui:Effects.Shadow>
-                                <ui:AttachedDropShadow Opacity="1" BlurRadius="10" Color="#88333333" Offset="0,0.2" CastTo="{x:Bind T1ShadowTarget}"/>
+                                <ui:AttachedDropShadow Opacity="1" BlurRadius="10" Offset="0,0.2" Color="#555555" CastTo="{x:Bind T1ShadowTarget}"/>
                             </ui:Effects.Shadow>
                             <Run x:Name="T1" Text="TewiMP" Foreground="{ThemeResource LrcForeground}"/>
                             <Run x:Name="T11" Foreground="{ThemeResource LrcSecondForeground}" FontSize="10"/>
@@ -61,7 +61,7 @@
                         <Border x:Name="T2ShadowTarget"/>
                         <TextBlock x:Name="T2Base" Grid.Column="1">
                             <ui:Effects.Shadow>
-                                <ui:AttachedDropShadow Opacity="1" BlurRadius="10" Color="#88333333" Offset="0,0.2" CastTo="{x:Bind T2ShadowTarget}"/>
+                                <ui:AttachedDropShadow Opacity=".8" BlurRadius="10" Offset="0,0.2" Color="#555555" CastTo="{x:Bind T2ShadowTarget}"/>
                             </ui:Effects.Shadow>
                             <Run x:Name="T2" Text="无歌词" Foreground="{ThemeResource LrcForeground}"/>
                             <Run x:Name="T21" Foreground="{ThemeResource LrcSecondForeground}" FontSize="10"/>
@@ -70,21 +70,21 @@
                 </Viewbox>
             </Grid>
         </Grid>
-        <Border x:Name="InfoTBBorder" RequestedTheme="Dark"
+        <Border x:Name="InfoTBBorder"
                 HorizontalAlignment="Center" VerticalAlignment="Bottom" Opacity="0"
-                CornerRadius="4" BorderThickness="1" Background="#90000000" BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+                CornerRadius="4" BorderThickness="1" Background="{ThemeResource ControlOnImageFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}">
             <Border.OpacityTransition>
                 <ScalarTransition/>
             </Border.OpacityTransition>
-            <TextBlock Text="正在播放：" x:Name="InfoTB" Foreground="White"
+            <TextBlock Text="正在播放：" x:Name="InfoTB"
                    TextAlignment="Center" TextTrimming="CharacterEllipsis"
                    FontWeight="Light" Margin="4,1">
             </TextBlock>
         </Border>
         <Border Padding="20" CornerRadius="8" BorderThickness="1"
                 HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="#90000000" BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                x:Name="InfoBorder" Opacity="0" RequestedTheme="Dark">
+                Background="{ThemeResource ControlOnImageFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                x:Name="InfoBorder" Opacity="0">
             <Border.OpacityTransition>
                 <ScalarTransition/>
             </Border.OpacityTransition>
@@ -104,7 +104,6 @@
         <Grid x:Name="ToolButtonsBase"
               VerticalAlignment="Top"
               HorizontalAlignment="Left"
-              RequestedTheme="Dark"
               PointerEntered="ToolButtonsBase_PointerEntered"
               PointerExited="ToolButtonsBase_PointerExited">
             <StackPanel Margin="0,0,0,0"
@@ -157,7 +156,7 @@
                        VerticalAlignment="Top"
                        HorizontalAlignment="Center">
                 <ui:Effects.Shadow>
-                    <ui:AttachedDropShadow Opacity="1" BlurRadius="3" Color="#AA000000" Offset="0,0.5" CastTo="{x:Bind TRShadowTarget}"/>
+                    <ui:AttachedDropShadow Opacity="1" BlurRadius="3" Offset="0,0.5" CastTo="{x:Bind TRShadowTarget}"/>
                 </ui:Effects.Shadow>
             </TextBlock>
 

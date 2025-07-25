@@ -618,14 +618,16 @@ namespace TewiMP.Helpers
             var result = Windows.UI.Color.FromArgb(c.A, c.R, c.G, c.B);
             result.ColorToHSV(out var h, out var s, out var v);
 
+            LogManager.Info("Album HSV before", $"h:{h}, s:{s}, v:{v}");
             ElementTheme elementTheme = App.MainWindowInstance.WindowGridBase.ActualTheme;
-            var saturation = s + (elementTheme == ElementTheme.Dark ? .06 : .9);
-            var value = v + (elementTheme == ElementTheme.Dark ? .8 : .1);
+            var saturation = s + (elementTheme == ElementTheme.Dark ? .1 : .6);
+            var value = v + (elementTheme == ElementTheme.Dark ? 1 : .1);
             var color1 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
+            LogManager.Info("Album HSV after", $"h:{h}, s:{saturation}, v:{value}");
 
             elementTheme = App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
-            saturation = s + (elementTheme == ElementTheme.Dark ? .06 : .9);
-            value = v + (elementTheme == ElementTheme.Dark ? .8 : .1);
+            saturation = s + (elementTheme == ElementTheme.Dark ? .1 : .6);
+            value = v + (elementTheme == ElementTheme.Dark ? 1 : .1);
             var color2 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
             return (color1, color2, IsAccentColorDark(color1) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0));
         }

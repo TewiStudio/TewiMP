@@ -168,7 +168,7 @@
             </MenuFlyoutItem>
             <MenuFlyoutItem
                 x:Name="DeleteFromPlaylistAndLocalFileItem"
-                Text="从列表中删除并删除其文件"
+                Text="从列表中删除并删除其文件..."
                 Click="MenuFlyoutItem_Click"
                 AccessKey="B"
                 Tag="deleteFile">

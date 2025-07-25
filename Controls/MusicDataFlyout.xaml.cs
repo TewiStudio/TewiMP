@@ -128,12 +128,16 @@ namespace TewiMP.Controls
                     }
                     break;
                 case "deleteFile":
-                    if (songItemBind.MusicListData.ListDataType == DataType.本地歌单 || songItemBind.MusicListData.ListDataType == DataType.歌单)
+                    var result = await App.MainWindowInstance.ShowDialog("删除音频文件", $"确定要删除 \"{songItemBind.MusicData.Title}\" 吗？此操作不可恢复。", "取消", "确定", null, ContentDialogButton.Close);
+                    if (result == ContentDialogResult.Primary)
                     {
-                        string deletePath = songItemBind.MusicData.InLocal;
-                        await Task.Run(() => File.Delete(deletePath));
-                        await PlayListHelper.DeleteMusicDataFromPlayList(songItemBind.MusicListData.ListName, songItemBind.MusicData);
-                        await App.Instance.playListReader.Refresh();
+                        if (songItemBind.MusicListData.ListDataType == DataType.本地歌单 || songItemBind.MusicListData.ListDataType == DataType.歌单)
+                        {
+                            string deletePath = songItemBind.MusicData.InLocal;
+                            await Task.Run(() => File.Delete(deletePath));
+                            await PlayListHelper.DeleteMusicDataFromPlayList(songItemBind.MusicListData.ListName, songItemBind.MusicData);
+                            await App.Instance.playListReader.Refresh();
+                        }
                     }
                     break;
                 case "album":

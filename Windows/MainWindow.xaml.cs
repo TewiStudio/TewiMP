@@ -111,12 +111,12 @@ namespace TewiMP
             LogManager.Info("MainWindow", "Inited");
         }
 
-        internal static SystemBackdropConfiguration systemBackdropConfiguration;
-        internal static DesktopAcrylicController desktopAcrylicController;
-        internal static MicaBackdrop micaBackdrop = new();
-        internal static MicaBackdrop micaAltBackdrop = new() { Kind = MicaKind.BaseAlt };
-        private static BlurredBackdrop blurBackdrop = new();
-        private static TransparentTintBackdrop transparentTintBackdrop = new();
+        internal SystemBackdropConfiguration systemBackdropConfiguration;
+        internal DesktopAcrylicController desktopAcrylicController;
+        internal MicaBackdrop micaBackdrop = new();
+        internal MicaBackdrop micaAltBackdrop = new() { Kind = MicaKind.BaseAlt };
+        private BlurredBackdrop blurBackdrop = new();
+        private TransparentTintBackdrop transparentTintBackdrop = new();
         public void SetBackdrop(BackdropType backdropType)
         {
             desktopAcrylicController?.Dispose();
@@ -1597,7 +1597,7 @@ namespace TewiMP
 
                 LogManager.Log("MainWindow", "主界面被显示。");
                 GridBase.Visibility = Visibility.Visible;
-                InitializeTitleBar(WindowGridBase.RequestedTheme);
+                InitializeTitleBar(WindowGridBase.ActualTheme);
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualClosingAnimation);
                 musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
                 {
@@ -1645,7 +1645,7 @@ namespace TewiMP
                 InOpenMusicPage = true;
 
                 MusicPageBaseFrame.Visibility = Visibility.Visible;
-                InitializeTitleBar(SMusicPage.pageRoot.RequestedTheme);
+                InitializeTitleBar(SMusicPage.pageRoot.ActualTheme);
                 musicPageVisual.Offset = new(0, (float)MusicPageBaseGrid.ActualHeight, 0);
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualOpeningAnimation);
                 musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
@@ -2104,7 +2104,17 @@ namespace TewiMP
 
         private void Button_Click_8(object sender, RoutedEventArgs e)
         {
-            GC.Collect();
+            if (sender is Button button)
+            {
+                if ((string)button.Tag == "GC")
+                {
+                    GC.Collect();
+                }
+                else
+                {
+                    LogWindow.ShowWindow();
+                }
+            }
         }
 
         ObservableCollection<string> oc = new();
@@ -2203,7 +2213,7 @@ namespace TewiMP
             {
                 NotifySeverity.Warning => LogLevel.Warning,
                 NotifySeverity.Error => LogLevel.Error,
-                NotifySeverity.Info => LogLevel.Information,
+                NotifySeverity.Info => LogLevel.Info,
                 _ => null,
             };
         }

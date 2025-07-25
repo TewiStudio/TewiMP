@@ -521,7 +521,7 @@
                                  IsClickEnabled="True"
                                  Click="SettingsCard_Click_2">
                 </cc:SettingsCard>
-                <cc:SettingsCard Header="透明窗口"
+                <cc:SettingsCard Header="新窗口"
                                  IsClickEnabled="True"
                                  Click="SettingsCard_Click_3">
                 </cc:SettingsCard>
