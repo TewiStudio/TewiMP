@@ -137,7 +137,7 @@ namespace TewiMP.Pages
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            await App.Instance.playingList.Play(((sender as Button).DataContext as SongHistoryData).MusicData);
+            await App.Instance.PlayingList.Play(((sender as Button).DataContext as SongHistoryData).MusicData);
         }
 
         ScrollViewer scrollViewer;

@@ -150,7 +150,7 @@ namespace TewiMP.Media
                 throw new System.Exception("找不到 ffmpeg.exe，请检查 ffmpeg.exe 是否被删除，或者其路径设置是否正确。");
             }
 
-            var tFile = App.Instance.audioPlayer.tfile;
+            var tFile = App.Instance.AudioPlayer.tfile;
             string codec = tFile.BitDepth switch
             {
                 8 => "u8",

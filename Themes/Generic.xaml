@@ -1,0 +1,54 @@
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP"
+    xmlns:local2="using:TewiMP.Controls"
+    xmlns:controls="using:CommunityToolkit.WinUI.Controls">
+
+    <Style TargetType="local2:AutoScrollView">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local2:AutoScrollView">
+                    <controls:OpacityMaskView>
+                        <controls:OpacityMaskView.OpacityMask>
+                            <Grid>
+                                <Rectangle>
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0" MappingMode="RelativeToBoundingBox">
+                                            <GradientStop Offset="0" Color="Transparent" />
+                                            <GradientStop x:Name="PART_GS1" Offset=".25" Color="White" />
+                                            <GradientStop x:Name="PART_GS2" Offset=".75" Color="White" />
+                                            <GradientStop Offset="1" Color="Transparent" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Rectangle x:Name="PART_GS1_animation" HorizontalAlignment="Left" Fill="White" Opacity="0">
+                                    <Rectangle.OpacityTransition>
+                                        <ScalarTransition/>
+                                    </Rectangle.OpacityTransition>
+                                </Rectangle>
+                                <Rectangle x:Name="PART_GS2_animation" HorizontalAlignment="Right" Fill="White" Opacity="0">
+                                    <Rectangle.OpacityTransition>
+                                        <ScalarTransition/>
+                                    </Rectangle.OpacityTransition>
+                                </Rectangle>
+                            </Grid>
+                        </controls:OpacityMaskView.OpacityMask>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollView
+                                x:Name="PART_ScrollView"
+                                HorizontalScrollBarVisibility="Hidden"
+                                VerticalScrollBarVisibility="Hidden"
+                                HorizontalScrollMode="Enabled"
+                                ContentOrientation="Both">
+                                <ContentPresenter x:Name="PART_ContentPresenter" Content="{TemplateBinding Content}"/>
+                            </ScrollView>
+                        </Border>
+                    </controls:OpacityMaskView>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

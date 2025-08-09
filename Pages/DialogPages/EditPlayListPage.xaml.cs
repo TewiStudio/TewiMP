@@ -27,7 +27,7 @@ namespace TewiMP.Pages.DialogPages
                 data[MusicListData.ListName]["ListShowName"] = Name_TB.Text;
                 data[MusicListData.ListName]["PicturePath"] = ImagePath_TB.Text;
                 await PlayListHelper.SaveData(data);
-                await App.Instance.playListReader.Refresh();
+                await App.Instance.PlayListReader.Refresh();
                 App.MainWindowInstance.AddNotify("编辑列表成功。", null, NotifySeverity.Complete);
             }
             ResultEvent -= AddPlayListPage_ResultEvent;

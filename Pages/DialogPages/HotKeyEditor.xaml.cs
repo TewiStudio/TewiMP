@@ -109,7 +109,7 @@ namespace TewiMP.Pages.DialogPages
                 if (hotKey != null)
                 {
                     hotKey.HotKeyID = changedHotKey.HotKeyID;
-                    App.Instance.hotKeyManager.ChangeHotKey(hotKey);
+                    App.Instance.HotKeyManager.ChangeHotKey(hotKey);
                 }
             }
             else if (r == ContentDialogResult.Secondary)
@@ -118,7 +118,7 @@ namespace TewiMP.Pages.DialogPages
                 {
                     if (k.HotKeyID == changedHotKey.HotKeyID)
                     {
-                        App.Instance.hotKeyManager.ChangeHotKey(k);
+                        App.Instance.HotKeyManager.ChangeHotKey(k);
                         break;
                     }
                 }

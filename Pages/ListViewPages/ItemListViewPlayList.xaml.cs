@@ -50,8 +50,8 @@ namespace TewiMP.Pages
             IsNavigatedOutFromPage = false;
             App.MainWindowInstance.InKeyDownEvent += MainWindow_InKeyDownEvent;
             App.MainWindowInstance.MainViewStateChanged += MainWindow_MainViewStateChanged;
-            App.Instance.playListReader.Updated += PlayListReader_Updated;
-            App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+            App.Instance.PlayListReader.Updated += PlayListReader_Updated;
+            App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
             ImageManage.localImageCache.Clear();
             /*
             ConnectedAnimation animation =
@@ -63,7 +63,7 @@ namespace TewiMP.Pages
 */
             //PlayAllButton.Foreground = new SolidColorBrush(CodeHelper.IsAccentColorDark() ? Colors.White : Colors.Black);
 
-            foreach (var mld in App.Instance.playListReader.NowMusicListData)
+            foreach (var mld in App.Instance.PlayListReader.NowMusicListData)
             {
                 if (mld == (MusicListData)e.Parameter)
                 {
@@ -88,8 +88,8 @@ namespace TewiMP.Pages
             IsNavigatedOutFromPage = true;
             App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
             App.MainWindowInstance.MainViewStateChanged -= MainWindow_MainViewStateChanged;
-            App.Instance.playListReader.Updated -= PlayListReader_Updated;
-            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            App.Instance.PlayListReader.Updated -= PlayListReader_Updated;
+            App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
 
             DisposeAllVisual();
 
@@ -303,10 +303,10 @@ namespace TewiMP.Pages
         {
             if (IsNavigatedOutFromPage || NavToObj is null)
             {
-                App.Instance.playListReader.Updated -= PlayListReader_Updated;
+                App.Instance.PlayListReader.Updated -= PlayListReader_Updated;
                 return;
             }
-            foreach (var data in App.Instance.playListReader.NowMusicListData)
+            foreach (var data in App.Instance.PlayListReader.NowMusicListData)
             {
                 if (data == NavToObj)
                 {
@@ -589,16 +589,16 @@ namespace TewiMP.Pages
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (Children.Items.Count == 0) return;
-            if (App.Instance.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
+            if (App.Instance.PlayingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
             {
-                App.Instance.playingList.ClearAll();
+                App.Instance.PlayingList.ClearAll();
             }
             foreach (var songItem in MusicDataList)
             {
-                App.Instance.playingList.Add(songItem.MusicData, false);
+                App.Instance.PlayingList.Add(songItem.MusicData, false);
             }
-            await App.Instance.playingList.Play(MusicDataList.First().MusicData, true);
-            App.Instance.playingList.SetRandomPlay(App.Instance.playingList.PlayBehavior);
+            await App.Instance.PlayingList.Play(MusicDataList.First().MusicData, true);
+            App.Instance.PlayingList.SetRandomPlay(App.Instance.PlayingList.PlayBehavior);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -668,7 +668,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase item in Children.SelectedItems.Cast<SongItemBindBase>())
                 {
-                    App.Instance.playingList.Add(item.MusicData);
+                    App.Instance.PlayingList.Add(item.MusicData);
                 }
             }
         }
@@ -697,14 +697,14 @@ namespace TewiMP.Pages
                     item.SetNotifyItemData("删除歌曲", "正在保存...", NotifySeverity.Loading);
                     item.SetProcess(0, 0);
                     await PlayListHelper.SaveData(jdata);
-                    await App.Instance.playListReader.Refresh();
+                    await App.Instance.PlayListReader.Refresh();
                     item.SetNotifyItemData("删除歌曲", "删除歌曲成功。", NotifySeverity.Complete);
                     App.MainWindowInstance.NotifyCountDown(item);
                     ToolsCommandBar.IsEnabled = true;
 
                     if (NavToObj != null)
                     {
-                        foreach (var m in App.Instance.playListReader.NowMusicListData)
+                        foreach (var m in App.Instance.PlayListReader.NowMusicListData)
                         {
                             if (m.MD5 == NavToObj.MD5)
                             {
@@ -781,10 +781,10 @@ namespace TewiMP.Pages
                     item.HorizontalAlignment = HorizontalAlignment.Center;
                     item.SetNotifyItemData("添加本地歌曲", "正在保存...", NotifySeverity.Loading);
                     await PlayListHelper.SaveData(jdata);
-                    await App.Instance.playListReader.Refresh();
+                    await App.Instance.PlayListReader.Refresh();
                     if (NavToObj != null)
                     {
-                        foreach (var m in App.Instance.playListReader.NowMusicListData)
+                        foreach (var m in App.Instance.PlayListReader.NowMusicListData)
                         {
                             if (m.MD5 == NavToObj.MD5)
                             {
@@ -815,8 +815,8 @@ namespace TewiMP.Pages
                         }
                     }
                     await PlayListHelper.SaveData(jdata);
-                    await App.Instance.playListReader.Refresh();
-                    foreach (var m in App.Instance.playListReader.NowMusicListData)
+                    await App.Instance.PlayListReader.Refresh();
+                    foreach (var m in App.Instance.PlayListReader.NowMusicListData)
                     {
                         if (m.MD5 == NavToObj.MD5)
                         {
@@ -841,7 +841,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase songItem in Children.SelectedItems)
                 {
-                    App.Instance.downloadManager.Add(songItem.MusicData);
+                    App.Instance.DownloadManager.Add(songItem.MusicData);
                 }
             }
         }
@@ -880,7 +880,7 @@ namespace TewiMP.Pages
             }
             text[listName] = JObject.FromObject(list);
             await PlayListHelper.SaveData(text);
-            await App.Instance.playListReader.Refresh();
+            await App.Instance.PlayListReader.Refresh();
             App.MainWindowInstance.HideDialog();
         }
 
@@ -925,14 +925,14 @@ namespace TewiMP.Pages
                 case "2":
                     foreach(var i in MusicDataList)
                     {
-                        if (i.MusicData == App.Instance.audioPlayer.MusicData)
+                        if (i.MusicData == App.Instance.AudioPlayer.MusicData)
                         {
                             await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                             await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, true);
                             foreach (var j in SongItem.StaticSongItems)
                             {
                                 if (j != null)
-                                    if (j.MusicData == App.Instance.audioPlayer.MusicData)
+                                    if (j.MusicData == App.Instance.AudioPlayer.MusicData)
                                         j.AnimateStroke();
                             }
                         }
@@ -1010,7 +1010,7 @@ namespace TewiMP.Pages
                 }
                 data[NavToObj.ListName] = JObject.FromObject(NavToObj);
                 await PlayListHelper.SaveData(data);
-                await App.Instance.playListReader.Refresh();
+                await App.Instance.PlayListReader.Refresh();
                 item.SetNotifyItemData("保存排序完成。", null, NotifySeverity.Complete);
                 App.MainWindowInstance.NotifyCountDown(item);
             }

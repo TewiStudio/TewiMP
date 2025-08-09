@@ -26,7 +26,7 @@ namespace TewiMP.Controls
         {
             if (isStaticInited) return;
             isStaticInited = true;
-            App.Instance.audioPlayer.SourceChanged += (_) =>
+            App.Instance.AudioPlayer.SourceChanged += (_) =>
             {
                 foreach (MusicDataItem item in staticMusicDataItem)
                 {
@@ -89,7 +89,7 @@ namespace TewiMP.Controls
 
         public bool IsMusicDataPlaying
         {
-            get => songItemBind?.MusicData == App.Instance.audioPlayer.MusicData;
+            get => songItemBind?.MusicData == App.Instance.AudioPlayer.MusicData;
         }
 
         SongItemBindBase songItemBind;
@@ -227,16 +227,16 @@ namespace TewiMP.Controls
 
             if (IsMusicDataPlaying)
             {
-                App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-                App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-                SetPlayingIcon(App.Instance.audioPlayer.PlaybackState);
+                App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+                App.Instance.AudioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+                SetPlayingIcon(App.Instance.AudioPlayer.PlaybackState);
                 OnMouseIn();
                 Background_PlayingRectangle.Opacity = 1;
                 last_IsMusicDataPlaying = true;
             }
             else
             {
-                App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+                App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
                 if (last_IsMusicDataPlaying) // 只有当上次调用此函数时 IsMusicDataPlaying 判断为 true 时才执行下面的恢复样式代码
                 {
                     SetPlayingIcon(NAudio.Wave.PlaybackState.Paused);
@@ -338,7 +338,7 @@ namespace TewiMP.Controls
             {
                 rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
             }
-            App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+            App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
             staticMusicDataItem.Remove(this);
             songItemBind = null;
             Info_Image.Source = null;
@@ -377,7 +377,7 @@ namespace TewiMP.Controls
         private async void UserControl_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             if (isMouseEventClosed) return;
-            await App.Instance.playingList.Play(songItemBind.MusicData, true);
+            await App.Instance.PlayingList.Play(songItemBind.MusicData, true);
         }
 
         private void UserControl_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -406,13 +406,13 @@ namespace TewiMP.Controls
         {
             if (IsMusicDataPlaying)
             {
-                if (App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
-                    App.Instance.audioPlayer.SetPause();
+                if (App.Instance.AudioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                    App.Instance.AudioPlayer.SetPause();
                 else
-                    App.Instance.audioPlayer.SetPlay();
+                    App.Instance.AudioPlayer.SetPlay();
             }
             else
-                await App.Instance.playingList.Play(songItemBind.MusicData, true);
+                await App.Instance.PlayingList.Play(songItemBind.MusicData, true);
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)

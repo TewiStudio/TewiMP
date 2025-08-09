@@ -72,9 +72,9 @@
                             </TransitionCollection>
                         </Grid.Transitions>
                         <StackPanel VerticalAlignment="Top">
-                            <c:AutoScrollViewer x:Name="TitleTBBase">
+                            <c:AutoScrollView x:Name="TitleTBBase">
                                 <TextBlock x:Name="TitleTB" Text="TewiMP" FontSize="18" TextTrimming="CharacterEllipsis"/>
-                            </c:AutoScrollViewer>
+                            </c:AutoScrollView>
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="auto"/>
@@ -82,14 +82,14 @@
                                 </Grid.ColumnDefinitions>
                                 <FontIcon Glyph="&#xE77B;" FontSize="16" Margin="0,0,4,0"
                                           Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                                <c:AutoScrollViewer x:Name="ArtistTBBase"
+                                <c:AutoScrollView x:Name="ArtistTBBase"
                                                     Grid.Column="1"
 >
                                     <TextBlock x:Name="ArtistTB" Text="无"
                                                TextTrimming="CharacterEllipsis" TextWrapping="WrapWholeWords"
                                                MaxLines="1"
                                                Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                                </c:AutoScrollViewer>
+                                </c:AutoScrollView>
                             </Grid>
                             <Grid>
                                 <Grid.ColumnDefinitions>
@@ -98,12 +98,12 @@
                                 </Grid.ColumnDefinitions>
                                 <FontIcon Glyph="&#xE93C;" FontSize="16" Margin="0,0,4,0"
                                           Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                                <c:AutoScrollViewer x:Name="AlbumTBBase" Grid.Column="1">
+                                <c:AutoScrollView x:Name="AlbumTBBase" Grid.Column="1">
                                     <TextBlock x:Name="AlbumTB" Text="无"
                                                TextTrimming="CharacterEllipsis" TextWrapping="WrapWholeWords"
                                                MaxLines="1"
                                                Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                                </c:AutoScrollViewer>
+                                </c:AutoScrollView>
                             </Grid>
                         </StackPanel>
                         <Grid VerticalAlignment="bottom" Grid.Row="1">

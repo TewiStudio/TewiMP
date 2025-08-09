@@ -83,7 +83,7 @@ namespace TewiMP.Controls
         private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
             AudioFilterStatic.PassFilterDatas.Remove(DataContext);
-            App.Instance.audioPlayer.UpdateEqualizer();
+            App.Instance.AudioPlayer.UpdateEqualizer();
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)

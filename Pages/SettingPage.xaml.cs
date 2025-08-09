@@ -338,7 +338,7 @@ namespace TewiMP.Pages
             combo0loading = true;
             var combo = sender as ComboBox;
             int index = 0;
-            switch (App.Instance.downloadManager.DownloadQuality)
+            switch (App.Instance.DownloadManager.DownloadQuality)
             {
                 case DataFolderBase.DownloadQuality.lossless: index = 0; break;
                 case DataFolderBase.DownloadQuality.lossy_high: index = 1; break;
@@ -356,16 +356,16 @@ namespace TewiMP.Pages
             switch (combo.SelectedIndex)
             {
                 case 0:
-                    App.Instance.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossless;
+                    App.Instance.DownloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossless;
                     break;
                 case 1:
-                    App.Instance.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_high;
+                    App.Instance.DownloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_high;
                     break;
                 case 2:
-                    App.Instance.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_mid;
+                    App.Instance.DownloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_mid;
                     break;
                 case 3:
-                    App.Instance.downloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_low;
+                    App.Instance.DownloadManager.DownloadQuality = DataFolderBase.DownloadQuality.lossy_low;
                     break;
             }
         }
@@ -374,28 +374,28 @@ namespace TewiMP.Pages
         private void DownloadMaximumBaseGrid_Loaded(object sender, RoutedEventArgs e)
         {
             downloadMaximumLoading = true;
-            (sender as NumberBox).Value = App.Instance.downloadManager.DownloadingMaximum;
+            (sender as NumberBox).Value = App.Instance.DownloadManager.DownloadingMaximum;
             downloadMaximumLoading = false;
         }
 
         private void NumberBox_ValueChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
         {
             if (downloadMaximumLoading) return;
-            App.Instance.downloadManager.DownloadingMaximum = (int)sender.Value;
+            App.Instance.DownloadManager.DownloadingMaximum = (int)sender.Value;
         }
 
         bool downloadNamedLoading = false;
         private void Download_NamedRadioButtons_Loaded(object sender, RoutedEventArgs e)
         {
             downloadNamedLoading = true;
-            (sender as ComboBox).SelectedIndex = (int)App.Instance.downloadManager.DownloadNamedMethod;
+            (sender as ComboBox).SelectedIndex = (int)App.Instance.DownloadManager.DownloadNamedMethod;
             downloadNamedLoading = false;
         }
 
         private void Download_NamedRadioButtons_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (downloadNamedLoading) return;
-            App.Instance.downloadManager.DownloadNamedMethod = (DataFolderBase.DownloadNamedMethod)(sender as ComboBox).SelectedIndex;
+            App.Instance.DownloadManager.DownloadNamedMethod = (DataFolderBase.DownloadNamedMethod)(sender as ComboBox).SelectedIndex;
         }
 
         bool downloadOptionsLoading = false;
@@ -403,10 +403,10 @@ namespace TewiMP.Pages
         {
             downloadOptionsLoading = true;
             var root = sender as StackPanel;
-            (root.Children[0] as CheckBox).IsChecked = App.Instance.downloadManager.IDv3WriteImage;
-            (root.Children[1] as CheckBox).IsChecked = App.Instance.downloadManager.IDv3WriteArtistImage;
-            (root.Children[2] as CheckBox).IsChecked = App.Instance.downloadManager.IDv3WriteLyric;
-            (root.Children[3] as CheckBox).IsChecked = App.Instance.downloadManager.SaveLyricToLrcFile;
+            (root.Children[0] as CheckBox).IsChecked = App.Instance.DownloadManager.IDv3WriteImage;
+            (root.Children[1] as CheckBox).IsChecked = App.Instance.DownloadManager.IDv3WriteArtistImage;
+            (root.Children[2] as CheckBox).IsChecked = App.Instance.DownloadManager.IDv3WriteLyric;
+            (root.Children[3] as CheckBox).IsChecked = App.Instance.DownloadManager.SaveLyricToLrcFile;
             downloadOptionsLoading = false;
         }
 
@@ -417,16 +417,16 @@ namespace TewiMP.Pages
             switch (checkBox.Tag)
             {
                 case "0":
-                    App.Instance.downloadManager.IDv3WriteImage = (bool)checkBox.IsChecked;
+                    App.Instance.DownloadManager.IDv3WriteImage = (bool)checkBox.IsChecked;
                     break;
                 case "1":
-                    App.Instance.downloadManager.IDv3WriteArtistImage = (bool)checkBox.IsChecked;
+                    App.Instance.DownloadManager.IDv3WriteArtistImage = (bool)checkBox.IsChecked;
                     break;
                 case "2":
-                    App.Instance.downloadManager.IDv3WriteLyric = (bool)checkBox.IsChecked;
+                    App.Instance.DownloadManager.IDv3WriteLyric = (bool)checkBox.IsChecked;
                     break;
                 case "3":
-                    App.Instance.downloadManager.SaveLyricToLrcFile = (bool)checkBox.IsChecked;
+                    App.Instance.DownloadManager.SaveLyricToLrcFile = (bool)checkBox.IsChecked;
                     break;
             }
         }
@@ -437,21 +437,21 @@ namespace TewiMP.Pages
         private void ComboBox_Loaded_1(object sender, RoutedEventArgs e)
         {
             combo1Loading = true;
-            (sender as ComboBox).SelectedIndex = (int)App.Instance.playingList.PlayBehavior;
+            (sender as ComboBox).SelectedIndex = (int)App.Instance.PlayingList.PlayBehavior;
             combo1Loading = false;
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (combo1Loading) return;
-            App.Instance.playingList.PlayBehavior = (PlayBehavior)(sender as ComboBox).SelectedIndex;
+            App.Instance.PlayingList.PlayBehavior = (PlayBehavior)(sender as ComboBox).SelectedIndex;
         }
 
         private void StackPanel_Loaded(object sender, RoutedEventArgs e)
         {
             var sp = sender as StackPanel;
-            (sp.Children[0] as CheckBox).IsChecked = App.Instance.playingList.PauseWhenPreviousPause;
-            (sp.Children[1] as CheckBox).IsChecked = App.Instance.playingList.NextWhenPlayError;
+            (sp.Children[0] as CheckBox).IsChecked = App.Instance.PlayingList.PauseWhenPreviousPause;
+            (sp.Children[1] as CheckBox).IsChecked = App.Instance.PlayingList.NextWhenPlayError;
             (sp.Children[2] as CheckBox).IsChecked = App.Instance.LoadLastExitPlayingSongAndSongList;
         }
 
@@ -461,10 +461,10 @@ namespace TewiMP.Pages
             switch (checkBox.Tag)
             {
                 case "0":
-                    App.Instance.playingList.PauseWhenPreviousPause = (bool)checkBox.IsChecked;
+                    App.Instance.PlayingList.PauseWhenPreviousPause = (bool)checkBox.IsChecked;
                     break;
                 case "1":
-                    App.Instance.playingList.NextWhenPlayError = (bool)checkBox.IsChecked;
+                    App.Instance.PlayingList.NextWhenPlayError = (bool)checkBox.IsChecked;
                     break;
                 case "2":
                     App.Instance.LoadLastExitPlayingSongAndSongList = (bool)checkBox.IsChecked;
@@ -875,13 +875,13 @@ namespace TewiMP.Pages
         {
         }
 
-        private async void Button_Click_9(object sender, RoutedEventArgs e)
+        private void Button_Click_9(object sender, RoutedEventArgs e)
         {
             App.Instance.SaveSettings();
             App.MainWindowInstance.AddNotify("保存设置成功", "已将设置数据写入设置文件中。", NotifySeverity.Complete);
         }
 
-        private async void Button_Click_10(object sender, RoutedEventArgs e)
+        private void Button_Click_10(object sender, RoutedEventArgs e)
         {
             App.Instance.LoadSettings();
             App.MainWindowInstance.AddNotify("读取设置成功", "已从设置文件中读取设置。", NotifySeverity.Complete);

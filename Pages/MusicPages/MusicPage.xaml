@@ -176,12 +176,12 @@
                                     <MenuFlyoutItem x:Name="CopyMenuItem" Click="CopyMenuItem_Click" Text="复制" Icon="copy"/>
                                 </MenuFlyout>
                             </Button.Flyout>
-                            <controls:AutoScrollViewer x:Name="AutoScrollViewer2">
+                            <controls:AutoScrollView x:Name="AutoScrollViewer2">
                                 <StackPanel Orientation="Horizontal" Spacing="4">
                                     <TextBlock x:Name="TitleRunText" FontWeight="Bold" FontSize="24" Foreground="{ThemeResource ApplicationForegroundThemeBrush}"/>
                                     <TextBlock x:Name="Title2RunText" FontWeight="Bold" VerticalAlignment="Center" FontSize="22" Foreground="{ThemeResource ApplicationPressedForegroundThemeBrush}"/>
                                 </StackPanel>
-                            </controls:AutoScrollViewer>
+                            </controls:AutoScrollView>
                         </Button>
                         <Button x:Name="ArtistRunButton" AccessKey="A" Click="ArtistRunButton_Click">
                             <Button.Flyout>
@@ -193,9 +193,9 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <FontIcon Glyph="&#xE77B;"/>
-                                <controls:AutoScrollViewer x:Name="AutoScrollViewer1" Grid.Column="1">
+                                <controls:AutoScrollView x:Name="AutoScrollViewer1" Grid.Column="1">
                                     <TextBlock x:Name="ArtistRunText" Text="Artist"/>
-                                </controls:AutoScrollViewer>
+                                </controls:AutoScrollView>
                             </Grid>
                         </Button>
                         <Button x:Name="AlbumRunButton" AccessKey="B" Click="AlbumRunButton_Click">
@@ -210,9 +210,9 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <FontIcon Glyph="&#xE93C;"/>
-                                <controls:AutoScrollViewer x:Name="AutoScrollViewer3" Grid.Column="1">
+                                <controls:AutoScrollView x:Name="AutoScrollViewer3" Grid.Column="1">
                                     <TextBlock x:Name="AlbumRunText" Text="Album"/>
-                                </controls:AutoScrollViewer>
+                                </controls:AutoScrollView>
                             </Grid>
                         </Button>
                         <Button x:Name="OtherRunButton" AccessKey="O" Click="OtherRunButton_Click">
@@ -222,9 +222,9 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <FontIcon Glyph="&#xE8CE;"/>
-                                <controls:AutoScrollViewer x:Name="AutoScrollViewer4" Grid.Column="1">
+                                <controls:AutoScrollView x:Name="AutoScrollViewer4" Grid.Column="1">
                                     <TextBlock x:Name="OtherRunText"/>
-                                </controls:AutoScrollViewer>
+                                </controls:AutoScrollView>
                             </Grid>
                         </Button>
                         <Button x:Name="AudioInfoButton" AccessKey="I"  Click="AudioInfoButton_Click">
@@ -234,9 +234,9 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <FontIcon Glyph="&#xF120;"/>
-                                <controls:AutoScrollViewer x:Name="AutoScrollViewer5" Grid.Column="1">
+                                <controls:AutoScrollView x:Name="AutoScrollViewer5" Grid.Column="1">
                                     <TextBlock x:Name="AudioInfoRunText" Text="{Binding App.Instance.audioPlayer}"/>
-                                </controls:AutoScrollViewer>
+                                </controls:AutoScrollView>
                             </Grid>
                         </Button>
                     </StackPanel>

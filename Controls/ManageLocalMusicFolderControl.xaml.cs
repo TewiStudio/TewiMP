@@ -54,7 +54,7 @@ namespace TewiMP.Controls
             ItemsList.ItemsSource = null;
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
             var btn = sender as Button;
             string folderPath = (string)btn.DataContext;

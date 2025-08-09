@@ -32,9 +32,9 @@ namespace TewiMP.Windowed
             //SetTaskbarImage(Path.Combine(localPath, "icon.png"));
 
             App.MainWindowInstance.WindowViewStateChanged += MainWindow_WindowViewStateChanged;
-            App.Instance.audioPlayer.PlayStateChanged += (_) => SetTaskbarButtonIcon(_.PlaybackState);
-            App.Instance.playingList.NowPlayingImageLoaded += (_, __) => IconPath = __;
-            App.Instance.audioPlayer.SourceChanged += (_) =>
+            App.Instance.AudioPlayer.PlayStateChanged += (_) => SetTaskbarButtonIcon(_.PlaybackState);
+            App.Instance.PlayingList.NowPlayingImageLoaded += (_, __) => IconPath = __;
+            App.Instance.AudioPlayer.SourceChanged += (_) =>
             {
                 if (_.MusicData is null)
                     Title = App.Instance.AppName;
@@ -44,13 +44,13 @@ namespace TewiMP.Windowed
                 }
                 Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetThumbnailTooltip(Handle, $"正在播放：{_.MusicData.Title} - {_.MusicData.ArtistName}");
             };
-            if (App.Instance.audioPlayer.MusicData is null)
+            if (App.Instance.AudioPlayer.MusicData is null)
                 Title = App.Instance.AppName;
             else
             {
-                Title = $"{App.Instance.audioPlayer.MusicData.Title} - {App.Instance.audioPlayer.MusicData.ArtistName} · {App.Instance.AppName}";
+                Title = $"{App.Instance.AudioPlayer.MusicData.Title} - {App.Instance.AudioPlayer.MusicData.ArtistName} · {App.Instance.AppName}";
             }
-            IconPath = App.Instance.playingList.NowPlayingImagePath;
+            IconPath = App.Instance.PlayingList.NowPlayingImagePath;
 
             Activated += (_, __) =>
             {
@@ -87,7 +87,7 @@ namespace TewiMP.Windowed
         private void MainWindow_WindowViewStateChanged(bool isView)
         {
             ShowTaskBarButtons();
-            SetTaskbarButtonIcon(App.Instance.audioPlayer.PlaybackState);
+            SetTaskbarButtonIcon(App.Instance.AudioPlayer.PlaybackState);
             //TryTransparentWindow();
         }
 
@@ -168,7 +168,7 @@ namespace TewiMP.Windowed
             Helpers.SDKs.TaskbarProgress.THUMBBUTTON[] taskbarInfoButtonPauseStyle = new[]
             {
                 new Helpers.SDKs.TaskbarProgress.THUMBBUTTON(){ iId = 1, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = perviousPlayIconHandle, szTip = "上一首" },
-                new Helpers.SDKs.TaskbarProgress.THUMBBUTTON(){ iId = 2, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing ? pauseIconHandle : playIconHandle, szTip = "播放" },
+                new Helpers.SDKs.TaskbarProgress.THUMBBUTTON(){ iId = 2, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = App.Instance.AudioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing ? pauseIconHandle : playIconHandle, szTip = "播放" },
                 new Helpers.SDKs.TaskbarProgress.THUMBBUTTON(){ iId = 3, dwMask = Helpers.SDKs.TaskbarProgress.THUMBBUTTONMASK.THB_ICON, dwFlags = Helpers.SDKs.TaskbarProgress.THUMBBUTTONFLAGS.THBF_ENABLED, hIcon = nextPlayIconHandle, szTip = "下一首" },
             };
             Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.ThumbBarAddButtons(Handle, 3, taskbarInfoButtonPauseStyle);
@@ -269,24 +269,24 @@ namespace TewiMP.Windowed
             switch (wParam.Value)
             {
                 case 402653185:
-                    await App.Instance.playingList.PlayPrevious();
+                    await App.Instance.PlayingList.PlayPrevious();
                     break;
                 case 402653186:
-                    if (App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
-                        App.Instance.audioPlayer.SetPause();
+                    if (App.Instance.AudioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                        App.Instance.AudioPlayer.SetPause();
                     else
-                        App.Instance.audioPlayer.SetPlay();
+                        App.Instance.AudioPlayer.SetPlay();
                     break;
                 case 402653187:
-                    await App.Instance.playingList.PlayNext();
+                    await App.Instance.PlayingList.PlayNext();
                     break;
             }
-            App.Instance.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+            App.Instance.PlayingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
         }
 
         private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string path)
         {
-            App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.PlayingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
             SetTaskbarImage(path);
         }
 

@@ -268,7 +268,7 @@ namespace TewiMP.Pages
                 case ScrollFootButton.ButtonType.NowPlaying:
                     foreach (var i in MusicDataList)
                     {
-                        if (i.MusicData != App.Instance.audioPlayer.MusicData) continue;
+                        if (i.MusicData != App.Instance.AudioPlayer.MusicData) continue;
                         await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                         await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
                         MusicDataItem.TryHighlightPlayingItem();
@@ -328,16 +328,16 @@ namespace TewiMP.Pages
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (!Children.Items.Any()) return;
-            if (App.Instance.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
+            if (App.Instance.PlayingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
             {
-                App.Instance.playingList.ClearAll();
+                App.Instance.PlayingList.ClearAll();
             }
             foreach (var songItem in MusicDataList)
             {
-                App.Instance.playingList.Add(songItem.MusicData, false);
+                App.Instance.PlayingList.Add(songItem.MusicData, false);
             }
-            await App.Instance.playingList.Play(MusicDataList.First().MusicData, true);
-            App.Instance.playingList.SetRandomPlay(App.Instance.playingList.PlayBehavior);
+            await App.Instance.PlayingList.Play(MusicDataList.First().MusicData, true);
+            App.Instance.PlayingList.SetRandomPlay(App.Instance.PlayingList.PlayBehavior);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -438,7 +438,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase item in Children.SelectedItems)
                 {
-                    App.Instance.playingList.Add(item.MusicData);
+                    App.Instance.PlayingList.Add(item.MusicData);
                 }
             }
         }
@@ -490,7 +490,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase songItem in Children.Items)
                 {
-                    App.Instance.downloadManager.Add(songItem.MusicData);
+                    App.Instance.DownloadManager.Add(songItem.MusicData);
                 }
             }
         }
@@ -544,14 +544,14 @@ namespace TewiMP.Pages
                 case "2":
                     foreach (var i in MusicDataList)
                     {
-                        if (i.MusicData == App.Instance.audioPlayer.MusicData)
+                        if (i.MusicData == App.Instance.AudioPlayer.MusicData)
                         {
                             await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                             await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, true);
                             foreach (var j in SongItem.StaticSongItems)
                             {
                                 if (j != null)
-                                    if (j.MusicData == App.Instance.audioPlayer.MusicData)
+                                    if (j.MusicData == App.Instance.AudioPlayer.MusicData)
                                         j.AnimateStroke();
                             }
                         }

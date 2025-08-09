@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading; 
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
@@ -21,7 +22,7 @@ namespace TewiMP.DataEditor
 
     public static class HistoryHelper
     {
-        static object syncLock = new();
+        static Lock syncLock = new();
         public delegate void HistoryDataChangedDelegate();
         public static event HistoryDataChangedDelegate HistoryDataChanged;
         public static async Task<JObject> GetHistoriesJObject()
@@ -44,7 +45,16 @@ namespace TewiMP.DataEditor
             await Task.Run(() =>
             {
                 lock (syncLock)
-                    System.IO.File.WriteAllText(DataFolderBase.HistoryDataPath, keyValuePairs.ToString());
+                {
+                    try
+                    {
+                        System.IO.File.WriteAllText(DataFolderBase.HistoryDataPath, keyValuePairs.ToString());
+                    }
+                    catch
+                    {
+                        LogManager.Error("DataFolderBase", "Failed to save history data.");
+                    }
+                }
             });
             HistoryDataChanged?.Invoke();
         }

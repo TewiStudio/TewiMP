@@ -42,7 +42,7 @@ namespace TewiMP.Controls
             }
         }
 
-        public async Task Init(MusicFrom musicFrom, string id)
+        public void Init(MusicFrom musicFrom, string id)
         {/*
             MusicListData = await App.Instance.metingServices.NeteaseServices.GetPlayList(id);
             Init(MusicListData);
@@ -108,7 +108,7 @@ namespace TewiMP.Controls
             ElementCompositionPreview.SetElementChildVisual(ShadowBaseRectangle, basicRectVisual);
         }
 
-        private async void UILoaded(object sender, RoutedEventArgs e)
+        private void UILoaded(object sender, RoutedEventArgs e)
         {
             //System.Diagnostics.LogManager.Log(MusicListData.PicturePath);
         }
@@ -238,7 +238,7 @@ namespace TewiMP.Controls
             {
                 App.MainWindowInstance.AddNotify("正在删除", $"正在删除列表 \"{MusicListData.ListShowName}\"。");
                 await PlayListHelper.DeletePlayList(MusicListData);
-                await App.Instance.playListReader.Refresh();
+                await App.Instance.PlayListReader.Refresh();
                 App.MainWindowInstance.AddNotify("删除列表成功。", null, NotifySeverity.Complete);
             }
         }
@@ -267,7 +267,7 @@ namespace TewiMP.Controls
                 data[musicListData.ListName] = JObject.FromObject(playlist);
                 await PlayListHelper.SaveData(data);
 
-                await App.Instance.playListReader.Refresh();
+                await App.Instance.PlayListReader.Refresh();
                 App.MainWindowInstance.AddNotify("更新歌单成功。", null, NotifySeverity.Complete);
             }
             catch (Exception ex)
@@ -277,7 +277,7 @@ namespace TewiMP.Controls
             }
         }
 
-        private async void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
+        private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
         {
             UpdateMusicList(MusicListData);
         }

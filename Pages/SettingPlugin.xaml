@@ -67,5 +67,9 @@
             ItemTemplate="{StaticResource PluginDataTemplate}">
         </cc:SettingsExpander>
 
+        <Button Style="{StaticResource TextBlockButtonStyle}"
+                Content="如何制作插件？"
+                Click="Button_Click"
+                Margin="0,0,0,0"/>
     </ListView>
 </Page>

@@ -23,19 +23,19 @@ namespace TewiMP.Controls
 
         private void DownloadCard_Loaded(object sender, RoutedEventArgs e)
         {
-            App.Instance.downloadManager.OnDownloading += DownloadManager_OnDownloading;
-            App.Instance.downloadManager.OnDownloadedSaving += DownloadManager_OnDownloadedSaving;
-            App.Instance.downloadManager.OnDownloadedPreview += DownloadManager_OnDownloadedPreview;
-            App.Instance.downloadManager.OnDownloaded += DownloadManager_OnDownloaded;
-            App.Instance.downloadManager.OnDownloadError += DownloadManager_OnDownloadError;
+            App.Instance.DownloadManager.OnDownloading += DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.OnDownloadedSaving += DownloadManager_OnDownloadedSaving;
+            App.Instance.DownloadManager.OnDownloadedPreview += DownloadManager_OnDownloadedPreview;
+            App.Instance.DownloadManager.OnDownloaded += DownloadManager_OnDownloaded;
+            App.Instance.DownloadManager.OnDownloadError += DownloadManager_OnDownloadError;
         }
 
         private void DownloadCard_Unloaded(object sender, RoutedEventArgs e)
         {
-            App.Instance.downloadManager.OnDownloading -= DownloadManager_OnDownloading;
-            App.Instance.downloadManager.OnDownloadedPreview -= DownloadManager_OnDownloadedPreview;
-            App.Instance.downloadManager.OnDownloaded -= DownloadManager_OnDownloaded;
-            App.Instance.downloadManager.OnDownloadError -= DownloadManager_OnDownloadError;
+            App.Instance.DownloadManager.OnDownloading -= DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.OnDownloadedPreview -= DownloadManager_OnDownloadedPreview;
+            App.Instance.DownloadManager.OnDownloaded -= DownloadManager_OnDownloaded;
+            App.Instance.DownloadManager.OnDownloadError -= DownloadManager_OnDownloadError;
         }
 
         private void DownloadManager_OnDownloaded(DownloadData data)
@@ -253,9 +253,9 @@ namespace TewiMP.Controls
                             if (File.Exists(downloadData.Path)) File.Delete(downloadData.Path);
                             if (File.Exists(downloadData.LrcPath)) File.Delete(downloadData.LrcPath);
                         });
-                        App.Instance.downloadManager.WaitingDownloadData.Remove(downloadData);
-                        App.Instance.downloadManager.DownloadedData.Remove(downloadData);
-                        App.Instance.downloadManager.NowDownloadPage.DownloadDatas.Remove(downloadData);
+                        App.Instance.DownloadManager.WaitingDownloadData.Remove(downloadData);
+                        App.Instance.DownloadManager.DownloadedData.Remove(downloadData);
+                        App.Instance.DownloadManager.NowDownloadPage.DownloadDatas.Remove(downloadData);
                     }
                 }
             }

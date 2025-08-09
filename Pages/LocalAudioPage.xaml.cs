@@ -96,8 +96,8 @@ namespace TewiMP.Pages
                     App.MainWindowInstance.NotifyCountDown(item);
                     item.SetNotifyItemData("删除歌曲", "正在加载...", NotifySeverity.Loading);
                     item.SetProcess(0, 0);
-                    await App.Instance.localMusicManager.ReAnalysisMusicDatas();
-                    await App.Instance.localMusicManager.Refresh();
+                    await App.Instance.LocalMusicManager.ReAnalysisMusicDatas();
+                    await App.Instance.LocalMusicManager.Refresh();
                     item.SetNotifyItemData("删除歌曲", "删除歌曲成功。", NotifySeverity.Complete);
                     ItemsList_Header_CommandBar.IsEnabled = true;
                 }
@@ -109,7 +109,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase item in ItemsList.SelectedItems.Cast<SongItemBindBase>())
                 {
-                    App.Instance.playingList.Add(item.MusicData);
+                    App.Instance.PlayingList.Add(item.MusicData);
                 }
             }
         }
@@ -128,8 +128,8 @@ namespace TewiMP.Pages
             {
                 isFirstLoadedPage = false;
                 await Task.Delay(3000);
-                await App.Instance.localMusicManager.ReAnalysisMusicDatas();
-                await App.Instance.localMusicManager.Refresh();
+                await App.Instance.LocalMusicManager.ReAnalysisMusicDatas();
+                await App.Instance.LocalMusicManager.Refresh();
             }
         }
 
@@ -214,14 +214,14 @@ namespace TewiMP.Pages
             App.MainWindowInstance.InKeyDownEvent += MainWindow_InKeyDownEvent;
             scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
             scrollViewer.ViewChanging += ScrollViewer_ViewChanging;
-            App.Instance.localMusicManager.DataAnalyzing -= LocalMusicManager_DataAnalyzing;
-            App.Instance.localMusicManager.DataAnalyzing += LocalMusicManager_DataAnalyzing;
-            App.Instance.localMusicManager.DataAnalyzed -= LocalMusicManager_DataAnalyzed;
-            App.Instance.localMusicManager.DataAnalyzed += LocalMusicManager_DataAnalyzed;
-            App.Instance.localMusicManager.DataChanging -= LocalMusicManager_DataChanging;
-            App.Instance.localMusicManager.DataChanging += LocalMusicManager_DataChanging;
-            App.Instance.localMusicManager.DataChanged -= LocalMusicManager_DataChanged;
-            App.Instance.localMusicManager.DataChanged += LocalMusicManager_DataChanged;
+            App.Instance.LocalMusicManager.DataAnalyzing -= LocalMusicManager_DataAnalyzing;
+            App.Instance.LocalMusicManager.DataAnalyzing += LocalMusicManager_DataAnalyzing;
+            App.Instance.LocalMusicManager.DataAnalyzed -= LocalMusicManager_DataAnalyzed;
+            App.Instance.LocalMusicManager.DataAnalyzed += LocalMusicManager_DataAnalyzed;
+            App.Instance.LocalMusicManager.DataChanging -= LocalMusicManager_DataChanging;
+            App.Instance.LocalMusicManager.DataChanging += LocalMusicManager_DataChanging;
+            App.Instance.LocalMusicManager.DataChanged -= LocalMusicManager_DataChanged;
+            App.Instance.LocalMusicManager.DataChanged += LocalMusicManager_DataChanged;
             ItemsList_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
             ItemsList_BottomButtons.PositionToNowPlaying_Button.Click += Position_Button_Click;
             ItemsList_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
@@ -238,10 +238,10 @@ namespace TewiMP.Pages
         {
             App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
             scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
-            App.Instance.localMusicManager.DataAnalyzing -= LocalMusicManager_DataAnalyzing;
-            App.Instance.localMusicManager.DataAnalyzed -= LocalMusicManager_DataAnalyzed;
-            App.Instance.localMusicManager.DataChanging -= LocalMusicManager_DataChanging;
-            App.Instance.localMusicManager.DataChanged -= LocalMusicManager_DataChanged;
+            App.Instance.LocalMusicManager.DataAnalyzing -= LocalMusicManager_DataAnalyzing;
+            App.Instance.LocalMusicManager.DataAnalyzed -= LocalMusicManager_DataAnalyzed;
+            App.Instance.LocalMusicManager.DataChanging -= LocalMusicManager_DataChanging;
+            App.Instance.LocalMusicManager.DataChanged -= LocalMusicManager_DataChanged;
             ItemsList_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
             ItemsList_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
             ItemsList_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
@@ -304,7 +304,7 @@ namespace TewiMP.Pages
                     {
                         using Kawazu.KawazuConverter converter = new();
                         Dictionary<MusicData, string> array = [];
-                        foreach (var i in App.Instance.localMusicManager.LocalMusicItems)
+                        foreach (var i in App.Instance.LocalMusicManager.LocalMusicItems)
                         {
                             if (array.ContainsKey(i.MusicData)) continue;
                             string a = i.MusicData.Title;
@@ -313,7 +313,7 @@ namespace TewiMP.Pages
                             array.Add(i.MusicData, a);
                         }
 
-                        return App.Instance.localMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).GroupBy(t => array[t.MusicData].ToUpper().First().ToString());
+                        return App.Instance.LocalMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).GroupBy(t => array[t.MusicData].ToUpper().First().ToString());
                     });
                     break;
                 case 1:
@@ -321,7 +321,7 @@ namespace TewiMP.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 90000;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.Instance.localMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).OrderBy(t => t.MusicData.Album.Title).GroupBy(t => t.MusicData.ArtistName).OrderBy(t => t.Key);
+                        return App.Instance.LocalMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).OrderBy(t => t.MusicData.Album.Title).GroupBy(t => t.MusicData.ArtistName).OrderBy(t => t.Key);
                     });
                     break;
                 case 2:
@@ -329,7 +329,7 @@ namespace TewiMP.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 90000;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.Instance.localMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).OrderBy(t => t.MusicData.Index).GroupBy(t => t.MusicData.Album.Title);
+                        return App.Instance.LocalMusicManager.LocalMusicItems.OrderBy(t => t.MusicData.Title).OrderBy(t => t.MusicData.Index).GroupBy(t => t.MusicData.Album.Title);
                     });
                     break;
                 case 3:
@@ -337,7 +337,7 @@ namespace TewiMP.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.Instance.localMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.ReleaseTime).GroupBy(t => t.MusicData.ReleaseTime is null ? "..." : t.MusicData.ReleaseTime.Value.Year.ToString());
+                        return App.Instance.LocalMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.ReleaseTime).GroupBy(t => t.MusicData.ReleaseTime is null ? "..." : t.MusicData.ReleaseTime.Value.Year.ToString());
                     });
                     break;
                 case 4:
@@ -345,7 +345,7 @@ namespace TewiMP.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(() =>
                     {
-                        return App.Instance.localMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.FileTime).GroupBy(t => t.MusicData.FileTime is null ? "..." : t.MusicData.FileTime.Value.Year.ToString());
+                        return App.Instance.LocalMusicManager.LocalMusicItems.OrderByDescending(t => t.MusicData.FileTime).GroupBy(t => t.MusicData.FileTime is null ? "..." : t.MusicData.FileTime.Value.Year.ToString());
                     });
                     break;
             }
@@ -353,7 +353,7 @@ namespace TewiMP.Pages
             vOffset = scrollViewer.VerticalOffset;
             ItemsList_SongGroup.Source = groupsResult;
             ItemsList_HeaderGridView.ItemsSource = ItemsList_SongGroup.View.CollectionGroups;
-            ItemsList_Header_Label_Count.Text = $"{App.Instance.localMusicManager.LocalMusicItems.Count} 首歌曲";
+            ItemsList_Header_Label_Count.Text = $"{App.Instance.LocalMusicManager.LocalMusicItems.Count} 首歌曲";
             scrollViewer.ChangeView(null, vOffset, null, true);
             int count = 0;
             foreach (SongItemBindBase songItem in ItemsList_SongGroup.View)
@@ -377,19 +377,19 @@ namespace TewiMP.Pages
             {
                 case "play":
                     if (ItemsList_SongGroup.View.Count == 0) return;
-                    if (App.Instance.playingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
+                    if (App.Instance.PlayingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
                     {
-                        App.Instance.playingList.ClearAll();
+                        App.Instance.PlayingList.ClearAll();
                     }
                     foreach (SongItemBindBase songItem in ItemsList_SongGroup.View)
                     {
-                        App.Instance.playingList.Add(songItem.MusicData, false);
+                        App.Instance.PlayingList.Add(songItem.MusicData, false);
                     }
-                    await App.Instance.playingList.Play((ItemsList_SongGroup.View.First() as SongItemBindBase).MusicData, true);
-                    App.Instance.playingList.SetRandomPlay(App.Instance.playingList.PlayBehavior);
+                    await App.Instance.PlayingList.Play((ItemsList_SongGroup.View.First() as SongItemBindBase).MusicData, true);
+                    App.Instance.PlayingList.SetRandomPlay(App.Instance.PlayingList.PlayBehavior);
                     break;
                 case "refresh":
-                    await App.Instance.localMusicManager.Refresh();
+                    await App.Instance.LocalMusicManager.Refresh();
                     break;
                 case "manageFolder":
                     await App.MainWindowInstance.ShowDialog("管理本地音乐文件夹", new ManageLocalMusicFolderControl(), "完成");
@@ -399,8 +399,8 @@ namespace TewiMP.Pages
                     break;
                 case "reAnalysis":
                     button.IsEnabled = false;
-                    await App.Instance.localMusicManager.ReAnalysisMusicDatas();
-                    await App.Instance.localMusicManager.Refresh();
+                    await App.Instance.LocalMusicManager.ReAnalysisMusicDatas();
+                    await App.Instance.LocalMusicManager.Refresh();
                     button.IsEnabled = true;
                     break;
             }
@@ -412,9 +412,9 @@ namespace TewiMP.Pages
             switch ((ScrollFootButton.ButtonType)btn.Tag)
             {
                 case ScrollFootButton.ButtonType.NowPlaying:
-                    foreach (var i in App.Instance.localMusicManager.LocalMusicItems)
+                    foreach (var i in App.Instance.LocalMusicManager.LocalMusicItems)
                     {
-                        if (i.MusicData != App.Instance.audioPlayer.MusicData) continue;
+                        if (i.MusicData != App.Instance.AudioPlayer.MusicData) continue;
                         await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                         await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
                         await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
@@ -468,7 +468,7 @@ namespace TewiMP.Pages
         private void multi_addSelectToPlayList_flyout_Opening(object sender, object e)
         {
             MenuFlyout flyout = sender as MenuFlyout;
-            foreach (var list in App.Instance.playListReader.NowMusicListData)
+            foreach (var list in App.Instance.PlayListReader.NowMusicListData)
             {
                 MenuFlyoutItem item = new MenuFlyoutItem()
                 {
@@ -500,7 +500,7 @@ namespace TewiMP.Pages
             }
             text[listName] = JObject.FromObject(list);
             await PlayListHelper.SaveData(text);
-            await App.Instance.playListReader.Refresh();
+            await App.Instance.PlayListReader.Refresh();
             App.MainWindowInstance.HideDialog();
         }
 
@@ -519,7 +519,7 @@ namespace TewiMP.Pages
             if (isRefresh) return;
             if (!IsLoaded) return;
             ItemSortBy = CommandBar_SortComboBox.SelectedIndex;
-            await App.Instance.localMusicManager.Refresh();
+            await App.Instance.LocalMusicManager.Refresh();
         }
 
         private void ItemsList_SearchControl_IsOpenChanged(object sender, DependencyPropertyChangedEventArgs e)

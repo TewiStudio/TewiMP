@@ -68,8 +68,8 @@ namespace TewiMP.Pages
 
             try
             {
-                if (App.Instance.playingList.NowPlayingList.Any())
-                    abcd.Source = (await ImageManage.GetImageSource(App.Instance.playingList.NowPlayingList[new Random().Next(0, App.Instance.playingList.NowPlayingList.Count - 1)])).Item1;
+                if (App.Instance.PlayingList.NowPlayingList.Any())
+                    abcd.Source = (await ImageManage.GetImageSource(App.Instance.PlayingList.NowPlayingList[new Random().Next(0, App.Instance.PlayingList.NowPlayingList.Count - 1)])).Item1;
             }
             catch { }
             GC.Collect();/*

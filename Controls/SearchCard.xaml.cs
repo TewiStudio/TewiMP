@@ -57,7 +57,7 @@ namespace TewiMP.Controls
             }
         }
 
-        private async void UILoaded(object sender, RoutedEventArgs e)
+        private void UILoaded(object sender, RoutedEventArgs e)
         {
 
         }

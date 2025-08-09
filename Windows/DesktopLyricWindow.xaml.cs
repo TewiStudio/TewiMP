@@ -103,7 +103,7 @@ namespace TewiMP.Windowed
         {
             AddEvents();
             RestartTimer();
-            SetLyric(App.Instance.lyricManager.NowLyricsData);
+            SetLyric(App.Instance.LyricManager.NowLyricsData);
             /*
             AnimateHelper.AnimateOffset(T1BaseViewbox, 0, 0, 0, 0.2, 0, 0, 0, 0,
                 out tb1Visual, out var compositor, out tb1Animation);
@@ -165,26 +165,26 @@ namespace TewiMP.Windowed
         public void AddEvents()
         {
             LogManager.Log("DesktopLyricWindow", "Add Events.");
-            App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-            App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-            App.Instance.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
-            App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
-            App.Instance.lyricManager.LyricTimingChanged += LyricManager_LyricTimingChanged;
-            AudioPlayer_PlayStateChanged(App.Instance.audioPlayer);
-            AudioPlayer_TimingChanged(App.Instance.audioPlayer);
-            LyricManager_LyricTimingChanged(App.Instance.lyricManager.NowLyricsData);
-            App.Instance.audioPlayer.ReCallTiming();
+            App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+            App.Instance.AudioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+            App.Instance.AudioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
+            App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+            App.Instance.LyricManager.LyricTimingChanged += LyricManager_LyricTimingChanged;
+            AudioPlayer_PlayStateChanged(App.Instance.AudioPlayer);
+            AudioPlayer_TimingChanged(App.Instance.AudioPlayer);
+            LyricManager_LyricTimingChanged(App.Instance.LyricManager.NowLyricsData);
+            App.Instance.AudioPlayer.ReCallTiming();
             SetLyricOpacity(LyricOpacity);
         }
 
         public void RemoveEvents()
         {
             LogManager.Log("DesktopLyricWindow", "Removed Events.");
-            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
-            App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-            App.Instance.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
-            App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
-            App.Instance.lyricManager.LyricTimingChanged -= LyricManager_LyricTimingChanged;
+            App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+            App.Instance.AudioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
+            App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+            App.Instance.LyricManager.LyricTimingChanged -= LyricManager_LyricTimingChanged;
         }
 
         public void SetLyricOpacity(double value)
@@ -252,9 +252,9 @@ namespace TewiMP.Windowed
         {
             if (lyricIntervalEnd != TimeSpan.MinValue)
             {
-                App.Instance.lyricManager.FastUpdateMode = true;
+                App.Instance.LyricManager.FastUpdateMode = true;
 
-                var c1 = App.Instance.audioPlayer.CurrentTime - (lyricIntervalEnd - fiveSecond);
+                var c1 = App.Instance.AudioPlayer.CurrentTime - (lyricIntervalEnd - fiveSecond);
                 //LogManager.Log("DEBUG", $"{c1} | {c2} | {c3}");
                 double result = double.Clamp(c1 / fiveSecond, 0, 1);
                 LyricIntervalRoot.Visibility = Visibility.Visible;
@@ -279,18 +279,18 @@ namespace TewiMP.Windowed
                 if (!isAddedEvent)
                 {
                     isAddedEvent = true;
-                    App.Instance.lyricManager.PlayingLyricSourceChanged += LyricManager_PlayingLyricSourceChange;
-                    App.Instance.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
-                    App.Instance.lyricManager.StartTimer();
-                    LyricManager_PlayingLyricSelectedChange(App.Instance.lyricManager.NowLyricsData);
+                    App.Instance.LyricManager.PlayingLyricSourceChanged += LyricManager_PlayingLyricSourceChange;
+                    App.Instance.LyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
+                    App.Instance.LyricManager.StartTimer();
+                    LyricManager_PlayingLyricSelectedChange(App.Instance.LyricManager.NowLyricsData);
                 }
             }
             else
             {
                 if (PauseButtonVisible) InfoBorder.Opacity = 1;
                 isAddedEvent = false;
-                App.Instance.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
-                App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
+                App.Instance.LyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
+                App.Instance.LyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
             }
         }
 
@@ -339,14 +339,14 @@ namespace TewiMP.Windowed
             T21.Text = null;
             LyricRomajiPopup_tb.Text = null;
             lyricIntervalEnd = TimeSpan.MinValue;
-            App.Instance.lyricManager.FastUpdateMode = false;
+            App.Instance.LyricManager.FastUpdateMode = false;
 
             if (nowLyricsData is null)
             {
-                if (App.Instance.audioPlayer.MusicData != null)
+                if (App.Instance.AudioPlayer.MusicData != null)
                 {
-                    T1.Text = App.Instance.audioPlayer.MusicData.Title;
-                    T2.Text = App.Instance.audioPlayer.MusicData.ButtonName;
+                    T1.Text = App.Instance.AudioPlayer.MusicData.Title;
+                    T2.Text = App.Instance.AudioPlayer.MusicData.ButtonName;
                 }
                 T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                 T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
@@ -372,8 +372,8 @@ namespace TewiMP.Windowed
             }
             if (nowLyricsData.Lyric is null)
             {
-                T1.Text = App.Instance.audioPlayer.MusicData.Title;
-                T2.Text = App.Instance.audioPlayer.MusicData.ButtonName;
+                T1.Text = App.Instance.AudioPlayer.MusicData.Title;
+                T2.Text = App.Instance.AudioPlayer.MusicData.ButtonName;
                 T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
                 T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
 
@@ -398,11 +398,11 @@ namespace TewiMP.Windowed
             }
             if (nowLyricsData.Lyric.First() == LyricHelper.NoneLyricString)
             {
-                if (App.Instance.lyricManager.NowPlayingLyrics.Any())
+                if (App.Instance.LyricManager.NowPlayingLyrics.Any())
                 {
-                    var index = App.Instance.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData) + 1;
-                    if (index > App.Instance.lyricManager.NowPlayingLyrics.Count - 1) return;
-                    SetLyric(App.Instance.lyricManager.NowPlayingLyrics[index], true);
+                    var index = App.Instance.LyricManager.NowPlayingLyrics.IndexOf(nowLyricsData) + 1;
+                    if (index > App.Instance.LyricManager.NowPlayingLyrics.Count - 1) return;
+                    SetLyric(App.Instance.LyricManager.NowPlayingLyrics[index], true);
                 }
                 return;
             }
@@ -412,14 +412,14 @@ namespace TewiMP.Windowed
                 App.Current.Resources["MusicAlbumAccentBrush"]);
 */
             var accentBrush = (SolidColorBrush)App.Current.Resources["MusicAlbumAccentBrush"];
-            int nowLyricNum = App.Instance.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
+            int nowLyricNum = App.Instance.LyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
             LyricData nextLyric = null;
             LyricData beforeLyric = null;
             if (nowLyricNum != -1)
             {
-                nextLyric = App.Instance.lyricManager.NowPlayingLyrics[nowLyricNum + 1];
+                nextLyric = App.Instance.LyricManager.NowPlayingLyrics[nowLyricNum + 1];
                 if (nowLyricNum > 0)
-                    beforeLyric = App.Instance.lyricManager.NowPlayingLyrics[nowLyricNum - 1];
+                    beforeLyric = App.Instance.LyricManager.NowPlayingLyrics[nowLyricNum - 1];
             }
 
             var doubleLyricLineMode = LyricTranslateTextBehavior == LyricTranslateTextBehavior.MainLyric || LyricTranslateTextBehavior == LyricTranslateTextBehavior.TranslateLyric;
@@ -431,7 +431,7 @@ namespace TewiMP.Windowed
                 int tCount = 1;
                 try
                 {
-                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.Instance.lyricManager.NowPlayingLyrics[nowLyricNum + tCount]?.Lyric?.FirstOrDefault())
+                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.Instance.LyricManager.NowPlayingLyrics[nowLyricNum + tCount]?.Lyric?.FirstOrDefault())
                     {
                         tCount++;
                     }
@@ -563,21 +563,21 @@ namespace TewiMP.Windowed
                 LyricData nextData = new(null, null, TimeSpan.Zero);
                 try
                 {
-                    int num1 = App.Instance.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
+                    int num1 = App.Instance.LyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
                     do
                     {
                         num1++;
-                        nextData = App.Instance.lyricManager.NowPlayingLyrics[num1];
+                        nextData = App.Instance.LyricManager.NowPlayingLyrics[num1];
                     }
                     while (nextData?.Lyric?.FirstOrDefault() == LyricHelper.NoneLyricString);
                 }
                 catch { }
 
                 int tCount = 1;
-                int num2 = App.Instance.lyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
+                int num2 = App.Instance.LyricManager.NowPlayingLyrics.IndexOf(nowLyricsData);
                 try
                 {
-                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.Instance.lyricManager.NowPlayingLyrics[num2 + tCount]?.Lyric?.FirstOrDefault())
+                    while (nowLyricsData?.Lyric?.FirstOrDefault() == App.Instance.LyricManager.NowPlayingLyrics[num2 + tCount]?.Lyric?.FirstOrDefault())
                     {
                         tCount++;
                     }
@@ -680,7 +680,7 @@ namespace TewiMP.Windowed
         {
             if (!ProgressUIVisible)
             {
-                App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+                App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
                 progressRoot.Visibility = Visibility.Collapsed;
                 return;
             }
@@ -789,8 +789,8 @@ namespace TewiMP.Windowed
             IsMoved = true;
             lastWindowPosition = AppWindow.Position;
             lastWindowSize = AppWindow.Size;
-            App.Instance.lyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
-            App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
+            App.Instance.LyricManager.PlayingLyricSourceChanged -= LyricManager_PlayingLyricSourceChange;
+            App.Instance.LyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
         }
 
         private void ToolButtonsBase_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
@@ -898,9 +898,9 @@ namespace TewiMP.Windowed
 
         public void AddMusicControlEvents()
         {
-            App.Instance.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
-            App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged1;
-            App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged1;
+            App.Instance.PlayingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+            App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged1;
+            App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged1;
         }
 
         private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string path)
@@ -923,9 +923,9 @@ namespace TewiMP.Windowed
 
         public void RemoveMusicControlEvents()
         {
-            App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged1;
-            App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged1;
+            App.Instance.PlayingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged1;
+            App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged1;
         }
 
         private void ResizeButton_Click(object sender, RoutedEventArgs e)

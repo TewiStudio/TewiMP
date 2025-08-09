@@ -18,10 +18,10 @@ namespace TewiMP.Controls
 
         private async void HotKeyPage_Loaded(object sender, RoutedEventArgs e)
         {
-            HotKeyRoot.ItemsSource = App.Instance.hotKeyManager.RegisteredHotKeys;
+            HotKeyRoot.ItemsSource = App.Instance.HotKeyManager.RegisteredHotKeys;
             await Task.Delay(100);
             if (HotKeyRoot.ItemsSource is null)
-                HotKeyRoot.ItemsSource = App.Instance.hotKeyManager.RegisteredHotKeys;
+                HotKeyRoot.ItemsSource = App.Instance.HotKeyManager.RegisteredHotKeys;
         }
 
         private void HotKey_Unloaded(object sender, RoutedEventArgs e)
@@ -39,7 +39,7 @@ namespace TewiMP.Controls
             {
                 case "0":
                     nowChangedHotKey.IsDisabled = !nowChangedHotKey.IsDisabled;
-                    App.Instance.hotKeyManager.ChangeHotKey(nowChangedHotKey);
+                    App.Instance.HotKeyManager.ChangeHotKey(nowChangedHotKey);
                     break;
                 case "1":
                     Pages.DialogPages.HotKeyEditor a = new();

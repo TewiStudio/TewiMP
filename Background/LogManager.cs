@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Diagnostics;
 using System.Collections.ObjectModel;
 using TewiMP.DataEditor;
 
@@ -31,7 +32,7 @@ namespace TewiMP.Background
 
         public static void Log(string name, string content, LogLevel logLevel = LogLevel.Info)
         {
-            App.Instance?.logManager.LogInstance(name, content, logLevel);
+            App.Instance?.LogManager.LogInstance(name, content, logLevel);
         }
 
         public static void LogIf(bool b, string name, string content, LogLevel logLevel = LogLevel.Info)
@@ -62,7 +63,7 @@ namespace TewiMP.Background
         public static DateTime StartTime;
         private static FileStream NowLog;
         private static StreamWriter NowLogWriter;
-        private static object locker = new();
+        private static Lock locker = new();
         public static void InitNowLog()
         {
             StartTime = DateTime.Now;
@@ -72,9 +73,9 @@ namespace TewiMP.Background
             WriteToLogStream($"{App.Instance.AppName} launched on {StartTime}");
             WriteToLogStream($"Version: {App.Instance.NowVersion}, built time: {App.Instance.NowVersion.ReleaseTime}");
             WriteToLogStream($"System: {Environment.OSVersion}\n");
-            if (App.Instance.logManager is not null)
+            if (App.Instance.LogManager is not null)
             {
-                foreach (var l in App.Instance.logManager.LogDatas)
+                foreach (var l in App.Instance.LogManager.LogDatas)
                 {
                     WriteToLogStream($"[{l.LogTime}][{l.LogLevel}][{l.LogName}]: {l.LogContent}");
                 }
@@ -86,9 +87,16 @@ namespace TewiMP.Background
             if (NowLog is null || NowLogWriter is null) return;
             lock (locker)
             {
-                NowLogWriter.Write($"{text}\n");
-                NowLogWriter.Flush();
-                NowLog.Flush();
+                try
+                {
+                    NowLogWriter.Write($"{text}\n");
+                    NowLogWriter.Flush();
+                    NowLog.Flush();
+                }
+                catch
+                {
+                    LogManager.Error("LogManager", "Failed to write to log stream.");
+                }
             }
         }
 

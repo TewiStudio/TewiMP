@@ -8,7 +8,7 @@ namespace TewiMP.Pages.DialogPages
 {
     public partial class EqualizerPage : Page
     {
-        public Media.AudioPlayer AudioPlayer => App.Instance.audioPlayer;
+        public Media.AudioPlayer AudioPlayer => App.Instance.AudioPlayer;
         public List<Slider> EqSliders { get; set; } = new();
 
         public bool WasapiOnly
@@ -250,13 +250,13 @@ namespace TewiMP.Pages.DialogPages
         private async void ReloadAudio_Click(object sender, RoutedEventArgs e)
         {
             (sender as Button).IsEnabled = false;
-            await App.Instance.audioPlayer.Reload();
+            await App.Instance.AudioPlayer.Reload();
             (sender as Button).IsEnabled = true;
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            AudioPlayer_SourceChanged(App.Instance.audioPlayer);
+            AudioPlayer_SourceChanged(App.Instance.AudioPlayer);
         }
 
         private void EqEnableTS_Toggled(object sender, RoutedEventArgs e)

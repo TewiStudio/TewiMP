@@ -95,7 +95,7 @@ namespace TewiMP.Pages.DialogPages
         {
             if (WaitPlayEndCheckBox.IsChecked == true)
             {
-                App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+                App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
             }
             else
                 TimingEndEventDo();
@@ -109,10 +109,10 @@ namespace TewiMP.Pages.DialogPages
             {
                 case TimingEndEvent.暂停播放:
                     if (WaitPlayEndCheckBox.IsChecked == true) await System.Threading.Tasks.Task.Delay(100);
-                    App.Instance.audioPlayer.SetPause();
+                    App.Instance.AudioPlayer.SetPause();
                     break;
                 case TimingEndEvent.退出程序:
-                    App.Instance.ExitApp();
+                    await App.Instance.ExitApp();
                     break;
                 case TimingEndEvent.注销:
                     break;
@@ -123,7 +123,7 @@ namespace TewiMP.Pages.DialogPages
 
         private void CancelTiming()
         {
-            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
             if (TimingTimer is not null)
             {
                 TimingTimer.Tick -= TimingTimer_Tick;
@@ -139,7 +139,7 @@ namespace TewiMP.Pages.DialogPages
 
         private void AudioPlayer_SourceChanged(Media.AudioPlayer audioPlayer)
         {
-            App.Instance.audioPlayer.PlayEnd -= AudioPlayer_SourceChanged;
+            App.Instance.AudioPlayer.PlayEnd -= AudioPlayer_SourceChanged;
             TimingEndEventDo();
         }
     }

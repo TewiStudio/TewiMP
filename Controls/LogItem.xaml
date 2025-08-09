@@ -20,10 +20,10 @@
                 <Rectangle Fill="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
             </community:Case>
             <community:Case Value="Warning">
-                <Rectangle Fill="{ThemeResource SystemFillColorCautionBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity=".8"/>
+                <Rectangle Fill="{ThemeResource SystemFillColorCautionBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity=".8" Margin="0,1,0,1"/>
             </community:Case>
             <community:Case Value="Error">
-                <Rectangle Fill="{ThemeResource SystemFillColorCriticalBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity=".8"/>
+                <Rectangle Fill="{ThemeResource SystemFillColorCriticalBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity=".8" Margin="0,1,0,1"/>
             </community:Case>
         </community:SwitchPresenter>
         <TextBlock

@@ -16,20 +16,20 @@ namespace TewiMP.Pages
             init();
         }
 
-        public async void init()
+        public void init()
         {
             var LoadList1 = async () =>
             {
                 foreach (PlayListCard playListCard in List1.Children)
                 {
-                    await playListCard.Init(DataEditor.MusicFrom.pluginMusicSource, playListCard.ID);
+                    //await playListCard.Init(DataEditor.MusicFrom.pluginMusicSource, playListCard.ID);
                 }
             };
             var LoadList2 = async () =>
             {
                 foreach (PlayListCard playListCard in List2.Children)
                 {
-                    await playListCard.Init(DataEditor.MusicFrom.pluginMusicSource, playListCard.ID);
+                    //await playListCard.Init(DataEditor.MusicFrom.pluginMusicSource, playListCard.ID);
                 }
             };
             LoadList1();

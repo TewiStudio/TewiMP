@@ -62,10 +62,10 @@
                                             <RowDefinition Height="auto"/>
                                         </Grid.RowDefinitions>
                                         <StackPanel>
-                                            <controlszn:AutoScrollViewer x:Name="AutoScrollViewerControl">
+                                            <controlszn:AutoScrollView x:Name="AutoScrollViewerControl">
                                                 <TextBlock x:Name="PlayList_TitleTextBlock"
                                                            Style="{ThemeResource SubTBHeader}"/>
-                                            </controlszn:AutoScrollViewer>
+                                            </controlszn:AutoScrollView>
                                             <TextBlock x:Name="PlayList_OtherTextBlock" Text="共0首歌曲"/>
                                         </StackPanel>
                                         <Grid x:Name="CommandBarWidthChanger"

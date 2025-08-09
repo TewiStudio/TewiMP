@@ -7,6 +7,7 @@ using Vanara.PInvoke;
 using Newtonsoft.Json;
 using Microsoft.UI.Xaml;
 using WinUIEx;
+using System.Threading.Tasks;
 
 namespace TewiMP.Background.HotKeys
 {
@@ -331,36 +332,36 @@ namespace TewiMP.Background.HotKeys
                 switch (hotKeyID)
                 {
                     case HotKeyID.PreviousSong:
-                        App.Instance.playingList.PlayPrevious();
+                        PlayPrevious();
                         break;
                     case HotKeyID.NextSong:
-                        App.Instance.playingList.PlayNext();
+                        PlayNext();
                         break;
                     case HotKeyID.Pause:
-                        if (App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                        if (App.Instance.AudioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
                         {
-                            App.Instance.audioPlayer.SetPause();
+                            App.Instance.AudioPlayer.SetPause();
                         }
                         else
                         {
-                            App.Instance.audioPlayer.SetPlay();
+                            App.Instance.AudioPlayer.SetPlay();
                         }
                         break;
                     case HotKeyID.Stop:
-                        App.Instance.audioPlayer.CurrentTime = TimeSpan.Zero;
-                        App.Instance.audioPlayer.SetStop();
+                        App.Instance.AudioPlayer.CurrentTime = TimeSpan.Zero;
+                        App.Instance.AudioPlayer.SetStop();
                         break;
                     case HotKeyID.VolumeAdd:
-                        App.Instance.audioPlayer.Volume += 1f;
+                        App.Instance.AudioPlayer.Volume += 1f;
                         break;
                     case HotKeyID.VolumeRemove:
-                        App.Instance.audioPlayer.Volume -= 1f;
+                        App.Instance.AudioPlayer.Volume -= 1f;
                         break;
                     case HotKeyID.OpenLyricWindow:
                         App.MainWindowInstance.OpenDesktopLyricWindow();
                         break;
                     case HotKeyID.RandomPlay:
-                        App.Instance.playingList.PlayBehavior = App.Instance.playingList.PlayBehavior == Background.PlayBehavior.随机播放 ? Background.PlayBehavior.顺序播放 : Background.PlayBehavior.随机播放;
+                        App.Instance.PlayingList.PlayBehavior = App.Instance.PlayingList.PlayBehavior == Background.PlayBehavior.随机播放 ? Background.PlayBehavior.顺序播放 : Background.PlayBehavior.随机播放;
                         break;
                     case HotKeyID.OpenMainWindow:
                         App.MainWindowInstance.Restore();
@@ -374,9 +375,9 @@ namespace TewiMP.Background.HotKeys
                         }
                         break;
                     case HotKeyID.ReturnToFirstSong:
-                        if (App.Instance.playingList.NowPlayingList.Any())
+                        if (App.Instance.PlayingList.NowPlayingList.Any())
                         {
-                            App.Instance.playingList.Play(App.Instance.playingList.NowPlayingList.First());
+                            PlayFirst();
                         }
                         break;
                     case HotKeyID.LockLyricWindow:
@@ -406,6 +407,21 @@ namespace TewiMP.Background.HotKeys
             }
 
             return Windows.Win32.PInvoke.CallWindowProc(origPrc, hwnd, uMsg, wParam, lParam);
+        }
+
+        private async void PlayNext()
+        {
+            await App.Instance.PlayingList.PlayNext();
+        }
+
+        private async void PlayPrevious()
+        {
+            await App.Instance.PlayingList.PlayPrevious();
+        }
+
+        private async void PlayFirst()
+        {
+            await App.Instance.PlayingList.Play(App.Instance.PlayingList.NowPlayingList.First());
         }
     }
 }

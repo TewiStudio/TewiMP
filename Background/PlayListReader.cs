@@ -55,7 +55,6 @@ namespace TewiMP.Background
         public LocalMusicManager()
         {
             LogManager.Log("Starting", "初始化 LocalMusicManager.");
-            Refresh();
         }
 
         bool isAnalyzingData = false;

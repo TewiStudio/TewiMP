@@ -24,7 +24,7 @@ namespace TewiMP.Pages.DialogPages
             bindingMusicListData = new();
             ListBaseViewer.ItemsSource = bindingMusicListData;
 
-            foreach (var l in App.Instance.playListReader.NowMusicListData) bindingMusicListData.Add(l);
+            foreach (var l in App.Instance.PlayListReader.NowMusicListData) bindingMusicListData.Add(l);
         }
 
         private async void InsertPlayListPage_ResultEvent(ContentDialogResult contentDialogResult)
@@ -44,7 +44,7 @@ namespace TewiMP.Pages.DialogPages
             });
 
             await PlayListHelper.SaveData(data);
-            await App.Instance.playListReader.Refresh();
+            await App.Instance.PlayListReader.Refresh();
             App.MainWindowInstance.AddNotify("歌单排序更改成功。", null, NotifySeverity.Complete);
         }
 

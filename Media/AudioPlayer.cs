@@ -179,10 +179,10 @@ namespace TewiMP.Media
             switch (outDevice.DeviceType)
             {
                 case OutApi.WaveOut:
-                    result = outDevices[outDevices.IndexOf(App.Instance.audioPlayer.NowOutDevice) + audioOutDeviceCount * 2];
+                    result = outDevices[outDevices.IndexOf(App.Instance.AudioPlayer.NowOutDevice) + audioOutDeviceCount * 2];
                     break;
                 case OutApi.DirectSound:
-                    result = outDevices[outDevices.IndexOf(App.Instance.audioPlayer.NowOutDevice) + audioOutDeviceCount];
+                    result = outDevices[outDevices.IndexOf(App.Instance.AudioPlayer.NowOutDevice) + audioOutDeviceCount];
                     break;
             }
             return result;
@@ -560,9 +560,9 @@ namespace TewiMP.Media
             timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(200) };
             timer.Tick += (_, __) => ReCallTiming();
 
-            App.Instance.cacheManager.AddingCacheMusicData += CacheManager_AddingCacheMusicData;
-            App.Instance.cacheManager.CachedMusicData += CacheManager_CachedMusicData;
-            App.Instance.cacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
+            App.Instance.CacheManager.AddingCacheMusicData += CacheManager_AddingCacheMusicData;
+            App.Instance.CacheManager.CachedMusicData += CacheManager_CachedMusicData;
+            App.Instance.CacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
             ClientDeviceEvents.notificationClient.OnDefaultDeviceChangedEvent += NotificationClient_OnDefaultDeviceChangedEvent;
             ClientDeviceEvents.notificationClient.OnDeviceStateChangedEvent += NotificationClient_OnDeviceStateChangedEvent;
             ClientDeviceEvents.notificationClient.OnDeviceRemovedEvent += NotificationClient_OnDeviceRemovedEvent;
@@ -691,7 +691,7 @@ namespace TewiMP.Media
             {
                 try
                 {
-                    resultPath = await App.Instance.cacheManager.StartCacheMusic(musicData);
+                    resultPath = await App.Instance.CacheManager.StartCacheMusic(musicData);
                 }
                 catch (Exception e) { throw; }
             }

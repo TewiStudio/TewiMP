@@ -126,12 +126,12 @@
                                 x:Name="ItemsList_Header_Info_Root_SizeChanger"
                                 HorizontalAlignment="Left">
                                 <StackPanel x:Name="ItemsList_Header_Info_StackPanel">
-                                    <controls:AutoScrollViewer>
+                                    <controls:AutoScrollView>
                                         <TextBlock
                                             x:Name="ItemsList_Header_Info_TitleTextBlock"
                                             Text="Title"
                                             Style="{ThemeResource SubTBHeader}"/>
-                                    </controls:AutoScrollViewer>
+                                    </controls:AutoScrollView>
                                     <TextBlock x:Name="ItemsList_Header_Info_OtherTextBlock" Text="Other"/>
                                 </StackPanel>
                                 <CommandBar

@@ -1,4 +1,8 @@
-﻿using CommunityToolkit.WinUI;
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
@@ -9,31 +13,22 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Xaml.Shapes;
-using NAudio.Wave;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using TewiMP.Background;
-using TewiMP.Background.HotKeys;
-using TewiMP.Controls;
-using TewiMP.DataEditor;
-using TewiMP.Helpers;
-using TewiMP.Media;
-using TewiMP.Pages;
-using TewiMP.Pages.MusicPages;
-using TewiMP.Windowed;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Graphics;
-using Windows.Storage;
 using Windows.UI;
+using Windows.Storage;
+using Windows.Graphics;
+using Windows.ApplicationModel.DataTransfer;
+using CommunityToolkit.WinUI;
 using WinRT;
 using WinUIEx;
+using NAudio.Wave;
+using TewiMP.Helpers;
+using TewiMP.Controls;
+using TewiMP.Windowed;
+using TewiMP.DataEditor;
+using TewiMP.Background;
+using TewiMP.Background.HotKeys;
+using TewiMP.Pages;
+using TewiMP.Pages.MusicPages;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -86,6 +81,7 @@ namespace TewiMP
 
         public MainWindow()
         {
+            App.MainWindowCount++;
             LogManager.Info("Staring", "初始化 MainWindow.");
             InitializeComponent();
 
@@ -99,7 +95,7 @@ namespace TewiMP
             loadingst.Children.Add(loadingtextBlock);
 
             InitDialog();
-            equalizerPage = new Pages.DialogPages.EqualizerPage();
+            equalizerPage ??= new Pages.DialogPages.EqualizerPage();
             //SubClassing();
 
             AppWindow.Title = App.Instance.AppName;
@@ -173,7 +169,7 @@ namespace TewiMP
         {
             LogManager.Log("MainWindow", "Closing...");
             App.Instance.SaveSettings();
-            SaveNowPlaying();
+            App.Instance.SaveNowPlaying();
 
             if (RunInBackground)
             {
@@ -186,11 +182,15 @@ namespace TewiMP
                 return;
             }
 
-            args.Cancel = true;
             if (isShowClosingDialog) return;
             isShowClosingDialog = true;
             HideDialog();
-            App.Instance.ExitApp();
+            App.MainWindowCount--;
+            if (App.MainWindowCount == 0)
+            {
+                args.Cancel = true;
+                App.Instance.ExitApp();
+            }
             isShowClosingDialog = false;
         }
 
@@ -305,14 +305,14 @@ namespace TewiMP
             if (isPreparedActivate) Activate();
 
             List<string> hotKeyUsed = new();
-            foreach (var hotKey in App.Instance.hotKeyManager.RegisteredHotKeys)
+            foreach (var hotKey in App.Instance.HotKeyManager.RegisteredHotKeys)
             {
                 if (hotKey.IsUsed)
                 {
                     hotKeyUsed.Add(HotKey.GetHotKeyIDString(hotKey.HotKeyID));
                 }
             }
-            if (hotKeyUsed.Any())
+            if (hotKeyUsed.Count != 0)
             {
                 AddNotify("热键已被占用", $"你可以转到设置界面更改被占用的热键：\n{string.Join('、', hotKeyUsed)}。", NotifySeverity.Warning, TimeSpan.FromSeconds(5));
             }
@@ -329,87 +329,27 @@ namespace TewiMP
             {
                 foreach (var musicData in await MusicData.FromFile(str))
                 {
-                    App.Instance.playingList.Add(musicData); mlist.Add(musicData);
+                    App.Instance.PlayingList.Add(musicData); mlist.Add(musicData);
                 }
             }
             if (mlist.Count > 0)
             {
-                await App.Instance.playingList.Play(mlist.First());
+                await App.Instance.PlayingList.Play(mlist.First());
             }
-        }
-
-        public async Task SaveNowPlaying()
-        {
-            if (App.Instance.audioPlayer.MusicData is null) return;
-
-            var path = System.IO.Path.Combine(DataFolderBase.UserDataFolder, "LastPlaying");
-            if (!App.Instance.LoadLastExitPlayingSongAndSongList)
-            {
-                await Task.Run(() => System.IO.File.Delete(path));
-                return;
-            }
-
-            if (!await Task.Run(() => System.IO.File.Exists(path))) await Task.Run(() => System.IO.File.Create(path).Close());
-
-            JObject jObject = null;
-            await Task.Run(() =>
-            {
-                JArray array = new JArray();
-                foreach (var a in App.Instance.playingList.PlayBehavior == PlayBehavior.随机播放 ? App.Instance.playingList.RandomSavePlayingList : App.Instance.playingList.NowPlayingList)
-                    array.Add(JObject.FromObject(a));
-                jObject = new JObject() {
-                    { "music", JObject.FromObject(App.Instance.audioPlayer.MusicData) },
-                    { "list", array }
-                };
-            });
-            if (jObject is null) return;
-            await System.IO.File.WriteAllTextAsync(path, jObject.ToString());
-            LogManager.Log("SaveNowPlaying", "正在播放列表已保存！");
-        }
-
-        public async void LoadLastPlaying()
-        {
-            if (!App.Instance.LoadLastExitPlayingSongAndSongList) return;
-            if (isOpeningMusicLoaded) return;
-
-            var path = System.IO.Path.Combine(DataFolderBase.UserDataFolder, "LastPlaying");
-            if (!System.IO.File.Exists(path)) return;
-
-            MusicData musicData = null;
-            JObject jobject = null;
-            await Task.Run(() =>
-            {
-                var texts = System.IO.File.ReadAllText(path);
-                jobject = JObject.Parse(texts);
-                musicData = JsonNewtonsoft.FromJSON<MusicData>(jobject["music"].ToString());
-            });
-            foreach (var m in jobject["list"])
-            {
-                var md = JsonNewtonsoft.FromJSON<MusicData>(m.ToString());
-                App.Instance.playingList.NowPlayingList.Add(md);
-            }
-
-            if (musicData is null) return;
-            if (App.Instance.playingList.PlayBehavior == PlayBehavior.随机播放)
-            {
-                App.Instance.playingList.SetRandomPlay(PlayBehavior.随机播放);
-            }
-            await App.Instance.playingList.Play(musicData, false);
         }
 
         #region Window Events
-        private async void WindowGridBase_Loaded(object sender, RoutedEventArgs e)
+        private void WindowGridBase_Loaded(object sender, RoutedEventArgs e)
         {
             SetBackdrop(CurrentBackdrop);
-            App.Instance.SMTC.ButtonPressed += SMTC_ButtonPressed;
-            App.Instance.playListReader.Updated += UpdatePlayListButtonUI;
-            App.Instance.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
+            App.Instance.PlayListReader.Updated += UpdatePlayListButtonUI;
+            App.Instance.AudioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
             PlayingListScrollControl.PositionToNowPlaying_Button.Click += async (_, __) =>
             {
-                if (PlayingListBaseView.Items.Contains(App.Instance.audioPlayer.MusicData))
+                if (PlayingListBaseView.Items.Contains(App.Instance.AudioPlayer.MusicData))
                 {
-                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.audioPlayer.MusicData, ScrollItemPlacement.Center);
-                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
+                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.AudioPlayer.MusicData, ScrollItemPlacement.Center);
+                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.AudioPlayer.MusicData, ScrollItemPlacement.Center, true);
                 }
             };
             PlayingListScrollControl.PositionToTop_Button.Click += (_, __) =>
@@ -428,7 +368,6 @@ namespace TewiMP
             Canvas.SetZIndex(AppTitleBar, 1);
 
             StaringPrepare();
-            LoadLastPlaying();
 
             //NotifyListView.ItemsSource = NotifyList;
             //PlayingListBasePopup.SystemBackdrop = new DesktopAcrylicBackdrop();
@@ -437,20 +376,12 @@ namespace TewiMP
             NavView.SelectedItem = NavView.MenuItems[1];
             NavView.IsBackEnabled = false;
 
-            PlayingListBaseView.ItemsSource = App.Instance.playingList.NowPlayingList;
+            PlayingListBaseView.ItemsSource = App.Instance.PlayingList.NowPlayingList;
             //SystemNavigationManager.GetForCurrentView().BackRequested += (_, __) => { TryGoBack(); };
 #if DEBUG
             DebugViewPopup.XamlRoot = WindowGridBase.XamlRoot;
             DebugViewPopup.IsOpen = true;
 #endif
-            try
-            {
-                await App.Instance.CheckUpdate();
-            }
-            catch
-            {
-
-            }
         }
 
         private async void WindowGridBase_ActualThemeChanged(FrameworkElement sender, object args)
@@ -460,21 +391,21 @@ namespace TewiMP
                 SetBackdrop(CurrentBackdrop);
             }
             InitializeTitleBar(WindowGridBase.RequestedTheme);
-            await App.Instance.playingList.UpdateImageColor();
+            await App.Instance.PlayingList.UpdateImageColor();
         }
 
         private void UpdateWhenDataLated()
         {
-            AudioPlayer_SourceChanged(App.Instance.audioPlayer);
-            AudioPlayer_PlayStateChanged(App.Instance.audioPlayer);
-            AudioPlayer_CacheLoadedChanged(App.Instance.audioPlayer);
-            AudioPlayer_TimingChanged(App.Instance.audioPlayer);
-            AudioPlayer_VolumeChanged(App.Instance.audioPlayer, App.Instance.audioPlayer.Volume);
-            PlayingList_NowPlayingImageLoaded(App.Instance.playingList.NowPlayingImage, null);
-            LyricManager_PlayingLyricSelectedChange(App.Instance.lyricManager.NowLyricsData);
-            PlayingList_PlayingListItemChange(App.Instance.playingList.NowPlayingList);
+            AudioPlayer_SourceChanged(App.Instance.AudioPlayer);
+            AudioPlayer_PlayStateChanged(App.Instance.AudioPlayer);
+            AudioPlayer_CacheLoadedChanged(App.Instance.AudioPlayer);
+            AudioPlayer_TimingChanged(App.Instance.AudioPlayer);
+            AudioPlayer_VolumeChanged(App.Instance.AudioPlayer, App.Instance.AudioPlayer.Volume);
+            PlayingList_NowPlayingImageLoaded(App.Instance.PlayingList.NowPlayingImage, null);
+            LyricManager_PlayingLyricSelectedChange(App.Instance.LyricManager.NowLyricsData);
+            PlayingList_PlayingListItemChange(App.Instance.PlayingList.NowPlayingList);
             UpdataDownloadPageButtonInfoBadgeText();
-            App.Instance.audioPlayer.ReCallTiming();
+            App.Instance.AudioPlayer.ReCallTiming();
             LogManager.Log("MainWindow", "Data Updated.");
         }
 
@@ -490,21 +421,21 @@ namespace TewiMP
             if (isAddEvents) return;
             //AutoScrollViewerFirst.Pause = false;
             //AutoScrollViewerSecond.Pause = false;
-            App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-            App.Instance.audioPlayer.PlayEnd += AudioPlayer_PlayEnd;
-            App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-            App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
-            App.Instance.audioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
-            App.Instance.audioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
-            App.Instance.playingList.NowPlayingImageLoading += PlayingList_NowPlayingImageLoading;
-            App.Instance.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
-            App.Instance.playingList.PlayingListItemChange += PlayingList_PlayingListItemChange;
+            App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+            App.Instance.AudioPlayer.PlayEnd += AudioPlayer_PlayEnd;
+            App.Instance.AudioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+            App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+            App.Instance.AudioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
+            App.Instance.AudioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
+            App.Instance.PlayingList.NowPlayingImageLoading += PlayingList_NowPlayingImageLoading;
+            App.Instance.PlayingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+            App.Instance.PlayingList.PlayingListItemChange += PlayingList_PlayingListItemChange;
 
-            App.Instance.downloadManager.AddDownload += DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloadedSaving += DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloadedPreview += DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloaded += DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloadError += DownloadManager_AddDownload;
+            App.Instance.DownloadManager.AddDownload += DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloadedSaving += DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloadedPreview += DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloaded += DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloadError += DownloadManager_AddDownload;
 
             isAddEvents = true;
             UpdateWhenDataLated();
@@ -516,22 +447,22 @@ namespace TewiMP
         {
             //AutoScrollViewerFirst.Pause = true;
             //AutoScrollViewerSecond.Pause = true;
-            App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
-            App.Instance.audioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
-            App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-            App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
-            App.Instance.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
-            App.Instance.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
-            App.Instance.playingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
-            App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-            App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
-            App.Instance.playingList.PlayingListItemChange -= PlayingList_PlayingListItemChange;
+            App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+            App.Instance.AudioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
+            App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+            App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+            App.Instance.AudioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
+            App.Instance.AudioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
+            App.Instance.PlayingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
+            App.Instance.PlayingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.LyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
+            App.Instance.PlayingList.PlayingListItemChange -= PlayingList_PlayingListItemChange;
 
-            App.Instance.downloadManager.AddDownload -= DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloadedSaving -= DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloadedPreview -= DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloaded -= DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloadError -= DownloadManager_AddDownload;
+            App.Instance.DownloadManager.AddDownload -= DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloadedSaving -= DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloadedPreview -= DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloaded -= DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloadError -= DownloadManager_AddDownload;
 
             isAddEvents = false;
             MainViewStateChanged?.Invoke(false);
@@ -566,7 +497,7 @@ namespace TewiMP
             {
                 if (CodeHelper.IsIconic(Handle))
                 {
-                    SaveNowPlaying();
+                    App.Instance.SaveNowPlaying();
                     App.Instance.SaveSettings();
 
                     isMinSize = true;
@@ -595,12 +526,12 @@ namespace TewiMP
             SetDragRegionForCustomTitleBar();
         }
 
-        private async void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             SetDragRegionForCustomTitleBar();
 #if DEBUG
             DebugView_Detail_WindowSizeRun.Text = $"{WindowGridBase.ActualWidth}x{WindowGridBase.ActualHeight}";
-            DebugViewPopup.VerticalOffset = AppWindow.Size.Height;
+            DebugViewPopup.VerticalOffset = AppWindow.Size.Height / NowDPI - 24;
 #endif
             //NotifyListView.Padding = new(0, GridBase.ActualHeight, 0, 12);
             /*
@@ -699,7 +630,7 @@ namespace TewiMP
         #endregion
 
         #region Dialog
-        async void InitDialog()
+        void InitDialog()
         {
             AsyncDialog = new ContentDialog()
             {
@@ -765,7 +696,7 @@ namespace TewiMP
             }
         }
 
-        Pages.DialogPages.EqualizerPage equalizerPage { get; set; }
+        static Pages.DialogPages.EqualizerPage equalizerPage { get; set; }
         public async Task ShowEqualizerDialog()
         {
             await ShowDialog("音频设置", new Pages.DialogPages.EqualizerPage());
@@ -851,12 +782,12 @@ namespace TewiMP
 
         private void UpdataDownloadPageButtonInfoBadgeText()
         {
-            if (App.Instance.downloadManager.AllDownloadData.Any())
+            if (App.Instance.DownloadManager.AllDownloadData.Any())
             {
-                if (App.Instance.downloadManager.DownloadingData.Any())
+                if (App.Instance.DownloadManager.DownloadingData.Any())
                 {
                     DownloadPageButtonInfoBadge.Opacity = 1;
-                    DownloadPageButtonInfoBadge.Value = App.Instance.downloadManager.AllDownloadData.Count - App.Instance.downloadManager.DownloadedData.Count;
+                    DownloadPageButtonInfoBadge.Value = App.Instance.DownloadManager.AllDownloadData.Count - App.Instance.DownloadManager.DownloadedData.Count;
                 }
                 else
                 {
@@ -887,10 +818,10 @@ namespace TewiMP
                 if (!_.Lyric.Any()) { SetLyricToNormal(); return; }
 
                 int tcount = 1;
-                int num = App.Instance.lyricManager.NowPlayingLyrics.IndexOf(_);
+                int num = App.Instance.LyricManager.NowPlayingLyrics.IndexOf(_);
                 try
                 {
-                    while (_?.Lyric?.FirstOrDefault() == App.Instance.lyricManager.NowPlayingLyrics[num + tcount]?.Lyric?.FirstOrDefault())
+                    while (_?.Lyric?.FirstOrDefault() == App.Instance.LyricManager.NowPlayingLyrics[num + tcount]?.Lyric?.FirstOrDefault())
                     {
                         tcount++;
                     }
@@ -918,31 +849,6 @@ namespace TewiMP
                 else action();
             }
             else action();
-        }
-
-        private void SMTC_ButtonPressed(Windows.Media.SystemMediaTransportControls sender, Windows.Media.SystemMediaTransportControlsButtonPressedEventArgs args)
-        {
-            Invoke(() =>
-            {
-                switch (args.Button)
-                {
-                    case Windows.Media.SystemMediaTransportControlsButton.Play:
-                        App.Instance.audioPlayer.SetPlay();
-                        break;
-                    case Windows.Media.SystemMediaTransportControlsButton.Pause:
-                        App.Instance.audioPlayer.SetPause();
-                        break;
-                    case Windows.Media.SystemMediaTransportControlsButton.Previous:
-                        PlayBeforeButton_Click(null, null);
-                        break;
-                    case Windows.Media.SystemMediaTransportControlsButton.Next:
-                        PlayNextButton_Click(null, null);
-                        break;
-                    case Windows.Media.SystemMediaTransportControlsButton.Stop:
-                        App.Instance.audioPlayer.SetStop();
-                        break;
-                }
-            });
         }
 
         private void PlayingList_PlayingListItemChange(ObservableCollection<MusicData> nowPlayingList)
@@ -1036,11 +942,11 @@ namespace TewiMP
             if (imageSource != im.Source)
             {
                 im.Source = imageSource;
-                im.SaveName = $"{App.Instance.audioPlayer.MusicData.Title} · {App.Instance.audioPlayer.MusicData.Album.Title}";
+                im.SaveName = $"{App.Instance.AudioPlayer.MusicData.Title} · {App.Instance.AudioPlayer.MusicData.Album.Title}";
                 im.BorderThickness = new(1);
             }
 
-            if (App.Instance.audioPlayer.PlaybackState == PlaybackState.Playing)
+            if (App.Instance.AudioPlayer.PlaybackState == PlaybackState.Playing)
             {
                 PlayRing.Foreground = App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush;
             }
@@ -1107,13 +1013,13 @@ namespace TewiMP
             if (audioPlayer.PlaybackState == PlaybackState.Playing)
             {
                 PlayRing.Foreground = App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush;
-                App.Instance.lyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
-                App.Instance.lyricManager.StartTimer();
+                App.Instance.LyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
+                App.Instance.LyricManager.StartTimer();
             }
             else
             {
                 PlayRing.Foreground = App.Current.Resources["SystemFillColorCautionBrush"] as SolidColorBrush;
-                App.Instance.lyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
+                App.Instance.LyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
             }
 
             MediaPlayStateViewer.PlaybackState = audioPlayer.PlaybackState;
@@ -1181,7 +1087,7 @@ namespace TewiMP
         #region NavView Events
         public async void OpenPlayListNavView()
         {
-            await App.Instance.playListReader.Refresh();
+            await App.Instance.PlayListReader.Refresh();
             if (NavView.DisplayMode == NavigationViewDisplayMode.Expanded)
             {
                 MusicPlayListButton.IsExpanded = true;
@@ -1195,7 +1101,7 @@ namespace TewiMP
                 nvi.Tag = null;
             }
             MusicPlayListButton.MenuItems.Clear();
-            foreach (var i in App.Instance.playListReader.NowMusicListData)
+            foreach (var i in App.Instance.PlayListReader.NowMusicListData)
             {
                 var nvi = new NavigationViewItem() { Content = i.ListShowName, Tag = i };
                 MusicPlayListButton.MenuItems.Add(nvi);
@@ -1222,7 +1128,7 @@ namespace TewiMP
         }
 
         public bool IsBackRequest = false;
-        private async void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
+        private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)
         {
             if (IsBackRequest || sender.SelectedItem is null || IsJustUpdate)
             {
@@ -1412,24 +1318,24 @@ namespace TewiMP
         #region Bottom Buttons Events
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            if (App.Instance.audioPlayer.PlaybackState == PlaybackState.Playing)
+            if (App.Instance.AudioPlayer.PlaybackState == PlaybackState.Playing)
             {
-                App.Instance.audioPlayer.SetPause();
+                App.Instance.AudioPlayer.SetPause();
             }
             else
             {
-                App.Instance.audioPlayer.SetPlay();
+                App.Instance.AudioPlayer.SetPlay();
             }
         }
 
         private async void PlayBeforeButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.Instance.playingList.PlayPrevious();
+            await App.Instance.PlayingList.PlayPrevious();
         }
 
         private async void PlayNextButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.Instance.playingList.PlayNext();
+            await App.Instance.PlayingList.PlayNext();
         }
 
         // VolumeButton
@@ -1484,9 +1390,9 @@ namespace TewiMP
             PlayingListBasePopup.ShowAt(TopControlsBaseGrid);
             try
             {
-                await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.audioPlayer.MusicData, ScrollItemPlacement.Center);
-                await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.audioPlayer.MusicData, ScrollItemPlacement.Center, true);
-                PlayingListBaseView.SelectedItem = App.Instance.audioPlayer.MusicData;
+                await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.AudioPlayer.MusicData, ScrollItemPlacement.Center);
+                await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.AudioPlayer.MusicData, ScrollItemPlacement.Center, true);
+                PlayingListBaseView.SelectedItem = App.Instance.AudioPlayer.MusicData;
             }
             catch { }
         }
@@ -1501,8 +1407,8 @@ namespace TewiMP
 
         private void TeachingTipPlayingList_Opened(object sender, object e)
         {
-            ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{App.Instance.playingList.PlayBehavior}");
-            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
+            ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{App.Instance.PlayingList.PlayBehavior}");
+            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
             PlayingListScrollControl.Translation = new(
                 -16,
                 (float)(PlayingListBaseView.ActualHeight - PlayingListScrollControl.ActualHeight - 20 - 16),
@@ -1541,8 +1447,8 @@ namespace TewiMP
         private void B_Click(object sender, RoutedEventArgs e)
         {
             var a = (PlayBehavior)(sender as MenuFlyoutItem).Tag;
-            App.Instance.playingList.PlayBehavior = a;
-            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
+            App.Instance.PlayingList.PlayBehavior = a;
+            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
             ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{a}");
         }
 
@@ -1585,7 +1491,7 @@ namespace TewiMP
         bool isHiddenMusicPageAnimationNotCompleted = false;
         public void OpenOrCloseMusicPage()
         {
-            if (App.Instance.audioPlayer.MusicData is null) return;
+            if (App.Instance.AudioPlayer.MusicData is null) return;
             if (musicPageVisual is null) InitMusicPageVisuals();
             else InitMusicPageVisuals(true);
 
@@ -1630,7 +1536,7 @@ namespace TewiMP
                     canimation2.TryStart(PlayArtist);
                 }
 
-                if (App.Instance.lyricManager.NowPlayingLyrics.Any())
+                if (App.Instance.LyricManager.NowPlayingLyrics.Any())
                 {
                     ConnectedAnimation canimation3 =
                     ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation3");
@@ -1691,11 +1597,11 @@ namespace TewiMP
         {
             if (e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta > 0)
                 //VolumeSlider.Value += 1.1f;
-                App.Instance.audioPlayer.Volume += 1f;
+                App.Instance.AudioPlayer.Volume += 1f;
             else
-                App.Instance.audioPlayer.Volume -= 1f;
+                App.Instance.AudioPlayer.Volume -= 1f;
 
-            (VolumePopup.Content as TextBlock).Text = $"音量：{App.Instance.audioPlayer.Volume}";
+            (VolumePopup.Content as TextBlock).Text = $"音量：{App.Instance.AudioPlayer.Volume}";
             VolumePopup.ShowAt(sender as DependencyObject, new() { Placement = FlyoutPlacementMode.Top, ShowMode = FlyoutShowMode.Transient });
             volumePopupCounter++;
             await Task.Delay(3000);
@@ -1741,11 +1647,23 @@ namespace TewiMP
                     break;
                 case Windows.System.VirtualKey.Left:
                     if (isAltDown)
+                    {
+                        isAltDown = false;
                         TryGoBack();
+                    }
                     break;
                 case Windows.System.VirtualKey.Right:
                     if (isAltDown)
+                    {
+                        isAltDown = false;
                         TryGoForward();
+                    }
+                    break;
+                case Windows.System.VirtualKey.T:
+                    if (isControlDown && isShiftDown)
+                    {
+                        SetNavViewContent(typeof(TestPage));
+                    }
                     break;
             }
             InKeyDownEvent?.Invoke(e.Key);
@@ -1817,16 +1735,16 @@ namespace TewiMP
         {
             if (e.GetCurrentPoint(sender as UIElement).Properties.MouseWheelDelta > 0)
                 //VolumeSlider.Value += 1.1f;
-                App.Instance.audioPlayer.Volume += 1f;
+                App.Instance.AudioPlayer.Volume += 1f;
             else
-                App.Instance.audioPlayer.Volume -= 1f;
+                App.Instance.AudioPlayer.Volume -= 1f;
         }
 
         private void VolumeSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (willChangeVolume)
             {
-                App.Instance.audioPlayer.Volume = (float)(sender as Slider).Value;
+                App.Instance.AudioPlayer.Volume = (float)(sender as Slider).Value;
             }
         }
         #endregion
@@ -1848,21 +1766,21 @@ namespace TewiMP
 
         public void MuteOrUnmuteVolume()
         {
-            if (App.Instance.audioPlayer.Volume != 0)
+            if (App.Instance.AudioPlayer.Volume != 0)
             {
-                NoVolumeValue = App.Instance.audioPlayer.Volume;
-                App.Instance.audioPlayer.Volume = 0;
+                NoVolumeValue = App.Instance.AudioPlayer.Volume;
+                App.Instance.AudioPlayer.Volume = 0;
             }
             else
             {
-                App.Instance.audioPlayer.Volume = NoVolumeValue;
+                App.Instance.AudioPlayer.Volume = NoVolumeValue;
             }
         }
         #endregion
 
         #region PlayingListView Events
         bool inSelectionChange = false;
-        private async void PlayingListBaseView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void PlayingListBaseView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {/*
             inSelectionChange = true;
             if (PlayingListBaseView.SelectedItem != null)
@@ -1876,16 +1794,16 @@ namespace TewiMP
 
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
-            App.Instance.playingList.ClearAll();
+            App.Instance.PlayingList.ClearAll();
         }
 
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
             var name = $"{DateTime.Now} 时的播放列表";
             var musicPlayList = new MusicListData(
-                name, name, "", MusicFrom.localMusic, null, [.. App.Instance.playingList.NowPlayingList], DataType.本地歌单);
+                name, name, "", MusicFrom.localMusic, null, [.. App.Instance.PlayingList.NowPlayingList], DataType.本地歌单);
             await PlayListHelper.AddPlayList(musicPlayList);
-            await App.Instance.playListReader.Refresh();
+            await App.Instance.PlayListReader.Refresh();
             AddNotify("播放列表已添加！", $"播放列表 \"{name}\" 已添加。", buttonMessage: "打开播放列表", buttonAction: () =>
             {
                 Pages.ListViewPages.ListViewPage.SetPageToListViewPage(new()
@@ -2027,14 +1945,14 @@ namespace TewiMP
             PlayTimeSliderBasePopup.IsOpen = !PlayTimeSliderBasePopup.IsOpen;
             PlayTimeSliderBasePopup.IsLightDismissEnabled = true;
             PlayTimeSliderBasePopup.Closed += PlayTimeSliderBasePopup_Closed;
-            App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged1;
+            App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged1;
             PlayTimeSlider.ValueChanged += PlayTimeSlider_ValueChanged;
         }
 
         private void PlayTimeSliderBasePopup_Closed(TeachingTip sender, TeachingTipClosedEventArgs args)
         {
             PlayTimeSliderBasePopup.Closed -= PlayTimeSliderBasePopup_Closed;
-            App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged1;
+            App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged1;
             PlayTimeSlider.ValueChanged -= PlayTimeSlider_ValueChanged;
         }
 
@@ -2056,9 +1974,9 @@ namespace TewiMP
         bool isCodeChangedSilderValue = false;
         private void PlayTimeSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
-            if (!isCodeChangedSilderValue && App.Instance.audioPlayer.FileReader != null)
+            if (!isCodeChangedSilderValue && App.Instance.AudioPlayer.FileReader != null)
             {
-                App.Instance.audioPlayer.CurrentTime = TimeSpan.FromTicks((long)PlayTimeSlider.Value);
+                App.Instance.AudioPlayer.CurrentTime = TimeSpan.FromTicks((long)PlayTimeSlider.Value);
             }
         }
         #endregion
@@ -2186,13 +2104,13 @@ namespace TewiMP
 
         private void Button_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
-            MusicDataFlyout.SongItemBind = new() { MusicData = App.Instance.audioPlayer.MusicData };
+            MusicDataFlyout.SongItemBind = new() { MusicData = App.Instance.AudioPlayer.MusicData };
             MusicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
         }
 
         private void Button_Holding(object sender, HoldingRoutedEventArgs e)
         {
-            MusicDataFlyout.SongItemBind = new() { MusicData = App.Instance.audioPlayer.MusicData };
+            MusicDataFlyout.SongItemBind = new() { MusicData = App.Instance.AudioPlayer.MusicData };
             MusicDataFlyout.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
         }
         #endregion

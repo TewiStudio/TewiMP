@@ -72,14 +72,14 @@ namespace TewiMP.Background
             };
 
             //App.MainWindowInstance.WindowViewStateChanged += MainWindow_WindowViewStateChanged;
-            App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-            App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-            App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+            App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+            App.Instance.AudioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+            App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged;
         }
 
         private void AudioPlayer_PlayStateChanged(Media.AudioPlayer audioPlayer)
         {
-            if (App.Instance.audioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+            if (App.Instance.AudioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
             {
                 StartTimer();
             }
@@ -253,11 +253,11 @@ namespace TewiMP.Background
             if (PlayingLyricSelectedChanged is null) StopTimer();
             if (!NowPlayingLyrics.Any()) StopTimer();
             if (NowPlayingLyrics.Count <= 3) StopTimer();
-            if (App.Instance.audioPlayer.PlaybackState != NAudio.Wave.PlaybackState.Playing) StopTimer();
+            if (App.Instance.AudioPlayer.PlaybackState != NAudio.Wave.PlaybackState.Playing) StopTimer();
 
             foreach (var data in NowPlayingLyrics)
             {
-                if (data.LyricTimeSpan < App.Instance.audioPlayer.CurrentTime)
+                if (data.LyricTimeSpan < App.Instance.AudioPlayer.CurrentTime)
                 {
                     lastLyricData = data;
                 }

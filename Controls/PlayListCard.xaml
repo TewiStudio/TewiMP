@@ -45,16 +45,16 @@
                         <RowDefinition Height="auto"/>
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <local:AutoScrollViewer>
+                    <local:AutoScrollView>
                         <TextBlock
                             x:Name="TextBaseTb"
                             Text="{Binding ListShowName}"/>
-                    </local:AutoScrollViewer>
-                    <local:AutoScrollViewer Grid.Row="1">
+                    </local:AutoScrollView>
+                    <local:AutoScrollView Grid.Row="1">
                         <TextBlock FontSize="12">
                         <Run Text="{Binding Songs.Count}"/>首歌曲
                         </TextBlock>
-                    </local:AutoScrollViewer>
+                    </local:AutoScrollView>
                 </Grid>
             </Grid>
             <Grid

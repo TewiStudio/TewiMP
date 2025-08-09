@@ -23,37 +23,37 @@ namespace TewiMP.Pages
         private void UpdateTextTB()
         {
             PausePlayBtn.Visibility = DownloadDatas.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
-            HeaderBaseTextBlock.Text = $"下载（{App.Instance.downloadManager.DownloadedData.Count}/{App.Instance.downloadManager.AllDownloadData.Count} - {App.Instance.downloadManager.DownloadingData.Count} 下载中，{App.Instance.downloadManager.DownloadErrorData.Count} 错误）";
+            HeaderBaseTextBlock.Text = $"下载（{App.Instance.DownloadManager.DownloadedData.Count}/{App.Instance.DownloadManager.AllDownloadData.Count} - {App.Instance.DownloadManager.DownloadingData.Count} 下载中，{App.Instance.DownloadManager.DownloadErrorData.Count} 错误）";
         }
         private void DownloadPage_Loaded(object sender, RoutedEventArgs e)
         {
-            App.Instance.downloadManager.NowDownloadPage = this;
+            App.Instance.DownloadManager.NowDownloadPage = this;
             UpdateTextTB();
             ListViewBase.ItemsSource = DownloadDatas;
 
-            App.Instance.downloadManager.AddDownload += DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloading += DownloadManager_OnDownloading;
-            App.Instance.downloadManager.OnDownloadedSaving += DownloadManager_OnDownloadedSaving;
-            App.Instance.downloadManager.OnDownloadedPreview += DownloadManager_OnDownloading;
-            App.Instance.downloadManager.OnDownloaded += DownloadManager_OnDownloading;
-            App.Instance.downloadManager.OnDownloadError += DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.AddDownload += DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloading += DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.OnDownloadedSaving += DownloadManager_OnDownloadedSaving;
+            App.Instance.DownloadManager.OnDownloadedPreview += DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.OnDownloaded += DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.OnDownloadError += DownloadManager_OnDownloading;
 
             // 当第一次初始化时加载
-            foreach (var dm in App.Instance.downloadManager.AllDownloadData)
+            foreach (var dm in App.Instance.DownloadManager.AllDownloadData)
             {
                 DownloadDatas.Add(dm);
             }
-            foreach (var dm in App.Instance.downloadManager.DownloadingData)
+            foreach (var dm in App.Instance.DownloadManager.DownloadingData)
             {
-                App.Instance.downloadManager.CallOnDownloadingEvent(dm);
+                App.Instance.DownloadManager.CallOnDownloadingEvent(dm);
             }
-            foreach (var dm in App.Instance.downloadManager.DownloadedData)
+            foreach (var dm in App.Instance.DownloadManager.DownloadedData)
             {
-                App.Instance.downloadManager.CallOnDownloadedEvent(dm);
+                App.Instance.DownloadManager.CallOnDownloadedEvent(dm);
             }
-            foreach (var dm in App.Instance.downloadManager.DownloadErrorData)
+            foreach (var dm in App.Instance.DownloadManager.DownloadErrorData)
             {
-                App.Instance.downloadManager.CallOnDownloadErrorEvent(dm);
+                App.Instance.DownloadManager.CallOnDownloadErrorEvent(dm);
             }
 
             if (!DownloadDatas.Any())
@@ -87,12 +87,12 @@ namespace TewiMP.Pages
         private void DownloadPage_Unloaded(object sender, RoutedEventArgs e)
         {
             ListViewBase.ItemsSource = null;
-            App.Instance.downloadManager.AddDownload -= DownloadManager_AddDownload;
-            App.Instance.downloadManager.OnDownloading -= DownloadManager_OnDownloading;
-            App.Instance.downloadManager.OnDownloadedPreview -= DownloadManager_OnDownloading;
-            App.Instance.downloadManager.OnDownloadedSaving -= DownloadManager_OnDownloadedSaving;
-            App.Instance.downloadManager.OnDownloaded -= DownloadManager_OnDownloading;
-            App.Instance.downloadManager.OnDownloadError -= DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.AddDownload -= DownloadManager_AddDownload;
+            App.Instance.DownloadManager.OnDownloading -= DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.OnDownloadedPreview -= DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.OnDownloadedSaving -= DownloadManager_OnDownloadedSaving;
+            App.Instance.DownloadManager.OnDownloaded -= DownloadManager_OnDownloading;
+            App.Instance.DownloadManager.OnDownloadError -= DownloadManager_OnDownloading;
         }
 
         ScrollViewer scrollViewer;
@@ -174,15 +174,15 @@ namespace TewiMP.Pages
 
         private void PausePlayBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (App.Instance.downloadManager.PauseDownload)
+            if (App.Instance.DownloadManager.PauseDownload)
             {
-                App.Instance.downloadManager.PauseDownload = false;
+                App.Instance.DownloadManager.PauseDownload = false;
                 PausePlayBtn.Label = "暂停下载";
                 PausePlayIcon.Glyph = "\uE769";
             }
             else
             {
-                App.Instance.downloadManager.PauseDownload = true;
+                App.Instance.DownloadManager.PauseDownload = true;
                 PausePlayBtn.Label = "继续下载";
                 PausePlayIcon.Glyph = "\uE768";
             }

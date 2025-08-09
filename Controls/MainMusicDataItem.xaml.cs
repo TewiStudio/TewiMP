@@ -18,7 +18,7 @@ namespace TewiMP.Controls
         {
             if (isInited) return;
             isInited = true;
-            App.Instance.audioPlayer.SourceChanged += (_) =>
+            App.Instance.AudioPlayer.SourceChanged += (_) =>
             {
                 foreach (MainMusicDataItem item in InstancesList)
                 {
@@ -69,13 +69,13 @@ namespace TewiMP.Controls
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            App.Instance.playingList.NowPlayingList.Remove(DataContext as MusicData);
+            App.Instance.PlayingList.NowPlayingList.Remove(DataContext as MusicData);
         }
 
         private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (DataContext is null) return;
-            IsPlaying = MusicData == App.Instance.audioPlayer.MusicData;
+            IsPlaying = MusicData == App.Instance.AudioPlayer.MusicData;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -92,7 +92,7 @@ namespace TewiMP.Controls
         private async void Grid_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             if (IsPlaying) return;
-            await App.Instance.playingList.Play(MusicData);
+            await App.Instance.PlayingList.Play(MusicData);
         }
 
         private void UserControl_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)

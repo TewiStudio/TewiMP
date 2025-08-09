@@ -110,13 +110,13 @@ namespace TewiMP.Windowed
         public void UpdateDatas()
         {
             UpdateWindowDisplay();
-            AudioPlayer_SourceChanged(App.Instance.audioPlayer);
-            AudioPlayer_PlayStateChanged(App.Instance.audioPlayer);
-            AudioPlayer_TimingChanged(App.Instance.audioPlayer);
-            AudioPlayer_VolumeChanged(App.Instance.audioPlayer, App.Instance.audioPlayer.Volume);
-            PlayingList_NowPlayingImageLoaded(App.Instance.playingList.NowPlayingImage, null);
-            App.Instance.audioPlayer.ReCallTiming();
-            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
+            AudioPlayer_SourceChanged(App.Instance.AudioPlayer);
+            AudioPlayer_PlayStateChanged(App.Instance.AudioPlayer);
+            AudioPlayer_TimingChanged(App.Instance.AudioPlayer);
+            AudioPlayer_VolumeChanged(App.Instance.AudioPlayer, App.Instance.AudioPlayer.Volume);
+            PlayingList_NowPlayingImageLoaded(App.Instance.PlayingList.NowPlayingImage, null);
+            App.Instance.AudioPlayer.ReCallTiming();
+            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
 
             isCodeChangedDesktopLyricWindow = true;
             TB_Lyric.IsChecked = App.MainWindowInstance.DesktopLyricWindow != null;
@@ -130,13 +130,13 @@ namespace TewiMP.Windowed
 #if !DEBUG
                 AppWindow.Hide();
 #endif
-                App.Instance.audioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
-                App.Instance.audioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
-                App.Instance.audioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
-                App.Instance.audioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
-                App.Instance.audioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
-                App.Instance.audioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
-                App.Instance.playingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+                App.Instance.AudioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
+                App.Instance.AudioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
+                App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
+                App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
+                App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
+                App.Instance.AudioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
+                App.Instance.PlayingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
                 App.MainWindowInstance.DesktopLyricWindowOpenedEvent -= MainWindow_DesktopLyricWindowOpenedEvent;
                 App.MainWindowInstance.DesktopLyricWindowClosedEvent -= MainWindow_DesktopLyricWindowClosedEvent;
                 TitleTBBase.Pause = true;
@@ -146,13 +146,13 @@ namespace TewiMP.Windowed
             }
             else
             {
-                App.Instance.audioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
-                App.Instance.audioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
-                App.Instance.audioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-                App.Instance.audioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-                App.Instance.audioPlayer.TimingChanged += AudioPlayer_TimingChanged;
-                App.Instance.audioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
-                App.Instance.playingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+                App.Instance.AudioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
+                App.Instance.AudioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
+                App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
+                App.Instance.AudioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
+                App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+                App.Instance.AudioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
+                App.Instance.PlayingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
                 App.MainWindowInstance.DesktopLyricWindowOpenedEvent += MainWindow_DesktopLyricWindowOpenedEvent;
                 App.MainWindowInstance.DesktopLyricWindowClosedEvent += MainWindow_DesktopLyricWindowClosedEvent;
                 TitleTBBase.Pause = false;
@@ -316,7 +316,7 @@ namespace TewiMP.Windowed
 
         private void NotifyIcon_DoubleClick(object sender, EventArgs e)
         {
-            App.MainWindowInstance.Restore();
+            App.MainWindowInstance.Activate();
             App.MainWindowInstance.SetForegroundWindow();
         }
 
@@ -540,20 +540,20 @@ namespace TewiMP.Windowed
             switch ((sender as Button).Tag)
             {
                 case "0":
-                    App.Instance.playingList.PlayPrevious();
+                    App.Instance.PlayingList.PlayPrevious();
                     break;
                 case "1":
-                    if (App.Instance.audioPlayer.PlaybackState == PlaybackState.Playing)
+                    if (App.Instance.AudioPlayer.PlaybackState == PlaybackState.Playing)
                     {
-                        App.Instance.audioPlayer.SetPause();
+                        App.Instance.AudioPlayer.SetPause();
                     }
                     else
                     {
-                        App.Instance.audioPlayer.SetPlay();
+                        App.Instance.AudioPlayer.SetPlay();
                     }
                     break;
                 case "2":
-                    App.Instance.playingList.PlayNext();
+                    App.Instance.PlayingList.PlayNext();
                     break;
             }
         }
@@ -566,14 +566,14 @@ namespace TewiMP.Windowed
         private void VolumeSD_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (!isCodeChangedVolumeValue)
-                App.Instance.audioPlayer.Volume = (float)VolumeSD.Value;
+                App.Instance.AudioPlayer.Volume = (float)VolumeSD.Value;
         }
 
         private void TimeSD_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (!isCodeChangedSliderValue)
             {
-                App.Instance.audioPlayer.CurrentTime = TimeSpan.FromTicks((long)TimeSD.Value);
+                App.Instance.AudioPlayer.CurrentTime = TimeSpan.FromTicks((long)TimeSD.Value);
             }
         }
 
@@ -616,10 +616,10 @@ namespace TewiMP.Windowed
         private void C_Click(object sender, RoutedEventArgs e)
         {
             var a = (OutDevice)(sender as MenuFlyoutItem).Tag;
-            App.Instance.audioPlayer.NowOutDevice = a;
-            TB_OutputSelector_Name.Text = App.Instance.audioPlayer.NowOutDevice.ToString();
+            App.Instance.AudioPlayer.NowOutDevice = a;
+            TB_OutputSelector_Name.Text = App.Instance.AudioPlayer.NowOutDevice.ToString();
 
-            App.Instance.audioPlayer.SetReloadAsync();
+            App.Instance.AudioPlayer.SetReloadAsync();
         }
         
         private async void AddOutDeviceToFlyOut()
@@ -647,8 +647,8 @@ namespace TewiMP.Windowed
         private void B_Click(object sender, RoutedEventArgs e)
         {
             var a = (PlayBehavior)(sender as MenuFlyoutItem).Tag;
-            App.Instance.playingList.PlayBehavior = a;
-            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
+            App.Instance.PlayingList.PlayBehavior = a;
+            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
         }
 
         private void SetPlayModeIconAndName(PlayBehavior playBehavior)
@@ -685,7 +685,7 @@ namespace TewiMP.Windowed
 
         private void TB_PlayModeSelector_Base_Loaded(object sender, RoutedEventArgs e)
         {
-            SetPlayModeIconAndName(App.Instance.playingList.PlayBehavior);
+            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
         }
     }
 

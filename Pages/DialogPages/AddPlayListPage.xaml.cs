@@ -59,7 +59,7 @@ namespace TewiMP.Pages.DialogPages
                     try
                     {
                         await PlayListHelper.AddPlayList(musicListData);
-                        await App.Instance.playListReader.Refresh();
+                        await App.Instance.PlayListReader.Refresh();
                         App.MainWindowInstance.AddNotify("添加列表成功", null, NotifySeverity.Complete);
                     }
                     catch (ArgumentException)

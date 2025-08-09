@@ -118,6 +118,10 @@
 
             <!-- Hyperlink -->
             <StaticResource x:Key="TextControlSelectionHighlightColor" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="HyperlinkButtonForeground" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="HyperlinkButtonForegroundPointerOver" ResourceKey="MusicAlbumAccentBrush" />
+            <StaticResource x:Key="HyperlinkButtonForegroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+
             <StaticResource x:Key="HyperlinkForegroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
             <StaticResource x:Key="HyperlinkForegroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
             

@@ -4,42 +4,22 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
-using CommunityToolkit.WinUI.Controls;
-using TewiMP.Plugin;
-using TewiMP.Helpers;
-using TewiMP.DataEditor;
-using System.Threading.Tasks;
 
 namespace TewiMP.Pages
 {
-    public partial class SettingPlugin : Page
+    public partial class TestPage : Page
     {
-        public SettingPlugin()
+        public TestPage()
         {
             InitializeComponent();
         }
 
-
-        bool isInLoading = false;
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            isInLoading = true;
-            PluginMusicSource.ItemsSource = PluginManager.MusicSourcePlugins;
-            PluginOther.ItemsSource = PluginManager.Plugins;
-            isInLoading = false;
-        }
-
-        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            UpdateShyHeader();
-        }
-
         public void UpdateShyHeader()
         {
-            // 设置 header 为顶层
+            // 设置header为顶层
             var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ListViewBase.Header);
             var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
-            Canvas.SetZIndex(HeaderBaseGrid, 1);
+            Canvas.SetZIndex(headerContainer, 1);
 
             var scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;
             scrollViewer.CanContentRenderOutsideBounds = true;
@@ -88,42 +68,14 @@ namespace TewiMP.Pages
             backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
         }
 
-        private void SettingsCard_Click(object sender, RoutedEventArgs e)
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            PluginManager.Init();
+            UpdateShyHeader();
         }
 
-        private async void SettingsCard_Click_1(object sender, RoutedEventArgs e)
+        private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is SettingsCard card)
-            {
-                if (card.DataContext is Plugin.Plugin plugin)
-                {
-                    await plugin.ShowSettingsDialog();
-                    PluginManager.SavePluginInfoSettings();
-                }
-            }
-        }
-
-        private void SettingsCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-            if (sender is SettingsCard card && args.NewValue is Plugin.Plugin dataContent)
-            {
-                card.Header = $"{dataContent.PluginInfo.Name} ({dataContent.PluginInfo.Version})";
-                card.Description = string.IsNullOrEmpty(dataContent.PluginInfo.Describe) ?
-                    $"by {dataContent.PluginInfo.Author}" :
-                    $"{dataContent.PluginInfo.Describe}\nby {dataContent.PluginInfo.Author}";
-            }
-        }
-
-        private async void SettingsCard_Click_2(object sender, RoutedEventArgs e)
-        {
-            await FileHelper.ExploreFolder(DataFolderBase.PluginFolder);
-        }
-
-        private async void Button_Click(object sender, RoutedEventArgs e)
-        {
-            await CodeHelper.OpenInBrowser("https://github.com/TewiStudio/TewiMP/tree/master/Plugin/BuildInPlugins/BuildInPluginSample");
+            asv.Pause = !asv.Pause;
         }
     }
 }

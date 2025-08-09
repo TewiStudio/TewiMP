@@ -34,22 +34,22 @@ namespace TewiMP.Pages.DialogPages
             string createTime = "";
             await Task.Run(() =>
             {
-                FileInfo fileInfo = new(App.Instance.audioPlayer.FileReader.FileName);
+                FileInfo fileInfo = new(App.Instance.AudioPlayer.FileReader.FileName);
                 createTime = fileInfo.CreationTime.ToString();
                 filePath = fileInfo.DirectoryName;
             });
 
-            ((Run)((Hyperlink)((TextBlock)FileInfoSp.Children[2]).Inlines[0]).Inlines[0]).Text = App.Instance.audioPlayer.FileReader.FileName;
+            ((Run)((Hyperlink)((TextBlock)FileInfoSp.Children[2]).Inlines[0]).Inlines[0]).Text = App.Instance.AudioPlayer.FileReader.FileName;
             ((Run)((Hyperlink)((TextBlock)FileInfoSp.Children[4]).Inlines[0]).Inlines[0]).Text = filePath;
             ((TextBlock)FileInfoSp.Children[6]).Text = createTime;
-            ((TextBlock)FileInfoSp.Children[8]).Text = CodeHelper.GetAutoSizeString(App.Instance.audioPlayer.FileSize, 2);
+            ((TextBlock)FileInfoSp.Children[8]).Text = CodeHelper.GetAutoSizeString(App.Instance.AudioPlayer.FileSize, 2);
         }
 
         private async void SetAudioInfoText()
         {
-            if (App.Instance.audioPlayer.FileReader != null)
+            if (App.Instance.AudioPlayer.FileReader != null)
             {
-                if (App.Instance.audioPlayer.FileReader.isMidi)
+                if (App.Instance.AudioPlayer.FileReader.isMidi)
                 {
                     AudioInfoGrid.Visibility = Visibility.Collapsed;
                     return;
@@ -57,16 +57,16 @@ namespace TewiMP.Pages.DialogPages
             }
 
             ATL.Track tfile = null;
-            if (App.Instance.audioPlayer.tfile is null)
+            if (App.Instance.AudioPlayer.tfile is null)
             {
                 await Task.Run(() =>
                 {
-                    tfile = new ATL.Track(App.Instance.audioPlayer.FileReader.FileName);
+                    tfile = new ATL.Track(App.Instance.AudioPlayer.FileReader.FileName);
                 });
             }
             else
             {
-                tfile = App.Instance.audioPlayer.tfile;
+                tfile = App.Instance.AudioPlayer.tfile;
             }
 
             if (tfile != null)
@@ -79,10 +79,10 @@ namespace TewiMP.Pages.DialogPages
                     additionalFields += $"● {element.Key}: {(string.IsNullOrEmpty(element.Value) ? "无内容" : element.Value)}{(i == tfile.AdditionalFields.Count - 1 ? "" : "\n")}";
                 }
 
-                ((TextBlock)AudioInfoSp.Children[1]).Text = $"{App.Instance.audioPlayer.FileType}" +
+                ((TextBlock)AudioInfoSp.Children[1]).Text = $"{App.Instance.AudioPlayer.FileType}" +
                     $"{(ConvertCodecFamilyIntToString(tfile.CodecFamily) is null ? "" : $"  {ConvertCodecFamilyIntToString(tfile.CodecFamily)}")}" +
                     $"  {tfile.SampleRate} Hz  {tfile.Bitrate} kbps" +
-                    $"  {tfile.ChannelsArrangement.NbChannels} 声道  {App.Instance.audioPlayer.FileReader.TotalTime.ToString("hh\\:mm\\:ss\\.ff")}({tfile.Duration}s)";
+                    $"  {tfile.ChannelsArrangement.NbChannels} 声道  {App.Instance.AudioPlayer.FileReader.TotalTime.ToString("hh\\:mm\\:ss\\.ff")}({tfile.Duration}s)";
 
                 if (tfile.BitDepth == -1)
                 {
@@ -114,9 +114,9 @@ namespace TewiMP.Pages.DialogPages
 
         private async void SetOutInfoText()
         {
-            if (App.Instance.audioPlayer.FileReader.isMidi)
+            if (App.Instance.AudioPlayer.FileReader.isMidi)
             {
-                ((TextBlock)OutInfoSp.Children[2]).Text = $"Midi -> {App.Instance.audioPlayer.MidiOutputDevice.Name}";
+                ((TextBlock)OutInfoSp.Children[2]).Text = $"Midi -> {App.Instance.AudioPlayer.MidiOutputDevice.Name}";
                 ((TextBlock)OutInfoSp.Children[3]).Visibility = Visibility.Collapsed;
                 ((TextBlock)OutInfoSp.Children[4]).Visibility = Visibility.Collapsed;
                 ((TextBlock)OutInfoSp.Children[5]).Visibility = Visibility.Collapsed;
@@ -144,68 +144,68 @@ namespace TewiMP.Pages.DialogPages
                 }
 
                 string outInfo = $"未知";
-                if ((App.Instance.audioPlayer.WasapiOnly && App.Instance.audioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi) || App.Instance.audioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Asio)
+                if ((App.Instance.AudioPlayer.WasapiOnly && App.Instance.AudioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi) || App.Instance.AudioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Asio)
                 {
-                    outInfo = $"{App.Instance.audioPlayer.NowOutDevice.DeviceType} -> {App.Instance.audioPlayer.NowOutDevice.DeviceName}";
+                    outInfo = $"{App.Instance.AudioPlayer.NowOutDevice.DeviceType} -> {App.Instance.AudioPlayer.NowOutDevice.DeviceName}";
                 }
                 else
                 {
-                    outInfo = $"{App.Instance.audioPlayer.NowOutDevice.DeviceType} -> SRC -> {App.Instance.audioPlayer.NowOutDevice.DeviceName}";
+                    outInfo = $"{App.Instance.AudioPlayer.NowOutDevice.DeviceType} -> SRC -> {App.Instance.AudioPlayer.NowOutDevice.DeviceName}";
                 }
 
                 string sampleRateText = "未知";
                 string channelsText = "未知";
 
-                if (App.Instance.audioPlayer.NowOutDevice.DeviceType != AudioPlayer.OutApi.Asio)
+                if (App.Instance.AudioPlayer.NowOutDevice.DeviceType != AudioPlayer.OutApi.Asio)
                 {
-                    var getd = await OutDevice.GetWasapiDeviceFromOtherAPI(App.Instance.audioPlayer.NowOutDevice);
-                    if (App.Instance.audioPlayer.WasapiOnly && App.Instance.audioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi)
+                    var getd = await OutDevice.GetWasapiDeviceFromOtherAPI(App.Instance.AudioPlayer.NowOutDevice);
+                    if (App.Instance.AudioPlayer.WasapiOnly && App.Instance.AudioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi)
                     {
-                        if (App.Instance.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate != App.Instance.audioPlayer.FileReader.WaveFormat.SampleRate)
-                            sampleRateText = $"{App.Instance.audioPlayer.FileReader.WaveFormat.SampleRate} Hz -> {App.Instance.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（重采样）";
+                        if (App.Instance.AudioPlayer.NowOutObj.OutputWaveFormat.SampleRate != App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate)
+                            sampleRateText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate} Hz -> {App.Instance.AudioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（重采样）";
                         else
-                            sampleRateText = $"{App.Instance.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz";
+                            sampleRateText = $"{App.Instance.AudioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz";
                     }
                     else
                     {
-                        if (getd.SampleRate != App.Instance.audioPlayer.FileReader.WaveFormat.SampleRate)
-                            sampleRateText = $"{App.Instance.audioPlayer.FileReader.WaveFormat.SampleRate} Hz -> SRC -> {getd.SampleRate} Hz";
+                        if (getd.SampleRate != App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate)
+                            sampleRateText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate} Hz -> SRC -> {getd.SampleRate} Hz";
                         else
-                            sampleRateText = $"{App.Instance.audioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（SRC）";
+                            sampleRateText = $"{App.Instance.AudioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（SRC）";
 
                     }
 
-                    if (App.Instance.audioPlayer.FileReader.WaveFormat.Channels != getd.Channels)
+                    if (App.Instance.AudioPlayer.FileReader.WaveFormat.Channels != getd.Channels)
                     {
-                        channelsText = $"{App.Instance.audioPlayer.FileReader.WaveFormat.Channels} 声道 -> {getd.Channels} 声道";
+                        channelsText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.Channels} 声道 -> {getd.Channels} 声道";
                     }
                     else
                     {
-                        channelsText = $"{App.Instance.audioPlayer.FileReader.WaveFormat.Channels} 声道";
+                        channelsText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.Channels} 声道";
                     }
-                    ((TextBlock)OutInfoSp.Children[10]).Text = $"{App.Instance.audioPlayer.Latency} ms";
+                    ((TextBlock)OutInfoSp.Children[10]).Text = $"{App.Instance.AudioPlayer.Latency} ms";
                 }
                 else
                 {
-                    var asioOut = App.Instance.audioPlayer.NowOutObj as AsioOut;
-                    if (asioOut.OutputWaveFormat.SampleRate != App.Instance.audioPlayer.FileReader.WaveFormat.SampleRate)
-                        sampleRateText = $"{App.Instance.audioPlayer.FileReader.WaveFormat.SampleRate} Hz -> {asioOut.OutputWaveFormat.SampleRate} Hz（重采样）";
+                    var asioOut = App.Instance.AudioPlayer.NowOutObj as AsioOut;
+                    if (asioOut.OutputWaveFormat.SampleRate != App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate)
+                        sampleRateText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate} Hz -> {asioOut.OutputWaveFormat.SampleRate} Hz（重采样）";
                     else
                         sampleRateText = $"{asioOut.OutputWaveFormat.SampleRate} Hz";
 
-                    if (App.Instance.audioPlayer.FileReader.WaveFormat.Channels != asioOut.OutputWaveFormat.Channels)
+                    if (App.Instance.AudioPlayer.FileReader.WaveFormat.Channels != asioOut.OutputWaveFormat.Channels)
                     {
-                        channelsText = $"{App.Instance.audioPlayer.FileReader.WaveFormat.Channels} 声道 -> {asioOut.OutputWaveFormat.Channels} 声道";
+                        channelsText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.Channels} 声道 -> {asioOut.OutputWaveFormat.Channels} 声道";
                     }
                     else
                     {
                         channelsText = $"{asioOut.OutputWaveFormat.Channels} 声道";
                     }
-                    ((TextBlock)OutInfoSp.Children[10]).Text = $"{(App.Instance.audioPlayer.NowOutObj as AsioOut).PlaybackLatency} ms";
+                    ((TextBlock)OutInfoSp.Children[10]).Text = $"{(App.Instance.AudioPlayer.NowOutObj as AsioOut).PlaybackLatency} ms";
                 }
 
                 ((TextBlock)OutInfoSp.Children[2]).Text = outInfo;
-                ((TextBlock)OutInfoSp.Children[4]).Text = string.IsNullOrEmpty(App.Instance.audioPlayer.FileReader.DecodeName) ? "未知" : App.Instance.audioPlayer.FileReader.DecodeName;
+                ((TextBlock)OutInfoSp.Children[4]).Text = string.IsNullOrEmpty(App.Instance.AudioPlayer.FileReader.DecodeName) ? "未知" : App.Instance.AudioPlayer.FileReader.DecodeName;
                 ((TextBlock)OutInfoSp.Children[6]).Text = sampleRateText;
                 ((TextBlock)OutInfoSp.Children[8]).Text = channelsText;
             }
@@ -213,8 +213,8 @@ namespace TewiMP.Pages.DialogPages
 
         private async void SetCUEInfoText()
         {
-            if (App.Instance.audioPlayer.MusicData is null) return;
-            if (App.Instance.audioPlayer.MusicData.CUETrackData is null)
+            if (App.Instance.AudioPlayer.MusicData is null) return;
+            if (App.Instance.AudioPlayer.MusicData.CUETrackData is null)
             {
                 CUEInfoGrid.Visibility = Visibility.Collapsed;
                 return;
@@ -222,7 +222,7 @@ namespace TewiMP.Pages.DialogPages
 
             CueSheet cueSheet = await Task.Run(() =>
             {
-                return new CueSheet(App.Instance.audioPlayer.MusicData.CUETrackData.Path);
+                return new CueSheet(App.Instance.AudioPlayer.MusicData.CUETrackData.Path);
             });
             if (cueSheet is null)
             {
@@ -230,11 +230,11 @@ namespace TewiMP.Pages.DialogPages
                 return;
             }
 
-            string nowTrackName = $"标题：{App.Instance.audioPlayer.MusicData.Title}\n艺术家：{App.Instance.audioPlayer.MusicData.ArtistName}\n" +
-                $"索引：{App.Instance.audioPlayer.MusicData.CUETrackData.Index}\n" +
-                $"开始时间：{App.Instance.audioPlayer.MusicData.CUETrackData.StartDuration.ToString("hh\\:mm\\:ss\\.ff")}\n" +
-                $"结束时间：{App.Instance.audioPlayer.MusicData.CUETrackData.EndDuration.ToString("hh\\:mm\\:ss\\.ff")}\n" +
-                $"时长：{App.Instance.audioPlayer.MusicData.CUETrackData.Duration.ToString("hh\\:mm\\:ss\\.ff")}";
+            string nowTrackName = $"标题：{App.Instance.AudioPlayer.MusicData.Title}\n艺术家：{App.Instance.AudioPlayer.MusicData.ArtistName}\n" +
+                $"索引：{App.Instance.AudioPlayer.MusicData.CUETrackData.Index}\n" +
+                $"开始时间：{App.Instance.AudioPlayer.MusicData.CUETrackData.StartDuration.ToString("hh\\:mm\\:ss\\.ff")}\n" +
+                $"结束时间：{App.Instance.AudioPlayer.MusicData.CUETrackData.EndDuration.ToString("hh\\:mm\\:ss\\.ff")}\n" +
+                $"时长：{App.Instance.AudioPlayer.MusicData.CUETrackData.Duration.ToString("hh\\:mm\\:ss\\.ff")}";
 
             string tracksName = $"共 {cueSheet.Tracks.Length} 首\n";
             for (int i = 0; i < cueSheet.Tracks.Length; i++)
@@ -269,7 +269,7 @@ namespace TewiMP.Pages.DialogPages
                 }
             }
 
-            ((TextBlock)CUEInfoSp.Children[2]).Text = App.Instance.audioPlayer.MusicData.CUETrackData.Path;
+            ((TextBlock)CUEInfoSp.Children[2]).Text = App.Instance.AudioPlayer.MusicData.CUETrackData.Path;
             ((TextBlock)CUEInfoSp.Children[4]).Text = cueSheet.Title;
             ((TextBlock)CUEInfoSp.Children[6]).Text = string.IsNullOrEmpty(cueSheet.Performer) ? "未知" : cueSheet.Performer;
             ((TextBlock)CUEInfoSp.Children[8]).Text = string.IsNullOrEmpty(nowTrackName) ? "无内容" : nowTrackName;
