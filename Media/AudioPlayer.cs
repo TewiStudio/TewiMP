@@ -370,7 +370,7 @@ namespace TewiMP.Media
         {
             get
             {
-                if (localFileIniting) return default;
+                if (localFileIniting) return TimeSpan.Zero;
                 if (FileReader != null)
                 {
                     if (FileReader.isMidi)
@@ -819,7 +819,8 @@ namespace TewiMP.Media
                 MidiFile = MidiFile.Read(filePath, new()
                 {
                     NotEnoughBytesPolicy = NotEnoughBytesPolicy.Ignore,
-                    InvalidChunkSizePolicy = InvalidChunkSizePolicy.Ignore
+                    InvalidChunkSizePolicy = InvalidChunkSizePolicy.Ignore,
+                    InvalidMetaEventParameterValuePolicy = InvalidMetaEventParameterValuePolicy.SnapToLimits,
                 });
                 MidiPlayback = MidiFile.GetPlayback(MidiOutputDevice);
                 MidiPlayback.Finished += (_, __) => App.MainWindowInstance.Invoke(() => AudioPlayer_PlaybackStopped(null, null));

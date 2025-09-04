@@ -138,55 +138,65 @@ namespace TewiMP.Media
             }*/
 
 
-            if (addr == "7784") // MIDI文件处理
+            if (addr == "7784" || Path.GetExtension(fileName) == ".mid") // MIDI文件处理
             {
                 isMidi = true;
                 return;
             }
 
             LogManager.Log("AudioFileReader", $"ffmpeg.exe: {FFmpegPath}");
+            bool useMF = false;
             if (!File.Exists(FFmpegPath))
             {
-                throw new System.Exception("找不到 ffmpeg.exe，请检查 ffmpeg.exe 是否被删除，或者其路径设置是否正确。");
+                LogManager.Error("AudioFileReader", "找不到 ffmpeg.exe，请检查 ffmpeg.exe 是否被删除，或者其路径设置是否正确。");
+                useMF = true;
             }
-
-            var tFile = App.Instance.AudioPlayer.tfile;
-            string codec = tFile.BitDepth switch
+            else
             {
-                8 => "u8",
-                16 => "s16le",
-                24 => "s24le",
-                32 => "s32le",
-                _ => "s16le"
-            };
-            var psi = new ProcessStartInfo
-            {
-                FileName = FFmpegPath,
-                Arguments = $"-i \"{fileName}\" -f {codec} -acodec pcm_{codec} -ac 2 -ar {tFile.SampleRate} -",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            _ffmpegProcess = Process.Start(psi);
-            if (_ffmpegProcess is not null)
-            {
-                LogManager.Log("AudioFileReader", $"正在使用 FFmpeg 解码器，文件标识符为：{addr}");
-                _ffmpegProcess.StandardOutput.BaseStream.CopyTo(_ffmpegReadMemory = new());
-                _ffmpegReadMemory.Position = 0;
-                _ffmpegProcess.Kill();
-                _ffmpegProcess.Dispose();
-                if (tFile.BitDepth == -1) // 当一些音频数据无位深时
+                var tFile = App.Instance.AudioPlayer.tfile;
+                string codec = tFile.BitDepth switch
                 {
-                    readerStream = new RawSourceWaveStream(_ffmpegReadMemory, new WaveFormat((int)tFile.SampleRate, tFile.ChannelsArrangement.NbChannels));
+                    8 => "u8",
+                    16 => "s16le",
+                    24 => "s24le",
+                    32 => "s32le",
+                    _ => "s16le"
+                };
+                var psi = new ProcessStartInfo
+                {
+                    FileName = FFmpegPath,
+                    Arguments = $"-i \"{fileName}\" -f {codec} -acodec pcm_{codec} -ac 2 -ar {tFile.SampleRate} -",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                _ffmpegProcess = Process.Start(psi);
+                if (_ffmpegProcess is not null)
+                {
+                    LogManager.Log("AudioFileReader", $"正在使用 FFmpeg 解码器，文件标识符为：{addr}");
+                    _ffmpegProcess.StandardOutput.BaseStream.CopyTo(_ffmpegReadMemory = new());
+                    _ffmpegReadMemory.Position = 0;
+                    _ffmpegProcess.Kill();
+                    _ffmpegProcess.Dispose();
+                    if (tFile.BitDepth == -1) // 当一些音频数据无位深时
+                    {
+                        readerStream = new RawSourceWaveStream(_ffmpegReadMemory, new WaveFormat((int)tFile.SampleRate, tFile.ChannelsArrangement.NbChannels));
+                    }
+                    else
+                    {
+                        readerStream = new RawSourceWaveStream(_ffmpegReadMemory, new WaveFormat((int)tFile.SampleRate, tFile.BitDepth, tFile.ChannelsArrangement.NbChannels));
+                    }
+                    DecodeName = $"TewiMP built-in FFmpeg Decoder";
                 }
                 else
                 {
-                    readerStream = new RawSourceWaveStream(_ffmpegReadMemory, new WaveFormat((int)tFile.SampleRate, tFile.BitDepth, tFile.ChannelsArrangement.NbChannels));
+                    LogManager.Error("AudioFileReader", "ffmpeg 运行失败。");
+                    useMF = true;
                 }
-                DecodeName = $"TewiMP built-in FFmpeg Decoder";
             }
-            else
+
+            if (useMF)
             {
                 LogManager.Log("AudioFileReader", $"正在使用 Microsoft MediaFoundationReader 解码器，文件标识符为：{addr}");
                 readerStream = new MediaFoundationReader(fileName);

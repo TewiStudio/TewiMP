@@ -32,7 +32,7 @@ namespace TewiMP.Pages
             }
         }
 
-        private void DelaySetParameter(string value)
+        private async Task DelaySetParameter(string value)
         {
             CommunityToolkit.WinUI.Controls.SettingsExpander expander = null;
             switch (value)
@@ -93,6 +93,8 @@ namespace TewiMP.Pages
             ImageCachePath = DataFolderBase.ImageCacheFolder;
             LyricCachePath = DataFolderBase.LyricCacheFolder;
             DownloadPath = DataFolderBase.DownloadFolder;
+
+            AudioDownloadPathCard.Description = DownloadPath;
 
             //System.Diagnostics.LogManager.Log(App.Instance.downloadManager.br);
             /*
@@ -585,6 +587,8 @@ namespace TewiMP.Pages
             if (index == 3 || index == 4 || index == 5)
             {
                 imageselect_root.Visibility = Visibility.Visible;
+                if (index == 5) background_selectimage_button.Visibility = Visibility.Visible;
+                else background_selectimage_button.Visibility = Visibility.Collapsed;
             }
             else
             {

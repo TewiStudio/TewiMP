@@ -106,11 +106,6 @@ namespace TewiMP.Pages
             {
                 searchDatas = await NowMusicFrom.GetSearch(searchData, pageNumber, pageSize, (int)NowSearchMode);
             }
-            catch (ArgumentOutOfRangeException)
-            {
-                App.MainWindowInstance.AddNotify("不支持的平台", "当前不支持此平台搜索。", NotifySeverity.Error);
-                searchDatas = null;
-            }
             catch (NullReferenceException)
             {
                 App.MainWindowInstance.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);

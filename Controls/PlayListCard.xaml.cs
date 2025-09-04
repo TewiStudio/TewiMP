@@ -13,6 +13,7 @@ using TewiMP.Helpers;
 using TewiMP.DataEditor;
 using TewiMP.Pages.ListViewPages;
 using TewiMP.Background;
+using Windows.UI.ViewManagement;
 
 namespace TewiMP.Controls
 {
@@ -204,7 +205,7 @@ namespace TewiMP.Controls
             isRightPressed = e.GetCurrentPoint(sender as UIElement).Properties.IsRightButtonPressed;
         }
 
-        private void Grid_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+        private async void Grid_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             if (isPressed && MusicListData != null)
             {
@@ -215,6 +216,10 @@ namespace TewiMP.Controls
                 }
                 else
                 {
+                    if (!new UISettings().AnimationsEnabled)
+                    {
+                        await Task.Delay(10); // 当系统动画关闭时，会导致程序卡死
+                    }
                     ListViewPage.SetPageToListViewPage(new() { PageType = PageType.PlayList, Param = MusicListData.MD5 });
                 }
             }

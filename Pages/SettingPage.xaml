@@ -173,7 +173,7 @@
             </cc:SettingsExpander.HeaderIcon>
             <cc:SettingsExpander.Items>
                 <cc:SettingsCard Header="音频下载路径"
-                                 Description="{Binding DownloadPath}">
+                                 x:Name="AudioDownloadPathCard">
                     <cc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE8B7;"/>
                     </cc:SettingsCard.HeaderIcon>
@@ -354,6 +354,11 @@
                                 <x:String>纯色</x:String>
                             </ComboBox>
                             <StackPanel Spacing="8" x:Name="imageselect_root" Visibility="Collapsed" Loaded="imageselect_root_Loaded">
+                                <StackPanel.Transitions>
+                                    <TransitionCollection>
+                                        <ContentThemeTransition/>
+                                    </TransitionCollection>
+                                </StackPanel.Transitions>
                                 <Button Content="选择图片..." x:Name="background_selectimage_button" Click="Button_Click_2"/>
                                 <Slider Header="蒙版不透明度" HorizontalAlignment="Left" ValueChanged="Slider_ValueChanged"/>
                             </StackPanel>

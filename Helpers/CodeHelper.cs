@@ -661,9 +661,9 @@ namespace TewiMP.Helpers
                     if (string.IsNullOrEmpty(lyric)) continue;
                     var timesAndLyric = lyric.Split(']');
                     //当一句歌词在不同时间段时
-                    if (timesAndLyric.Count() > 2)
+                    if (timesAndLyric.Length > 2)
                     {
-                        for (int i = timesAndLyric.Count(); i > 0; i--)
+                        for (int i = timesAndLyric.Length; i > 0; i--)
                         {
                             var timef = timesAndLyric[i - 1].Replace("[", "");
                             TimeSpan? timesResultBackup = GetLrcTimeStringTimeSpan(timef);
@@ -681,6 +681,7 @@ namespace TewiMP.Helpers
                     //当一句歌词在只在同一时间段时
                     else
                     {
+                        if (timesAndLyric.Length < 2) continue;
                         var timef = timesAndLyric[0].Replace("[", "");
                         TimeSpan? timesResultBackup = GetLrcTimeStringTimeSpan(timef);
                         if (timesResultBackup is null) continue;

@@ -90,7 +90,9 @@ namespace TewiMP.Controls
         int _isHorizontalScrolling = 1;
         int _beforeIsHorizontalScrolling = 1;
 
+        /// <summary>
         /// 1 为不动, 0 为往回， 2 为往前
+        /// </summary>
         public int IsHorizontalScrolling
         {
             get => _isHorizontalScrolling;
@@ -217,47 +219,58 @@ namespace TewiMP.Controls
                 // 当实际宽度太小时将偏移值设置为实际宽度的四分之一
                 gs1Offset = ActualWidth / 2d;
                 gs2Offset = 1d - ActualWidth / 2d;
+                _contentPresenter.Margin = new(0, 0, ActualWidth / 2d, 0);
             }
             else
             {
                 // 计算 MaskSize 在新宽度中的占比
                 gs1Offset = MaskSize / ActualWidth;
                 gs2Offset = 1d - MaskSize / ActualWidth;
-                
-                _gs1a.Width = MaskSize;
-                _gs2a.Width = MaskSize;
-                if (IsHorizontalScrolling == 1) // 当滚动停止时
+                _contentPresenter.Margin = new(0, 0, MaskSize, 0);
+            }
+
+            _gs1a.Width = MaskSize;
+            _gs2a.Width = MaskSize;
+            if (IsHorizontalScrolling == 1) // 当滚动停止时
+            {
+                if (_beforeIsHorizontalScrolling == 2)
                 {
-                    if (_beforeIsHorizontalScrolling == 2)
-                    {
-                        _gs1a.Opacity = 0;
-                        _gs2a.Opacity = 1;
-                    }
-                    else if (_beforeIsHorizontalScrolling == 0)
+                    _gs1a.Opacity = 0;
+                    _gs2a.Opacity = 1;
+                }
+                else if (_beforeIsHorizontalScrolling == 0)
+                {
+                    _gs1a.Opacity = 1;
+                    _gs2a.Opacity = 0;
+                }
+                else
+                {
+                    if (IsHorizontalContentOutOfBounds)
                     {
                         _gs1a.Opacity = 1;
                         _gs2a.Opacity = 0;
                     }
                     else
                     {
-                        if (IsHorizontalContentOutOfBounds)
-                        {
-                            _gs1a.Opacity = 1;
-                            _gs2a.Opacity = 0;
-                        }
-                        else
-                        {
-                            _gs1a.Opacity = 1;
-                            _gs2a.Opacity = 1;
-                        }
+                        _gs1a.Opacity = 1;
+                        _gs2a.Opacity = 1;
                     }
                 }
-                else if (IsHorizontalScrolling == 2 || IsHorizontalScrolling == 0) // 当向前向后滚动时
+            }
+            else if (IsHorizontalScrolling == 2 || IsHorizontalScrolling == 0) // 当向前向后滚动时
+            {
+                if (IsHorizontalScrolling == 0)
+                {
+                    _gs1a.Opacity = 1;
+                    _gs2a.Opacity = 0;
+                }
+                else
                 {
                     _gs1a.Opacity = 0;
                     _gs2a.Opacity = 0;
                 }
             }
+
             _gs1.Offset = double.Clamp(gs1Offset, 0, 1);
             _gs2.Offset = double.Clamp(gs2Offset, 0, 1);
             //LogManager.Info("Debug", $"{_gs1.Offset} / {_gs2.Offset} | {ActualWidth * _gs1.Offset} : {ActualWidth}");
@@ -291,7 +304,11 @@ namespace TewiMP.Controls
             await Task.Delay(RepeatTime);
             isAddedVelocity = false;
 
-            if (Pause) return;
+            if (Pause)
+            {
+                ComputeGradientStops();
+                return;
+            }
 
             GetSizeResult();
             if (!IsHorizontalContentOutOfBounds && !IsVerticalContentOutOfBounds) return;

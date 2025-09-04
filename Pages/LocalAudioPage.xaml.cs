@@ -124,7 +124,7 @@ namespace TewiMP.Pages
             CallEventsWhenDataLated();
             inInit = false;
 
-            if (isFirstLoadedPage)
+            if (isFirstLoadedPage && App.Instance.LocalMusicManager.LocalMusicItems.Count == 0)
             {
                 isFirstLoadedPage = false;
                 await Task.Delay(3000);
