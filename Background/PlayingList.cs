@@ -228,6 +228,7 @@ namespace TewiMP.Background
         int nextErrorCount = 0;
         public async Task<bool> Play(MusicData musicData, bool isAutoPlay = true, SetPlayInfo isNextPlay = default)
         {
+            var time = DateTime.Now;
             Add(musicData, true, true);
 
             LogManager.Log("PlayingList", $"正在设置播放：\"{musicData.Title}\"");
@@ -325,6 +326,7 @@ namespace TewiMP.Background
             {
                 nextErrorCount = 0;
             }
+            LogManager.Elapsed("PlayingList.Play", "Setting play in {0}.", time);
             return clear;
         }
 

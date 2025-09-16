@@ -40,6 +40,19 @@ namespace TewiMP.Controls
             set => SetValue(RepeatTimeProperty, value);
         }
 
+        public static readonly DependencyProperty ScrollSpeedRatioProperty = DependencyProperty.Register(
+            "ScrollSpeedRatio",
+            typeof(double),
+            typeof(AutoScrollView),
+            new PropertyMetadata(1d, null)
+        );
+
+        public double ScrollSpeedRatio
+        {
+            get => (double)GetValue(ScrollSpeedRatioProperty);
+            set => SetValue(ScrollSpeedRatioProperty, value);
+        }
+
         public static readonly DependencyProperty MaskSizeProperty = DependencyProperty.Register(
             "MaskSize",
             typeof(double),
@@ -325,13 +338,13 @@ namespace TewiMP.Controls
             if (IsHorizontalContentOutOfBounds)
             {
                 float velocity = (float)Math.Min(80f, Math.Max(4, ActualWidth / 4 + _contentPresenter.ActualWidth / 12));
-                _scrollView.AddScrollVelocity(new(velocity, 0), new());
+                _scrollView.AddScrollVelocity(new(velocity * (float)ScrollSpeedRatio, 0), new());
                 IsHorizontalScrolling = 2;
             }
             if (IsVerticalContentOutOfBounds)
             {
                 float velocity = Math.Min(80f, Math.Max(4f, ActualSize.Y / 4 + _contentPresenter.ActualSize.Y / 12));
-                _scrollView.AddScrollVelocity(new(0, velocity), new());
+                _scrollView.AddScrollVelocity(new(0, velocity * (float)ScrollSpeedRatio), new());
             }
 
             ComputeGradientStops();

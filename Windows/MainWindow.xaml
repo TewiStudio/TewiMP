@@ -273,22 +273,30 @@
                                             <RepositionThemeTransition/>
                                         </TransitionCollection>
                                     </StackPanel.Transitions>
-                                    <TextBlock
-                                        x:Name="PlayTitle"
-                                        Text="TewiMP"
-                                        FontSize="20"
-                                        HorizontalAlignment="Left"
-                                        RasterizationScale="1.89"
-                                        TextTrimming="CharacterEllipsis">
-                                    </TextBlock>
-                                    <TextBlock
-                                        x:Name="PlayArtist"
-                                        Text="No media playing"
-                                        FontSize="14"
-                                        HorizontalAlignment="Left"
-                                        RasterizationScale="1.96"
-                                        TextTrimming="CharacterEllipsis">
-                                    </TextBlock>
+                                    <controls:AutoScrollView
+                                        x:Name="PlayTitle_ASV"
+                                        ScrollSpeedRatio=".5">
+                                        <TextBlock
+                                            x:Name="PlayTitle"
+                                            Text="TewiMP"
+                                            FontSize="20"
+                                            HorizontalAlignment="Left"
+                                            RasterizationScale="1.89"
+                                            TextTrimming="CharacterEllipsis">
+                                        </TextBlock>
+                                    </controls:AutoScrollView>
+                                    <controls:AutoScrollView
+                                        x:Name="PlayArtist_ASV"
+                                        ScrollSpeedRatio=".5">
+                                        <TextBlock
+                                            x:Name="PlayArtist"
+                                            Text="No media playing"
+                                            FontSize="14"
+                                            HorizontalAlignment="Left"
+                                            RasterizationScale="1.96"
+                                            TextTrimming="CharacterEllipsis">
+                                        </TextBlock>
+                                    </controls:AutoScrollView>
                                 </StackPanel>
                             </Grid>
 

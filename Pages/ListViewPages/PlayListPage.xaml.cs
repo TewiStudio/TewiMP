@@ -13,6 +13,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using TewiMP.Background;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
 using TewiMP.Helpers;
@@ -661,9 +662,11 @@ namespace TewiMP.Pages.ListViewPages
         public ArrayList arrayList { get; set; }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            DateTime time = DateTime.Now;
             Init();
             ItemsList.ItemsSource = musicListBind;
             ItemList_Header_Search_Control.SongItemBinds = musicListBind;
+            LogManager.Elapsed("PlayListPage", "Loaded in {0}.", time);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)

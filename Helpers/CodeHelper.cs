@@ -610,6 +610,7 @@ namespace TewiMP.Helpers
 
         public static async Task<(Windows.UI.Color, Windows.UI.Color, Windows.UI.Color)> GetThemeColorAsync(string file)
         {
+            DateTime time = DateTime.Now;
             using var image = Image.FromFile(file);
             using var bitmap = new Bitmap(image.GetThumbnailImage(100, 100, () => false, nint.Zero));
             var colorThief = new ColorThiefDotNet.ColorThief();
@@ -618,17 +619,18 @@ namespace TewiMP.Helpers
             var result = Windows.UI.Color.FromArgb(c.A, c.R, c.G, c.B);
             result.ColorToHSV(out var h, out var s, out var v);
 
-            LogManager.Info("Album HSV before", $"h:{h}, s:{s}, v:{v}");
+            //LogManager.Info("Album HSV before", $"h:{h}, s:{s}, v:{v}");
             ElementTheme elementTheme = App.MainWindowInstance.WindowGridBase.ActualTheme;
             var saturation = s + (elementTheme == ElementTheme.Dark ? .1 : .6);
             var value = v + (elementTheme == ElementTheme.Dark ? 1 : .1);
             var color1 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
-            LogManager.Info("Album HSV after", $"h:{h}, s:{saturation}, v:{value}");
+            //LogManager.Info("Album HSV after", $"h:{h}, s:{saturation}, v:{value}");
 
             elementTheme = App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ? ElementTheme.Dark : ElementTheme.Light;
             saturation = s + (elementTheme == ElementTheme.Dark ? .1 : .6);
             value = v + (elementTheme == ElementTheme.Dark ? 1 : .1);
             var color2 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
+            LogManager.Elapsed("CodeHelper.GetThemeColorAsync", $"Get \"{file}\" theme color elapsed: {{0}}.", time);
             return (color1, color2, IsAccentColorDark(color1) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0));
         }
 

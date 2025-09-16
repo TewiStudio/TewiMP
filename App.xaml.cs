@@ -159,6 +159,7 @@ namespace TewiMP
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             base.OnLaunched(args);
+            var time = DateTime.Now;
             LogManager = new();
             LogManager.Log("Staring", "准备初始化...");
 
@@ -299,7 +300,7 @@ namespace TewiMP
             LaunchAsync();
             PluginManager.Init();
             LoadLastPlaying();
-            LogManager.Log("Starting", "初始化完成。");
+            LogManager.Log("Starting", $"初始化完成。耗时：{DateTime.Now - time}");
         }
 
         public async void LaunchAsync()

@@ -421,6 +421,8 @@ namespace TewiMP
             if (isAddEvents) return;
             //AutoScrollViewerFirst.Pause = false;
             //AutoScrollViewerSecond.Pause = false;
+            PlayTitle_ASV.Pause = false;
+            PlayArtist_ASV.Pause = false;
             App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
             App.Instance.AudioPlayer.PlayEnd += AudioPlayer_PlayEnd;
             App.Instance.AudioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
@@ -447,6 +449,8 @@ namespace TewiMP
         {
             //AutoScrollViewerFirst.Pause = true;
             //AutoScrollViewerSecond.Pause = true;
+            PlayTitle_ASV.Pause = true;
+            PlayArtist_ASV.Pause = true;
             App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
             App.Instance.AudioPlayer.PlayEnd -= AudioPlayer_PlayEnd;
             App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
