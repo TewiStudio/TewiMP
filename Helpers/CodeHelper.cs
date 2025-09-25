@@ -649,6 +649,48 @@ namespace TewiMP.Helpers
         }
     }
 
+    public static class StringSimilarity
+    {
+        /// <summary>
+        /// 获取两个字符串的匹配程度 (0 ~ 1)
+        /// 1 表示完全相同，0 表示完全不同
+        /// </summary>
+        public static double GetSimilarity(this string s1, string s2)
+        {
+            if (string.IsNullOrEmpty(s1) && string.IsNullOrEmpty(s2)) return 1.0;
+            if (string.IsNullOrEmpty(s1) || string.IsNullOrEmpty(s2)) return 0.0;
+
+            int distance = LevenshteinDistance(s1, s2);
+            int maxLen = Math.Max(s1.Length, s2.Length);
+
+            // 相似度 = (最大长度 - 编辑距离) / 最大长度
+            return 1.0 - (double)distance / maxLen;
+        }
+
+        private static int LevenshteinDistance(string s, string t)
+        {
+            int n = s.Length;
+            int m = t.Length;
+            int[,] dp = new int[n + 1, m + 1];
+
+            for (int i = 0; i <= n; i++) dp[i, 0] = i;
+            for (int j = 0; j <= m; j++) dp[0, j] = j;
+
+            for (int i = 1; i <= n; i++)
+            {
+                for (int j = 1; j <= m; j++)
+                {
+                    int cost = (s[i - 1] == t[j - 1]) ? 0 : 1;
+                    dp[i, j] = Math.Min(
+                        Math.Min(dp[i - 1, j] + 1, dp[i, j - 1] + 1),
+                        dp[i - 1, j - 1] + cost
+                    );
+                }
+            }
+            return dp[n, m];
+        }
+    }
+
     public static class LyricHelper
     {
         public static string NoneLyricString = "·········";

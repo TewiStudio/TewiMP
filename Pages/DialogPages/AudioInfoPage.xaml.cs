@@ -158,7 +158,9 @@ namespace TewiMP.Pages.DialogPages
 
                 if (App.Instance.AudioPlayer.NowOutDevice.DeviceType != AudioPlayer.OutApi.Asio)
                 {
-                    var getd = await OutDevice.GetWasapiDeviceFromOtherAPI(App.Instance.AudioPlayer.NowOutDevice);
+                    //var getd = await OutDevice.GetWasapiDeviceFromOtherAPI(App.Instance.AudioPlayer.NowOutDevice);
+                    var outputFormat = await OutDevice.GetWasapiDeviceFromOtherAPI(App.Instance.AudioPlayer.NowOutDevice);
+                    //var outputFormat = App.Instance.AudioPlayer.NowOutDevice;
                     if (App.Instance.AudioPlayer.WasapiOnly && App.Instance.AudioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi)
                     {
                         if (App.Instance.AudioPlayer.NowOutObj.OutputWaveFormat.SampleRate != App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate)
@@ -168,16 +170,16 @@ namespace TewiMP.Pages.DialogPages
                     }
                     else
                     {
-                        if (getd.SampleRate != App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate)
-                            sampleRateText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate} Hz -> SRC -> {getd.SampleRate} Hz";
+                        if (outputFormat.SampleRate != App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate)
+                            sampleRateText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate} Hz -> SRC -> {outputFormat.SampleRate} Hz";
                         else
                             sampleRateText = $"{App.Instance.AudioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（SRC）";
 
                     }
 
-                    if (App.Instance.AudioPlayer.FileReader.WaveFormat.Channels != getd.Channels)
+                    if (App.Instance.AudioPlayer.FileReader.WaveFormat.Channels != outputFormat.Channels)
                     {
-                        channelsText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.Channels} 声道 -> {getd.Channels} 声道";
+                        channelsText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.Channels} 声道 -> {outputFormat.Channels} 声道";
                     }
                     else
                     {
@@ -250,7 +252,7 @@ namespace TewiMP.Pages.DialogPages
             }
 
             string commentsName = "";
-            if (cueSheet.Comments.Any())
+            if (cueSheet.Comments.Length == 0)
             {
                 for (int i = 0; i < cueSheet.Comments.Length; i++)
                 {
@@ -260,7 +262,7 @@ namespace TewiMP.Pages.DialogPages
             }
 
             string garbageName = "";
-            if (cueSheet.Garbage.Any())
+            if (cueSheet.Garbage.Length == 0)
             {
                 for (int i = 0; i < cueSheet.Garbage.Length; i++)
                 {

@@ -14,6 +14,7 @@ using Melanchall.DryWetMidi.Interaction;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 using static TewiMP.Media.AudioPlayer;
+using TewiMP.Helpers;
 
 namespace TewiMP.Media
 {
@@ -96,64 +97,64 @@ namespace TewiMP.Media
             List<OutDevice> outDevices = new List<OutDevice>();
             await Task.Run(() =>
             {
+                // Wasapi
+                var enumerator = new MMDeviceEnumerator();
+                try
+                {
+                    // 添加默认设备
+                    outDevices.Add(GetWasapiDefaultDevice(enumerator));
+                }
+                catch { }
+
+                foreach (var wasapi in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
+                {
+                    OutDevice outDevice = new(OutApi.Wasapi, wasapi.ID, wasapi.FriendlyName);
+                    outDevice.SampleRate = wasapi.AudioClient.MixFormat.SampleRate;
+                    outDevice.Channels = wasapi.AudioClient.MixFormat.Channels;
+                    outDevices.Add(outDevice);
+                }
+                enumerator.Dispose();
+                if (outDevices.Count < 2) outDevices.Clear(); // 当只有默认播放设备时，直接认为此 api 没有输出设备
+
                 // WaveOut
                 for (int n = -1; n < WaveOut.DeviceCount; n++)
                 {
                     var wocb = WaveOut.GetCapabilities(n);
                     string name = wocb.ProductName;
-                    OutDevice outDevice = new OutDevice(OutApi.WaveOut, n, name) { IsDefaultDevice = name == "Microsoft 声音映射器" || name == "Microsoft Sound Mapper" };
+                    OutDevice outDevice = new(OutApi.WaveOut, n, name) { IsDefaultDevice = name == "Microsoft 声音映射器" || name == "Microsoft Sound Mapper" };
                     outDevices.Add(outDevice);
-                }
-                if (outDevices.Count < 2) outDevices.Clear();
-
-                // DirectSound
-                foreach (var dev in DirectSoundOut.Devices)
-                {
-                    string name = dev.Description;
-                    OutDevice outDevice = new OutDevice(OutApi.DirectSound, dev, name) { IsDefaultDevice = name == "主声音驱动程序" };
-
-                    if (dev != null)
-                        foreach (var device in outDevices)
-                        {
-                            if (device != outDevice)
-                            {
-                                outDevices.Add(outDevice);
-                                break;
-                            }
-                        }
                 }
                 if (outDevices.Count < 2) outDevices.Clear();
 
                 if (outDevices.Any())
                 {
-                    // Wasapi
-                    var enumerator = new MMDeviceEnumerator();
-                    try
+                    // DirectSound
+                    foreach (var dev in DirectSoundOut.Devices)
                     {
-                        // 添加默认设备
-                        outDevices.Add(GetWasapiDefaultDevice(enumerator));
-                    }
-                    catch { }
+                        string name = dev.Description;
+                        OutDevice outDevice = new(OutApi.DirectSound, dev, name) { IsDefaultDevice = name == "主声音驱动程序" };
 
-                    foreach (var wasapi in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
-                    {
-                        OutDevice outDevice = new OutDevice(OutApi.Wasapi, wasapi.ID, wasapi.FriendlyName);
-                        outDevice.SampleRate = wasapi.AudioClient.MixFormat.SampleRate;
-                        outDevice.Channels = wasapi.AudioClient.MixFormat.Channels;
-                        outDevices.Add(outDevice);
+                        if (dev != null)
+                            foreach (var device in outDevices)
+                            {
+                                if (device != outDevice)
+                                {
+                                    outDevices.Add(outDevice);
+                                    break;
+                                }
+                            }
                     }
-                    enumerator.Dispose();
-
                     // Asio
                     var asioNames = AsioOut.GetDriverNames().ToList();
                     foreach (var asio in asioNames)
                     {
-                        OutDevice outDevice = new OutDevice(OutApi.Asio, asioNames.IndexOf(asio), asio);
+                        OutDevice outDevice = new(OutApi.Asio, asioNames.IndexOf(asio), asio);
                         outDevices.Add(outDevice);
                     }
 
                 }
-                if (!outDevices.Any())
+
+                if (outDevices.Count == 0)
                 {
                     outDevices.Add(new(OutApi.None, null, "无音频输出设备"));
                 }
@@ -169,22 +170,25 @@ namespace TewiMP.Media
             if (outDevice.DeviceType == OutApi.Wasapi) return outDevice;
             if (outDevice.DeviceType == OutApi.Asio) return null;
             var outDevices = await GetOutDevicesAsync();
-            int audioOutDeviceCount = 0;
-            foreach (var device in outDevices)
-            {
-                if (device.DeviceType == OutApi.Wasapi) audioOutDeviceCount++;
-            }
+            if (outDevice.IsDefaultDevice) return outDevices[0]; // 第一个默认为 Wasapi 的默认输出设备
 
             OutDevice result = null;
-            switch (outDevice.DeviceType)
+            double lastDiff = 0;
+            foreach (var device in outDevices)
             {
-                case OutApi.WaveOut:
-                    result = outDevices[outDevices.IndexOf(App.Instance.AudioPlayer.NowOutDevice) + audioOutDeviceCount * 2];
-                    break;
-                case OutApi.DirectSound:
-                    result = outDevices[outDevices.IndexOf(App.Instance.AudioPlayer.NowOutDevice) + audioOutDeviceCount];
-                    break;
+                if (device.DeviceType == OutApi.Wasapi)
+                {
+                    var diff = device.DeviceName.GetSimilarity(outDevice.DeviceName); // 比对字符串相似度，相似度最高的认为是同一个设备
+                    LogManager.LogDebug($"device: {device.DeviceName} / {outDevice.DeviceName}, by {diff}");
+                    if (diff > lastDiff)
+                    {
+                        lastDiff = diff;
+                        result = device;
+                    }
+                }
             }
+
+            LogManager.LogDebug($"Final device: {result.DeviceName}, by {lastDiff}");
             return result;
         }
     }

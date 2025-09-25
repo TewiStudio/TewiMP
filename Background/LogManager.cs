@@ -43,6 +43,7 @@ namespace TewiMP.Background
         public static void Info(string name, string content) => Log(name, content, LogLevel.Info);
         public static void Warning(string name, string content) => Log(name, content, LogLevel.Warning);
         public static void Error(string name, string content) => Log(name, content, LogLevel.Error);
+        public static void LogDebug(string content) => Log("Debug", content, LogLevel.Info);
         public static TimeSpan Elapsed(string name, string content, DateTime lastTime)
         {
             var elapsedTime = DateTime.Now - lastTime;
