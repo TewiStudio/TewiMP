@@ -92,7 +92,11 @@
                                                 <TextBlock x:Name="Title2_Text"
                                                            TextWrapping="WrapWholeWords"
                                                            TextTrimming="CharacterEllipsis"
-                                                           FontSize="20" Margin="0,0,0,4"/>
+                                                           Margin="0,0,0,4">
+                                                    <Run x:Name="Title2" FontSize="20"/>
+                                                    <Run x:Name="ReleaseTime"
+                                                         Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
+                                                </TextBlock>
                                                 <TextBlock x:Name="DescribeeText"
                                                            TextWrapping="WrapWholeWords"
                                                            TextTrimming="CharacterEllipsis"

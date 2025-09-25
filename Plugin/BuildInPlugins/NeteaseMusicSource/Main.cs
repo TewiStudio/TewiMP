@@ -93,7 +93,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                 ID = (string)json["id"],
                 PicturePath = (string)json["picUrl"],
                 Describe = (string)json["description"],
-                ReleaseTime = (string)json["publishTime"],
+                ReleaseTime = ((long)json["publishTime"]).ToDateTimeFromMillisecondsUnix(),
                 From = MusicFrom.pluginMusicSource,
                 PluginInfo = PluginInfo
             };
@@ -155,6 +155,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
             var datas = new List<MusicData>();
             foreach (JObject md in token)
             {
+                // 获取艺术家列表
                 List<Artist> artists = new();
                 foreach (var artist in md["ar"])
                 {
@@ -167,6 +168,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                     });
                 }
 
+                // 获取专辑封面
                 string pic = null;
                 if ((md["al"] as JObject).ContainsKey("picUrl"))
                 {
@@ -177,6 +179,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                     pic = null;
                 }
 
+                // 获取专辑信息
                 Album album = new(
                     (string)md["al"]["name"], (string)md["al"]["id"], pic)
                 {
@@ -184,15 +187,16 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                     PluginInfo = PluginInfo
                 };
 
+                // 获取发行时间
                 DateTime? dateTime = null;
                 bool dateTickComplete = long.TryParse((string)md["publishTime"], out var dateTick);
-                if (dateTick != 0)
+                if (dateTickComplete && dateTick != 0L)
                 {
-                    DateTime? resultDateTime = dateTickComplete ? CodeHelper.UnixGetTime(dateTick, true) : null;
-                    dateTime =
-                        md.ContainsKey("publishTime") ? resultDateTime : null;
+                    DateTime resultDateTime = dateTick.ToDateTimeFromMillisecondsUnix();
+                    dateTime = resultDateTime;
                 }
 
+                // 创建 MusicData 对象
                 MusicData data = new(
                     (string)md["name"],
                     (string)md["id"],
@@ -202,8 +206,10 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                     PluginInfo = PluginInfo
                 };
 
+                // 获取翻译信息
                 if (md.ContainsKey("tns"))
                     data.Title2 = (string)md["tns"].First();
+
                 datas.Add(data);
             }
             return datas;
@@ -417,7 +423,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                         if (pls["code"].ToString() == "200")
                         {
                             MusicListData musicListData = GetMusicListDataFromJson(pls["playlist"]);
-                            if (musicListData.Songs.Any()) return musicListData;
+                            if (musicListData.Songs.Count != 0) return musicListData;
                         }
                         else
                         {

@@ -120,7 +120,7 @@ namespace TewiMP.DataEditor
         public string ID { get; set; }
         public string PicturePath { get; set; }
         public string Describe { get; set; }
-        public string ReleaseTime { get; set; }
+        public DateTime ReleaseTime { get; set; }
         public int Count { get; set; }
         public MusicFrom From { get; set; }
         public PluginInfo PluginInfo { get; set; }
@@ -424,6 +424,7 @@ namespace TewiMP.DataEditor
         public DataType ListDataType { get; set; }
         public string ID { get; set; }
         public PlaySort PlaySort { get; set; }
+        public DateTime CreationTime { get; set; } = DateTime.Now;
         public List<MusicData> Songs { get; set; }
 
         public MusicListData(string listName = null, string listShowName = null, string picturePath = null,

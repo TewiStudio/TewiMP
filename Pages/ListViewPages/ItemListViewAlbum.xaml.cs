@@ -132,12 +132,16 @@ namespace TewiMP.Pages
             }
             NavToObj = obj;
             musicListData = NavToObj.Songs;
-            if (string.IsNullOrEmpty(obj.Title2))
+            if (string.IsNullOrEmpty(obj.Title2) && obj.ReleaseTime == DateTime.MinValue)
             {
                 Title2_Text.Visibility = Visibility.Collapsed;
             }
             else
-                Title2_Text.Text = obj.Title2;
+            {
+                Title2_Text.Visibility = Visibility.Visible;
+                Title2.Text = obj.Title2;
+                ReleaseTime.Text = string.IsNullOrEmpty(obj.Title2) ? $"发布日期：{obj.ReleaseTime}" : $"\n发布日期：{obj.ReleaseTime}";
+            }
 
             if (musicListData != null)
             {

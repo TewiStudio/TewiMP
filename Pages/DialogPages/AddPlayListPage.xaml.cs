@@ -79,6 +79,13 @@ namespace TewiMP.Pages.DialogPages
                         }
                     }
                 }
+                else
+                {
+                    App.MainWindowInstance.AddNotify(
+                        "无法添加播放列表",
+                        "获取不到列表数据，请重试。",
+                        NotifySeverity.Error);
+                }
             }
             ResultEvent -= AddPlayListPage_ResultEvent;
         }

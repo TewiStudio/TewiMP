@@ -717,11 +717,29 @@ namespace TewiMP
             return timestamp;
         }
 
-        public static DateTime ToDateTime(this long unix)
+        public static DateTime ToDateTimeFromUnix(this long unix)
         {
             DateTime startTime = TimeZone.CurrentTimeZone.ToLocalTime(new DateTime(1970, 1, 1));
             var time = startTime.AddSeconds(unix);
             return time;
+        }
+
+        /// <summary>
+        /// 将毫秒级 Unix 时间戳转换为 DateTime (本地时间)
+        /// </summary>
+        public static DateTime ToDateTimeFromMillisecondsUnix(this long timestamp)
+        {
+            // Unix 时间戳起点：1970-01-01 00:00:00 UTC
+            DateTimeOffset dto = DateTimeOffset.FromUnixTimeMilliseconds(timestamp);
+            return dto.ToLocalTime().DateTime;
+        }
+
+        /// <summary>
+        /// 将 DateTime 转换为毫秒级 Unix 时间戳
+        /// </summary>
+        public static long ToUnixTimeMilliseconds(this DateTime dateTime)
+        {
+            return new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeMilliseconds();
         }
     }
 }
