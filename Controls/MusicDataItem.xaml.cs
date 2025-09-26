@@ -108,7 +108,8 @@ namespace TewiMP.Controls
             Info_Texts_CountRun.Text = songItemBind.MusicData.Count == 0 ? null : $"{songItemBind.MusicData.Count}. ";
             Info_Texts_TitleRun.Text = songItemBind.MusicData.Title;
             Info_Texts_Title2Run.Text = $" {songItemBind.MusicData.Title2}";
-            Info_Texts_ButtonNameTextBlock.Text = songItemBind.MusicData.ButtonName;
+            Info_Texts_ButtonNameTextBlock.Text = 
+                songItemBind.MusicListData?.ListDataType == DataType.×¨¼­ ? songItemBind.MusicData.ArtistName : songItemBind.MusicData.ButtonName;
         }
 
         int initImageCallCount = 0;
@@ -148,11 +149,11 @@ namespace TewiMP.Controls
             }
 
             MusicData musicData = songItemBind.MusicData;
-            ImageSource result = null;
+            Uri result = null;
 
             if (isExists)
             {
-                var bitmapTuple = await ImageManage.GetImageSource(musicData, (int)(56 * App.MainWindowInstance.NowDPI), (int)(56 * App.MainWindowInstance.NowDPI), true);
+                var bitmapTuple = await ImageManage.GetImageUri(musicData);
                 result = bitmapTuple.Item1;
                 FileNotExists_Root.Visibility = Visibility.Collapsed;
             }

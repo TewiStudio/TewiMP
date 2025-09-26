@@ -24,9 +24,13 @@
         x:Name="root"
         CornerRadius="{Binding ElementName=control,Path=CornerRadius}">
         <Image
-            x:Name="Image_Control"
+            x:Name="Image_Control" ImageOpened="Image_Control_ImageOpened"
             HorizontalAlignment="{Binding ElementName=control, Path=HorizontalAlignment}"
-            VerticalAlignment="{Binding ElementName=control, Path=VerticalAlignment}"/>
+            VerticalAlignment="{Binding ElementName=control, Path=VerticalAlignment}">
+            <Image.Source>
+                <BitmapImage x:Name="Image_ControlSources"/>
+            </Image.Source>
+        </Image>
         <Rectangle x:Name="Image_GammaMass">
             <Rectangle.Fill>
                 <brushs:BackdropGammaTransferBrush

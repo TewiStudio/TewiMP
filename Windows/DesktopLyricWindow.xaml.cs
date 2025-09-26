@@ -903,7 +903,7 @@ namespace TewiMP.Windowed
             App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged1;
         }
 
-        private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string path)
+        private void PlayingList_NowPlayingImageLoaded(Uri imageSource, string path)
         {
             MusicControl_Image.Source = imageSource;
         }

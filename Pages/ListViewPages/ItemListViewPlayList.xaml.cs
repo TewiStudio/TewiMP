@@ -330,16 +330,16 @@ namespace TewiMP.Pages
             {
                 bool isExists = true;
                 await Task.Run(() => { isExists = File.Exists(NavToObj.PicturePath); });
-                if (isExists) PlayList_Image.Source = await FileHelper.GetImageSource(NavToObj.PicturePath);
+                if (isExists) PlayList_Image.Source = NavToObj.PicturePath.ToImageUri();
             }
             else if (NavToObj.ListDataType == DataType.歌单)
             {
-                PlayList_Image.Source = (await ImageManage.GetImageSource(NavToObj)).Item1;
+                PlayList_Image.Source = (await ImageManage.GetImageUri(NavToObj)).Item1;
             }
             if (NavToObj is null) return;
             if (PlayList_Image.Source is null)
             {
-                PlayList_Image.Source = await FileHelper.GetImageSource("");
+                PlayList_Image.Source ="".ToImageUri();
             }
             PlayList_Image.SaveName = NavToObj?.ListShowName;
             PlayList_Image.BorderThickness = new(1);

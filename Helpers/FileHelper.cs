@@ -75,7 +75,7 @@ namespace TewiMP.Helpers
         /// !=null - 图片缓存文件路径 /
         /// null - 未查询到图片缓存
         /// </returns>
-        public static async Task<string> GetImageCache(DataEditor.MusicData musicData)
+        public static async Task<string> GetImageCachePath(DataEditor.MusicData musicData)
         {
             var filename = musicData.From == DataEditor.MusicFrom.localMusic ?
                 $"{musicData.From}{musicData.MD5.Replace(@"/", "#")}" :
@@ -134,37 +134,17 @@ namespace TewiMP.Helpers
             });
         }
 
-        public static async Task<ImageSource> GetImageSource(string filePath, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
+        public static Uri ToImageUri(this string filePath)
         {
             //System.Diagnostics.LogManager.Log(filePath);
             if (string.IsNullOrEmpty(filePath))
             {
                 filePath = @"ms-appx:///Images/icon.png";
-                return GetImageSource(new Uri(filePath), decodePixelWidth, decodePixelHeight);
             }
-            else if (Path.GetExtension(filePath) == ".gif" || useBitmapImage)
-            {
-                return GetImageSource(new Uri(filePath), decodePixelWidth, decodePixelHeight);
-            }
-            else
-            {
-                try
-                {
-                    return await OpenWriteableBitmapFile(await StorageFile.GetFileFromPathAsync(filePath));
-                }
-                catch
-                {
-                    return null;
-                }
-            }
+            return new Uri(filePath);
         }
 
-        public static ImageSource GetImageSource(Uri fileUri, int decodePixelWidth = 0, int decodePixelHeight = 0)
-        {
-            return new BitmapImage(fileUri) { DecodePixelWidth = decodePixelWidth, DecodePixelHeight = decodePixelHeight };
-        }
-
-        private static async Task<WriteableBitmap> OpenWriteableBitmapFile(StorageFile file)
+        public static async Task<(WriteableBitmap, IRandomAccessStream)> OpenWriteableBitmapFile(StorageFile file)
         {
             using IRandomAccessStream stream = await file.OpenAsync(FileAccessMode.Read);
             BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
@@ -174,7 +154,7 @@ namespace TewiMP.Helpers
             //pixelWidth == 0 ? (int)decoder.PixelWidth : pixelWidth,
             //pixelHeight == 0 ? (int)decoder.PixelHeight : pixelHeight);
             await image.SetSourceAsync(stream);
-            return image;
+            return (image, stream);
         }
 
         public static async Task<IReadOnlyList<StorageFile>> UserSelectFiles(

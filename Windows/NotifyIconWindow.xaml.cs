@@ -242,7 +242,7 @@ namespace TewiMP.Windowed
             MPV.PlaybackState = audioPlayer.PlaybackState;
         }
 
-        private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string path)
+        private void PlayingList_NowPlayingImageLoaded(Uri imageSource, string path)
         {
             if (imageSource == LogoImage.Source) return;
             LogoImage.Source = imageSource;

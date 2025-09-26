@@ -64,8 +64,8 @@ namespace TewiMP.Pages.MusicPages
             }
         }
 
-        private ImageSource _imageSources = null;
-        public ImageSource ImageSources
+        private Uri _imageSources = null;
+        public Uri ImageSources
         {
             get => _imageSources;
             set
@@ -209,7 +209,7 @@ namespace TewiMP.Pages.MusicPages
             }*/
         }
 
-        private void PlayingList_NowPlayingImageLoading(ImageSource imageSource, string _)
+        private void PlayingList_NowPlayingImageLoading(Uri imageSource, string _)
         {
             /*if (App.Instance.audioPlayer.MusicData?.AlbumID != MusicData?.AlbumID)
             {
@@ -222,7 +222,7 @@ namespace TewiMP.Pages.MusicPages
         }
 
         string imagePath;
-        private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
+        private void PlayingList_NowPlayingImageLoaded(Uri imageSource, string _)
         {
             UpdateAccentColor();
             imagePath = _;

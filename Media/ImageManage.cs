@@ -42,7 +42,7 @@ namespace TewiMP.Media
             return error;
         }
 
-        public static Dictionary<OnlyClass, Tuple<ImageSource, string>> localImageCache { get; set; } = new();
+        public static Dictionary<OnlyClass, Tuple<Uri, string>> localImageCache { get; set; } = new();
         /// <summary>
         /// 返回musicData对应的图像对象和图像所在的本地路径
         /// </summary>
@@ -52,11 +52,11 @@ namespace TewiMP.Media
         /// <param name="useBitmapImage"></param>
         /// <returns>
         /// <list type="table">
-        /// <item>T1: ImageSource，图像对象</item>
-        /// <item>T2: string，图像在本地的路径</item>
+        /// <item>T1: <see cref="Uri"/>，图像对象</item>
+        /// <item>T2: <see cref="string">，图像在本地的路径</item>
         /// </list>
         /// </returns>
-        public static async Task<Tuple<ImageSource, string>> GetImageSource(MusicData musicData, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
+        public static async Task<Tuple<Uri, string>> GetImageUri(MusicData musicData)
         {
             foreach (var imageCache in localImageCache)
             {
@@ -67,9 +67,9 @@ namespace TewiMP.Media
                 }
             }
 
-            ImageSource source = null;
+            Uri source = null;
             string resultPath = null;
-            resultPath = await FileHelper.GetImageCache(musicData);
+            resultPath = await FileHelper.GetImageCachePath(musicData);
 
             if (musicData.From == MusicFrom.localMusic)
             {
@@ -86,26 +86,26 @@ namespace TewiMP.Media
                             f.Close();
                             f.Dispose();
                         });
-                        source = await FileHelper.GetImageSource(b, decodePixelWidth, decodePixelHeight, useBitmapImage);
+                        source = b.ToImageUri();
                     }
                     else
                     {
-                        string coverPath = await Task.Run(() =>
+                        Uri coverPath = await Task.Run(() =>
                         {
                             FileInfo fileInfo = new FileInfo(musicData.InLocal);
                             string coverPath = $"{fileInfo.DirectoryName}\\Cover.jpg";
-                            if (File.Exists(coverPath)) return coverPath;
+                            if (File.Exists(coverPath)) return new Uri(coverPath);
                             else return null;
                         });
                         if (coverPath != null)
                         {
-                            source = await FileHelper.GetImageSource(coverPath, decodePixelWidth, decodePixelHeight, useBitmapImage);
+                            source = coverPath;
                         }
                     }
                 }
                 else
                 {
-                    source = await FileHelper.GetImageSource(resultPath, decodePixelWidth, decodePixelHeight, useBitmapImage);
+                    source = new(resultPath);
                 }
             }
             else
@@ -142,7 +142,7 @@ namespace TewiMP.Media
 
                 try
                 {
-                    source = await FileHelper.GetImageSource(resultPath, decodePixelWidth, decodePixelHeight, useBitmapImage);
+                    source = new(resultPath);
                 }
                 finally
                 {
@@ -151,7 +151,7 @@ namespace TewiMP.Media
                 }
             }
 
-            Tuple<ImageSource, string> resultTuple = new(source, resultPath);
+            Tuple<Uri, string> resultTuple = new(source, resultPath);
             //localImageCache.Add(musicData, resultTuple);
             return resultTuple;
         }
@@ -164,7 +164,7 @@ namespace TewiMP.Media
         /// <param name="decodePixelHeight"></param>
         /// <param name="useBitmapImage"></param>
         /// <returns>Item1 为 ImageSource，Item2 为获取到 ImageSource 的文件路径</returns>
-        public static async Task<Tuple<ImageSource, string>> GetImageSource(MusicListData musicListData, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
+        public static async Task<Tuple<Uri, string>> GetImageUri(MusicListData musicListData, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
         {
             if (musicListData is null) return null;
 
@@ -203,9 +203,9 @@ namespace TewiMP.Media
                 }
             }
 
-            var source = await FileHelper.GetImageSource(resultPath, decodePixelWidth, decodePixelHeight, useBitmapImage);
+            var source = resultPath.ToImageUri();
 
-            Tuple<ImageSource, string> resultTuple = new(source, resultPath);
+            Tuple<Uri, string> resultTuple = new(source, resultPath);
             //localImageCache.Add(musicListData, resultTuple);
             return resultTuple;
         }

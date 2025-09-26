@@ -171,16 +171,16 @@ namespace TewiMP.Pages
             AlbumLogo.BorderThickness = new(0);
             if (musicListData.ListDataType == DataType.本地歌单)
             {
-                Album_Image.Source = await FileHelper.GetImageSource(musicListData.PicturePath);
+                Album_Image.Source = musicListData.PicturePath.ToImageUri();
             }
             else if (musicListData.ListDataType == DataType.歌单)
             {
-                Album_Image.Source =(await ImageManage.GetImageSource(musicListData)).Item1;
+                Album_Image.Source =(await ImageManage.GetImageUri(musicListData)).Item1;
             }
             else if (musicListData.ListDataType == DataType.专辑)
             {
                 var art = NavToObj;
-                Album_Image.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(art.PicturePath));
+                Album_Image.Source = new Uri(art.PicturePath);
             }
             AlbumLogo.Source = Album_Image.Source;
             AlbumLogo.SaveName = NavToObj.Title;

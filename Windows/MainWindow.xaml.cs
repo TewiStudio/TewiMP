@@ -152,7 +152,7 @@ namespace TewiMP
                     BackgroundImageRoot.Visibility = Visibility.Visible;
                     BackgroundColor.Visibility = Visibility.Visible;
                     BackgroundMass.Visibility = Visibility.Visible;
-                    if (ImagePath is not null) BackgroundImage.Source = FileHelper.GetImageSource(new Uri(ImagePath));
+                    if (ImagePath is not null) BackgroundImageSource.UriSource = new Uri(ImagePath);
                     SystemBackdrop = null;
                     break;
                 case BackdropType.DefaultColor:
@@ -928,12 +928,12 @@ namespace TewiMP
         }
 
         static bool isDeleteImage = true;
-        private static void PlayingList_NowPlayingImageLoading(ImageSource imageSource, string _)
+        private static void PlayingList_NowPlayingImageLoading(Uri imageSource, string _)
         {
 
         }
 
-        public void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string _)
+        public void PlayingList_NowPlayingImageLoaded(Uri imageSource, string _)
         {
             var im = PlayContent.Content as ImageEx;
             if (im is null) return;

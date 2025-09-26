@@ -1,27 +1,28 @@
-﻿using System;
-using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
-using TewiMP.Helpers;
-using System.Threading.Tasks;
+﻿using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
-using Microsoft.UI.Windowing;
-using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
-using Windows.Storage;
-using TewiMP.DataEditor;
-using WinRT.Interop;
-using Windows.UI;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using TewiMP.Background;
+using TewiMP.DataEditor;
+using TewiMP.Helpers;
+using Windows.Graphics.Imaging;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.UI;
+using WinRT.Interop;
 
 namespace TewiMP.Windowed
 {
     public partial class ImageViewerWindow : Window
     {
-        public static ImageViewerWindow ShowWindow(ImageSource image, string saveName = null)
+        public static ImageViewerWindow ShowWindow(Uri image, string saveName = null)
         {
             var window = new ImageViewerWindow();
             window.SetSource(image);
@@ -42,7 +43,7 @@ namespace TewiMP.Windowed
         }
 
         OverlappedPresenter overlappedPresenter = null;
-
+        IRandomAccessStream storageFileStream;
         static bool IsOpened = false;
         public ImageViewerWindow()
         {
@@ -57,9 +58,9 @@ namespace TewiMP.Windowed
             overlappedPresenter.Maximize();
         }
 
-        public void SetSource(ImageSource imageSource)
+        public void SetSource(Uri imageSource)
         {
-            ImageControl.Source = imageSource;
+            ImageControl_Source.UriSource = imageSource;
         }
 
         public string SaveName { get; set; }
@@ -92,38 +93,24 @@ namespace TewiMP.Windowed
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            StorageFile f = null;
+            StorageFile targetFile = null;
 
-            if (ImageControl.Source.GetType() == typeof(WriteableBitmap))
+            //if (ImageControl.Source.GetType() == typeof(WriteableBitmap))
+            if (true)
             {
-                f = await FileHelper.UserSaveFile(SaveName is null ? "一张图片" : SaveName, Windows.Storage.Pickers.PickerLocationId.PicturesLibrary, [".png"], "图片",
-                    windowHandle: WindowNative.GetWindowHandle(this)
-                    );
+                targetFile = await FileHelper.UserSaveFile(SaveName is null ? "一张图片" : SaveName, Windows.Storage.Pickers.PickerLocationId.PicturesLibrary, [".png", ".gif"], "图片",
+                    windowHandle: WindowNative.GetWindowHandle(this));
             }
             else
             {
                 await ShowDialog("无法保存图片", "不支持保存此类型的图片。");
             }
-
-            if (f != null)
+            var sourceFile = await StorageFile.GetFileFromPathAsync(ImageControl_Source.UriSource.LocalPath);
+            if (targetFile != null)
             {
                 try
                 {
-                    using (IRandomAccessStream stream = await f.OpenAsync(FileAccessMode.ReadWrite))
-                    {
-                        WriteableBitmap wb = ImageControl.Source as WriteableBitmap;
-                        BitmapEncoder encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, stream);
-                        Stream pixelStream = wb.PixelBuffer.AsStream();
-                        byte[] pixels = new byte[pixelStream.Length];
-                        await pixelStream.ReadAsync(pixels, 0, pixels.Length);
-
-                        encoder.SetPixelData(BitmapPixelFormat.Bgra8, BitmapAlphaMode.Ignore,
-                                            (uint)wb.PixelWidth,
-                                            (uint)wb.PixelHeight,
-                                            96.0, 96.0,
-                                            pixels);
-                        await encoder.FlushAsync();
-                    }
+                    await sourceFile.CopyAndReplaceAsync(targetFile);
                 }
                 catch (Exception err)
                 {
@@ -170,6 +157,11 @@ namespace TewiMP.Windowed
             {
                 ImageScrollView.VerticalScrollMode = ScrollMode.Enabled;
             }
+        }
+
+        private void Grid_Unloaded(object sender, RoutedEventArgs e)
+        {
+            storageFileStream.Dispose();
         }
     }
 }

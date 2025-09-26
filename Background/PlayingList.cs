@@ -38,7 +38,7 @@ namespace TewiMP.Background
         public delegate void PlayingListItemChangeDelegate(ObservableCollection<MusicData> nowPlayingList);
         public event PlayingListItemChangeDelegate PlayingListItemChange;
 
-        public delegate void NowPlayingImageChangeDelegate(ImageSource imageSource, string path);
+        public delegate void NowPlayingImageChangeDelegate(Uri imageSource, string path);
         public event NowPlayingImageChangeDelegate NowPlayingImageLoading;
         public event NowPlayingImageChangeDelegate NowPlayingImageLoaded;
 
@@ -64,8 +64,8 @@ namespace TewiMP.Background
             }
         }
 
-        ImageSource _nowPlayingImage;
-        public ImageSource NowPlayingImage
+        Uri _nowPlayingImage;
+        public Uri NowPlayingImage
         {
             get => _nowPlayingImage;
             set
@@ -174,10 +174,10 @@ namespace TewiMP.Background
 
             NowPlayingImageLoading?.Invoke(null, null);
             string path;
-            ImageSource a = null;
+            Uri a = null;
 
-            var _ = await ImageManage.GetImageSource(audioPlayer.MusicData);
-            var thumbnail = await ImageManage.GetImageSource(audioPlayer.MusicData);
+            var _ = await ImageManage.GetImageUri(audioPlayer.MusicData);
+            var thumbnail = await ImageManage.GetImageUri(audioPlayer.MusicData);
             a = _.Item1;
             path = _.Item2;
 

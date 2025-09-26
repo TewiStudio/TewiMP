@@ -284,7 +284,7 @@ namespace TewiMP.Windowed
             App.Instance.PlayingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
         }
 
-        private void PlayingList_NowPlayingImageLoaded(ImageSource imageSource, string path)
+        private void PlayingList_NowPlayingImageLoaded(Uri imageSource, string path)
         {
             App.Instance.PlayingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
             SetTaskbarImage(path);

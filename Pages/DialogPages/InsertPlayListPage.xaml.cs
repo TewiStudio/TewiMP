@@ -69,11 +69,11 @@ namespace TewiMP.Pages.DialogPages
             int size = 0;
             if (ml.ListDataType == DataType.本地歌单)
             {
-                image.Source = await FileHelper.GetImageSource(ml.PicturePath, size, size, true);
+                image.Source = ml.PicturePath.ToImageUri();
             }
             else if (ml.ListDataType == DataType.歌单)
             {
-                var imageSources = await ImageManage.GetImageSource(ml, size, size, true);
+                var imageSources = await ImageManage.GetImageUri(ml, size, size, true);
                 image.Source = imageSources.Item1;
             }
         }

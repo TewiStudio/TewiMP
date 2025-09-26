@@ -32,7 +32,7 @@ namespace TewiMP.Controls
                 case SearchBindDataType.Artist:
                     if (DataContext.Artist != null)
                     {
-                        Img.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(DataContext.Artist.PicturePath));
+                        Img.Source = new Uri(DataContext.Artist.PicturePath);
                         Title.Text = DataContext.Artist.Name;
                         SubTitle.Text = DataContext.Artist.Name2;
                     }
@@ -40,7 +40,7 @@ namespace TewiMP.Controls
                 case SearchBindDataType.Album:
                     if (DataContext.Album != null)
                     {
-                        Img.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(DataContext.Album.PicturePath));
+                        Img.Source = new Uri(DataContext.Album.PicturePath);
                         Title.Text = $"{DataContext.Album.Title}";
                         Title2.Text = $" {DataContext.Album.Title2}";
                         SubTitle.Text = $"{DataContext.Album.ArtistName}";
@@ -49,7 +49,7 @@ namespace TewiMP.Controls
                 case SearchBindDataType.PlayList:
                     if (DataContext.PlayList != null)
                     {
-                        Img.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(DataContext.PlayList.PicturePath));
+                        Img.Source = new Uri(DataContext.PlayList.PicturePath);
                         Title.Text = DataContext.PlayList.ListShowName;
                         SubTitle.Text = $"{DataContext.PlayList_Count} 首歌曲";
                     }

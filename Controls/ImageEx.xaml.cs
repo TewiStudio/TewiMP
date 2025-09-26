@@ -6,6 +6,9 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
 using TewiMP.Helpers;
 using System.Collections;
+using System;
+using System.Threading.Tasks;
+using TewiMP.Background;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -21,19 +24,19 @@ namespace TewiMP.Controls
         public static readonly DependencyProperty SourceProperty =
             DependencyProperty.Register(
                 "Source",
-                typeof(ImageSource),
+                typeof(Uri),
                 typeof(ImageEx),
                 new(null, OnImageSourceChanged)
                 );
-        public ImageSource Source
+        public Uri Source
         {
-            get { return GetValue(SourceProperty) as ImageSource; }
+            get { return GetValue(SourceProperty) as Uri; }
             set { SetValue(SourceProperty, value); }
         }
         private static void OnImageSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             ImageEx ie = d as ImageEx;
-            var value = e.NewValue as ImageSource;
+            var value = e.NewValue as Uri;
             ie.SetImageSource(value);
         }
         
@@ -44,6 +47,10 @@ namespace TewiMP.Controls
         }
         public PointInBehaviors PointInBehavior { get; set; } = PointInBehaviors.Tapped;
         public string SaveName { get; set; } = null;
+        /// <summary>
+        /// 为 true 时图片切换时不会等到下一张图片加载完成后再显示动画
+        /// </summary>
+        public bool SwitchImageImmediateSetOpacity { get; set; } = false;
 
         ArrayList array = null;
         public ImageEx()
@@ -53,8 +60,8 @@ namespace TewiMP.Controls
         }
 
         bool isInitedVisuals = false;
+        Visual controlVisual;
         Visual rootVisual;
-        Visual imageVisual;
         Visual gammaMassVisual;
         ScalarKeyFrameAnimation animationOpacity_SourceChanged = null;
         ScalarKeyFrameAnimation animationMassOpacity_MouseIn = null;
@@ -68,15 +75,15 @@ namespace TewiMP.Controls
             isInitedVisuals = true;
             root_Background.Visibility = Visibility.Collapsed;
 
+            controlVisual = ElementCompositionPreview.GetElementVisual(control);
             rootVisual = ElementCompositionPreview.GetElementVisual(root);
-            imageVisual = ElementCompositionPreview.GetElementVisual(Image_Control);
             gammaMassVisual = ElementCompositionPreview.GetElementVisual(Image_GammaMass);
             rootVisual.Opacity = 1;
             gammaMassVisual.Opacity = 0;
 
             // 图片源切换动画
             AnimateHelper.AnimateScalar(
-                rootVisual, 1, 02, 
+                controlVisual, 1, 02, 
                 0.2f, 1, 0.22f, 1f,
                 out animationOpacity_SourceChanged);
             // 鼠标移入遮罩动画
@@ -111,12 +118,11 @@ namespace TewiMP.Controls
                 out animationSize_MouseReleased);
         }
 
-        private void SetImageSource(ImageSource imageSource)
+        private void SetImageSource(Uri imageSource)
         {
-            if (imageVisual is null) return;
-            if (isInitedVisuals) imageVisual.Opacity = 0;
-            imageVisual.StartAnimation("Opacity", animationOpacity_SourceChanged);
-            Image_Control.Source = imageSource;
+            if (controlVisual is null) return;
+            if (isInitedVisuals || SwitchImageImmediateSetOpacity)controlVisual.Opacity = 0;
+            Image_ControlSources.UriSource = imageSource;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -136,7 +142,7 @@ namespace TewiMP.Controls
             animationSize_MousePressed?.Dispose();
             animationSize_MouseReleased?.Dispose();
             rootVisual = null;
-            imageVisual = null;
+            controlVisual = null;
             gammaMassVisual = null;
             animationOpacity_SourceChanged = null;
             animationMassOpacity_MouseIn = null;
@@ -152,7 +158,7 @@ namespace TewiMP.Controls
             if (IsMouse4Click) { IsMouse4Click = false; return; }
             if (PointInBehavior == PointInBehaviors.None || PointInBehavior == PointInBehaviors.OnlyLightUp) return;
             //if (e.PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
-            Windowed.ImageViewerWindow.ShowWindow(Source, SaveName);
+            Windowed.ImageViewerWindow.ShowWindow(Image_ControlSources.UriSource, SaveName);
         }
 
         bool isPointEnter = false;
@@ -209,6 +215,12 @@ namespace TewiMP.Controls
         {
             if (rootVisual is null) return;
             rootVisual.CenterPoint = new((float)ActualWidth / 2, (float)ActualHeight / 2, 1);
+        }
+
+        // 图片加载完成时加入淡入动画
+        private void Image_Control_ImageOpened(object sender, RoutedEventArgs e)
+        {
+            controlVisual.StartAnimation("Opacity", animationOpacity_SourceChanged);
         }
 
         private void ImageEx_Completed(object sender, CompositionBatchCompletedEventArgs args)

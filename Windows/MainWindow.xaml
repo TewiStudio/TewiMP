@@ -57,7 +57,11 @@
                 x:FieldModifier="Public"
                 Stretch="UniformToFill"
                 VerticalAlignment="Center"
-                HorizontalAlignment="Center"/>
+                HorizontalAlignment="Center">
+                <Image.Source>
+                    <BitmapImage x:Name="BackgroundImageSource"/>
+                </Image.Source>
+            </Image>
         </Grid>
 
         <Rectangle

@@ -7,7 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:helper="using:TewiMP.Helpers"
-    xmlns:ui="using:CommunityToolkit.WinUI.UI"
+    xmlns:ui="using:CommunityToolkit.WinUI.Controls"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     mc:Ignorable="d" SizeChanged="Result_BaseGrid_SizeChanged">
 
@@ -86,24 +86,37 @@
                                             <TextBlock x:Name="AlbumTitle_Text" Style="{ThemeResource SubTBHeader}" Text="{Binding NavToObj.Title}"
                                                        IsTextSelectionEnabled="True"/>
                                         </controlszn:AutoScrollView>
-                                        <ScrollView x:Name="DescribeeTextRoot" Grid.Row="1" VerticalScrollBarVisibility="Hidden" Margin="0,4,0,0"
-                                                    Background="Transparent">
-                                            <StackPanel Orientation="Vertical" Background="Transparent">
-                                                <TextBlock x:Name="Title2_Text"
+                                        <!--<ui:OpacityMaskView Grid.Row="1">
+                                            <ui:OpacityMaskView.OpacityMask>
+                                                <Rectangle>
+                                                    <Rectangle.Fill>
+                                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                            <GradientStop Offset="0" Color="Transparent" />
+                                                            <GradientStop Offset=".15" Color="White" />
+                                                            <GradientStop Offset=".85" Color="White" />
+                                                            <GradientStop Offset="1" Color="Transparent" />
+                                                        </LinearGradientBrush>
+                                                    </Rectangle.Fill>
+                                                </Rectangle>
+                                            </ui:OpacityMaskView.OpacityMask>-->
+                                            <ScrollView x:Name="DescribeeTextRoot" Grid.Row="1" VerticalScrollBarVisibility="Hidden" Margin="0,4,0,0"
+                                                        Background="Transparent">
+                                                <StackPanel Orientation="Vertical" Background="Transparent">
+                                                    <TextBlock x:Name="Title2_Text"
                                                            TextWrapping="WrapWholeWords"
                                                            TextTrimming="CharacterEllipsis"
                                                            Margin="0,0,0,4">
-                                                    <Run x:Name="Title2" FontSize="20"/>
-                                                    <Run x:Name="ReleaseTime"
-                                                         Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                                                </TextBlock>
-                                                <TextBlock x:Name="DescribeeText"
+                                                    <Run x:Name="Title2" FontSize="20"/><Run x:Name="ReleaseTime"
+                                                    Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
+                                                    </TextBlock>
+                                                    <TextBlock x:Name="DescribeeText"
                                                            TextWrapping="WrapWholeWords"
                                                            TextTrimming="CharacterEllipsis"
                                                            Margin="0,0,0,0"
                                                            Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>
-                                            </StackPanel>
-                                        </ScrollView>
+                                                </StackPanel>
+                                            </ScrollView>
+                                        <!--</ui:OpacityMaskView>-->
                                         <CommandBar x:Name="ToolsCommandBar"
                                                     DefaultLabelPosition="Right"
                                                     HorizontalAlignment="Left"

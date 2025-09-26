@@ -579,23 +579,23 @@ namespace TewiMP.Pages.ListViewPages
             if (!IsLoaded) return;
             if (musicListData is null) return;
             ItemsList_Header_Image.BorderThickness = thickness0;
-            ImageSource imageSource = null;
+            Uri imageSource = null;
             if (musicListData.ListDataType == DataType.本地歌单)
             {
                 bool isExists = true;
                 await Task.Run(() => { isExists = File.Exists(musicListData.PicturePath); });
-                if (isExists) imageSource = await FileHelper.GetImageSource(musicListData.PicturePath);
+                if (isExists) imageSource = musicListData.PicturePath.ToImageUri();
                 resultPath = musicListData.PicturePath;
             }
             else if (musicListData.ListDataType == DataType.歌单)
             {
-                var result = await ImageManage.GetImageSource(musicListData);
+                var result = await ImageManage.GetImageUri(musicListData);
                 imageSource = result.Item1;
                 resultPath = result.Item2;
             }
             if (imageSource is null)
             {
-                imageSource = await FileHelper.GetImageSource("");
+                imageSource ="".ToImageUri();
                 resultPath = Path.Combine(Environment.CurrentDirectory, "Images", "icon.png");
             }
 

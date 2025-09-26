@@ -287,7 +287,7 @@ namespace TewiMP.Controls
             }
 
             MusicData data = musicData;
-            ImageSource a = null;
+            Uri a = null;
             try
             {
                 bool err = false;
@@ -301,7 +301,7 @@ namespace TewiMP.Controls
                 }
                 if (!err)
                 {
-                    var b = await ImageManage.GetImageSource(musicData, (int)(56 * ImageScaleDPI), (int)(56 * ImageScaleDPI), true);
+                    var b = await ImageManage.GetImageUri(musicData);
                     a = b.Item1;
                 }
             }

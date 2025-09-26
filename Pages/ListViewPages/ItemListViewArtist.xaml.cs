@@ -125,16 +125,16 @@ namespace TewiMP.Pages
         {
             if (musicListData.ListDataType == DataType.本地歌单)
             {
-                Artist_Image.Source = await FileHelper.GetImageSource(musicListData.PicturePath);
+                Artist_Image.Source = musicListData.PicturePath.ToImageUri();
             }
             else if (musicListData.ListDataType == DataType.歌单)
             {
-                Artist_Image.Source = (await ImageManage.GetImageSource(musicListData)).Item1;
+                Artist_Image.Source = (await ImageManage.GetImageUri(musicListData)).Item1;
             }
             else if (musicListData.ListDataType == DataType.艺术家)
             {
                 var art = NavToObj;
-                Artist_Image.Source = new Microsoft.UI.Xaml.Media.Imaging.BitmapImage(new Uri(art.PicturePath));
+                Artist_Image.Source = new Uri(art.PicturePath);
             }
             Artist_Image1.Source = Artist_Image.Source;
             Artist_Image1.SaveName = NavToObj.Name;

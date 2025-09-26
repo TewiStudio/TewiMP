@@ -81,7 +81,7 @@ namespace TewiMP.Controls
             if (MusicListData != null)
             {
                 int size = 0;//(int)(200 * ImageScaleDPI);
-                var imageSources = await ImageManage.GetImageSource(MusicListData, size, size, true);
+                var imageSources = await ImageManage.GetImageUri(MusicListData, size, size, true);
                 PlayListImage.Source = imageSources.Item1;
                 PlayListImage.SaveName = $"{MusicListData.ListShowName}";
             }
@@ -254,7 +254,7 @@ namespace TewiMP.Controls
 
             try
             {
-                var deletePath = (await ImageManage.GetImageSource(musicListData)).Item2;
+                var deletePath = (await ImageManage.GetImageUri(musicListData)).Item2;
                 await Task.Run(() =>
                 {
                     try

@@ -20,8 +20,12 @@
                       ViewChanged="ScrollViewer_ViewChanged"
                       IsVerticalRailEnabled="False"
                       IsHorizontalRailEnabled="False">
-            <Image x:Name="ImageControl" Source="/Images/icon.png"
-                   Margin="0,-32,0,0"/>
+            <Image x:Name="ImageControl"
+                   Margin="0,-32,0,0">
+                <Image.Source>
+                    <BitmapImage x:Name="ImageControl_Source"/>
+                </Image.Source>
+            </Image>
         </ScrollViewer>
         <Grid x:Name="TitleBar" Background="{ThemeResource CardStrokeColorDefault}"
               VerticalAlignment="Top" Height="32">
