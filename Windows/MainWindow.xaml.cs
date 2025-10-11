@@ -1666,7 +1666,8 @@ namespace TewiMP
                 case Windows.System.VirtualKey.T:
                     if (isControlDown && isShiftDown)
                     {
-                        SetNavViewContent(typeof(TestPage));
+                        //SetNavViewContent(typeof(TestPage));
+                        SetNavViewContent(typeof(SettingEqPage));
                     }
                     break;
             }

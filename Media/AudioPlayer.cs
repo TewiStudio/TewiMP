@@ -15,6 +15,7 @@ using TewiMP.DataEditor;
 using TewiMP.Background;
 using static TewiMP.Media.AudioPlayer;
 using TewiMP.Helpers;
+using NAudio.Wave.SampleProviders;
 
 namespace TewiMP.Media
 {
@@ -270,6 +271,7 @@ namespace TewiMP.Media
     {
         public delegate void AudioPlayerDelegate(AudioPlayer audioPlayer);
         public delegate void AudioPlayerDataDelegate(AudioPlayer audioPlayer, object data);
+        public delegate void AudioPlayerVolumeMeterDelegate(AudioPlayer audioPlayer, float[] sample);
         public event AudioPlayerDelegate PlayEnd;
         public event AudioPlayerDelegate SourceChanged;
         public event AudioPlayerDelegate PreviewSourceChanged;
@@ -280,12 +282,14 @@ namespace TewiMP.Media
         public event AudioPlayerDelegate CacheLoadedChanged;
         public event AudioPlayerDelegate EqEnableChanged;
         public event AudioPlayerDelegate EqBandChanged;
+        public event AudioPlayerVolumeMeterDelegate VolumeMeter;
 
         DispatcherTimer timer;
 
         public ClientDeviceEvents ClientDeviceEvents { get; private set; } = new();
         public Media.AudioFileReader FileReader { get; set; } = null;
         public AudioEffects.SoundTouchWaveProvider FileProvider { get; set; } = null;
+        public AudioAnalyzer AudioAnalyzer { get; set; } = null;
         public enum OutApi { WaveOut, DirectSound, Wasapi, Asio, None }
         public IWavePlayer NowOutObj { get; set; } = null;
         public MidiFile MidiFile { get; set; } = null;
@@ -779,6 +783,7 @@ namespace TewiMP.Media
 
             localFileIniting = true;
             AudioFileReader fileReader = null;
+            AudioAnalyzer audioAnalyzer = null;
             AudioEffects.SoundTouchWaveProvider fileProvider = null;
 
             await Task.Run(() =>
@@ -792,8 +797,8 @@ namespace TewiMP.Media
                     WaveInfo = "midi";
                     return;
                 }
-
-                fileProvider = new AudioEffects.SoundTouchWaveProvider(fileReader);
+                audioAnalyzer = new AudioAnalyzer(fileReader, 8192);
+                fileProvider = new AudioEffects.SoundTouchWaveProvider(audioAnalyzer.ToWaveProvider());
                 fileReader.EqEnabled = EqEnabled;
                 fileReader.Volume = Volume / 100;
                 fileProvider.Pitch = Pitch;
@@ -802,6 +807,7 @@ namespace TewiMP.Media
             });
             await Task.Run(DisposeAll);
             FileReader = fileReader;
+            AudioAnalyzer = audioAnalyzer;
             FileProvider = fileProvider;
             LogManager.Log("AudioPlayer", $"FileReader filePath \"{fileReader.FileName}\".");
             if (EqEnabled && !fileReader.isMidi)
@@ -896,12 +902,23 @@ namespace TewiMP.Media
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                 }
+
                 LogManager.Log("AudioPlayer", $"Inited FileReader filePath \"{fileReader.FileName}\".");
                 LogManager.Log("AudioPlayer", $"Inited MusicData \"{MusicData}\".");
             }
 
             SourceChanged?.Invoke(this);
             localFileIniting = false;
+        }
+
+        private void SampleCaptureProvider_SamplesCaptured(float[] obj)
+        {
+            if (VolumeMeter is not null)
+            {
+                //audioAnalyzer = new AudioAnalyzer(1024);
+                //audioAnalyzer.OnSamplesCaptured(obj);
+                VolumeMeter?.Invoke(this, obj);
+            }
         }
 
         private void AudioPlayer_TimingChanged(AudioPlayer audioPlayer)
@@ -1106,6 +1123,8 @@ namespace TewiMP.Media
             {
                 FileReader = null;
             }
+
+            AudioAnalyzer = null;
 
             try
             {

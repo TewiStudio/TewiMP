@@ -1,11 +1,14 @@
-﻿using System;
-using Windows.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Controls;
+﻿using Microsoft.UI;
 using Microsoft.UI.Composition;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using System;
+using System.Numerics;
+using System.Threading.Tasks;
 using TewiMP.Media;
+using Windows.UI;
 
 namespace TewiMP.Pages
 {
@@ -30,58 +33,122 @@ namespace TewiMP.Pages
             DataContext = this;
         }
 
-        public void UpdateShyHeader()
+        void Init()
+        {
+            InitVisual();
+            InitShyHeader();
+        }
+
+        ScrollViewer scrollViewer;
+        CompositionPropertySet scrollerPropertySet;
+        Compositor compositor;
+        Visual headerVisual;
+        Visual backgroundVisual;
+        Visual logoVisual;
+        Visual headerFootRootVisual;
+        void InitVisual()
         {
             // 设置header为顶层
             var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ListViewBase.Header);
             var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
             Canvas.SetZIndex(headerContainer, 1);
 
-            var scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;
+            scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;
             scrollViewer.CanContentRenderOutsideBounds = true;
+            scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
+            scrollViewer.ViewChanging += ScrollViewer_ViewChanging;
 
-            CompositionPropertySet scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
-            Compositor compositor = scrollerPropertySet.Compositor;
+            scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
+            compositor = scrollerPropertySet.Compositor;
+            headerVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseGrid);
+            logoVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
+            backgroundVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseRectangle);
+            headerFootRootVisual = ElementCompositionPreview.GetElementVisual(HeaderFootRoot);
+        }
 
-            var padingSize = 40;
-            // Get the visual that represents our HeaderTextBlock 
-            // And define the progress animation string
-            var headerVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseGrid);
-            String progress = $"Clamp(-scroller.Translation.Y / {padingSize}, 0, 1.0)";
 
-            // Shift the header by 50 pixels when scrolling down
-            var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {padingSize}");
+        ExpressionAnimation offsetExpression;
+        ExpressionAnimation logoHeaderScaleAnimation;
+        ExpressionAnimation logoVisualOffsetYAnimation;
+        ExpressionAnimation logoVisualOffsetXAnimation;
+        ExpressionAnimation backgroundVisualOpacityAnimation;
+        ExpressionAnimation headerFootRootVisualOffsetAnimation;
+        void InitShyHeader()
+        {
+            if (!IsLoaded) return;
+            if (scrollViewer is null) return;
+
+            var paddingSize = 40;
+            var progress = $"Clamp(-scroller.Translation.Y / {paddingSize}, 0, 1.0)";
+
+            offsetExpression?.Dispose();
+            offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - Round({progress} * {paddingSize})");
             offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
             headerVisual.StartAnimation("Offset.Y", offsetExpression);
 
-            /*
-            Visual textVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
-            Vector3 finalOffset = new Vector3(0, 10, 0);
-            var headerOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(0,0,0), finalOffset, {progress})");
-            headerOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerOffsetAnimation.SetVector3Parameter("finalOffset", finalOffset);
-            textVisual.StartAnimation(nameof(Visual.Offset), headerOffsetAnimation);
-            */
-
-            // Logo scale and transform                                          from               to
-            var logoHeaderScaleAnimation = compositor.CreateExpressionAnimation("Lerp(Vector2(1,1), Vector2(0.7, 0.7), " + progress + ")");
+            logoHeaderScaleAnimation?.Dispose();
+            logoHeaderScaleAnimation = compositor.CreateExpressionAnimation("Lerp(Vector2(1,1), Vector2(0.7, 0.7), " + progress + ")");
             logoHeaderScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-
-            var logoVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
             logoVisual.StartAnimation("Scale.xy", logoHeaderScaleAnimation);
 
-            var logoVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 24, {progress})");
+            logoVisualOffsetYAnimation?.Dispose();
+            logoVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 24, {progress})");
             logoVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             logoVisual.StartAnimation("Offset.Y", logoVisualOffsetYAnimation);
 
-            var logoVisualOffsetXAnimation = compositor.CreateExpressionAnimation($"Lerp(0, -12, {progress})");
+            logoVisualOffsetXAnimation?.Dispose();
+            logoVisualOffsetXAnimation = compositor.CreateExpressionAnimation($"Lerp(0, -12, {progress})");
             logoVisualOffsetXAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             logoVisual.StartAnimation("Offset.X", logoVisualOffsetXAnimation);
 
-            var backgroundVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseRectangle);
-            var backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
+            backgroundVisualOpacityAnimation?.Dispose();
+            backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
             backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
+            /*
+                        headerFootRootVisualOffsetAnimation?.Dispose();
+                        headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
+                            $"Lerp(" +
+                                $"Vector3(" +
+                                    $"-16," +
+                                    $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                                    $"0)," +
+                                $"Vector3(" +
+                                    $"-16," +
+                                    $"{paddingSize} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                                    $"0)," +
+                                $"{progress})");
+                        headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+                        headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);*/
+        }
+
+        void DisposeVisuals()
+        {
+            offsetExpression?.Dispose();
+            logoHeaderScaleAnimation?.Dispose();
+            logoVisualOffsetYAnimation?.Dispose();
+            logoVisualOffsetXAnimation?.Dispose();
+            backgroundVisualOpacityAnimation?.Dispose();
+            headerFootRootVisualOffsetAnimation?.Dispose();
+
+            scrollViewer = null;
+            scrollerPropertySet = null;
+            compositor = null;
+            headerVisual = null;
+            backgroundVisual = null;
+            logoVisual = null;
+            headerFootRootVisual = null;
+            offsetExpression = null;
+            logoHeaderScaleAnimation = null;
+            logoVisualOffsetYAnimation = null;
+            logoVisualOffsetXAnimation = null;
+            backgroundVisualOpacityAnimation = null;
+            headerFootRootVisualOffsetAnimation = null;
+        }
+
+        private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
+        {
+            headerVisual.IsPixelSnappingEnabled = true;
         }
 
         private async void AddOutDeviceToFlyOut()
@@ -119,7 +186,7 @@ namespace TewiMP.Pages
         }
 
         bool isInLoaded = false;
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             isInLoaded = true;
             GraphicEqToggleButton.IsOn = AudioFilterStatic.GraphicEqEnable;
@@ -127,18 +194,26 @@ namespace TewiMP.Pages
             PassFilterToggleButton.IsOn = AudioFilterStatic.PassFilterEqEnable;
             isInLoaded = false;
 
+            AudioPlayer.EqEnableChanged -= AudioPlayer_EqEnableChanged;
             AudioPlayer.EqEnableChanged += AudioPlayer_EqEnableChanged;
+            AudioPlayer.EqBandChanged -= AudioPlayer_EqualizerBandChanged;
             AudioPlayer.EqBandChanged += AudioPlayer_EqualizerBandChanged;
+
             EQList.ItemsSource = AudioFilterStatic.ParametricEqDatas;
             PassFilterList.ItemsSource = AudioFilterStatic.PassFilterDatas;
 
             AddOutDeviceToFlyOut();
             AudioPlayer_EqEnableChanged(AudioPlayer);
             AudioPlayer_EqualizerBandChanged(AudioPlayer);
+
+            Init();
+            await Task.Delay(10);
+            InitShyHeader();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
+            DisposeVisuals();
             AudioPlayer.EqEnableChanged -= AudioPlayer_EqEnableChanged;
             AudioPlayer.EqBandChanged -= AudioPlayer_EqualizerBandChanged;
             EQList.ItemsSource = null;
@@ -165,7 +240,7 @@ namespace TewiMP.Pages
 
         private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            UpdateShyHeader();
+            InitShyHeader();
         }
 
         private void EqEnableSwitcher_Toggled(object sender, RoutedEventArgs e)
@@ -295,6 +370,85 @@ namespace TewiMP.Pages
             if (isInLoaded) return;
             AudioFilterStatic.ParametricEqEnable = ParametricToggleButton.IsOn;
             App.Instance.AudioPlayer.UpdateEqualizer();
+        }
+
+        private float[] _smoothedSpectrum;
+        private void eqCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedDrawEventArgs args)
+        {
+            var ds = args.DrawingSession;
+            ds.Clear(Colors.Black);
+
+            var analyzer = AudioPlayer.AudioAnalyzer;
+            if (analyzer == null) return;
+            analyzer.Analyze();
+            if (analyzer.Spectrum == null) return;
+
+            int fftSize = analyzer.Spectrum.Length * 2;
+            int sampleRate = analyzer.WaveFormat.SampleRate;
+
+            double minFreq = 20;
+            double maxFreq = 20000;
+            int barCount = 128; // 可自定义矩形条数
+
+            int w = (int)sender.Size.Width;
+            int h = (int)sender.Size.Height;
+            float barWidth = w / (float)barCount;
+
+            // 初始化平滑数组
+            if (_smoothedSpectrum == null || _smoothedSpectrum.Length != analyzer.Spectrum.Length)
+                _smoothedSpectrum = new float[analyzer.Spectrum.Length];
+
+            float smoothingFactor = 0.2f; // 越小越平滑
+            for (int i = 0; i < analyzer.Spectrum.Length; i++)
+                _smoothedSpectrum[i] = _smoothedSpectrum[i] * (1 - smoothingFactor) + analyzer.Spectrum[i] * smoothingFactor;
+
+            double logMin = Math.Log10(minFreq);
+            double logMax = Math.Log10(maxFreq);
+
+            for (int i = 0; i < barCount; i++)
+            {
+                // 对数均分
+                double logStart = logMin + (logMax - logMin) * i / barCount;
+                double logEnd = logMin + (logMax - logMin) * (i + 1) / barCount;
+
+                double freqStart = Math.Pow(10, logStart);
+                double freqEnd = Math.Pow(10, logEnd);
+
+                // FFT bin 索引，保证至少覆盖一个 bin
+                int binStart = Math.Max(0, (int)Math.Round(freqStart / (sampleRate / 2.0) * (analyzer.Spectrum.Length - 1)));
+                int binEnd = Math.Min(analyzer.Spectrum.Length - 1, (int)Math.Round(freqEnd / (sampleRate / 2.0) * (analyzer.Spectrum.Length - 1)));
+                if (binEnd < binStart) binEnd = binStart;
+
+                // 平均该条所有 bin
+                float sum = 0;
+                int count = binEnd - binStart + 1;
+                for (int b = binStart; b <= binEnd; b++)
+                    sum += _smoothedSpectrum[b];
+
+                float db = sum / count;
+                float normalized = (db + 60) / 60f;
+                float barHeight = normalized * h;
+
+                // 渐变颜色
+                Color color;
+                if (normalized < 0.5f)
+                {
+                    float t = normalized / 0.5f;
+                    color = Color.FromArgb(255, (byte)(t * 255), 255, 0);
+                }
+                else
+                {
+                    float t = (normalized - 0.5f) / 0.5f;
+                    color = Color.FromArgb(255, 255, (byte)((1 - t) * 255), 0);
+                }
+
+                ds.FillRectangle(i * barWidth, h - barHeight, barWidth, barHeight, color);
+            }
+        }
+
+        private void eqCanvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
+        {
+
         }
     }
 

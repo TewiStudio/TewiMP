@@ -7,6 +7,7 @@
     xmlns:controls="using:TewiMP.Controls"
     xmlns:datas="using:TewiMP.Media"
     xmlns:controlsPrimitives="using:CommunityToolkit.WinUI.Controls"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" SizeChanged="Page_SizeChanged"
@@ -90,16 +91,32 @@
                 </Setter>
             </Style>
         </ListView.Resources>
-        
+
         <ListView.Header>
             <Grid x:Name="HeaderBaseGrid">
                 <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1"/>
+                        BorderThickness="0,0,0,1">
+                </Border>
                 <TextBlock x:Name="HeaderBaseTextBlock" Text="音效" Style="{ThemeResource TBHeader}"/>
             </Grid>
         </ListView.Header>
 
+        <Grid x:Name="HeaderFootRoot">
+            <Button
+                Padding="0"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Bottom">
+                <canvas:CanvasAnimatedControl 
+                    x:Name="eqCanvas"
+                    ClearColor="Transparent"
+                    Draw="eqCanvas_Draw"
+                    CreateResources="eqCanvas_CreateResources"
+                    HorizontalAlignment="Stretch"
+                    Width="700"
+                    Height="250"/>
+            </Button>
+        </Grid>
         <controlsPrimitives:SettingsCard
             Header="音效总开关">
             <ToggleSwitch
@@ -107,7 +124,7 @@
                 IsEnabled="True"
                 Toggled="EqEnableSwitcher_Toggled"/>
         </controlsPrimitives:SettingsCard>
-        
+
         <!--图形均衡器-->
         <controlsPrimitives:SettingsExpander
             Header="图形均衡器"
@@ -412,7 +429,7 @@
                     <Button Content="搜索"/>
                 </controlsPrimitives:SettingsCard>
             </controlsPrimitives:SettingsExpander.Items>
-            
+
         </controlsPrimitives:SettingsExpander>
     </ListView>
 </Page>
