@@ -200,6 +200,8 @@ namespace TewiMP.Pages
             AudioPlayer.EqEnableChanged += AudioPlayer_EqEnableChanged;
             AudioPlayer.EqBandChanged -= AudioPlayer_EqualizerBandChanged;
             AudioPlayer.EqBandChanged += AudioPlayer_EqualizerBandChanged;
+            App.MainWindowInstance.MainViewStateChanged -= MainWindowInstance_MainViewStateChanged;
+            App.MainWindowInstance.MainViewStateChanged += MainWindowInstance_MainViewStateChanged;
 
             EQList.ItemsSource = AudioFilterStatic.ParametricEqDatas;
             PassFilterList.ItemsSource = AudioFilterStatic.PassFilterDatas;
@@ -218,9 +220,15 @@ namespace TewiMP.Pages
             DisposeVisuals();
             AudioPlayer.EqEnableChanged -= AudioPlayer_EqEnableChanged;
             AudioPlayer.EqBandChanged -= AudioPlayer_EqualizerBandChanged;
+            App.MainWindowInstance.MainViewStateChanged -= MainWindowInstance_MainViewStateChanged;
             EQList.ItemsSource = null;
             PassFilterList.ItemsSource = null;
             App.Instance.SaveSettings();
+        }
+
+        private void MainWindowInstance_MainViewStateChanged(bool isView)
+        {
+            spectrumCanvas.IsStop = !isView;
         }
 
         private void C_Click(object sender, RoutedEventArgs e)

@@ -81,6 +81,27 @@ namespace TewiMP.Controls
             })
         ));
 
+        public static readonly DependencyProperty IsStopProperty = DependencyProperty.Register(
+            "IsStop",
+            typeof(bool),
+            typeof(AudioSpectrum),
+            new PropertyMetadata(false, new((_,  __) =>
+            {
+                if (_ is null) return;
+                var audioSpectrum = (AudioSpectrum)_;
+                audioSpectrum.IsStop = (bool)__.NewValue;
+                if (audioSpectrum.IsStop)
+                {
+                    App.Instance.AudioPlayer.VolumeMeter -= audioSpectrum.AudioPlayer_VolumeMeter;
+                }
+                else
+                {
+                    App.Instance.AudioPlayer.VolumeMeter -= audioSpectrum.AudioPlayer_VolumeMeter;
+                    App.Instance.AudioPlayer.VolumeMeter += audioSpectrum.AudioPlayer_VolumeMeter;
+                }
+            })
+        ));
+
         public int SampleCount
         {
             get => (int)GetValue(SampleCountProperty);
@@ -116,6 +137,12 @@ namespace TewiMP.Controls
             get => (double)GetValue(MaxFreqProperty);
             set => SetValue(MaxFreqProperty, value);
         }
+        
+        public bool IsStop
+        {
+            get => (bool)GetValue(IsStopProperty);
+            set => SetValue(IsStopProperty, value);
+        }
 
         public AudioSpectrum()
         {
@@ -128,14 +155,19 @@ namespace TewiMP.Controls
         {
             base.OnApplyTemplate();
 
+            Loaded -= AutoScrollView_Loaded;
             Loaded += AutoScrollView_Loaded;
+            Unloaded -= AutoScrollView_Unloaded;
             Unloaded += AutoScrollView_Unloaded;
             _spectrumCanvas = GetTemplateChild("PART_SpectrumCanvas") as CanvasControl;
 
             if (_spectrumCanvas != null)
             {
-                App.Instance.AudioPlayer.VolumeMeter -= AudioPlayer_VolumeMeter;
-                App.Instance.AudioPlayer.VolumeMeter += AudioPlayer_VolumeMeter;
+                if (!IsStop) // 如果状态不为停止，则订阅事件
+                {
+                    App.Instance.AudioPlayer.VolumeMeter -= AudioPlayer_VolumeMeter;
+                    App.Instance.AudioPlayer.VolumeMeter += AudioPlayer_VolumeMeter;
+                }
 
                 SizeChanged -= AudioSpectrum_SizeChanged;
                 SizeChanged += AudioSpectrum_SizeChanged;
@@ -145,7 +177,7 @@ namespace TewiMP.Controls
             }
         }
 
-        private void AudioPlayer_VolumeMeter(Media.AudioPlayer audioPlayer, float[] sample)
+        public void AudioPlayer_VolumeMeter(Media.AudioPlayer audioPlayer, float[] sample)
         {
             if (Visibility == Visibility.Collapsed) return;
             _spectrumCanvas.Invalidate();

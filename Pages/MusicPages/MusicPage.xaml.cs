@@ -106,7 +106,7 @@ namespace TewiMP.Pages.MusicPages
             if (isAddEvents) return;
             AutoScrollViewer1.Pause = false; AutoScrollViewer2.Pause = false;
             AutoScrollViewer3.Pause = false; AutoScrollViewer4.Pause = false;
-            AutoScrollViewer5.Pause = false;
+            AutoScrollViewer5.Pause = false; AudioSpectrum1.IsStop = false;
             App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
             App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
             App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
@@ -142,7 +142,7 @@ namespace TewiMP.Pages.MusicPages
         {
             AutoScrollViewer1.Pause = true; AutoScrollViewer2.Pause = true;
             AutoScrollViewer3.Pause = true; AutoScrollViewer4.Pause = true;
-            AutoScrollViewer5.Pause = true;
+            AutoScrollViewer5.Pause = true; AudioSpectrum1.IsStop = true;
             App.Instance.AudioPlayer.SourceChanged -= AudioPlayer_SourceChanged;
             App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
             App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
