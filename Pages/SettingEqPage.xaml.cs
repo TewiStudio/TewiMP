@@ -1,4 +1,6 @@
-﻿using Microsoft.UI;
+﻿using Microsoft.Graphics.Canvas.Brushes;
+using Microsoft.Graphics.Canvas.Geometry;
+using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -105,21 +107,21 @@ namespace TewiMP.Pages
             backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
             backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
             backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
-            /*
-                        headerFootRootVisualOffsetAnimation?.Dispose();
-                        headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
-                            $"Lerp(" +
-                                $"Vector3(" +
-                                    $"-16," +
-                                    $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                                    $"0)," +
-                                $"Vector3(" +
-                                    $"-16," +
-                                    $"{paddingSize} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                                    $"0)," +
-                                $"{progress})");
-                        headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-                        headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);*/
+            
+            headerFootRootVisualOffsetAnimation?.Dispose();
+            headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
+                $"Lerp(" +
+                    $"Vector3(" +
+                        $"-16," +
+                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                        $"0)," +
+                    $"Vector3(" +
+                        $"-16," +
+                        $"{paddingSize} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
+                        $"0)," +
+                    $"{progress})");
+            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
         }
 
         void DisposeVisuals()
@@ -370,85 +372,6 @@ namespace TewiMP.Pages
             if (isInLoaded) return;
             AudioFilterStatic.ParametricEqEnable = ParametricToggleButton.IsOn;
             App.Instance.AudioPlayer.UpdateEqualizer();
-        }
-
-        private float[] _smoothedSpectrum;
-        private void eqCanvas_Draw(Microsoft.Graphics.Canvas.UI.Xaml.ICanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedDrawEventArgs args)
-        {
-            var ds = args.DrawingSession;
-            ds.Clear(Colors.Black);
-
-            var analyzer = AudioPlayer.AudioAnalyzer;
-            if (analyzer == null) return;
-            analyzer.Analyze();
-            if (analyzer.Spectrum == null) return;
-
-            int fftSize = analyzer.Spectrum.Length * 2;
-            int sampleRate = analyzer.WaveFormat.SampleRate;
-
-            double minFreq = 20;
-            double maxFreq = 20000;
-            int barCount = 128; // 可自定义矩形条数
-
-            int w = (int)sender.Size.Width;
-            int h = (int)sender.Size.Height;
-            float barWidth = w / (float)barCount;
-
-            // 初始化平滑数组
-            if (_smoothedSpectrum == null || _smoothedSpectrum.Length != analyzer.Spectrum.Length)
-                _smoothedSpectrum = new float[analyzer.Spectrum.Length];
-
-            float smoothingFactor = 0.2f; // 越小越平滑
-            for (int i = 0; i < analyzer.Spectrum.Length; i++)
-                _smoothedSpectrum[i] = _smoothedSpectrum[i] * (1 - smoothingFactor) + analyzer.Spectrum[i] * smoothingFactor;
-
-            double logMin = Math.Log10(minFreq);
-            double logMax = Math.Log10(maxFreq);
-
-            for (int i = 0; i < barCount; i++)
-            {
-                // 对数均分
-                double logStart = logMin + (logMax - logMin) * i / barCount;
-                double logEnd = logMin + (logMax - logMin) * (i + 1) / barCount;
-
-                double freqStart = Math.Pow(10, logStart);
-                double freqEnd = Math.Pow(10, logEnd);
-
-                // FFT bin 索引，保证至少覆盖一个 bin
-                int binStart = Math.Max(0, (int)Math.Round(freqStart / (sampleRate / 2.0) * (analyzer.Spectrum.Length - 1)));
-                int binEnd = Math.Min(analyzer.Spectrum.Length - 1, (int)Math.Round(freqEnd / (sampleRate / 2.0) * (analyzer.Spectrum.Length - 1)));
-                if (binEnd < binStart) binEnd = binStart;
-
-                // 平均该条所有 bin
-                float sum = 0;
-                int count = binEnd - binStart + 1;
-                for (int b = binStart; b <= binEnd; b++)
-                    sum += _smoothedSpectrum[b];
-
-                float db = sum / count;
-                float normalized = (db + 60) / 60f;
-                float barHeight = normalized * h;
-
-                // 渐变颜色
-                Color color;
-                if (normalized < 0.5f)
-                {
-                    float t = normalized / 0.5f;
-                    color = Color.FromArgb(255, (byte)(t * 255), 255, 0);
-                }
-                else
-                {
-                    float t = (normalized - 0.5f) / 0.5f;
-                    color = Color.FromArgb(255, 255, (byte)((1 - t) * 255), 0);
-                }
-
-                ds.FillRectangle(i * barWidth, h - barHeight, barWidth, barHeight, color);
-            }
-        }
-
-        private void eqCanvas_CreateResources(Microsoft.Graphics.Canvas.UI.Xaml.CanvasAnimatedControl sender, Microsoft.Graphics.Canvas.UI.CanvasCreateResourcesEventArgs args)
-        {
-
         }
     }
 

@@ -3,6 +3,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TewiMP"
     xmlns:local2="using:TewiMP.Controls"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls">
 
     <Style TargetType="local2:AutoScrollView">
@@ -47,6 +48,19 @@
                             </ScrollView>
                         </Border>
                     </controls:OpacityMaskView>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="local2:AudioSpectrum">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local2:AudioSpectrum">
+                    <canvas:CanvasControl
+                        x:Name="PART_SpectrumCanvas"
+                        ClearColor="Transparent"
+                        Background="Transparent"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

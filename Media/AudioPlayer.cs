@@ -1,21 +1,23 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+﻿using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Interaction;
+using Melanchall.DryWetMidi.Multimedia;
 using Microsoft.UI.Xaml;
-using NAudio.Wave;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
-using Melanchall.DryWetMidi.Multimedia;
-using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Interaction;
-using TewiMP.DataEditor;
-using TewiMP.Background;
-using static TewiMP.Media.AudioPlayer;
-using TewiMP.Helpers;
+using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using TewiMP.Background;
+using TewiMP.DataEditor;
+using TewiMP.Helpers;
+using static TewiMP.Media.AudioPlayer;
 
 namespace TewiMP.Media
 {
@@ -289,7 +291,7 @@ namespace TewiMP.Media
         public ClientDeviceEvents ClientDeviceEvents { get; private set; } = new();
         public Media.AudioFileReader FileReader { get; set; } = null;
         public AudioEffects.SoundTouchWaveProvider FileProvider { get; set; } = null;
-        public AudioAnalyzer AudioAnalyzer { get; set; } = null;
+        public SpectrumAnalyzer AudioAnalyzer { get; set; } = null;
         public enum OutApi { WaveOut, DirectSound, Wasapi, Asio, None }
         public IWavePlayer NowOutObj { get; set; } = null;
         public MidiFile MidiFile { get; set; } = null;
@@ -567,6 +569,7 @@ namespace TewiMP.Media
 
             timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(200) };
             timer.Tick += (_, __) => ReCallTiming();
+            CompositionTarget.Rendering += CompositionTarget_Rendering;
 
             App.Instance.CacheManager.AddingCacheMusicData += CacheManager_AddingCacheMusicData;
             App.Instance.CacheManager.CachedMusicData += CacheManager_CachedMusicData;
@@ -574,6 +577,25 @@ namespace TewiMP.Media
             ClientDeviceEvents.notificationClient.OnDefaultDeviceChangedEvent += NotificationClient_OnDefaultDeviceChangedEvent;
             ClientDeviceEvents.notificationClient.OnDeviceStateChangedEvent += NotificationClient_OnDeviceStateChangedEvent;
             ClientDeviceEvents.notificationClient.OnDeviceRemovedEvent += NotificationClient_OnDeviceRemovedEvent;
+        }
+
+        private readonly object _analyzerLock = new();
+        private void CompositionTarget_Rendering(object sender, object e)
+        {
+            if (VolumeMeter is null) return;
+
+            float[] spectrum = null;
+            lock (_analyzerLock)
+            {
+                var analyzer = AudioAnalyzer;
+                if (analyzer is null) return;
+
+                analyzer.Analyze();
+                spectrum = analyzer.Spectrum;
+            }
+
+            if (spectrum != null)
+                VolumeMeter.Invoke(this, spectrum);
         }
 
         private void CacheManager_AddingCacheMusicData(MusicData musicData, object value)
@@ -783,7 +805,7 @@ namespace TewiMP.Media
 
             localFileIniting = true;
             AudioFileReader fileReader = null;
-            AudioAnalyzer audioAnalyzer = null;
+            SpectrumAnalyzer audioAnalyzer = null;
             AudioEffects.SoundTouchWaveProvider fileProvider = null;
 
             await Task.Run(() =>
@@ -797,7 +819,7 @@ namespace TewiMP.Media
                     WaveInfo = "midi";
                     return;
                 }
-                audioAnalyzer = new AudioAnalyzer(fileReader, 8192);
+                audioAnalyzer = new SpectrumAnalyzer(fileReader, 8192);
                 fileProvider = new AudioEffects.SoundTouchWaveProvider(audioAnalyzer.ToWaveProvider());
                 fileReader.EqEnabled = EqEnabled;
                 fileReader.Volume = Volume / 100;

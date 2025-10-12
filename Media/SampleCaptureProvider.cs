@@ -4,7 +4,7 @@ using NAudio.Wave;
 using System;
 using System.Numerics;
 
-public class AudioAnalyzer : ISampleProvider
+public class SpectrumAnalyzer : ISampleProvider
 {
     private readonly ISampleProvider _source;
     private readonly int _fftSize;
@@ -15,7 +15,7 @@ public class AudioAnalyzer : ISampleProvider
 
     public float[] Spectrum { get; private set; }
 
-    public AudioAnalyzer(ISampleProvider source, int fftSize = 2048)
+    public SpectrumAnalyzer(ISampleProvider source, int fftSize = 2048)
     {
         _source = source;
         _fftSize = fftSize;
@@ -73,19 +73,19 @@ public class AudioAnalyzer : ISampleProvider
         for (int i = 0; i < _fftSize; i++)
             complex[i] = new Complex(_fftBuffer[i], 0);
         FFT(complex);
-
-        // RMS 归一化
-        double rms = 0;
-        for (int i = 0; i < _fftSize; i++)
-            rms += _fftBuffer[i] * _fftBuffer[i];
-        rms = Math.Sqrt(rms / _fftSize);
-        if (rms < 1e-10) rms = 1e-10;
-
+        /*
+                // RMS 归一化
+                double rms = 0;
+                for (int i = 0; i < _fftSize; i++)
+                    rms += _fftBuffer[i] * _fftBuffer[i];
+                rms = Math.Sqrt(rms / _fftSize);
+                if (rms < 1e-10) rms = 1e-10;
+        */
         // 计算 dB
         for (int i = 0; i < _fftSize / 2; i++)
         {
             double mag = complex[i].Magnitude / (_fftSize / 2.0);
-            double db = 20 * Math.Log10(mag / rms);
+            double db = 20 * Math.Log10(Math.Max(mag, 1e-10)); // 防止 log0
             db = Math.Max(-60, Math.Min(0, db));
             Spectrum[i] = (float)db;
         }

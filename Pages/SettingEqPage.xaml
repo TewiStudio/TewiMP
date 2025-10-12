@@ -29,7 +29,7 @@
         x:Name="ListViewBase"
         HorizontalContentAlignment="Center"
         SelectionMode="None"
-        Padding="0,0,0,14">
+        Padding="0,0,0,94">
         <ListView.Resources>
             <Style TargetType="ListViewItem">
                 <Setter Property="Template">
@@ -99,24 +99,26 @@
                         BorderThickness="0,0,0,1">
                 </Border>
                 <TextBlock x:Name="HeaderBaseTextBlock" Text="音效" Style="{ThemeResource TBHeader}"/>
+                <Grid x:Name="HeaderFootRoot">
+                    <Border
+                        CornerRadius="4"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Background="{ThemeResource AcrylicNormal}">
+                        <Button
+                            Padding="0"
+                            Background="Transparent">
+                            <controls:AudioSpectrum
+                                x:Name="spectrumCanvas"
+                                Background="Transparent"
+                                Width="170"
+                                Height="70"/>
+                        </Button>
+                    </Border>
+                </Grid>
             </Grid>
         </ListView.Header>
 
-        <Grid x:Name="HeaderFootRoot">
-            <Button
-                Padding="0"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Bottom">
-                <canvas:CanvasAnimatedControl 
-                    x:Name="eqCanvas"
-                    ClearColor="Transparent"
-                    Draw="eqCanvas_Draw"
-                    CreateResources="eqCanvas_CreateResources"
-                    HorizontalAlignment="Stretch"
-                    Width="700"
-                    Height="250"/>
-            </Button>
-        </Grid>
         <controlsPrimitives:SettingsCard
             Header="音效总开关">
             <ToggleSwitch
