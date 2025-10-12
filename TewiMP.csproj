@@ -121,7 +121,9 @@
 		<PackageReference Include="CommunityToolkit.Labs.WinUI.TokenView" Version="0.1.230830" />
 		<PackageReference Include="CommunityToolkit.Labs.WinUI.TransitionHelper" Version="0.1.250618-build.2154" />
 		<PackageReference Include="CommunityToolkit.WinUI.Behaviors" Version="8.2.250402" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.HeaderedControls" Version="8.2.250402" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.RadialGauge" Version="8.2.250402" />
+		<PackageReference Include="CommunityToolkit.WinUI.Controls.RangeSelector" Version="8.2.250402" />
 		<PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.250402" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.ColorPicker" Version="8.2.250402" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.250402" />
