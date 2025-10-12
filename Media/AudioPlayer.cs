@@ -933,16 +933,6 @@ namespace TewiMP.Media
             localFileIniting = false;
         }
 
-        private void SampleCaptureProvider_SamplesCaptured(float[] obj)
-        {
-            if (VolumeMeter is not null)
-            {
-                //audioAnalyzer = new AudioAnalyzer(1024);
-                //audioAnalyzer.OnSamplesCaptured(obj);
-                VolumeMeter?.Invoke(this, obj);
-            }
-        }
-
         private void AudioPlayer_TimingChanged(AudioPlayer audioPlayer)
         {
             if (NowOutDevice.DeviceType == OutApi.Asio)

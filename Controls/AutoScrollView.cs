@@ -55,7 +55,7 @@ namespace TewiMP.Controls
 
         public static readonly DependencyProperty MaskSizeProperty = DependencyProperty.Register(
             "MaskSize",
-            typeof(double),
+            typeof(int),
             typeof(AutoScrollView),
             new PropertyMetadata(15, new((_,  __) =>
             {

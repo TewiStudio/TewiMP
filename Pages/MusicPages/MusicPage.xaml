@@ -79,6 +79,16 @@
                 </Rectangle.Fill>
             </Rectangle>
             <Rectangle Fill="{ThemeResource ApplicationPageBackgroundThemeBrush}" Opacity="0.0001"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <controls:AudioSpectrum
+                    Grid.Row="1" Opacity=".5" Margin="0,0,0,12" x:Name="AudioSpectrum1"
+                    StrokeWidth="2" SmoothingFactor=".15" SmoothWindow="10" SampleCount="256"
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Grid>
         </Grid>
         <Grid Padding="0" x:Name="InterfaceBaseGrid">
             <Grid.OpacityTransition>
@@ -430,6 +440,25 @@
                     <m:AnimatedChevronDownSmallVisualSource/>
                 </AnimatedIcon.Source>
             </AnimatedIcon>
+        </Button>
+        <Button
+            VerticalAlignment="Bottom"
+            HorizontalAlignment="Center"
+            Content="..."
+            BorderThickness="0"
+            Background="Transparent">
+            <Button.Flyout>
+                <Flyout>
+                    <ScrollViewer>
+                        <StackPanel Orientation="Vertical" Margin="4,0,16,0" Width="250">
+                            <Slider Header="StrokeWidth" Minimum="0" Maximum="10.0" Value="{x:Bind AudioSpectrum1.StrokeWidth, Mode=TwoWay}" StepFrequency="0.1"/>
+                            <Slider Header="SmoothingFactor" Minimum=".05" Maximum="1.0" Value="{x:Bind AudioSpectrum1.SmoothingFactor, Mode=TwoWay}" StepFrequency="0.01"/>
+                            <Slider Header="SmoothWindow" Minimum="0" Maximum="200" Value="{x:Bind AudioSpectrum1.SmoothWindow, Mode=TwoWay}" StepFrequency="0.5"/>
+                            <Slider Header="SampleCount" Minimum="2" Maximum="4096" Value="{x:Bind AudioSpectrum1.SampleCount, Mode=TwoWay}" StepFrequency="1"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Flyout>
+            </Button.Flyout>
         </Button>
         <Grid
             x:Name="Debug_Root"

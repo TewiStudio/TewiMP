@@ -14,20 +14,107 @@ namespace TewiMP.Controls
 {
     public sealed partial class AudioSpectrum : Control
     {
-        public static readonly DependencyProperty MaskSizeProperty = DependencyProperty.Register(
-            "MaskSize",
-            typeof(double),
+        public static readonly DependencyProperty SampleCountProperty = DependencyProperty.Register(
+            "SampleCount",
+            typeof(int),
             typeof(AudioSpectrum),
-            new PropertyMetadata(15, new((_,  __) =>
+            new PropertyMetadata(128, new((_,  __) =>
             {
-                //(_ as AudioSpectrum)?.ComputeGradientStops();
+                if (_ is null) return;
+                (_ as AudioSpectrum).SampleCount = (int)__.NewValue;
             })
         ));
 
-        public int MaskSize
+        public static readonly DependencyProperty SmoothingFactorProperty = DependencyProperty.Register(
+            "SmoothingFactor",
+            typeof(double),
+            typeof(AudioSpectrum),
+            new PropertyMetadata(.13d, new((_,  __) =>
+            {
+                if (_ is null) return;
+                (_ as AudioSpectrum).SmoothingFactor = (double)__.NewValue;
+            })
+        ));
+
+        
+        public static readonly DependencyProperty SmoothWindowProperty = DependencyProperty.Register(
+            "SmoothWindow",
+            typeof(int),
+            typeof(AudioSpectrum),
+            new PropertyMetadata(2, new((_,  __) =>
+            {
+                if (_ is null) return;
+                (_ as AudioSpectrum).SmoothWindow = (int)__.NewValue;
+            })
+        ));
+
+        public static readonly DependencyProperty StrokeWidthProperty = DependencyProperty.Register(
+            "StrokeWidth",
+            typeof(double),
+            typeof(AudioSpectrum),
+            new PropertyMetadata(1d, new((_,  __) =>
+            {
+                if (_ is null) return;
+                (_ as AudioSpectrum).StrokeWidth = (double)__.NewValue;
+            })
+        ));
+
+        public static readonly DependencyProperty MinFreqProperty = DependencyProperty.Register(
+            "MinFreq",
+            typeof(double),
+            typeof(AudioSpectrum),
+            new PropertyMetadata(20d, new((_,  __) =>
+            {
+                if (_ is null) return;
+                (_ as AudioSpectrum).MinFreq = (double)__.NewValue;
+            })
+        ));
+
+        public static readonly DependencyProperty MaxFreqProperty = DependencyProperty.Register(
+            "MaxFreq",
+            typeof(double),
+            typeof(AudioSpectrum),
+            new PropertyMetadata(16000d, new((_,  __) =>
+            {
+                if (_ is null) return;
+                (_ as AudioSpectrum).MaxFreq = (double)__.NewValue;
+            })
+        ));
+
+        public int SampleCount
         {
-            get => (int)GetValue(MaskSizeProperty);
-            set => SetValue(MaskSizeProperty, value);
+            get => (int)GetValue(SampleCountProperty);
+            set => SetValue(SampleCountProperty, value);
+        }
+        
+        public double SmoothingFactor
+        {
+            get => (double)GetValue(SmoothingFactorProperty);
+            set => SetValue(SmoothingFactorProperty, value);
+        }
+        
+        public int SmoothWindow
+        {
+            get => (int)GetValue(SmoothWindowProperty);
+            set => SetValue(SmoothWindowProperty, value);
+        }
+        
+        public double StrokeWidth
+        {
+            get => (double)GetValue(StrokeWidthProperty);
+            set => SetValue(StrokeWidthProperty, value);
+        }
+        
+        public double MinFreq
+        {
+            get => (double)GetValue(MinFreqProperty);
+            set => SetValue(MinFreqProperty, value);
+        }
+        
+        public double MaxFreq
+        {
+            get => (double)GetValue(MaxFreqProperty);
+            set => SetValue(MaxFreqProperty, value);
         }
 
         public AudioSpectrum()
@@ -60,6 +147,7 @@ namespace TewiMP.Controls
 
         private void AudioPlayer_VolumeMeter(Media.AudioPlayer audioPlayer, float[] sample)
         {
+            if (Visibility == Visibility.Collapsed) return;
             _spectrumCanvas.Invalidate();
         }
 
@@ -82,9 +170,9 @@ namespace TewiMP.Controls
             if (analyzer.Spectrum == null) return;
 
             int sampleRate = analyzer.WaveFormat.SampleRate;
-            double minFreq = 20;
-            double maxFreq = 16000;
-            int barCount = 128;
+            double minFreq = MinFreq;
+            double maxFreq = MaxFreq;
+            int barCount = SampleCount;
 
             float w = (float)sender.ActualWidth;
             float h = (float)sender.ActualHeight;
@@ -94,7 +182,7 @@ namespace TewiMP.Controls
                 _smoothedSpectrum = new float[analyzer.Spectrum.Length];
 
             // 平滑频谱数据
-            float smoothingFactor = 0.13f;
+            float smoothingFactor = (float)SmoothingFactor;
             for (int i = 0; i < analyzer.Spectrum.Length; i++)
                 _smoothedSpectrum[i] = _smoothedSpectrum[i] * (1 - smoothingFactor) + analyzer.Spectrum[i] * smoothingFactor;
 
@@ -122,11 +210,12 @@ namespace TewiMP.Controls
 
                 float db = sum / count;
                 float normalized = Math.Clamp((db + 60) / 60f, 0f, 1f);
-                pointsY[i] = h - normalized * h;
+                float offset = (float)StrokeWidth / 2f;
+                pointsY[i] = Math.Clamp(h - normalized * h - offset, 0, h - 1);
             }
 
             // 平滑折线
-            int smoothWindow = 2;
+            int smoothWindow = SmoothWindow;
             float[] smoothedPoints = new float[pointsY.Length];
             for (int i = 0; i < pointsY.Length; i++)
             {
@@ -165,14 +254,14 @@ namespace TewiMP.Controls
             // 填充折线下方
             ds.FillGeometry(CanvasGeometry.CreatePath(fillPath), gradient);
 
-            // 绘制白色折线
+            // 绘制折线
             var linePath = new CanvasPathBuilder(sender);
             linePath.BeginFigure(0, pointsY[0]);
             for (int i = 1; i < barCount; i++)
                 linePath.AddLine(i * stepX, pointsY[i]);
             linePath.EndFigure(CanvasFigureLoop.Open);
 
-            ds.DrawGeometry(CanvasGeometry.CreatePath(linePath), App.Instance.PlayingList.AlbumAccentColor, 1);
+            ds.DrawGeometry(CanvasGeometry.CreatePath(linePath), App.Instance.PlayingList.AlbumAccentColor, (float)StrokeWidth);
         }
 
         private void AutoScrollView_Loaded(object sender, RoutedEventArgs e)
