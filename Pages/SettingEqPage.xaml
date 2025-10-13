@@ -115,9 +115,9 @@
                     </Border>
                     <TextBlock x:Name="HeaderBaseTextBlock" Text="音效" Style="{ThemeResource TBHeader}"/>
                     <Grid x:Name="HeaderFootRoot">
-                        <Border
-                            ui:TransitionHelper.Id="background"
+                        <Grid
                             x:Name="tSpectrumRoot"
+                            ui:TransitionHelper.Id="background"
                             CornerRadius="4"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
@@ -141,7 +141,11 @@
                                     Width="140"
                                     Height="70"/>
                             </Button>
-                        </Border>
+                            <FontIcon
+                                IsHitTestVisible="False" Glyph="&#xE740;" FontSize="15"
+                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                Margin="9"/>
+                        </Grid>
                     </Grid>
                 </Grid>
             </ListView.Header>
@@ -478,7 +482,7 @@
                 </Grid.RowDefinitions>
                 <controls:AudioSpectrum
                     x:Name="AudioSpectrum"
-                    SmoothWindow="1" SmoothingFactor=".05"
+                    SmoothWindow="1" SmoothingFactor=".08"
                     SampleCount="1024" DrawDbLines="True" StrokeWidth="1"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     ui:TransitionHelper.Id="image"/>

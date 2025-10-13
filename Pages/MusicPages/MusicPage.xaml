@@ -82,11 +82,11 @@
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height=".7*"/>
+                    <RowDefinition Height=".3*"/>
                 </Grid.RowDefinitions>
                 <controls:AudioSpectrum
-                    Grid.Row="1" Opacity=".6" Margin="0,0,0,12" x:Name="AudioSpectrum1" DrawDbLines="False"
-                    StrokeWidth=".2" SmoothingFactor=".15" SmoothWindow="4" SampleCount="256" TiltDbPerOct="-4.5"
+                    Grid.Row="1" Opacity=".55" Margin="0,0,0,12" x:Name="AudioSpectrum1" DrawDbLines="False"
+                    StrokeWidth=".2" SmoothingFactor=".2" SmoothWindow="3" SampleCount="256" TiltDbPerOct="-4.5"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
             </Grid>
         </Grid>
