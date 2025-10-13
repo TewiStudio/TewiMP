@@ -381,6 +381,11 @@ namespace TewiMP.Pages
             AudioFilterStatic.ParametricEqEnable = ParametricToggleButton.IsOn;
             App.Instance.AudioPlayer.UpdateEqualizer();
         }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e)
+        {
+            AudioSpectrumRoot.Visibility = AudioSpectrumRoot.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        }
     }
 
     public partial class ThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter

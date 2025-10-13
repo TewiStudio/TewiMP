@@ -1,11 +1,13 @@
-using System;
-using Windows.UI;
+using Microsoft.Graphics.Canvas;
+using Microsoft.Graphics.Canvas.Brushes;
+using Microsoft.Graphics.Canvas.Geometry;
+using Microsoft.Graphics.Canvas.Text;
+using Microsoft.Graphics.Canvas.UI.Xaml;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.Graphics.Canvas.Brushes;
-using Microsoft.Graphics.Canvas.Geometry;
-using Microsoft.Graphics.Canvas.UI.Xaml;
+using System;
+using Windows.UI;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -102,6 +104,18 @@ namespace TewiMP.Controls
             })
         ));
 
+        public static readonly DependencyProperty DrawDbLinesProperty = DependencyProperty.Register(
+            "DrawDbLines",
+            typeof(bool),
+            typeof(AudioSpectrum),
+            new PropertyMetadata(false, new((_,  __) =>
+            {
+                if (_ is null) return;
+                (_ as AudioSpectrum).DrawDbLines = (bool)__.NewValue;
+                
+            })
+        ));
+
         public int SampleCount
         {
             get => (int)GetValue(SampleCountProperty);
@@ -142,6 +156,12 @@ namespace TewiMP.Controls
         {
             get => (bool)GetValue(IsStopProperty);
             set => SetValue(IsStopProperty, value);
+        }
+        
+        public bool DrawDbLines
+        {
+            get => (bool)GetValue(DrawDbLinesProperty);
+            set => SetValue(DrawDbLinesProperty, value);
         }
 
         public AudioSpectrum()
@@ -190,110 +210,164 @@ namespace TewiMP.Controls
         }
 
         private float[] _smoothedSpectrum;
+        private float[] _pointsY;
+        private float[] _smoothedPoints;
+        private CanvasLinearGradientBrush _gradientBrush;
+        private double _lastWidth, _lastHeight;
+        private Color _lastAccentColor;
+        private CanvasRenderTarget _gridCache;
+
         private void _spectrumCanvas_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
             var ds = args.DrawingSession;
-
-            // 背景透明
             ds.Clear(Colors.Transparent);
 
+            if (DrawDbLines)
+            {
+                EnsureGrid(sender, minDb: -90, maxDb: 0, stepDb: 10);
+                // 绘制缓存的网格
+                if (_gridCache != null)
+                    ds.DrawImage(_gridCache);
+            }
+
+            DrawSpectrum(sender, ds);
+        }
+
+        private void EnsureGrid(CanvasControl sender, float minDb, float maxDb, float stepDb)
+        {
+            if (_gridCache != null &&
+                _gridCache.Size.Width == sender.ActualWidth &&
+                _gridCache.Size.Height == sender.ActualHeight)
+                return; // 大小未变化，复用
+
+            _gridCache?.Dispose();
+            _gridCache = new CanvasRenderTarget(sender, (float)sender.ActualWidth, (float)sender.ActualHeight, 96);
+
+            using (var ds = _gridCache.CreateDrawingSession())
+            {
+                ds.Clear(Colors.Transparent);
+
+                float width = (float)_gridCache.Size.Width;
+                float height = (float)_gridCache.Size.Height;
+
+                var dashStroke = new CanvasStrokeStyle { DashStyle = CanvasDashStyle.Dash };
+                var textFormat = new CanvasTextFormat { FontSize = 12 };
+
+                float range = maxDb - minDb;
+
+                for (float db = minDb + stepDb; db < maxDb; db += stepDb)
+                {
+                    float normalized = (db - minDb) / range;
+                    float y = height - normalized * height;
+
+                    ds.DrawLine(0, y, width, y, Color.FromArgb(80, 255, 255, 255), 1f, dashStroke);
+                    ds.DrawText($"{db} dB", 4, y - 18, Color.FromArgb(120, 255, 255, 255), textFormat);
+                }
+            }
+        }
+
+        private void DrawSpectrum(CanvasControl sender, CanvasDrawingSession ds)
+        {
             var analyzer = App.Instance.AudioPlayer.AudioAnalyzer;
-            if (analyzer == null) return;
-            if (analyzer.Spectrum == null) return;
+            if (analyzer?.Spectrum == null) return;
 
             int sampleRate = analyzer.WaveFormat.SampleRate;
             double minFreq = MinFreq;
             double maxFreq = MaxFreq;
             int barCount = SampleCount;
+            var spectrum = analyzer.Spectrum;
 
             float w = (float)sender.ActualWidth;
             float h = (float)sender.ActualHeight;
             float stepX = w / (barCount - 1);
 
-            if (_smoothedSpectrum == null || _smoothedSpectrum.Length != analyzer.Spectrum.Length)
-                _smoothedSpectrum = new float[analyzer.Spectrum.Length];
+            // 初始化缓存数组
+            if (_smoothedSpectrum == null || _smoothedSpectrum.Length != spectrum.Length)
+                _smoothedSpectrum = new float[spectrum.Length];
 
-            // 平滑频谱数据
+            if (_pointsY == null || _pointsY.Length != barCount)
+            {
+                _pointsY = new float[barCount];
+                _smoothedPoints = new float[barCount];
+            }
+
+            // 更新或重建渐变刷（仅当颜色或尺寸变化时）
+            var accent = App.Instance.PlayingList.AlbumAccentColor;
+            if (_gradientBrush == null || w != _lastWidth || h != _lastHeight || accent != _lastAccentColor)
+            {
+                _gradientBrush?.Dispose();
+                _gradientBrush = new CanvasLinearGradientBrush(sender, accent, Color.FromArgb(0, 255, 255, 255))
+                {
+                    StartPoint = new(0, 0),
+                    EndPoint = new(0, h),
+                };
+                _lastWidth = w;
+                _lastHeight = h;
+                _lastAccentColor = accent;
+            }
+
+            // 一次遍历更新平滑频谱
             float smoothingFactor = (float)SmoothingFactor;
-            for (int i = 0; i < analyzer.Spectrum.Length; i++)
-                _smoothedSpectrum[i] = _smoothedSpectrum[i] * (1 - smoothingFactor) + analyzer.Spectrum[i] * smoothingFactor;
+            for (int i = 0; i < spectrum.Length; i++)
+                _smoothedSpectrum[i] = _smoothedSpectrum[i] * (1 - smoothingFactor) + spectrum[i] * smoothingFactor;
 
-            // 计算每个条的 Y 坐标
-            float[] pointsY = new float[barCount];
+            // log10 预计算
             double logMin = Math.Log10(minFreq);
             double logMax = Math.Log10(maxFreq);
+            double binScale = (_smoothedSpectrum.Length - 1) / (sampleRate / 2.0);
 
+            // 计算每个条目的 Y 坐标
             for (int i = 0; i < barCount; i++)
             {
                 double logStart = logMin + (logMax - logMin) * i / barCount;
                 double logEnd = logMin + (logMax - logMin) * (i + 1) / barCount;
 
-                double freqStart = Math.Pow(10, logStart);
-                double freqEnd = Math.Pow(10, logEnd);
-
-                int binStart = Math.Max(0, (int)Math.Round(freqStart / (sampleRate / 2.0) * (_smoothedSpectrum.Length - 1)));
-                int binEnd = Math.Min(_smoothedSpectrum.Length - 1, (int)Math.Round(freqEnd / (sampleRate / 2.0) * (_smoothedSpectrum.Length - 1)));
-                if (binEnd < binStart) binEnd = binStart;
+                int binStart = (int)(Math.Pow(10, logStart) * binScale);
+                int binEnd = (int)(Math.Pow(10, logEnd) * binScale);
+                binStart = Math.Clamp(binStart, 0, _smoothedSpectrum.Length - 1);
+                binEnd = Math.Clamp(binEnd, 0, _smoothedSpectrum.Length - 1);
 
                 float sum = 0;
-                int count = binEnd - binStart + 1;
-                for (int b = binStart; b <= binEnd; b++)
-                    sum += _smoothedSpectrum[b];
+                for (int b = binStart; b <= binEnd; b++) sum += _smoothedSpectrum[b];
+                float avgDb = sum / (binEnd - binStart + 1);
 
-                float db = sum / count;
-                float normalized = Math.Clamp((db + 60) / 60f, 0f, 1f);
-                float offset = (float)StrokeWidth / 2f;
-                pointsY[i] = Math.Clamp(h - normalized * h - offset, 0, h - 1);
+                float normalized = Math.Clamp((avgDb + 60) / 60f, 0f, 1f);
+                _pointsY[i] = h - normalized * h - (float)StrokeWidth / 2f;
             }
 
-            // 平滑折线
-            int smoothWindow = SmoothWindow;
-            float[] smoothedPoints = new float[pointsY.Length];
-            for (int i = 0; i < pointsY.Length; i++)
-            {
-                float sum = 0;
-                int count = 0;
-                for (int j = -smoothWindow; j <= smoothWindow; j++)
-                {
-                    int idx = i + j;
-                    if (idx >= 0 && idx < pointsY.Length)
-                    {
-                        sum += pointsY[idx];
-                        count++;
-                    }
-                }
-                smoothedPoints[i] = sum / count;
-            }
-            pointsY = smoothedPoints;
-
-            // 构建折线下方连续路径
-            var fillPath = new CanvasPathBuilder(sender);
-            fillPath.BeginFigure(0, h); // 左下
+            // 滑动窗口平滑（O(n) 实现）
+            int win = SmoothWindow;
+            float acc = 0;
             for (int i = 0; i < barCount; i++)
             {
-                fillPath.AddLine(i * stepX, pointsY[i]);
+                acc += _pointsY[i];
+                if (i >= win) acc -= _pointsY[i - win];
+                int len = Math.Min(i + 1, win);
+                _smoothedPoints[i] = acc / len;
             }
-            fillPath.AddLine((barCount - 1) * stepX, h); // 右下
-            fillPath.EndFigure(CanvasFigureLoop.Closed);
 
-            // 垂直渐变刷子：上半透明白色，下完全透明
-            var gradient = new CanvasLinearGradientBrush(sender, App.Instance.PlayingList.AlbumAccentColor, Color.FromArgb(0, 255, 255, 255))
+            // 构建填充路径
+            using (var fillPath = new CanvasPathBuilder(sender))
             {
-                StartPoint = new(0, 0),
-                EndPoint = new(0, h),
-            };
+                fillPath.BeginFigure(0, h);
+                for (int i = 0; i < barCount; i++)
+                    fillPath.AddLine(i * stepX, _smoothedPoints[i]);
+                fillPath.AddLine((barCount - 1) * stepX, h);
+                fillPath.EndFigure(CanvasFigureLoop.Closed);
 
-            // 填充折线下方
-            ds.FillGeometry(CanvasGeometry.CreatePath(fillPath), gradient);
+                ds.FillGeometry(CanvasGeometry.CreatePath(fillPath), _gradientBrush);
+            }
 
             // 绘制折线
-            var linePath = new CanvasPathBuilder(sender);
-            linePath.BeginFigure(0, pointsY[0]);
-            for (int i = 1; i < barCount; i++)
-                linePath.AddLine(i * stepX, pointsY[i]);
-            linePath.EndFigure(CanvasFigureLoop.Open);
+            using (var linePath = new CanvasPathBuilder(sender))
+            {
+                linePath.BeginFigure(0, _smoothedPoints[0]);
+                for (int i = 1; i < barCount; i++)
+                    linePath.AddLine(i * stepX, _smoothedPoints[i]);
+                linePath.EndFigure(CanvasFigureLoop.Open);
 
-            ds.DrawGeometry(CanvasGeometry.CreatePath(linePath), App.Instance.PlayingList.AlbumAccentColor, (float)StrokeWidth);
+                ds.DrawGeometry(CanvasGeometry.CreatePath(linePath), accent, (float)StrokeWidth);
+            }
         }
 
         private void AutoScrollView_Loaded(object sender, RoutedEventArgs e)
@@ -308,6 +382,7 @@ namespace TewiMP.Controls
                 _spectrumCanvas.Draw -= _spectrumCanvas_Draw;
             }
 
+            _gridCache?.Dispose();
             App.Instance.AudioPlayer.VolumeMeter -= AudioPlayer_VolumeMeter;
             SizeChanged -= AudioSpectrum_SizeChanged;
             Unloaded -= AutoScrollView_Unloaded;

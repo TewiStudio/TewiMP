@@ -291,6 +291,7 @@ namespace TewiMP.Media
         public ClientDeviceEvents ClientDeviceEvents { get; private set; } = new();
         public Media.AudioFileReader FileReader { get; set; } = null;
         public AudioEffects.SoundTouchWaveProvider FileProvider { get; set; } = null;
+        public VolumeSampleProvider VolumeSampleProvider { get; set; } = null;
         public SpectrumAnalyzer AudioAnalyzer { get; set; } = null;
         public enum OutApi { WaveOut, DirectSound, Wasapi, Asio, None }
         public IWavePlayer NowOutObj { get; set; } = null;
@@ -501,15 +502,13 @@ namespace TewiMP.Media
             }
             set
             {
-                if (value < 0f) value = 0;
-                else if (value > 100f) value = 100f;
-                _volume = value;
-                VolumeChanged?.Invoke(this, value);
-                if (FileReader != null)
+                _volume = float.Clamp(value, 0, 100f);
+                VolumeChanged?.Invoke(this, _volume);
+                if (VolumeSampleProvider != null)
                 {
                     if (!FileReader.isMidi)
                     {
-                        FileReader.Volume = value / 100;
+                        VolumeSampleProvider.Volume = _volume / 100f;
                     }
                 }
             }
@@ -807,6 +806,7 @@ namespace TewiMP.Media
             AudioFileReader fileReader = null;
             SpectrumAnalyzer audioAnalyzer = null;
             AudioEffects.SoundTouchWaveProvider fileProvider = null;
+            VolumeSampleProvider volumeSampleProvider = null;
 
             await Task.Run(() =>
             {
@@ -821,16 +821,18 @@ namespace TewiMP.Media
                 }
                 audioAnalyzer = new SpectrumAnalyzer(fileReader, 8192);
                 fileProvider = new AudioEffects.SoundTouchWaveProvider(audioAnalyzer.ToWaveProvider());
+                volumeSampleProvider = new VolumeSampleProvider(fileProvider.ToSampleProvider());
                 fileReader.EqEnabled = EqEnabled;
-                fileReader.Volume = Volume / 100;
                 fileProvider.Pitch = Pitch;
                 fileProvider.Tempo = Tempo;
                 fileProvider.Rate = Rate;
+                volumeSampleProvider.Volume = Volume / 100f;
             });
             await Task.Run(DisposeAll);
             FileReader = fileReader;
             AudioAnalyzer = audioAnalyzer;
             FileProvider = fileProvider;
+            VolumeSampleProvider = volumeSampleProvider;
             LogManager.Log("AudioPlayer", $"FileReader filePath \"{fileReader.FileName}\".");
             if (EqEnabled && !fileReader.isMidi)
             {
@@ -873,7 +875,7 @@ namespace TewiMP.Media
                         await Task.Run(() => NowOutObj = new WaveOutEvent());
                         (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
                         (NowOutObj as WaveOutEvent).NumberOfBuffers = Latency;
-                        NowOutObj.Init(FileProvider);
+                        NowOutObj.Init(VolumeSampleProvider);
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                     case OutApi.DirectSound:
@@ -886,7 +888,7 @@ namespace TewiMP.Media
                         {
                             await Task.Run(() => NowOutObj = new DirectSoundOut((NowOutDevice.Device as DirectSoundDeviceInfo).Guid, Latency));
                         }
-                        NowOutObj.Init(FileProvider);
+                        NowOutObj.Init(VolumeSampleProvider);
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
                     case OutApi.Wasapi:
@@ -902,7 +904,7 @@ namespace TewiMP.Media
                         });
                         try
                         {
-                            NowOutObj.Init(FileProvider);
+                            NowOutObj.Init(VolumeSampleProvider);
                         }
                         catch (COMException err)
                         {
@@ -919,7 +921,7 @@ namespace TewiMP.Media
                         var asioOut = new AsioOut((int)NowOutDevice.Device);
                         asioOut.AutoStop = false;
                         NowOutObj = asioOut;
-                        NowOutObj.Init(FileProvider);
+                        NowOutObj.Init(VolumeSampleProvider);
                         TimingChanged += AudioPlayer_TimingChanged;
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
                         break;
@@ -1137,6 +1139,7 @@ namespace TewiMP.Media
             }
 
             AudioAnalyzer = null;
+            VolumeSampleProvider = null;
 
             try
             {
