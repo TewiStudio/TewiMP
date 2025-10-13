@@ -85,8 +85,8 @@
                     <RowDefinition Height=".7*"/>
                 </Grid.RowDefinitions>
                 <controls:AudioSpectrum
-                    Grid.Row="1" Opacity=".6" Margin="0,0,0,12" x:Name="AudioSpectrum1"
-                    StrokeWidth=".2" SmoothingFactor=".15" SmoothWindow="4" SampleCount="256"
+                    Grid.Row="1" Opacity=".6" Margin="0,0,0,12" x:Name="AudioSpectrum1" DrawDbLines="False"
+                    StrokeWidth=".2" SmoothingFactor=".15" SmoothWindow="4" SampleCount="256" TiltDbPerOct="-4.5"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
             </Grid>
         </Grid>
@@ -451,18 +451,20 @@
                 <Flyout>
                     <ScrollViewer>
                         <StackPanel Orientation="Vertical" Margin="4,0,16,0" Width="250">
-                            <Slider Header="Opacity" Minimum="0" Maximum="1" Value="{x:Bind AudioSpectrum1.Opacity, Mode=TwoWay}" StepFrequency="0.01"/>
-                            <Slider Header="StrokeWidth" Minimum="0" Maximum="10.0" Value="{x:Bind AudioSpectrum1.StrokeWidth, Mode=TwoWay}" StepFrequency="0.1"/>
-                            <Slider Header="SmoothingFactor" Minimum=".05" Maximum="1.0" Value="{x:Bind AudioSpectrum1.SmoothingFactor, Mode=TwoWay}" StepFrequency="0.01"/>
-                            <Slider Header="SmoothWindow" Minimum="0" Maximum="200" Value="{x:Bind AudioSpectrum1.SmoothWindow, Mode=TwoWay}" StepFrequency="0.5"/>
-                            <Slider Header="SampleCount" Minimum="2" Maximum="4096" Value="{x:Bind AudioSpectrum1.SampleCount, Mode=TwoWay}" StepFrequency="1"/>
+                            <Slider Header="透明度" Minimum="0" Maximum="1" Value="{x:Bind AudioSpectrum1.Opacity, Mode=TwoWay}" StepFrequency="0.01"/>
+                            <Slider Header="线段宽度" Minimum="0" Maximum="10.0" Value="{x:Bind AudioSpectrum1.StrokeWidth, Mode=TwoWay}" StepFrequency="0.1"/>
+                            <Slider Header="斜率(dB/oct)" Minimum="-6" Maximum="6" Value="{x:Bind AudioSpectrum1.TiltDbPerOct, Mode=TwoWay}" StepFrequency="0.1"/>
+                            <Slider Header="频谱平滑度" Minimum=".05" Maximum="1.0" Value="{x:Bind AudioSpectrum1.SmoothingFactor, Mode=TwoWay}" StepFrequency="0.01"/>
+                            <Slider Header="滑动窗口平滑" Minimum="0" Maximum="200" Value="{x:Bind AudioSpectrum1.SmoothWindow, Mode=TwoWay}" StepFrequency="0.5"/>
+                            <Slider Header="采样数" Minimum="2" Maximum="4096" Value="{x:Bind AudioSpectrum1.SampleCount, Mode=TwoWay}" StepFrequency="1"/>
                             <ui:HeaderedItemsControl 
-                                Header="Min and Max Freq">
+                                        Header="最小/最大频率(Hz)">
                                 <ui:RangeSelector
-                                    Minimum="20" Maximum="22000" Visibility="Visible"
-                                    RangeStart="{x:Bind AudioSpectrum1.MinFreq, Mode=TwoWay}"
-                                    RangeEnd="{x:Bind AudioSpectrum1.MaxFreq, Mode=TwoWay}"/>
+                                            Minimum="20" Maximum="22000" Visibility="Visible"
+                                            RangeStart="{x:Bind AudioSpectrum1.MinFreq, Mode=TwoWay}"
+                                            RangeEnd="{x:Bind AudioSpectrum1.MaxFreq, Mode=TwoWay}"/>
                             </ui:HeaderedItemsControl>
+                            <CheckBox Content="绘制分贝/频率线条" IsChecked="{x:Bind AudioSpectrum1.DrawDbLines, Mode=TwoWay}"/>
                         </StackPanel>
                     </ScrollViewer>
                 </Flyout>
