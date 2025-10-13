@@ -320,7 +320,7 @@ namespace TewiMP.Controls
                 // 归一化
                 float normalized = Math.Clamp((avgDb - analyzer.MinDb) / (analyzer.MaxDb - analyzer.MinDb), 0f, 1f);
 
-                // tilt 叠加按比例缩放（方案二改进）
+                // tilt 叠加按比例缩放
                 double decadesFromRef = Math.Log10(freqCenter / refFreq);
                 float tiltOffset = (float)((slopeDbPerDec / (analyzer.MaxDb - analyzer.MinDb)) * decadesFromRef);
                 normalized = Math.Clamp(normalized + tiltOffset * normalized, 0f, 1f);

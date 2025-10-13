@@ -482,7 +482,7 @@
                 </Grid.RowDefinitions>
                 <controls:AudioSpectrum
                     x:Name="AudioSpectrum"
-                    SmoothWindow="1" SmoothingFactor=".08"
+                    SmoothWindow="1" SmoothingFactor=".15"
                     SampleCount="1024" DrawDbLines="True" StrokeWidth="1"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     ui:TransitionHelper.Id="image"/>
