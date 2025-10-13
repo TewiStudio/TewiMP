@@ -7,6 +7,7 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using TewiMP.Helpers;
 using Windows.UI;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -222,6 +223,8 @@ namespace TewiMP.Controls
             var ds = args.DrawingSession;
             ds.Clear(Colors.Transparent);
 
+            DrawSpectrum(sender, ds);
+
             if (DrawDbLines)
             {
                 EnsureGrid(sender, minDb: -90, maxDb: 0, stepDb: 10);
@@ -229,8 +232,6 @@ namespace TewiMP.Controls
                 if (_gridCache != null)
                     ds.DrawImage(_gridCache);
             }
-
-            DrawSpectrum(sender, ds);
         }
 
         private void EnsureGrid(CanvasControl sender, float minDb, float maxDb, float stepDb)
@@ -260,8 +261,8 @@ namespace TewiMP.Controls
                     float normalized = (db - minDb) / range;
                     float y = height - normalized * height;
 
-                    ds.DrawLine(0, y, width, y, Color.FromArgb(80, 255, 255, 255), 1f, dashStroke);
-                    ds.DrawText($"{db} dB", 4, y - 18, Color.FromArgb(120, 255, 255, 255), textFormat);
+                    ds.DrawLine(0, y, width, y, App.Instance.PlayingList.TextColor.A(30), 1f, dashStroke);
+                    ds.DrawText($"{db} dB", 4, y - 18, App.Instance.PlayingList.TextColor.A(100), textFormat);
                 }
             }
         }

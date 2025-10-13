@@ -395,6 +395,7 @@ namespace TewiMP.Background
         public Windows.UI.Color AlbumAccentColor { get; set; }
         public Windows.UI.Color AlbumAccentColorReverse { get; set; }
         public Windows.UI.Color TextOnAlbumAccentColor { get; set; }
+        public Windows.UI.Color TextColor { get; set; }
         string lastImagePath;
         public async Task GetImageColor()
         {
@@ -417,6 +418,7 @@ namespace TewiMP.Background
                 TextOnAlbumAccentColor = themeColor.Item3;
             }
 
+            TextColor = App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Dark ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0);
             (App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush).Color = AlbumAccentColor;
             (App.Current.Resources["MusicAlbumAccentBrushDark1"] as SolidColorBrush).Color = AlbumAccentColor.Darken(.1f);
             (App.Current.Resources["MusicAlbumAccentBrushDark2"] as SolidColorBrush).Color = AlbumAccentColor.Darken(.2f);

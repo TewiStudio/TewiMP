@@ -529,6 +529,30 @@ namespace TewiMP.Helpers
             return isDark;
         }
 
+        public static Windows.UI.Color A(this Windows.UI.Color color, byte value)
+        {
+            color.A = value;
+            return color;
+        }
+
+        public static Windows.UI.Color R(this Windows.UI.Color color, byte value)
+        {
+            color.R = value;
+            return color;
+        }
+
+        public static Windows.UI.Color G(this Windows.UI.Color color, byte value)
+        {
+            color.G = value;
+            return color;
+        }
+
+        public static Windows.UI.Color B(this Windows.UI.Color color, byte value)
+        {
+            color.B = value;
+            return color;
+        }
+
         public static Windows.UI.Color Lighten(this Windows.UI.Color color, float amount)
         {
             return Windows.UI.Color.FromArgb(

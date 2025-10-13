@@ -437,7 +437,7 @@
             </controlsPrimitives:SettingsExpander>
         </ListView>
         <Grid
-            Margin="36" CornerRadius="8" BorderThickness="1"
+            Margin="32,42" CornerRadius="8" BorderThickness="1"
             Background="{ThemeResource AcrylicNormal}"
             BorderBrush="{ThemeResource ControlStrokeColorDefaultBrush}"
             HorizontalAlignment="Stretch"
