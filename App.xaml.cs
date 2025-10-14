@@ -311,8 +311,10 @@ namespace TewiMP
             await CheckUpdate();
         }
 
+        public static bool IsExited = false;
         public async Task ExitApp()
         {
+            IsExited = true;
             LogManager.Log("App", "正在退出程序...");
             SaveSettings();
             MainWindowInstance.SetBackdrop(BackdropType.DefaultColor); // 在App.Instance.Exit前将MainWindow的Backdrop释放，否则会报错

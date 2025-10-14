@@ -223,7 +223,7 @@ namespace TewiMP.Pages
             App.MainWindowInstance.MainViewStateChanged -= MainWindowInstance_MainViewStateChanged;
             EQList.ItemsSource = null;
             PassFilterList.ItemsSource = null;
-            App.Instance.SaveSettings();
+            if (!App.IsExited) App.Instance.SaveSettings();
         }
 
         private void MainWindowInstance_MainViewStateChanged(bool isView)

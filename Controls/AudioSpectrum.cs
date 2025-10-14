@@ -294,62 +294,79 @@ namespace TewiMP.Controls
             double slopeDbPerDec = -tiltDbPerOct * 3.32; // 每十倍频变化斜率
             const double refFreq = 1000.0; // 参考频率
 
-            // ===== 计算每个条目的值 =====
+            // ===== 低频加密映射函数 =====
+            double a = minFreq == 20 ? 0.6 : 1; // <1 表示低频更密
+            Func<double, double> curve = t => Math.Pow(t, a);
+
+            // ===== 生成边界频率 =====
+            double[] freqEdges = new double[barCount + 1];
+            for (int i = 0; i <= barCount; i++)
+            {
+                double t = (double)i / barCount;
+                double curvedT = curve(t);
+                freqEdges[i] = Math.Pow(10, logMin + (logMax - logMin) * curvedT);
+            }
+
+            // ===== 计算每个条目 =====
             for (int i = 0; i < barCount; i++)
             {
-                // 对数比例
-                double t0 = (double)i / barCount;
-                double t1 = (double)(i + 1) / barCount;
+                double fStart = freqEdges[i];
+                double fEnd = freqEdges[i + 1];
+                double freqCenter = Math.Sqrt(fStart * fEnd);
 
-                // 频率范围
-                double fStart = Math.Pow(10, logMin + (logMax - logMin) * t0);
-                double fEnd = Math.Pow(10, logMin + (logMax - logMin) * t1);
-
-                // bin 索引
                 int binStart = Math.Clamp((int)(fStart * binScale), 0, _smoothedSpectrum.Length - 1);
                 int binEnd = Math.Clamp((int)(fEnd * binScale), 0, _smoothedSpectrum.Length - 1);
 
-                // 平均振幅
                 float sum = 0;
-                for (int b = binStart; b <= binEnd; b++) sum += _smoothedSpectrum[b];
+                for (int b = binStart; b <= binEnd; b++)
+                    sum += _smoothedSpectrum[b];
                 float avgDb = sum / (binEnd - binStart + 1);
 
-                // 对数几何平均频率
-                double freqCenter = Math.Sqrt(fStart * fEnd);
-
-                // 归一化
+                // 归一化 + tilt 修正
                 float normalized = Math.Clamp((avgDb - analyzer.MinDb) / (analyzer.MaxDb - analyzer.MinDb), 0f, 1f);
-
-                // tilt 叠加按比例缩放
                 double decadesFromRef = Math.Log10(freqCenter / refFreq);
                 float tiltOffset = (float)((slopeDbPerDec / (analyzer.MaxDb - analyzer.MinDb)) * decadesFromRef);
                 normalized = Math.Clamp(normalized + tiltOffset * normalized, 0f, 1f);
 
-                // Y 坐标
                 _pointsY[i] = h - normalized * h - (float)StrokeWidth / 2f;
-
-                // 对数 X 坐标
                 _pointsX[i] = (float)((Math.Log10(freqCenter) - logMin) / (logMax - logMin) * w);
             }
 
+            // ===== 固定边界坐标 =====
+            _pointsX[0] = 0;
+            _pointsX[^1] = w;
+
             // ===== 滑动窗口平滑 =====
-            int win = SmoothWindow;
-            float acc = 0;
-            for (int i = 0; i < barCount; i++)
+            if (SmoothWindow < 2)
             {
-                acc += _pointsY[i];
-                if (i >= win) acc -= _pointsY[i - win];
-                int len = Math.Min(i + 1, win);
-                _smoothedPoints[i] = acc / len;
+                _smoothedPoints = _pointsY;
+            }
+            else
+            {
+                for (int i = 0; i < barCount; i++)
+                {
+                    double freqRatio = (double)i / barCount;
+                    int win = (int)(SmoothWindow * (1 + (1 - freqRatio) * 8)); // 低频平滑更强
+                    float sum = 0;
+                    int count = 0;
+                    for (int j = Math.Max(0, i - win / 2); j < Math.Min(barCount, i + win / 2); j++)
+                    {
+                        sum += _pointsY[j];
+                        count++;
+                    }
+                    _smoothedPoints[i] = sum / count;
+                }
             }
 
             // ===== 绘制填充 =====
             using (var fillPath = new CanvasPathBuilder(sender))
             {
-                fillPath.BeginFigure(_pointsX[0], h);
-                for (int i = 0; i < barCount; i++)
+                fillPath.BeginFigure(-1, h);
+                fillPath.AddLine(0, _smoothedPoints[0]);
+                for (int i = 1; i < barCount - 1; i++)
                     fillPath.AddLine(_pointsX[i], _smoothedPoints[i]);
-                fillPath.AddLine(_pointsX[^1], h);
+                fillPath.AddLine(w, _smoothedPoints[^1]);
+                fillPath.AddLine(w + 1, h);
                 fillPath.EndFigure(CanvasFigureLoop.Closed);
 
                 ds.FillGeometry(CanvasGeometry.CreatePath(fillPath), _gradientBrush);
@@ -358,14 +375,16 @@ namespace TewiMP.Controls
             // ===== 绘制曲线 =====
             using (var linePath = new CanvasPathBuilder(sender))
             {
-                linePath.BeginFigure(_pointsX[0], _smoothedPoints[0]);
+                linePath.BeginFigure(0, _smoothedPoints[0]);
                 for (int i = 1; i < barCount; i++)
                     linePath.AddLine(_pointsX[i], _smoothedPoints[i]);
+                linePath.AddLine(w, _smoothedPoints[^1]);
                 linePath.EndFigure(CanvasFigureLoop.Open);
 
                 ds.DrawGeometry(CanvasGeometry.CreatePath(linePath), accent, (float)StrokeWidth);
             }
 
+            // ===== Hover 提示 =====
             if (_hoverX >= 0)
             {
                 UpdateHoverData();
@@ -373,7 +392,6 @@ namespace TewiMP.Controls
                 var textFormat = new CanvasTextFormat { FontSize = 14 };
                 var brush = App.Instance.PlayingList.TextColor;
 
-                // 防止文字超出右边界
                 float textWidth = (float)new CanvasTextLayout(ds, hoverText, textFormat, w, h).DrawBounds.Width;
                 float textX = _hoverX + 10;
                 if (textX + textWidth > w)
@@ -383,8 +401,6 @@ namespace TewiMP.Controls
                 if (textY < 0) textY = 0;
 
                 ds.DrawText(hoverText, textX, textY, brush, textFormat);
-
-                // 垂直辅助线
                 ds.DrawLine(_hoverX, 0, _hoverX, h, brush, .5f);
             }
         }
