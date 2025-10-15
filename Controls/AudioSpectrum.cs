@@ -355,7 +355,7 @@ namespace TewiMP.Controls
             bool ctrlDown = App.MainWindowInstance.isControlDown;
 
             // 如果 Ctrl 按下，则执行频谱缩放
-            if (ctrlDown)
+            if (ctrlDown && DrawDbLines)
             {
                 var pos = e.GetCurrentPoint(_spectrumCanvas).Position;
                 ZoomSpectrum((float)pos.X, delta);
@@ -386,6 +386,7 @@ namespace TewiMP.Controls
                 return;
             }
 
+            if (!DrawDbLines) return;
             // === 默认行为：频谱缩放 ===
             var pointerPos = e.GetCurrentPoint(_spectrumCanvas).Position;
             ZoomSpectrum((float)pointerPos.X, delta);
@@ -844,7 +845,8 @@ namespace TewiMP.Controls
 
                 double totalDb = 0.0;
 
-                // PassFilter（dB叠加，避免数值溢出）if (AudioFilterStatic.PassFilterEqEnable)
+                // PassFilter（dB叠加，避免数值溢出）
+                if (AudioFilterStatic.PassFilterEqEnable)
                 {
                     double fs = App.Instance.AudioPlayer?.FileReader?.WaveFormat.SampleRate ?? 44100;
 
@@ -939,7 +941,6 @@ namespace TewiMP.Controls
                         }
                     }
                 }
-
 
                 // ParametricEq（dB直接相加）
                 if (AudioFilterStatic.ParametricEqEnable)

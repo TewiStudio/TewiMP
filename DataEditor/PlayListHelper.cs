@@ -47,16 +47,17 @@ namespace TewiMP.DataEditor
             await SaveData(jdata);
         }
 
-        public static MusicListData AddMusicDataToPlayList(MusicData musicData, MusicListData musicListData)
+        public static MusicListData AddMusicDataToPlayList(MusicData musicData, MusicListData musicListData, bool insertToFirst = true)
         {
             if (musicListData.Songs is null)
             {
-                musicListData.Songs = new();
+                musicListData.Songs = [];
             }
 
             if (!musicListData.Songs.Contains(musicData))
             {
-                musicListData.Songs.Insert(0, musicData);
+                if (insertToFirst) musicListData.Songs.Insert(0, musicData);
+                else musicListData.Songs.Add(musicData);
             }
 
             return musicListData;
@@ -65,7 +66,7 @@ namespace TewiMP.DataEditor
         public static JObject AddMusicDataToPlayList(string listName, MusicData musicData, JObject jdata)
         {
             var ml = JsonNewtonsoft.FromJSON<MusicListData>(jdata[listName].ToString());
-            AddMusicDataToPlayList(musicData, ml);
+            AddMusicDataToPlayList(musicData, ml, ml.PlaySort == PlaySort.默认升序);
             jdata[listName] = JObject.FromObject(ml);
             return jdata;
         }
