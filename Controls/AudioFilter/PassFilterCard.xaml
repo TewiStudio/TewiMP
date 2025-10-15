@@ -96,6 +96,7 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="auto"/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel
                     Spacing="16"
@@ -105,8 +106,8 @@
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         ValueChanged="Silder_ValueChanged"
                         TickFrequency="825"
-                        Minimum="33"
-                        Maximum="3333"
+                        Minimum="30"
+                        Maximum="3000"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
@@ -175,6 +176,36 @@
                                 TextAlignment="Center"/>
                             <TextBlock
                             Text="增益"
+                                FontWeight="Bold"
+                                TextAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+                <StackPanel
+                    x:Name="slopeRoot"
+                    HorizontalAlignment="Center"
+                    Spacing="16"
+                    Grid.Column="3"
+                    Margin="4,0,0,0">
+                    <Slider
+                        x:Name="slopeSilder"
+                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
+                        ValueChanged="Silder_ValueChanged"
+                        Minimum="12"
+                        Maximum="96"
+                        StepFrequency="12"
+                        TickFrequency="7"
+                        ThumbToolTipValueConverter="{x:Null}"
+                        HorizontalAlignment="Center"/>
+                    <Button
+                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
+                        Click="Button_Click_1" Tag="Slope">
+                        <StackPanel>
+                            <TextBlock
+                                Text="{Binding ElementName=slopeSilder,Path=Value}"
+                                TextAlignment="Center"/>
+                            <TextBlock
+                            Text="Slope"
                                 FontWeight="Bold"
                                 TextAlignment="Center"/>
                         </StackPanel>

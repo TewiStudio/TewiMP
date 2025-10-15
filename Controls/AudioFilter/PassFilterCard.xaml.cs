@@ -26,6 +26,7 @@ namespace TewiMP.Controls
             QSilder.Value = DataContext.Q * 100;
             FreSilder.Value = DataContext.CentreFrequency;
             gainSilder.Value = DataContext.Gain * 10;
+            slopeSilder.Value = DataContext.SlopeDbPerOct;
             TypeCombo.SelectedIndex = (int)DataContext.PassFilterType;
             inChange = false;
         }
@@ -60,6 +61,7 @@ namespace TewiMP.Controls
             DataContext.Q = (float)QSilder.Value / 100f;
             DataContext.CentreFrequency = (float)FreSilder.Value;
             DataContext.Gain = (float)gainSilder.Value / 10f;
+            DataContext.SlopeDbPerOct = (int)slopeSilder.Value;
         }
 
         private void Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -115,6 +117,10 @@ namespace TewiMP.Controls
             {
                 dbGainRoot.Visibility = Visibility.Collapsed;
             }
+            if (DataContext.PassFilterType is PassFilterType.LowPass or PassFilterType.HighPass)
+            {
+                DataContext.Q = 1;
+            }
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
@@ -128,6 +134,7 @@ namespace TewiMP.Controls
                         "Quality" => DataContext.Q,
                         "Frequency" => DataContext.CentreFrequency,
                         "Gain" => DataContext.Gain,
+                        "Slope" => DataContext.SlopeDbPerOct,
                         _ => -1
                     },
                     SpinButtonPlacementMode = NumberBoxSpinButtonPlacementMode.Inline,
@@ -137,6 +144,7 @@ namespace TewiMP.Controls
                     "Quality" => "质量",
                     "Frequency" => "中心频率",
                     "Gain" => "增益",
+                    "Slope" => "斜率",
                     _ => "未知"
                 };
                 var result = await App.MainWindowInstance.ShowDialog($"设置 \"{chineseName}（{btn.Tag}）\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
@@ -154,6 +162,10 @@ namespace TewiMP.Controls
                     case "Gain":
                         DataContext.Gain = (float)numberBox.Value;
                         gainSilder.Value = DataContext.Gain * 10f;
+                        break;
+                    case "Slope":
+                        DataContext.SlopeDbPerOct = (int)numberBox.Value;
+                        gainSilder.Value = DataContext.SlopeDbPerOct;
                         break;
                 }
             }

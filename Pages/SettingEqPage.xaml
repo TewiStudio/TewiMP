@@ -138,6 +138,8 @@
                                     ui:TransitionHelper.Id="image"
                                     Background="Transparent"
                                     StrokeWidth="0"
+                                    DrawEqLines="True"
+                                    DrawEqPoints="True"
                                     Width="140"
                                     Height="70"/>
                             </Button>
@@ -483,7 +485,8 @@
                 <controls:AudioSpectrum
                     x:Name="AudioSpectrum"
                     SmoothWindow="2" SmoothingFactor=".15" MaxFreq="22000"
-                    SampleCount="1024" DrawDbLines="True" StrokeWidth="1"
+                    SampleCount="1024" StrokeWidth="1"
+                    DrawDbLines="True" DrawEqLines="True" DrawEqPoints="True"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     ui:TransitionHelper.Id="image"/>
                 <controlsPrimitives:RangeSelector

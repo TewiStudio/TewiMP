@@ -1,11 +1,12 @@
-﻿using System.IO;
-using System.Diagnostics;
-using System.Collections.Generic;
-using NAudio.Dsp;
+﻿using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
-using TewiMP.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using TewiMP.Background;
+using TewiMP.Helpers;
 
 namespace TewiMP.Media
 {
@@ -13,7 +14,8 @@ namespace TewiMP.Media
     {
         public static string FFmpegPath = DataEditor.DataFolderBase.FFmpegPath;
 
-        private List<BiQuadFilter[]> _filters = new();
+        private List<BiQuadFilter[]> _filters = [];
+        private List<BiQuadFilter[]> _passFilters = [];
         private WaveStream readerStream;
         private readonly SampleChannel sampleChannel;
         private readonly int destBytesPerSample;
@@ -215,17 +217,28 @@ namespace TewiMP.Media
         public void CreateFilters()
         {
             _filters.Clear();
+            _passFilters.Clear();
 
-            if (AudioFilterStatic.GraphicEqEnable)
+            if (AudioFilterStatic.PassFilterEqEnable)
             {
-                foreach (float[] floats in AudioEqualizerBands.NormalBands)
+                foreach (var passFilterData in AudioFilterStatic.PassFilterDatas)
                 {
-                    var filter = new BiQuadFilter[WaveFormat.Channels];
-                    for (int n = 0; n < WaveFormat.Channels; n++)
+                    if (!passFilterData.IsEnable) continue;
+
+                    int stagesCount = Math.Max(1, passFilterData.SlopeDbPerOct / 12);
+
+                    var filter = new BiQuadFilter[WaveFormat.Channels * stagesCount];
+
+                    for (int ch = 0; ch < WaveFormat.Channels; ch++)
                     {
-                        filter[n] = BiQuadFilterPeak(floats[0], floats[1], floats[2]);
+                        for (int s = 0; s < stagesCount; s++)
+                        {
+                            BiQuadFilter stageFilter = GetPassFilter(passFilterData);
+                            filter[ch * stagesCount + s] = stageFilter;
+                        }
                     }
-                    _filters.Add(filter);
+
+                    _passFilters.Add(filter);
                 }
             }
 
@@ -257,33 +270,24 @@ namespace TewiMP.Media
                 }
             }
 
-            if (AudioFilterStatic.PassFilterEqEnable)
+            if (AudioFilterStatic.GraphicEqEnable)
             {
-                foreach (var passFilterData in AudioFilterStatic.PassFilterDatas)
+                foreach (float[] floats in AudioEqualizerBands.NormalBands)
                 {
-                    if (!passFilterData.IsEnable) continue;
                     var filter = new BiQuadFilter[WaveFormat.Channels];
-                    switch (passFilterData.Channel)
+                    for (int n = 0; n < WaveFormat.Channels; n++)
                     {
-                        case 0:
-                            filter[0] = GetPassFilter(passFilterData);
-                            break;
-                        case 1:
-                            for (int n = 0; n < WaveFormat.Channels; n++)
-                            {
-                                filter[n] = GetPassFilter(passFilterData);
-                            }
-                            break;
-                        case 2:
-                            if (filter.Length >= 2)
-                            {
-                                filter[1] = GetPassFilter(passFilterData);
-                            }
-                            break;
+                        filter[n] = BiQuadFilterPeak(floats[0], floats[1], floats[2]);
                     }
                     _filters.Add(filter);
                 }
             }
+        }
+        
+
+        private BiQuadFilter BiQuadFilterCascade(BiQuadFilter first, BiQuadFilter second)
+        {
+            return second;
         }
 
         public BiQuadFilter BiQuadFilterPeak(float centreFrequency, float q, float dbGain)
@@ -336,24 +340,39 @@ namespace TewiMP.Media
 
                 try
                 {
-                    for (var a = 0; a < _filters.Count; a++)
+                    // --- 先处理 PassFilter ---
+                    foreach (var filterArray in _passFilters)
                     {
+                        int stagesCount = filterArray.Length / WaveFormat.Channels;
+
                         for (int i = 0; i < samplesRead; i++)
                         {
-                            var ch = i % WaveFormat.Channels;
-                            var filterArray = _filters[a];
-                            if (ch <= filterArray.Length - 1)
+                            int ch = i % WaveFormat.Channels;
+
+                            for (int s = 0; s < stagesCount; s++)
                             {
-                                var filter = filterArray[ch];
-                                if (filter is not null)
-                                {
+                                var filter = filterArray[ch * stagesCount + s];
+                                if (filter != null)
                                     buffer[offset + i] = filter.Transform(buffer[offset + i]);
-                                }
                             }
+                        }
+                    }
+
+                    // --- 再处理 ParametricEq 和 GraphicEq ---
+                    for (int a = 0; a < _filters.Count; a++)
+                    {
+                        var filterArray = _filters[a];
+                        for (int i = 0; i < samplesRead; i++)
+                        {
+                            int ch = i % WaveFormat.Channels;
+                            var filter = filterArray[ch];
+                            if (filter != null)
+                                buffer[offset + i] = filter.Transform(buffer[offset + i]);
                         }
                     }
                 }
                 catch { }
+
                 return samplesRead;
             }
         }
@@ -383,6 +402,26 @@ namespace TewiMP.Media
 
             IsDisposed = true;
             base.Dispose(disposing);
+        }
+    }
+
+    public class MultiStageFilter
+    {
+        private readonly BiQuadFilter[] _stages;
+
+        public MultiStageFilter(BiQuadFilter[] stages)
+        {
+            _stages = stages;
+        }
+
+        public float Transform(float sample)
+        {
+            float x = sample;
+            foreach (var stage in _stages)
+            {
+                x = stage.Transform(x);
+            }
+            return x;
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using TagLib.IIM;
 using Windows.UI;
 
 namespace TewiMP.Media
@@ -70,7 +69,7 @@ namespace TewiMP.Media
         public Color Color { get; set; }
     }
 
-    public class PassFilterData
+    public class PassFilterData : EQData
     {
         private PassFilterType passFilterType;
         public PassFilterType PassFilterType
@@ -82,66 +81,21 @@ namespace TewiMP.Media
                 App.Instance.AudioPlayer.UpdateEqualizer();
             }
         }
-        
-        private float centreFrequency;
-        public float CentreFrequency
+
+        private int slopeDbPerOct;
+        public int SlopeDbPerOct
         {
-            get => centreFrequency;
+            get => slopeDbPerOct;
             set
             {
-                centreFrequency = value;
+                slopeDbPerOct = value;
                 App.Instance.AudioPlayer.UpdateEqualizer();
             }
         }
-
-        private float q;
-        public float Q
-        {
-            get => q;
-            set
-            {
-                q = value;
-                App.Instance.AudioPlayer.UpdateEqualizer();
-            }
-        }
-
-
-        private float gain;
-        public float Gain
-        {
-            get => gain;
-            set
-            {
-                gain = value;
-                App.Instance.AudioPlayer.UpdateEqualizer();
-            }
-        }
-
-        private int channel;
-        public int Channel
-        {
-            get => channel;
-            set
-            {
-                channel = value;
-                App.Instance.AudioPlayer.UpdateEqualizer();
-            }
-        }
-
-        private bool isEnable;
-        public bool IsEnable
-        {
-            get => isEnable;
-            set
-            {
-                isEnable = value;
-                App.Instance.AudioPlayer.UpdateEqualizer();
-            }
-        }
-
-        public Color Color { get; set; }
     }
-    
+
+
+
     public static class AudioFilterStatic
     {
         public static bool GraphicEqEnable { get; set; } = false;
