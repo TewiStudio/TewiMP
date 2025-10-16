@@ -306,6 +306,9 @@ namespace TewiMP
         public async void LaunchAsync()
         {
             //await PlayListReader.Refresh();
+#if DEBUG
+            SetFramePerSecondViewer(true);
+#endif
             await PlayingList.UpdateImageColor();
             await LocalMusicManager.Refresh();
             await CheckUpdate();

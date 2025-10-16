@@ -9,6 +9,7 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Linq;
 using System.Numerics;
 using TewiMP.Helpers;
 using TewiMP.Media;
@@ -100,9 +101,17 @@ namespace TewiMP.Controls
             "DrawEqLines", typeof(bool), typeof(AudioSpectrum),
             new PropertyMetadata(false, OnPropertyChanged<bool>));
 
+        public static readonly DependencyProperty DrawEqLinesStrokeWidthProperty = DependencyProperty.Register(
+            "DrawEqLinesStrokeWidth", typeof(double), typeof(AudioSpectrum),
+            new PropertyMetadata(2d, OnPropertyChanged<bool>));
+
         public static readonly DependencyProperty DrawEqPointsProperty = DependencyProperty.Register(
             "DrawEqPoints", typeof(bool), typeof(AudioSpectrum),
             new PropertyMetadata(false, OnPropertyChanged<bool>));
+
+        public static readonly DependencyProperty DrawEqPointsRadiusProperty = DependencyProperty.Register(
+            "DrawEqPointsRadius", typeof(double), typeof(AudioSpectrum),
+            new PropertyMetadata(5d, OnPropertyChanged<bool>));
 
         public bool IsStop { get => (bool)GetValue(IsStopProperty); set => SetValue(IsStopProperty, value); }
         public int SampleCount { get => (int)GetValue(SampleCountProperty); set => SetValue(SampleCountProperty, value); }
@@ -114,7 +123,9 @@ namespace TewiMP.Controls
         public double MaxFreq { get => (double)GetValue(MaxFreqProperty); set => SetValue(MaxFreqProperty, value); }
         public bool DrawDbLines { get => (bool)GetValue(DrawDbLinesProperty); set => SetValue(DrawDbLinesProperty, value); }
         public bool DrawEqLines { get => (bool)GetValue(DrawEqLinesProperty); set => SetValue(DrawEqLinesProperty, value); }
+        public double DrawEqLinesStrokeWidth { get => (double)GetValue(DrawEqLinesStrokeWidthProperty); set => SetValue(DrawEqLinesStrokeWidthProperty, value); }
         public bool DrawEqPoints { get => (bool)GetValue(DrawEqPointsProperty); set => SetValue(DrawEqPointsProperty, value); }
+        public double DrawEqPointsRadius { get => (double)GetValue(DrawEqPointsRadiusProperty); set => SetValue(DrawEqPointsRadiusProperty, value); }
 
         private static void OnPropertyChanged<T>(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -289,7 +300,7 @@ namespace TewiMP.Controls
             {
                 double logFreq = logMin + (_hoverX / width) * (logMax - logMin);
                 float freq = (float)Math.Pow(10, logFreq);
-                _draggingEQ.CentreFrequency = Math.Clamp(freq, MinFreqHz, MaxFreqHz);
+                _draggingEQ.CentreFrequency = Math.Clamp(float.Round(freq, 2), MinFreqHz, MaxFreqHz);
 
                 float gain = (height / 2 - _hoverY) / (height / 2) * 24f;
                 _draggingEQ.Gain = Math.Clamp(gain, -24f, 24f);
@@ -301,12 +312,12 @@ namespace TewiMP.Controls
             {
                 double logFreq = logMin + (_hoverX / width) * (logMax - logMin);
                 float freq = (float)Math.Pow(10, logFreq);
-                _draggingPass.CentreFrequency = Math.Clamp(freq, MinFreqHz, MaxFreqHz);
+                _draggingPass.CentreFrequency = Math.Clamp(float.Round(freq, 2), MinFreqHz, MaxFreqHz);
 
                 if (_draggingPass.PassFilterType is PassFilterType.LowShelf or PassFilterType.HighShelf)
                 {
                     float gain = (height / 2 - _hoverY) / (height / 2) * 24f;
-                    _draggingPass.Gain = Math.Clamp(gain, -24f, 24f);
+                    _draggingPass.Gain = Math.Clamp(float.Round(gain, 2), -24f, 24f);
                 }
                 else
                 {
@@ -366,7 +377,7 @@ namespace TewiMP.Controls
             if (_hoveringEQ != null)
             {
                 float newQ = _hoveringEQ.Q + (delta > 0 ? QStep : -QStep);
-                _hoveringEQ.Q = Math.Clamp(newQ, MinQ, MaxQ);
+                _hoveringEQ.Q = Math.Clamp(float.Round(newQ, 2), MinQ, MaxQ);
                 return;
             }
 
@@ -381,7 +392,7 @@ namespace TewiMP.Controls
                 else
                 {
                     float newQ = _hoveringPass.Q + (delta > 0 ? QStep : -QStep);
-                    _hoveringPass.Q = Math.Clamp(newQ, MinQ, MaxQ);
+                    _hoveringPass.Q = Math.Clamp(float.Round(newQ, 2), MinQ, MaxQ);
                 }
                 return;
             }
@@ -811,7 +822,7 @@ namespace TewiMP.Controls
                     if (!eq.IsEnable) continue;
                     float x = (float)((Math.Log10(eq.CentreFrequency) - logMin) / (logMax - logMin) * width);
                     float y = height / 2 - eq.Gain / 24f * height / 2;
-                    ds.FillCircle(x, y, 5f, eq.Color);
+                    ds.FillCircle(x, y, (float)DrawEqPointsRadius, eq.Color.A(200));
                 }
             }
 
@@ -823,7 +834,7 @@ namespace TewiMP.Controls
                     if (!pf.IsEnable) continue;
                     float x = (float)((Math.Log10(pf.CentreFrequency) - logMin) / (logMax - logMin) * width);
                     float y = height / 2 - pf.Gain / 24f * height / 2;
-                    ds.FillCircle(x, y, 6f, pf.Color.A(200));
+                    ds.FillCircle(x, y, (float)DrawEqPointsRadius, pf.Color.A(200));
                 }
             }
         }
@@ -959,10 +970,25 @@ namespace TewiMP.Controls
                 curve[i] = new Vector2(x, y);
             }
 
-            // === 用连续线段绘制曲线 ===
-            for (int i = 1; i < points; i++)
+            // curve 是 List<Vector2> 或 Vector2[]，包含连续点
+            if (curve == null || curve.Length < 2)
+                return;
+
+            // 创建路径
+            using (var pathBuilder = new CanvasPathBuilder(ds))
             {
-                ds.DrawLine(curve[i - 1], curve[i], App.Instance.PlayingList.TextColor.A(180), 2f);
+                pathBuilder.BeginFigure(curve[0]);
+
+                for (int i = 1; i < curve.Length; i++)
+                    pathBuilder.AddLine(curve[i]);
+
+                pathBuilder.EndFigure(CanvasFigureLoop.Open);
+
+                // 绘制曲线
+                using (var geometry = CanvasGeometry.CreatePath(pathBuilder))
+                {
+                    ds.DrawGeometry(geometry, App.Instance.PlayingList.TextColor.A(180), (float)DrawEqLinesStrokeWidth);
+                }
             }
         }
         #endregion

@@ -9,6 +9,7 @@ using Microsoft.UI.Xaml.Media;
 using System;
 using System.Numerics;
 using System.Threading.Tasks;
+using TewiMP.Controls;
 using TewiMP.Media;
 using Windows.UI;
 
@@ -17,15 +18,23 @@ namespace TewiMP.Pages
     public partial class SettingEqPage : Page
     {
         public AudioPlayer AudioPlayer => App.Instance.AudioPlayer;
+
+        public static readonly DependencyProperty EqEnabledProperty = DependencyProperty.Register(
+            "EqEnabled", typeof(bool), typeof(AudioSpectrum),
+            new PropertyMetadata(false, new((_, __) =>
+            {
+                App.Instance.AudioPlayer.EqEnabled = (bool)__.NewValue;
+            })));
+
         public bool EqEnabled
         {
             get
             {
-                return App.Instance.AudioPlayer.EqEnabled;
+                return (bool)GetValue(EqEnabledProperty);
             }
             set
             {
-                App.Instance.AudioPlayer.EqEnabled = value;
+                SetValue(EqEnabledProperty, value);
             }
         }
 
