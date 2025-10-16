@@ -121,7 +121,7 @@ namespace TewiMP.DataEditor
         public static async Task<JObject> AddLocalMusicDataToPlayList(string listName, FileInfo localFile, JObject jdata)
         {
             var data = await MusicData.FromFile(localFile.FullName);
-            foreach (var i in data)
+            foreach (var i in data.Reverse())
             {
                 AddMusicDataToPlayList(listName, i, jdata);
             }

@@ -1006,6 +1006,7 @@ namespace TewiMP.Media
 
         public void UpdateEqualizer()
         {
+            EqBandChanged?.Invoke(this);
             FileReader?.CreateFilters();
         }
 

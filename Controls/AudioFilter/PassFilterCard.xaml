@@ -71,9 +71,6 @@
             Margin="0">
             <Grid>
                 <Grid.Resources>
-                    <local:GainThumbToolTipValueConverter x:Key="gainValueC"/>
-                    <local:ThumbToolTipValueConverter x:Key="doubleValueC"/>
-                    <local:PassFilterQValueConverter x:Key="passValueC"/>
                     <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Setter Property="Padding" Value="0"/>
                         <Setter Property="Margin" Value="0,-4"/>
@@ -89,7 +86,6 @@
                         <Setter Property="Orientation" Value="Vertical"/>
                         <Setter Property="Height" Value="120"/>
                         <Setter Property="TickPlacement" Value="Outside"/>
-                        <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource passValueC}"/>
                     </Style>
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
@@ -105,16 +101,17 @@
                         x:Name="QSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         ValueChanged="Silder_ValueChanged"
+                        StepFrequency=".1"
                         TickFrequency="825"
-                        Minimum="30"
-                        Maximum="3000"
+                        Minimum=".3"
+                        Maximum="30"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         Click="Button_Click_1" Tag="Quality">
                         <StackPanel>
                             <TextBlock
-                                Text="{Binding ElementName=QSilder,Path=Value,Converter={StaticResource passValueC}}"
+                                Text="{Binding ElementName=QSilder,Path=Value}"
                                 TextAlignment="Center"/>
                             <TextBlock
                                 Text="Q"
@@ -130,11 +127,10 @@
                     <Slider
                         x:Name="FreSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        ThumbToolTipValueConverter="{StaticResource doubleValueC}"
                         ValueChanged="Silder_ValueChanged"
                         TickFrequency="3995"
                         Minimum="20"
-                        Maximum="16000"
+                        Maximum="22000"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
@@ -161,18 +157,18 @@
                     <Slider
                         x:Name="gainSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        ThumbToolTipValueConverter="{StaticResource gainValueC}"
                         ValueChanged="Silder_ValueChanged"
-                        Minimum="-200"
-                        Maximum="200"
                         TickFrequency="100"
+                        StepFrequency=".1"
+                        Minimum="-20"
+                        Maximum="20"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         Click="Button_Click_1" Tag="Gain">
                         <StackPanel>
                             <TextBlock
-                                Text="{Binding ElementName=gainSilder,Path=Value,Converter={StaticResource gainValueC}}"
+                                Text="{Binding ElementName=gainSilder,Path=Value}"
                                 TextAlignment="Center"/>
                             <TextBlock
                             Text="增益"
@@ -195,7 +191,6 @@
                         Maximum="96"
                         StepFrequency="12"
                         TickFrequency="7"
-                        ThumbToolTipValueConverter="{x:Null}"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"

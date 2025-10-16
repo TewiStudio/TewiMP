@@ -23,9 +23,9 @@ namespace TewiMP.Controls
         {
             if (DataContext is null) return;
             inChange = true;
-            QSilder.Value = DataContext.Q * 100;
+            QSilder.Value = DataContext.Q;
             FreSilder.Value = DataContext.CentreFrequency;
-            gainSilder.Value = DataContext.Gain * 10;
+            gainSilder.Value = DataContext.Gain;
             slopeSilder.Value = DataContext.SlopeDbPerOct;
             TypeCombo.SelectedIndex = (int)DataContext.PassFilterType;
             inChange = false;
@@ -34,13 +34,21 @@ namespace TewiMP.Controls
         bool inChange = false;
         private void EQCard_Loaded(object sender, RoutedEventArgs e)
         {
+            App.Instance.AudioPlayer.EqBandChanged -= AudioPlayer_EqBandChanged;
+            App.Instance.AudioPlayer.EqBandChanged += AudioPlayer_EqBandChanged;
             ColorPickerPanel.SelectedColor = DataContext.Color;
             UpdateData();
         }
 
         private void EQCard_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (IsLoaded) return;
+            App.Instance.AudioPlayer.EqBandChanged -= AudioPlayer_EqBandChanged;
+        }
 
+        private void AudioPlayer_EqBandChanged(AudioPlayer audioPlayer)
+        {
+            UpdateData();
         }
 
         private void ColorPickerPanel_LayoutUpdated(object sender, object e)
@@ -58,9 +66,9 @@ namespace TewiMP.Controls
         private void Silder_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (inChange || DataContext is null) return;
-            DataContext.Q = (float)QSilder.Value / 100f;
+            DataContext.Q = (float)QSilder.Value;
             DataContext.CentreFrequency = (float)FreSilder.Value;
-            DataContext.Gain = (float)gainSilder.Value / 10f;
+            DataContext.Gain = (float)gainSilder.Value;
             DataContext.SlopeDbPerOct = (int)slopeSilder.Value;
         }
 
@@ -153,7 +161,7 @@ namespace TewiMP.Controls
                 {
                     case "Quality":
                         DataContext.Q = (float)numberBox.Value;
-                        QSilder.Value = DataContext.Q * 100f;
+                        QSilder.Value = DataContext.Q;
                         break;
                     case "Frequency":
                         DataContext.CentreFrequency = (float)numberBox.Value;
@@ -161,7 +169,7 @@ namespace TewiMP.Controls
                         break;
                     case "Gain":
                         DataContext.Gain = (float)numberBox.Value;
-                        gainSilder.Value = DataContext.Gain * 10f;
+                        gainSilder.Value = DataContext.Gain;
                         break;
                     case "Slope":
                         DataContext.SlopeDbPerOct = (int)numberBox.Value;
@@ -181,23 +189,4 @@ namespace TewiMP.Controls
             MoveIcon.Opacity = 0;
         }
     }
-
-    public partial class PassFilterQValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is double)
-            {
-                double dValue = System.Convert.ToDouble(value) / 100;
-                return dValue;
-            }
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            return null;
-        }
-    }
-
 }

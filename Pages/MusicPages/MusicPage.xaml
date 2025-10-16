@@ -466,9 +466,9 @@
                                             RangeStart="{x:Bind AudioSpectrum1.MinFreq, Mode=TwoWay}"
                                             RangeEnd="{x:Bind AudioSpectrum1.MaxFreq, Mode=TwoWay}"/>
                             </ui:HeaderedItemsControl>
-                            <CheckBox IsChecked="{x:Bind AudioSpectrum.DrawDbLines, Mode=TwoWay}" Content="绘制分贝/频率线条"/>
-                            <CheckBox IsChecked="{x:Bind AudioSpectrum.DrawEqLines, Mode=TwoWay}" Content="绘制均衡器影响曲线"/>
-                            <CheckBox IsChecked="{x:Bind AudioSpectrum.DrawEqPoints, Mode=TwoWay}" Content="绘制均衡器控制点"/>
+                            <CheckBox IsChecked="{x:Bind AudioSpectrum1.DrawDbLines, Mode=TwoWay}" Content="绘制分贝/频率线条"/>
+                            <CheckBox IsChecked="{x:Bind AudioSpectrum1.DrawEqLines, Mode=TwoWay}" Content="绘制均衡器影响曲线"/>
+                            <CheckBox IsChecked="{x:Bind AudioSpectrum1.DrawEqPoints, Mode=TwoWay}" Content="绘制均衡器控制点"/>
                         </StackPanel>
                     </ScrollViewer>
                 </Flyout>
