@@ -219,6 +219,9 @@ namespace TewiMP.Media
             _filters.Clear();
             _passFilters.Clear();
 
+            int channels = WaveFormat.Channels;
+
+            // PassFilter
             if (AudioFilterStatic.PassFilterEqEnable)
             {
                 foreach (var passFilterData in AudioFilterStatic.PassFilterDatas)
@@ -226,15 +229,15 @@ namespace TewiMP.Media
                     if (!passFilterData.IsEnable) continue;
 
                     int stagesCount = Math.Max(1, passFilterData.SlopeDbPerOct / 12);
+                    var filter = new BiQuadFilter[channels * stagesCount];
 
-                    var filter = new BiQuadFilter[WaveFormat.Channels * stagesCount];
-
-                    for (int ch = 0; ch < WaveFormat.Channels; ch++)
+                    for (int ch = 0; ch < channels; ch++)
                     {
+                        if (!ShouldApplyToChannel(passFilterData.Channel, ch)) continue;
+
                         for (int s = 0; s < stagesCount; s++)
                         {
-                            BiQuadFilter stageFilter = GetPassFilter(passFilterData);
-                            filter[ch * stagesCount + s] = stageFilter;
+                            filter[ch * stagesCount + s] = GetPassFilter(passFilterData);
                         }
                     }
 
@@ -242,40 +245,33 @@ namespace TewiMP.Media
                 }
             }
 
+            // Parametric EQ
             if (AudioFilterStatic.ParametricEqEnable)
             {
                 foreach (var eqData in AudioFilterStatic.ParametricEqDatas)
                 {
                     if (!eqData.IsEnable) continue;
-                    var filter = new BiQuadFilter[WaveFormat.Channels];
-                    switch (eqData.Channel)
+
+                    var filter = new BiQuadFilter[channels];
+
+                    for (int ch = 0; ch < channels; ch++)
                     {
-                        case 0:
-                            filter[0] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q, eqData.Gain);
-                            break;
-                        case 1:
-                            for (int n = 0; n < WaveFormat.Channels; n++)
-                            {
-                                filter[n] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q, eqData.Gain);
-                            }
-                            break;
-                        case 2:
-                            if (filter.Length >= 2)
-                            {
-                                filter[1] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q, eqData.Gain);
-                            }
-                            break;
+                        if (!ShouldApplyToChannel(eqData.Channel, ch)) continue;
+
+                        filter[ch] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q, eqData.Gain);
                     }
+
                     _filters.Add(filter);
                 }
             }
 
+            // Graphic EQ
             if (AudioFilterStatic.GraphicEqEnable)
             {
                 foreach (float[] floats in AudioEqualizerBands.NormalBands)
                 {
-                    var filter = new BiQuadFilter[WaveFormat.Channels];
-                    for (int n = 0; n < WaveFormat.Channels; n++)
+                    var filter = new BiQuadFilter[channels];
+                    for (int n = 0; n < channels; n++)
                     {
                         filter[n] = BiQuadFilterPeak(floats[0], floats[1], floats[2]);
                     }
@@ -283,11 +279,19 @@ namespace TewiMP.Media
                 }
             }
         }
-        
 
-        private BiQuadFilter BiQuadFilterCascade(BiQuadFilter first, BiQuadFilter second)
+        /// <summary>
+        /// 判断滤波器是否应用于当前声道
+        /// </summary>
+        private static bool ShouldApplyToChannel(int filterChannel, int currentChannel)
         {
-            return second;
+            return filterChannel switch
+            {
+                0 => currentChannel == 0,  // 左声道
+                1 => true,                 // 双声道
+                2 => currentChannel == 1,  // 右声道
+                _ => true
+            };
         }
 
         public BiQuadFilter BiQuadFilterPeak(float centreFrequency, float q, float dbGain)
@@ -333,48 +337,85 @@ namespace TewiMP.Media
         // 在读取音频数据时加入均衡器数据
         public int Read(float[] buffer, int offset, int count)
         {
+            int samplesRead;
+
+            // 尽可能缩小锁范围（避免音频阻塞）
             lock (lockObject)
             {
-                int samplesRead = sampleChannel.Read(buffer, offset, count);
-                if (!EqEnabled) return samplesRead;
+                samplesRead = sampleChannel.Read(buffer, offset, count);
+                if (samplesRead <= 0 || !EqEnabled)
+                    return samplesRead;
+            }
 
-                try
+            // 创建安全副本（防止UI线程修改滤波器列表）
+            var localPassFilters = _passFilters?.ToArray();
+            var localFilters = _filters?.ToArray();
+
+            int channels = WaveFormat.Channels;
+            if (channels <= 0)
+                return samplesRead;
+
+            int samplesPerChannel = samplesRead / channels;
+
+            // Pass Filters
+            if (localPassFilters != null)
+            {
+                foreach (var filterArray in localPassFilters)
                 {
-                    // --- 先处理 PassFilter ---
-                    foreach (var filterArray in _passFilters)
-                    {
-                        int stagesCount = filterArray.Length / WaveFormat.Channels;
+                    if (filterArray == null || filterArray.Length == 0)
+                        continue;
 
-                        for (int i = 0; i < samplesRead; i++)
+                    int stagesCount = filterArray.Length / channels;
+                    if (stagesCount <= 0) continue;
+
+                    // 按通道处理
+                    for (int ch = 0; ch < channels; ch++)
+                    {
+                        for (int n = 0; n < samplesPerChannel; n++)
                         {
-                            int ch = i % WaveFormat.Channels;
+                            int idx = offset + n * channels + ch;
+                            float sample = buffer[idx];
 
                             for (int s = 0; s < stagesCount; s++)
                             {
-                                var filter = filterArray[ch * stagesCount + s];
-                                if (filter != null)
-                                    buffer[offset + i] = filter.Transform(buffer[offset + i]);
+                                int filterIdx = ch * stagesCount + s;
+                                if (filterIdx < filterArray.Length)
+                                {
+                                    var filter = filterArray[filterIdx];
+                                    if (filter != null)
+                                        sample = filter.Transform(sample);
+                                }
                             }
-                        }
-                    }
 
-                    // --- 再处理 ParametricEq 和 GraphicEq ---
-                    for (int a = 0; a < _filters.Count; a++)
-                    {
-                        var filterArray = _filters[a];
-                        for (int i = 0; i < samplesRead; i++)
-                        {
-                            int ch = i % WaveFormat.Channels;
-                            var filter = filterArray[ch];
-                            if (filter != null)
-                                buffer[offset + i] = filter.Transform(buffer[offset + i]);
+                            buffer[idx] = sample;
                         }
                     }
                 }
-                catch { }
-
-                return samplesRead;
             }
+
+            // EQ Filters
+            if (localFilters != null)
+            {
+                foreach (var filterArray in localFilters)
+                {
+                    if (filterArray == null || filterArray.Length == 0)
+                        continue;
+
+                    for (int ch = 0; ch < channels; ch++)
+                    {
+                        var filter = (ch < filterArray.Length) ? filterArray[ch] : null;
+                        if (filter == null) continue;
+
+                        for (int n = 0; n < samplesPerChannel; n++)
+                        {
+                            int idx = offset + n * channels + ch;
+                            buffer[idx] = filter.Transform(buffer[idx]);
+                        }
+                    }
+                }
+            }
+
+            return samplesRead;
         }
 
         private long SourceToDest(long sourceBytes)

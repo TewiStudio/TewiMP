@@ -101,7 +101,7 @@
                         x:Name="QSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         ValueChanged="Silder_ValueChanged"
-                        StepFrequency=".1"
+                        StepFrequency=".01"
                         TickFrequency="825"
                         Minimum=".3"
                         Maximum="30"
@@ -159,7 +159,7 @@
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         ValueChanged="Silder_ValueChanged"
                         TickFrequency="100"
-                        StepFrequency=".1"
+                        StepFrequency=".01"
                         Minimum="-20"
                         Maximum="20"
                         HorizontalAlignment="Center"/>
@@ -200,7 +200,7 @@
                                 Text="{Binding ElementName=slopeSilder,Path=Value}"
                                 TextAlignment="Center"/>
                             <TextBlock
-                            Text="Slope"
+                                Text="斜率"
                                 FontWeight="Bold"
                                 TextAlignment="Center"/>
                         </StackPanel>
@@ -219,7 +219,7 @@
                 <community:Segmented
                     IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                     HorizontalAlignment="Stretch"
-                    SelectedIndex="{Binding Channel,Mode=TwoWay}"
+                    SelectedIndex="{x:Bind DataContext.Channel,Mode=TwoWay}"
                     SelectionChanged="Segmented_SelectionChanged">
                     <community:SegmentedItem
                         Content="L"

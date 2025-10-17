@@ -489,7 +489,7 @@
                     x:Name="AudioSpectrum"
                     SmoothWindow="2" SmoothingFactor=".15" MaxFreq="22000"
                     SampleCount="1024" StrokeWidth="1"
-                    DrawDbLines="True" DrawEqLines="True" DrawEqPoints="True"
+                    DrawDbLines="True" DrawEqLines="True" DrawEqPoints="True" DrawLatencyText="True"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
                     ui:TransitionHelper.Id="image"/>
                 <controlsPrimitives:RangeSelector
@@ -535,6 +535,7 @@
                                     <CheckBox IsChecked="{x:Bind AudioSpectrum.DrawDbLines, Mode=TwoWay}" Content="绘制分贝/频率线条"/>
                                     <CheckBox IsChecked="{x:Bind AudioSpectrum.DrawEqLines, Mode=TwoWay}" Content="绘制均衡器影响曲线"/>
                                     <CheckBox IsChecked="{x:Bind AudioSpectrum.DrawEqPoints, Mode=TwoWay}" Content="绘制均衡器控制点"/>
+                                    <CheckBox IsChecked="{x:Bind AudioSpectrum.DrawLatencyText, Mode=TwoWay}" Content="绘制帧数/延迟标签"/>
                                 </StackPanel>
                             </ScrollViewer>
                         </Flyout>

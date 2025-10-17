@@ -48,6 +48,7 @@ namespace TewiMP.Controls
 
         private void AudioPlayer_EqBandChanged(AudioPlayer audioPlayer)
         {
+            if (isUserChange) return;
             UpdateData();
         }
 
@@ -63,13 +64,16 @@ namespace TewiMP.Controls
             UpdateData();
         }
 
+        bool isUserChange = false;
         private void Silder_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (inChange || DataContext is null) return;
+            isUserChange = true;
             DataContext.Q = (float)QSilder.Value;
             DataContext.CentreFrequency = (float)FreSilder.Value;
             DataContext.Gain = (float)gainSilder.Value;
             DataContext.SlopeDbPerOct = (int)slopeSilder.Value;
+            isUserChange = false;
         }
 
         private void Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -155,7 +159,15 @@ namespace TewiMP.Controls
                     "Slope" => "斜率",
                     _ => "未知"
                 };
-                var result = await App.MainWindowInstance.ShowDialog($"设置 \"{chineseName}（{btn.Tag}）\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
+                string unit = btn.Tag switch
+                {
+                    "Quality" => "",
+                    "Frequency" => "Hz",
+                    "Gain" => "dB",
+                    "Slope" => "dB/Oct",
+                    _ => ""
+                };
+                var result = await App.MainWindowInstance.ShowDialog($"设置 \"{chineseName} {btn.Tag}{(string.IsNullOrEmpty(unit) ? "" : $" ({unit})")}\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
                 if (result != ContentDialogResult.Primary) return;
                 switch (btn.Tag)
                 {

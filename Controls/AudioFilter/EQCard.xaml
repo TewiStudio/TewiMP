@@ -71,9 +71,6 @@
             Margin="0">
             <Grid>
                 <Grid.Resources>
-                    <local:GainThumbToolTipValueConverter x:Key="gainValueC"/>
-                    <local:QValueConverter x:Key="qValueC"/>
-                    <local:ThumbToolTipValueConverter x:Key="doubleValueC"/>
                     <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
                         <Setter Property="Padding" Value="0"/>
                         <Setter Property="Margin" Value="0,-4"/>
@@ -89,7 +86,6 @@
                         <Setter Property="Orientation" Value="Vertical"/>
                         <Setter Property="Height" Value="120"/>
                         <Setter Property="TickPlacement" Value="Outside"/>
-                        <Setter Property="ThumbToolTipValueConverter" Value="{StaticResource gainValueC}"/>
                     </Style>
                 </Grid.Resources>
                 <Grid.ColumnDefinitions>
@@ -104,16 +100,17 @@
                         x:Name="gainSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         ValueChanged="Silder_ValueChanged"
-                        Minimum="-200"
-                        Maximum="200"
-                        TickFrequency="100"
+                        Minimum="-20"
+                        Maximum="20"
+                        StepFrequency=".01"
+                        TickFrequency="10"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         Click="Button_Click_1" Tag="Gain">
                         <StackPanel>
                             <TextBlock
-                                Text="{Binding ElementName=gainSilder,Path=Value,Converter={StaticResource gainValueC}}"
+                                Text="{Binding ElementName=gainSilder,Path=Value}"
                                 TextAlignment="Center"/>
                             <TextBlock
                                 Text="增益"
@@ -130,18 +127,18 @@
                     <Slider
                         x:Name="QSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        ThumbToolTipValueConverter="{StaticResource qValueC}"
                         ValueChanged="Silder_ValueChanged"
+                        StepFrequency=".01"
                         TickFrequency="825"
-                        Minimum="33"
-                        Maximum="3333"
+                        Minimum=".3"
+                        Maximum="30"
                         HorizontalAlignment="Center"/>
                     <Button
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                         Click="Button_Click_1" Tag="Quality">
                         <StackPanel>
                             <TextBlock
-                                Text="{Binding ElementName=QSilder,Path=Value,Converter={StaticResource qValueC}}"
+                                Text="{Binding ElementName=QSilder,Path=Value}"
                                 TextAlignment="Center"/>
                             <TextBlock
                                 Text="Q"
@@ -157,7 +154,6 @@
                     <Slider
                         x:Name="FreSilder"
                         IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        ThumbToolTipValueConverter="{StaticResource doubleValueC}"
                         ValueChanged="Silder_ValueChanged"
                         TickFrequency="3995"
                         Minimum="20"
@@ -182,7 +178,7 @@
             <community:Segmented
                 IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
                 HorizontalAlignment="Stretch"
-                SelectedIndex="{Binding Channel,Mode=TwoWay}"
+                SelectedIndex="{x:Bind DataContext.Channel,Mode=TwoWay}"
                 SelectionChanged="Segmented_SelectionChanged">
                 <community:SegmentedItem
                     Content="L"

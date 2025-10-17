@@ -9,6 +9,8 @@ using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using TewiMP.Helpers;
@@ -18,6 +20,9 @@ using static Vanara.PInvoke.Gdi32;
 
 namespace TewiMP.Controls
 {
+    /// <summary>
+    /// 从正在播放的歌曲获取经过转换的数据，实时绘制频谱、均衡器影响曲线
+    /// </summary>
     public sealed partial class AudioSpectrum : Control
     {
         private CanvasControl _spectrumCanvas;
@@ -29,17 +34,28 @@ namespace TewiMP.Controls
         private float[] _smoothedPoints;
         private CanvasLinearGradientBrush _gradientBrush;
         private CanvasRenderTarget _gridCache;
+        private CanvasTextFormat canvasTextFormat;
         private double _lastWidth, _lastHeight;
         private double _lastMinFreq, _lastMaxFreq;
         private Color _lastAccentColor;
         private EQData? _draggingEQ = null;
         private PassFilterData? _draggingPass = null;
+        private EQData? _hoveringEQ;
+        private PassFilterData? _hoveringPass;
         private const float EQHitRadius = 10f;
         private const float MinFreqHz = 20f;
         private const float MaxFreqHz = 22000f;
         private const float MinQ = 0.3f;
         private const float MaxQ = 33.3f;
         private const float QStep = 0.1f;
+
+        private readonly Queue<double> _frameTimes = new();   // 记录最近一段时间的帧间隔（秒）
+        private double _lastDrawTime = 0;
+        private double _avgFps = 0;
+        private double _avgFrameMs = 0;
+
+        // 控制统计窗口大小（秒）
+        private const double SampleDuration = 1.0; // 1秒内的平均值
 
         // 滚轮缩放
         private const double MinVisibleFreq = 20;
@@ -101,6 +117,10 @@ namespace TewiMP.Controls
             "DrawEqLines", typeof(bool), typeof(AudioSpectrum),
             new PropertyMetadata(false, OnPropertyChanged<bool>));
 
+        public static readonly DependencyProperty DrawLatencyTextProperty = DependencyProperty.Register(
+            "DrawLatencyText", typeof(bool), typeof(AudioSpectrum),
+            new PropertyMetadata(false, OnPropertyChanged<bool>));
+
         public static readonly DependencyProperty DrawEqLinesStrokeWidthProperty = DependencyProperty.Register(
             "DrawEqLinesStrokeWidth", typeof(double), typeof(AudioSpectrum),
             new PropertyMetadata(2d, OnPropertyChanged<bool>));
@@ -123,13 +143,14 @@ namespace TewiMP.Controls
         public double MaxFreq { get => (double)GetValue(MaxFreqProperty); set => SetValue(MaxFreqProperty, value); }
         public bool DrawDbLines { get => (bool)GetValue(DrawDbLinesProperty); set => SetValue(DrawDbLinesProperty, value); }
         public bool DrawEqLines { get => (bool)GetValue(DrawEqLinesProperty); set => SetValue(DrawEqLinesProperty, value); }
-        public double DrawEqLinesStrokeWidth { get => (double)GetValue(DrawEqLinesStrokeWidthProperty); set => SetValue(DrawEqLinesStrokeWidthProperty, value); }
+        public bool DrawLatencyText { get => (bool)GetValue(DrawLatencyTextProperty); set => SetValue(DrawLatencyTextProperty, value); }
         public bool DrawEqPoints { get => (bool)GetValue(DrawEqPointsProperty); set => SetValue(DrawEqPointsProperty, value); }
+        public double DrawEqLinesStrokeWidth { get => (double)GetValue(DrawEqLinesStrokeWidthProperty); set => SetValue(DrawEqLinesStrokeWidthProperty, value); }
         public double DrawEqPointsRadius { get => (double)GetValue(DrawEqPointsRadiusProperty); set => SetValue(DrawEqPointsRadiusProperty, value); }
 
         private static void OnPropertyChanged<T>(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (d is AudioSpectrum spectrum) spectrum._spectrumCanvas?.Invalidate();
+            //if (d is AudioSpectrum spectrum) spectrum._spectrumCanvas?.Invalidate();
         }
         #endregion
 
@@ -222,7 +243,7 @@ namespace TewiMP.Controls
 
         private void AudioPlayer_VolumeMeter(Media.AudioPlayer audioPlayer, float[] sample)
         {
-            if (Visibility == Visibility.Visible)
+            if (Visibility == Visibility.Visible && !IsStop)
                 _spectrumCanvas.Invalidate();
         }
 
@@ -272,8 +293,6 @@ namespace TewiMP.Controls
             }
         }
 
-        private EQData? _hoveringEQ;
-        private PassFilterData? _hoveringPass;
         private void SpectrumCanvas_PointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             if (!DrawDbLines) return;
@@ -303,7 +322,7 @@ namespace TewiMP.Controls
                 _draggingEQ.CentreFrequency = Math.Clamp(float.Round(freq, 2), MinFreqHz, MaxFreqHz);
 
                 float gain = (height / 2 - _hoverY) / (height / 2) * 24f;
-                _draggingEQ.Gain = Math.Clamp(gain, -24f, 24f);
+                _draggingEQ.Gain = Math.Clamp(float.Round(gain, 2), -24f, 24f);
                 return;
             }
 
@@ -493,6 +512,31 @@ namespace TewiMP.Controls
             var ds = args.DrawingSession;
             ds.Clear(Colors.Transparent);
 
+            if (DrawLatencyText)
+            {
+                // === 计算帧时间 ===
+                double now = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+                if (_lastDrawTime > 0)
+                {
+                    double delta = now - _lastDrawTime;
+                    _frameTimes.Enqueue(delta);
+
+                    // 移除超出统计窗口的旧数据
+                    while (_frameTimes.Sum() > SampleDuration)
+                        _frameTimes.Dequeue();
+
+                    // 计算平均帧时间和FPS
+                    if (_frameTimes.Count > 0)
+                    {
+                        double avgDelta = _frameTimes.Average();
+                        _avgFps = 1.0 / avgDelta;
+                        _avgFrameMs = avgDelta * 1000.0;
+                    }
+                }
+                _lastDrawTime = now;
+
+            }
+
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
 
@@ -509,6 +553,13 @@ namespace TewiMP.Controls
             if (DrawDbLines)
             {
                 DrawGrid(sender, ds);
+            }
+
+            if (DrawLatencyText)
+            {
+                // === 绘制平均 FPS 信息 ===
+                string info = $"FPS: {_avgFps:0.0} ({_avgFrameMs:0.0} ms)";
+                ds.DrawText(info, 10, 10, App.Instance.PlayingList.TextColor, canvasTextFormat ??= new CanvasTextFormat { FontSize = 14 });
             }
         }
 
@@ -705,13 +756,12 @@ namespace TewiMP.Controls
 
                     MinFreq = Lerp(_animMinFreq, _targetMinFreq, easedT);
                     MaxFreq = Lerp(_animMaxFreq, _targetMaxFreq, easedT);
-
-                    // 在动画中不断触发重绘
-                    _spectrumCanvas.Invalidate();
                 }
             }
         }
 
+        CanvasStrokeStyle gridDash;
+        CanvasTextFormat gridTextFormat;
         private void DrawGrid(CanvasControl sender, CanvasDrawingSession ds)
         {
             if (_gridCache != null && _gridCache.Size.Width == sender.ActualWidth && _gridCache.Size.Height == sender.ActualHeight
@@ -732,8 +782,8 @@ namespace TewiMP.Controls
             float minDb = -90, maxDb = 0, stepDb = 10;
             float width = (float)_gridCache.Size.Width;
             float height = (float)_gridCache.Size.Height;
-            var dash = new CanvasStrokeStyle { DashStyle = CanvasDashStyle.Dash };
-            var textFormat = new CanvasTextFormat { FontSize = 12 };
+            var dash = gridDash ??= new CanvasStrokeStyle { DashStyle = CanvasDashStyle.Dash };
+            var textFormat = gridTextFormat ??= new CanvasTextFormat { FontSize = 12 };
             var textColor = App.Instance.PlayingList.TextColor;
             float range = maxDb - minDb;
             for (float db = minDb + stepDb; db < maxDb; db += stepDb)

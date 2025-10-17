@@ -23,22 +23,31 @@ namespace TewiMP.Controls
         {
             if (DataContext is null) return;
             inChange = true;
-            QSilder.Value = DataContext.Q * 100;
+            QSilder.Value = DataContext.Q;
             FreSilder.Value = DataContext.CentreFrequency;
-            gainSilder.Value = DataContext.Gain * 10;
+            gainSilder.Value = DataContext.Gain;
             inChange = false;
         }
 
         bool inChange = false;
         private void EQCard_Loaded(object sender, RoutedEventArgs e)
         {
+            App.Instance.AudioPlayer.EqBandChanged -= AudioPlayer_EqBandChanged;
+            App.Instance.AudioPlayer.EqBandChanged += AudioPlayer_EqBandChanged;
             ColorPickerPanel.SelectedColor = DataContext.Color;
             UpdateData();
         }
 
         private void EQCard_Unloaded(object sender, RoutedEventArgs e)
         {
+            if (IsLoaded) return;
+            App.Instance.AudioPlayer.EqBandChanged -= AudioPlayer_EqBandChanged;
+        }
 
+        private void AudioPlayer_EqBandChanged(AudioPlayer audioPlayer)
+        {
+            if (isUserChange) return;
+            UpdateData();
         }
 
         private void ColorPickerPanel_LayoutUpdated(object sender, object e)
@@ -54,12 +63,15 @@ namespace TewiMP.Controls
             UpdateData();
         }
 
+        bool isUserChange = false;
         private void Silder_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
         {
             if (inChange || DataContext is null) return;
-            DataContext.Q = (float)QSilder.Value / 100f;
+            isUserChange = true;
+            DataContext.Q = (float)QSilder.Value;
             DataContext.CentreFrequency = (float)FreSilder.Value;
-            DataContext.Gain = (float)gainSilder.Value / 10f;
+            DataContext.Gain = (float)gainSilder.Value;
+            isUserChange = false;
         }
 
         private void Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -113,13 +125,21 @@ namespace TewiMP.Controls
                     "Gain" => "增益",
                     _ => "未知"
                 };
-                var result = await App.MainWindowInstance.ShowDialog($"设置 \"{chineseName}（{btn.Tag}）\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
+                string unit = btn.Tag switch
+                {
+                    "Quality" => "",
+                    "Frequency" => "Hz",
+                    "Gain" => "dB",
+                    "Slope" => "dB/Oct",
+                    _ => ""
+                };
+                var result = await App.MainWindowInstance.ShowDialog($"设置 \"{chineseName} {btn.Tag}{(string.IsNullOrEmpty(unit) ? "" : $"（{unit}）")}\" 值", numberBox, "取消", "确定", defaultButton: ContentDialogButton.Primary);
                 if (result != ContentDialogResult.Primary) return;
                 switch (btn.Tag)
                 {
                     case "Quality":
                         DataContext.Q = (float)numberBox.Value;
-                        QSilder.Value = DataContext.Q * 100f;
+                        QSilder.Value = DataContext.Q;
                         break;
                     case "Frequency":
                         DataContext.CentreFrequency = (float)numberBox.Value;
@@ -127,7 +147,7 @@ namespace TewiMP.Controls
                         break;
                     case "Gain":
                         DataContext.Gain = (float)numberBox.Value;
-                        gainSilder.Value = DataContext.Gain * 10f;
+                        gainSilder.Value = DataContext.Gain;
                         break;
                 }
             }
@@ -141,59 +161,6 @@ namespace TewiMP.Controls
         private void Grid_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             MoveIcon.Opacity = 0;
-        }
-    }
-
-    public partial class GainThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is double)
-            {
-                double dValue = System.Convert.ToDouble(value) / 10;
-                return dValue;
-            }
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            return null;
-        }
-    }
-
-    public partial class QValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is double)
-            {
-                double dValue = System.Convert.ToDouble(value) / 100;
-                return dValue;
-            }
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            return null;
-        }
-    }
-    public partial class ThumbToolTipValueConverter : Microsoft.UI.Xaml.Data.IValueConverter
-    {
-        public object Convert(object value, Type targetType, object parameter, string language)
-        {
-            if (value is double)
-            {
-                double dValue = System.Convert.ToDouble(value);
-                return dValue;
-            }
-            return null;
-        }
-
-        public object ConvertBack(object value, Type targetType, object parameter, string language)
-        {
-            return null;
         }
     }
 }

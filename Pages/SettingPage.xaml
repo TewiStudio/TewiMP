@@ -477,7 +477,7 @@
                                   Toggled="ToggleSwitch_Toggled_2"/>
                 </cc:SettingsCard>
                 <cc:SettingsCard Header="后台运行"
-                                 Description="此程序将在关闭主窗口后在后台运行，&#x000A;可以使用托盘图标和热键恢复主窗口。">
+                                 Description="此程序将在关闭主窗口后在后台运行&#x000A;可以使用托盘图标和热键恢复主窗口">
                     <!--<cc:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xEF1F;"/>
                     </cc:SettingsCard.HeaderIcon>-->
