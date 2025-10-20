@@ -221,64 +221,61 @@ namespace TewiMP.Media
 
             int channels = WaveFormat.Channels;
 
-            // PassFilter
+            // 创建 PassFilter 滤波器组
             if (AudioFilterStatic.PassFilterEqEnable)
             {
-                foreach (var passFilterData in AudioFilterStatic.PassFilterDatas)
+                foreach (var passData in AudioFilterStatic.PassFilterDatas)
                 {
-                    if (!passFilterData.IsEnable) continue;
+                    if (!passData.IsEnable) continue;
 
-                    int stagesCount = Math.Max(1, passFilterData.SlopeDbPerOct / 12);
-                    var filter = new BiQuadFilter[channels * stagesCount];
+                    int stagesCount = Math.Max(1, passData.SlopeDbPerOct / 12);
+                    var filterGroup = new BiQuadFilter[channels * stagesCount];
 
+                    // 根据声道类型设置
                     for (int ch = 0; ch < channels; ch++)
                     {
-                        if (!ShouldApplyToChannel(passFilterData.Channel, ch)) continue;
+                        if (!ShouldApplyToChannel(passData.Channel, ch)) continue;
 
                         for (int s = 0; s < stagesCount; s++)
-                        {
-                            filter[ch * stagesCount + s] = GetPassFilter(passFilterData);
-                        }
+                            filterGroup[ch * stagesCount + s] = GetPassFilter(passData);
                     }
 
-                    _passFilters.Add(filter);
+                    _passFilters.Add(filterGroup);
                 }
             }
 
-            // Parametric EQ
+            // 创建 Parametric EQ 滤波器组
             if (AudioFilterStatic.ParametricEqEnable)
             {
-                foreach (var eqData in AudioFilterStatic.ParametricEqDatas)
+                foreach (var eq in AudioFilterStatic.ParametricEqDatas)
                 {
-                    if (!eqData.IsEnable) continue;
+                    if (!eq.IsEnable) continue;
 
-                    var filter = new BiQuadFilter[channels];
-
+                    var filterGroup = new BiQuadFilter[channels];
                     for (int ch = 0; ch < channels; ch++)
                     {
-                        if (!ShouldApplyToChannel(eqData.Channel, ch)) continue;
-
-                        filter[ch] = BiQuadFilterPeak(eqData.CentreFrequency, eqData.Q, eqData.Gain);
+                        if (!ShouldApplyToChannel(eq.Channel, ch)) continue;
+                        filterGroup[ch] = BiQuadFilterPeak(eq.CentreFrequency, eq.Q, eq.Gain);
                     }
 
-                    _filters.Add(filter);
+                    _filters.Add(filterGroup);
                 }
             }
 
-            // Graphic EQ
+            // 创建 Graphic EQ 滤波器组
             if (AudioFilterStatic.GraphicEqEnable)
             {
-                foreach (float[] floats in AudioEqualizerBands.NormalBands)
+                foreach (float[] band in AudioEqualizerBands.NormalBands)
                 {
-                    var filter = new BiQuadFilter[channels];
-                    for (int n = 0; n < channels; n++)
-                    {
-                        filter[n] = BiQuadFilterPeak(floats[0], floats[1], floats[2]);
-                    }
-                    _filters.Add(filter);
+                    var filterGroup = new BiQuadFilter[channels];
+                    for (int ch = 0; ch < channels; ch++)
+                        filterGroup[ch] = BiQuadFilterPeak(band[0], band[1], band[2]);
+
+                    _filters.Add(filterGroup);
                 }
             }
         }
+
 
         /// <summary>
         /// 判断滤波器是否应用于当前声道

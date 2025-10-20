@@ -238,6 +238,7 @@ namespace TewiMP.Pages
         private void MainWindowInstance_MainViewStateChanged(bool isView)
         {
             spectrumCanvas.IsStop = !isView;
+            AudioSpectrum.IsStop = !isView;
         }
 
         private void C_Click(object sender, RoutedEventArgs e)
