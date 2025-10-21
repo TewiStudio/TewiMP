@@ -1,204 +1,203 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿namespace TewiMP.Plugin;
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Newtonsoft.Json.Linq;
 using TewiMP.DataEditor;
 using TewiMP.Background;
 
-namespace TewiMP.Plugin
+public static class PluginManager
 {
-    public static class PluginManager
+    public static Dictionary<PluginInfo, Dictionary<string, object>> PluginInfoSettings { get; set; } = [];
+    public static ObservableCollection<Plugin> Plugins { get; private set; } = [];
+    public static ObservableCollection<MusicSourcePlugin> MusicSourcePlugins { get; private set; } = [];
+    //private static AssemblyLoadContext assemblyLoadContext;
+
+    public static void Init()
     {
-        public static Dictionary<PluginInfo, Dictionary<string, object>> PluginInfoSettings { get; set; } = [];
-        public static ObservableCollection<Plugin> Plugins { get; private set; } = [];
-        public static ObservableCollection<MusicSourcePlugin> MusicSourcePlugins { get; private set; } = [];
-        //private static AssemblyLoadContext assemblyLoadContext;
+        LogManager.Log("PluginManager", "初始化 PluginManager.");
+        RemoveAllPlugin();
+        /*
+        assemblyLoadContext?.Unload();
+        GC.Collect();
+        assemblyLoadContext = new AssemblyLoadContext("Plugins", true);*/
 
-        public static void Init()
+        DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
+        var dllFiles = directoryInfo.GetFiles();
+        LogManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}.");
+
+        for (int i = 0; i < dllFiles.Length; i++)
         {
-            LogManager.Log("PluginManager", "初始化 PluginManager.");
-            RemoveAllPlugin();
-            /*
-            assemblyLoadContext?.Unload();
-            GC.Collect();
-            assemblyLoadContext = new AssemblyLoadContext("Plugins", true);*/
+            if (dllFiles[i].Extension.ToLower() is not ".dll") continue;
+            var fileData = File.ReadAllBytes(dllFiles[i].FullName);
 
-            DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
-            var dllFiles = directoryInfo.GetFiles();
-            LogManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}.");
+            //Assembly asm = assemblyLoadContext.LoadFromStream(new MemoryStream(fileData));
+            Assembly asm = Assembly.Load(fileData);
+            var manifestModuleName = asm.ManifestModule.ScopeName;
+            var classLibraryName = manifestModuleName.Remove(manifestModuleName.LastIndexOf("."), manifestModuleName.Length - manifestModuleName.LastIndexOf("."));
+            Type type = asm.GetType(classLibraryName + ".Main");
 
-            for (int i = 0; i < dllFiles.Length; i++)
+            bool isMusicSourcePlugin = false;
+            if (typeof(MusicSourcePlugin).IsAssignableFrom(type))
             {
-                if (dllFiles[i].Extension.ToLower() is not ".dll") continue;
-                var fileData = File.ReadAllBytes(dllFiles[i].FullName);
-
-                //Assembly asm = assemblyLoadContext.LoadFromStream(new MemoryStream(fileData));
-                Assembly asm = Assembly.Load(fileData);
-                var manifestModuleName = asm.ManifestModule.ScopeName;
-                var classLibraryName = manifestModuleName.Remove(manifestModuleName.LastIndexOf("."), manifestModuleName.Length - manifestModuleName.LastIndexOf("."));
-                Type type = asm.GetType(classLibraryName + ".Main");
-
-                bool isMusicSourcePlugin = false;
-                if (typeof(MusicSourcePlugin).IsAssignableFrom(type))
-                {
-                    isMusicSourcePlugin = true;
-                }
-                else if (typeof(Plugin).IsAssignableFrom(type))
-                {
-
-                }
-                else
-                {
-                    App.MainWindowInstance.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 Plugin 类。");
-                    LogManager.Log("PluginManager", $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
-                    continue;
-                }
-
-                if (isMusicSourcePlugin)
-                    AddPlugin(Activator.CreateInstance(type) as MusicSourcePlugin);
-                else
-                    AddPlugin(Activator.CreateInstance(type) as Plugin);
+                isMusicSourcePlugin = true;
             }
+            else if (typeof(Plugin).IsAssignableFrom(type))
+            {
+
+            }
+            else
+            {
+                App.MainWindowInstance.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 Plugin 类。");
+                LogManager.Log("PluginManager", $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
+                continue;
+            }
+
+            if (isMusicSourcePlugin)
+                AddPlugin(Activator.CreateInstance(type) as MusicSourcePlugin);
+            else
+                AddPlugin(Activator.CreateInstance(type) as Plugin);
+        }
 
 #if DEBUG
-            Assembly assembly = Assembly.GetExecutingAssembly();
+        Assembly assembly = Assembly.GetExecutingAssembly();
 
-            // 程序自带插件
-            string targetNamespace = "TewiMP.Plugin.BuildInPlugins";
-            var classes = assembly.GetTypes();
-            var result = classes.Where(t => t.Namespace?.Contains(targetNamespace) == true && t.Name.Equals("Main")).ToList();
+        // 程序自带插件
+        string targetNamespace = "TewiMP.Plugin.BuildInPlugins";
+        var classes = assembly.GetTypes();
+        var result = classes.Where(t => t.Namespace?.Contains(targetNamespace) == true && t.Name.Equals("Main")).ToList();
 
-            foreach (var type in result)
+        foreach (var type in result)
+        {
+            bool isMusicSourcePlugin = false;
+            if (typeof(MusicSourcePlugin).IsAssignableFrom(type))
             {
-                bool isMusicSourcePlugin = false;
-                if (typeof(MusicSourcePlugin).IsAssignableFrom(type))
-                {
-                    isMusicSourcePlugin = true;
-                }
-                else if (typeof(Plugin).IsAssignableFrom(type))
-                {
-
-                }
-                else
-                {
-                    App.MainWindowInstance.AddNotify("加载插件失败", $"\"{type}\" 加载失败：未继承 IPlugin 接口。");
-                    LogManager.Log("PluginManager", $"Load plugin failed: {type} does not inherit the IPlugin interface.");
-                    continue;
-                }
-                if (isMusicSourcePlugin)
-                    AddPlugin(Activator.CreateInstance(type) as MusicSourcePlugin);
-                else
-                    AddPlugin(Activator.CreateInstance(type) as Plugin);
+                isMusicSourcePlugin = true;
             }
+            else if (typeof(Plugin).IsAssignableFrom(type))
+            {
+
+            }
+            else
+            {
+                App.MainWindowInstance.AddNotify("加载插件失败", $"\"{type}\" 加载失败：未继承 IPlugin 接口。");
+                LogManager.Log("PluginManager", $"Load plugin failed: {type} does not inherit the IPlugin interface.");
+                continue;
+            }
+            if (isMusicSourcePlugin)
+                AddPlugin(Activator.CreateInstance(type) as MusicSourcePlugin);
+            else
+                AddPlugin(Activator.CreateInstance(type) as Plugin);
+        }
 #endif
 
-            LoadPluginInfoSettings();
-            foreach (var p in Plugins) EnablePlugin(p);
-            foreach (var p in MusicSourcePlugins) EnablePlugin(p);
-        }
+        LoadPluginInfoSettings();
+        foreach (var p in Plugins) EnablePlugin(p);
+        foreach (var p in MusicSourcePlugins) EnablePlugin(p);
+    }
 
-        public static void RemoveAllPlugin()
-        {
-            foreach (var plugin in Plugins)
-            {
-                DisablePlugin(plugin);
-            }
-            foreach (var plugin in MusicSourcePlugins)
-            {
-                DisablePlugin(plugin);
-            }
-            Plugins.Clear();
-            MusicSourcePlugins.Clear();
-        }
-
-        public static void AddPlugin(Plugin plugin)
-        {
-            Plugins.Add(plugin);
-            LogManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}.");
-        }
-
-        public static void AddPlugin(MusicSourcePlugin plugin)
-        {
-            MusicSourcePlugins.Add(plugin);
-            LogManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}.");
-        }
-
-        public static void RemovePlugin(Plugin plugin)
+    public static void RemoveAllPlugin()
+    {
+        foreach (var plugin in Plugins)
         {
             DisablePlugin(plugin);
-            Plugins.Remove(plugin);
-            LogManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}.");
         }
-
-        public static void RemovePlugin(MusicSourcePlugin plugin)
+        foreach (var plugin in MusicSourcePlugins)
         {
             DisablePlugin(plugin);
-            MusicSourcePlugins.Remove(plugin);
-            LogManager.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}.");
         }
+        Plugins.Clear();
+        MusicSourcePlugins.Clear();
+    }
 
-        public static void EnablePlugin(Plugin plugin)
+    public static void AddPlugin(Plugin plugin)
+    {
+        Plugins.Add(plugin);
+        LogManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}.");
+    }
+
+    public static void AddPlugin(MusicSourcePlugin plugin)
+    {
+        MusicSourcePlugins.Add(plugin);
+        LogManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}.");
+    }
+
+    public static void RemovePlugin(Plugin plugin)
+    {
+        DisablePlugin(plugin);
+        Plugins.Remove(plugin);
+        LogManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}.");
+    }
+
+    public static void RemovePlugin(MusicSourcePlugin plugin)
+    {
+        DisablePlugin(plugin);
+        MusicSourcePlugins.Remove(plugin);
+        LogManager.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}.");
+    }
+
+    public static void EnablePlugin(Plugin plugin)
+    {
+        plugin.OnEnable();
+        LogManager.Log("PluginManager", $"Enabled plugin: {plugin.PluginInfo.Name}.");
+    }
+
+    public static void DisablePlugin(Plugin plugin)
+    {
+        plugin.OnDisable();
+        LogManager.Log("PluginManager", $"Disabled plugin: {plugin.PluginInfo.Name}.");
+    }
+
+    public static void UpdatePluginInfoSettings()
+    {
+        PluginInfoSettings.Clear();
+        foreach (var p in MusicSourcePlugins)
         {
-            plugin.OnEnable();
-            LogManager.Log("PluginManager", $"Enabled plugin: {plugin.PluginInfo.Name}.");
+            PluginInfoSettings.Add(p.PluginInfo, p.GetPluginSettings());
         }
-
-        public static void DisablePlugin(Plugin plugin)
+        foreach (var p in Plugins)
         {
-            plugin.OnDisable();
-            LogManager.Log("PluginManager", $"Disabled plugin: {plugin.PluginInfo.Name}.");
+            PluginInfoSettings.Add(p.PluginInfo, p.GetPluginSettings());
         }
+    }
 
-        public static void UpdatePluginInfoSettings()
+    public static void LoadPluginInfoSettings()
+    {
+        JObject pluginSettingsData = DataFolderBase.PluginSettingsData;
+        foreach (var item in pluginSettingsData)
         {
-            PluginInfoSettings.Clear();
-            foreach (var p in MusicSourcePlugins)
+            var plugins = Plugins.Where(plugin => plugin.PluginInfo.ToString() == item.Key);
+            if (plugins.Any())
             {
-                PluginInfoSettings.Add(p.PluginInfo, p.GetPluginSettings());
+                plugins.First().SetPluginSettings(item.Value.ToObject<Dictionary<string, object>>());
             }
-            foreach (var p in Plugins)
+
+            var musicSourcePlugins = MusicSourcePlugins.Where(plugin => plugin.PluginInfo.ToString() == item.Key);
+            if (musicSourcePlugins.Any())
             {
-                PluginInfoSettings.Add(p.PluginInfo, p.GetPluginSettings());
+                musicSourcePlugins.First().SetPluginSettings(item.Value.ToObject<Dictionary<string, object>>());
             }
         }
+        UpdatePluginInfoSettings();
+    }
 
-        public static void LoadPluginInfoSettings()
+    public static void SavePluginInfoSettings()
+    {
+        UpdatePluginInfoSettings();
+        var j = JObject.FromObject(PluginInfoSettings);
+        DataFolderBase.PluginSettingsData = j;
+    }
+
+    public static void SetPluginSettingsToPlugin(Plugin plugin)
+    {
+        foreach (var settings in PluginInfoSettings)
         {
-            JObject pluginSettingsData = DataFolderBase.PluginSettingsData;
-            foreach (var item in pluginSettingsData)
-            {
-                var plugins = Plugins.Where(plugin => plugin.PluginInfo.ToString() == item.Key);
-                if (plugins.Any())
-                {
-                    plugins.First().SetPluginSettings(item.Value.ToObject<Dictionary<string, object>>());
-                }
-
-                var musicSourcePlugins = MusicSourcePlugins.Where(plugin => plugin.PluginInfo.ToString() == item.Key);
-                if (musicSourcePlugins.Any())
-                {
-                    musicSourcePlugins.First().SetPluginSettings(item.Value.ToObject<Dictionary<string, object>>());
-                }
-            }
-            UpdatePluginInfoSettings();
-        }
-
-        public static void SavePluginInfoSettings()
-        {
-            UpdatePluginInfoSettings();
-            var j = JObject.FromObject(PluginInfoSettings);
-            DataFolderBase.PluginSettingsData = j;
-        }
-
-        public static void SetPluginSettingsToPlugin(Plugin plugin)
-        {
-            foreach (var settings in PluginInfoSettings)
-            {
-                if (plugin.PluginInfo != settings.Key) continue;
-                plugin.SetPluginSettings(settings.Value);
-            }
+            if (plugin.PluginInfo != settings.Key) continue;
+            plugin.SetPluginSettings(settings.Value);
         }
     }
 }
