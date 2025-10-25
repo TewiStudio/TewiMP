@@ -362,3 +362,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /Plugin/BuildInPlugins/Encryptor/Main.cs
+/Plugins/FFmpegPathSelector.dll
+/Plugins/NeteaseMusicSource.dll
