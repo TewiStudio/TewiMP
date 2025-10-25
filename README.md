@@ -1,8 +1,8 @@
 # TewiMP
 
-基于 WinUI3 的 Windows 本地/在线音乐播放器，
+基于 WinUI3、NAudio+FFmpeg 的 Windows 本地/在线音乐播放器，
 
-仅支持 Windows 10、11。
+仅支持 Windows 11（Windows 10 未经测试）。
 
 * 可获取线上歌曲
 * 可导入外部歌单
@@ -17,7 +17,9 @@
 
 此程序需要下载 .NET运行时 才能正常运行。如果你的电脑没有 .NET运行时，运行此程序时会自动提示下载，下载安装完成后即可运行。
 
-转到 Release 页面：[Releases · TewiStudio/TewiMP](https://github.com/TewiStudio/TewiMP/releases) 下载程序的压缩包，下载完成后解压到想要解压到的目录，最后点击 TewiMP 文件夹里的 TewiMP.exe 就可以启动了 :)
+转到 Release 页面：[Releases · TewiStudio/TewiMP](https://github.com/TewiStudio/TewiMP/releases) 下载安装程序，等待安装程序执行完成就可以运行了 :)
+
+> 此程序当前没有数字签名，可能导致一些安全软件报毒
 
 # 闲话
 
