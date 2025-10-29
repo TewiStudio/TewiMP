@@ -2,10 +2,10 @@
 	<PropertyGroup>
 		<Product>TewiMP</Product>
 		<Title>TewiMP</Title>
-		<Version>0.0.5</Version>
-		<AssemblyVersion>0.0.5</AssemblyVersion>
-		<FileVersion>0.0.5</FileVersion>
-		<VersionPrefix>0.0.5</VersionPrefix>
+		<Version>0.0.4</Version>
+		<AssemblyVersion>0.0.4</AssemblyVersion>
+		<FileVersion>0.0.4</FileVersion>
+		<VersionPrefix>0.0.4</VersionPrefix>
 		<VersionSuffix>beta</VersionSuffix>
 		<Company>TewiStudio</Company>
 		<Authors>TewiStudio</Authors>
@@ -189,6 +189,12 @@
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="LICENSE">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Plugins\FFmpegPathSelector.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Plugins\NeteaseMusicSource.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<Page Update="Pages\TestPage.xaml">

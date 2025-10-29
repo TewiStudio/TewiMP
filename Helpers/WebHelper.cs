@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Net.Http;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
+using TewiMP.Background;
 using TewiMP.DataEditor;
 
 namespace TewiMP.Helpers
@@ -13,7 +15,6 @@ namespace TewiMP.Helpers
     {
         #region 属性
         public static string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.124 Safari/537.36 Edg/102.0.1245.44";
-        public static string NeteaseSearchAddress = "http://music.163.com/api/search/get/web?s={0}&type=1&offset={1}&limit={2}&total=true";
         public static HttpClient Client = new HttpClient();
         private static bool IsRequested = false;
         #endregion
@@ -42,34 +43,63 @@ namespace TewiMP.Helpers
         /// <exception cref="WebException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
         /// <exception cref="FileNotFoundException"></exception>
-        public static async Task DownloadFileAsync(string address, string downloadPath)
+        public static async Task DownloadFileAsync(
+        string address,
+        string downloadPath,
+        IProgress<double>? progress = null,
+        CancellationToken token = default)
         {
-            if (address is null) return;
-            if (downloadPath.Contains(address)) return;
+            if (string.IsNullOrWhiteSpace(address))
+                throw new ArgumentNullException(nameof(address));
+
+            if (!Uri.TryCreate(address, UriKind.Absolute, out Uri uri))
+                throw new InvalidOperationException("无法定位到网络地址，请检查域名服务器或DNS配置。");
+
             DownloadingPathCache.Add(address);
-            bool err1 = false;
 
-            await Task.Run(() =>
+            try
             {
-                if (!Uri.TryCreate(address, UriKind.Absolute, out Uri uriResult)) err1 = true;
-            });
+                using var response = await Client.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead, token);
+                response.EnsureSuccessStatusCode();
 
-            if (err1)
-                throw new InvalidOperationException("无法定位到网络地址，请检查你的域名服务器是否正常工作或DNS配置是否正确。");
+                var totalBytes = response.Content.Headers.ContentLength ?? -1L;
+                var canReportProgress = totalBytes > 0 && progress != null;
 
-            var data = await Client.GetByteArrayAsync(address);
-            await Task.Run(() =>
-            {
-                try
+                await using var contentStream = await response.Content.ReadAsStreamAsync(token);
+                await using var fileStream = File.Create(downloadPath);
+
+                var buffer = new byte[81920]; // 80KB buffer
+                long totalRead = 0;
+                int read;
+
+                while ((read = await contentStream.ReadAsync(buffer.AsMemory(0, buffer.Length), token)) > 0)
                 {
-                    var stream = File.Create(downloadPath);
-                    stream.Write(data);
-                    stream.Close();
-                    stream.Dispose();
+                    await fileStream.WriteAsync(buffer.AsMemory(0, read), token);
+                    totalRead += read;
+
+                    if (canReportProgress)
+                    {
+                        double pct = (double)totalRead / totalBytes;
+                        progress!.Report(pct);
+                    }
                 }
-                catch { }
-            });
-            DownloadingPathCache.Remove(address);
+            }
+            catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
+            {
+                LogManager.Info("DownloadFileAsync", "下载已取消。");
+                // 取消时删除未完成文件
+                if (File.Exists(downloadPath)) File.Delete(downloadPath);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                LogManager.Error("DownloadFileAsync", $"下载失败：{ex.Message}");
+                throw;
+            }
+            finally
+            {
+                DownloadingPathCache.Remove(address);
+            }
         }
 
         /// <summary>

@@ -26,6 +26,7 @@ public static class PluginManager
         GC.Collect();
         assemblyLoadContext = new AssemblyLoadContext("Plugins", true);*/
 
+#if !DEBUG
         DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
         var dllFiles = directoryInfo.GetFiles();
         LogManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}.");
@@ -62,7 +63,7 @@ public static class PluginManager
             else
                 AddPlugin(Activator.CreateInstance(type) as Plugin);
         }
-
+#endif
 #if DEBUG
         Assembly assembly = Assembly.GetExecutingAssembly();
 

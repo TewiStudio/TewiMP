@@ -362,6 +362,42 @@ namespace TewiMP.DataEditor
                 File.Create(LogDataPath).Close();
             }
             
+            if (Directory.GetFiles(RunLogFolder) is string[] files)
+            {
+                if (files.Length > 20)
+                {
+                    foreach (var file in files[..(files.Length - 20)])
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogManager.Error("DataFolderBase", $"删除旧日志文件时出错：{ex.Message}");
+                        }
+                    }
+                }
+            }
+            
+            if (Directory.GetFiles(UpdateFolder) is string[] updateFiles)
+            {
+                if (updateFiles.Length >= 2)
+                {
+                    foreach (var file in updateFiles)
+                    {
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch (Exception ex)
+                        {
+                            LogManager.Error("DataFolderBase", $"删除旧更新程序时出错：{ex.Message}");
+                        }
+                    }
+                }
+            }
+
             Directory.CreateDirectory(StartupFolder);
             LogManager.Log("DataFolderBase", "初始化文件目录完成。");
         }

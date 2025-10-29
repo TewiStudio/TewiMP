@@ -117,6 +117,7 @@ namespace TewiMP.Windowed
             PlayingList_NowPlayingImageLoaded(App.Instance.PlayingList.NowPlayingImage, null);
             App.Instance.AudioPlayer.ReCallTiming();
             SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
+            AudioPlayer_CacheLoadedChanged(App.Instance.AudioPlayer);
 
             isCodeChangedDesktopLyricWindow = true;
             TB_Lyric.IsChecked = App.MainWindowInstance.DesktopLyricWindow != null;

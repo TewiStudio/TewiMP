@@ -1,14 +1,16 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using CommunityToolkit.WinUI.Controls;
-using Windows.System;
 using NAudio.Wave;
-using TewiMP.Media;
-using TewiMP.Helpers;
+using System;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using TewiMP.DataEditor;
+using TewiMP.Helpers;
+using TewiMP.Media;
 
 namespace TewiMP.Pages
 {
@@ -146,18 +148,26 @@ namespace TewiMP.Pages
             await CodeHelper.OpenInBrowser("https://github.com/TewiStudio/TewiMP");
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             CheckUpdate();
+            installButton = InstallButton;
+            await DownloadInstallExeAsync(true);
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            installButton = null;
         }
 
         bool checkingUpdate = false;
+        static VersionData newestVersion;
         private void CheckUpdate()
         {
             if (checkingUpdate) return;
             checkingUpdate = true;
 
-            var newestVersion = App.Instance.GetNewVersionByReleaseData(App.Instance.NowVersion.SuffixType);
+            newestVersion = App.Instance.GetNewVersionByReleaseData(App.Instance.NowVersion.SuffixType);
             if (App.Instance.AppVersionIsNewest())
             {
                 UpdateExpander.Description = "当前版本是最新版本";
@@ -192,10 +202,115 @@ namespace TewiMP.Pages
             CheckUpdate();
         }
 
+        static Button installButton; static CancellationTokenSource? cts = null;
+        static async Task DownloadInstallExeAsync(bool dontDownload = false)
+        {
+            if (string.IsNullOrEmpty(newestVersion.InstallUrl))
+            {
+                App.MainWindowInstance.AddNotify("下载更新程序失败", "没有可用的更新程序，请前往发布详情页下载。",
+                    buttonMessage: "详情页", buttonAction: async () => await CodeHelper.OpenInBrowser(newestVersion.Url));
+                return;
+            }
+
+            var installExeFilePath = Path.Combine(DataFolderBase.UpdateFolder, $"Update_{newestVersion.Version}_{newestVersion.SuffixType}.exe");
+            bool fileExists = File.Exists(installExeFilePath);
+
+            // Helper: 更新按钮文本
+            void UpdateButton(string text) => ChangeInstallButtonContent(text);
+
+            // 如果正在下载
+            if (cts != null)
+            {
+                if (dontDownload)
+                    return;
+
+                // 取消下载
+                cts.Cancel();
+                cts = null;
+                UpdateButton("下载安装程序");
+                return;
+            }
+
+            // 文件已经存在
+            if (fileExists)
+            {
+                if (dontDownload)
+                {
+                    UpdateButton("开始安装");
+                }
+                else
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo { FileName = installExeFilePath });
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"启动安装程序失败: {ex.Message}");
+                    }
+                    UpdateButton("重新安装");
+                }
+                return;
+            }
+
+            // 文件不存在，需要下载
+            if (dontDownload)
+            {
+                UpdateButton("下载安装程序");
+                return;
+            }
+
+            cts = new CancellationTokenSource();
+            UpdateButton("取消（正在加载...）");
+
+            try
+            {
+                await WebHelper.DownloadFileAsync(newestVersion.InstallUrl, installExeFilePath,
+                    new Progress<double>(p =>
+                    {
+                        if (p < 0.99)
+                            UpdateButton($"取消（{p * 100:F0}%）");
+                    }), cts.Token);
+
+                UpdateButton("开始安装");
+            }
+            catch (OperationCanceledException)
+            {
+                // 用户取消下载
+                UpdateButton("下载安装程序");
+                if (File.Exists(installExeFilePath))
+                    File.Delete(installExeFilePath);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"下载失败: {ex.Message}");
+                UpdateButton("下载安装程序");
+            }
+            finally
+            {
+                cts = null;
+            }
+        }
+
+        static void ChangeInstallButtonContent(object content)
+        {
+            if (installButton is null) return;
+            App.MainWindowInstance.Invoke(() => installButton.Content = content);
+        }
+
         private async void Button_Click_2(object sender, RoutedEventArgs e)
         {
-            var newestVersion = App.Instance.GetNewVersionByReleaseData(App.Instance.NowVersion.SuffixType);
-            await CodeHelper.OpenInBrowser(newestVersion.Url);
+            if (sender is FrameworkElement fe)
+            {
+                if (fe.Tag.Equals("Card"))
+                {
+                    await CodeHelper.OpenInBrowser(newestVersion.Url);
+                }
+                else
+                {
+                    await DownloadInstallExeAsync();
+                }
+            }
         }
 
         private async void Button_Click_3(object sender, RoutedEventArgs e)

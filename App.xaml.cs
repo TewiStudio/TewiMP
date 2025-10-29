@@ -97,7 +97,7 @@ namespace TewiMP
             Available = true,
             SuffixType = SuffixType.Beta,
             Version = Assembly.GetExecutingAssembly().GetName().Version,
-            ReleaseTime = new(2025, 7, 11, 10, 45, 00),
+            ReleaseTime = new(2025, 10, 21, 19, 00, 00),
             ExtendMessage = null
         };
         public Version AppVersion => NowVersion.Version;
@@ -139,7 +139,8 @@ namespace TewiMP
 
         private void CoreApplication_UnhandledErrorDetected(object sender, UnhandledErrorDetectedEventArgs e)
         {
-            LogManager.Error("App", $"CoreApplication UnhandledErrorDetected: {e.UnhandledError}");
+            // useless
+            //LogManager.Error("App", $"CoreApplication UnhandledErrorDetected: {e.UnhandledError}");
         }
 
         private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
@@ -633,9 +634,10 @@ namespace TewiMP
                     $"可更新到版本 {newestVersion.Version} {newestVersion.SuffixType}，当前版本为 {NowVersion.Version} {NowVersion.SuffixType}。" +
                         (string.IsNullOrEmpty(newestVersion.ExtendMessage) ? "" : $"\n{newestVersion.ExtendMessage}"),
                     NotifySeverity.Warning, TimeSpan.FromMilliseconds(10000),
-                    "前往下载页面 ⨠", async () =>
+                    "更新", () =>
                     {
-                        var success = await CodeHelper.OpenInBrowser(newestVersion.Url);
+                        //var success = await CodeHelper.OpenInBrowser(newestVersion.Url);
+                        MainWindowInstance.SetNavViewContent(typeof(AboutPage));
                     });
             }
         }
@@ -703,6 +705,7 @@ namespace TewiMP
         public bool Available { get; set; }
         public Version Version { get; set; }
         public string Url { get; set; }
+        public string InstallUrl { get; set; }
         public DateTime ReleaseTime { get; set; }
         public string ExtendMessage { get; set; }
 
