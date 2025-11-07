@@ -81,17 +81,22 @@
                    FontWeight="Light" Margin="4,1">
             </TextBlock>
         </Border>
-        <Border Padding="20" CornerRadius="8" BorderThickness="1"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="{ThemeResource ControlOnImageFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                x:Name="InfoBorder" Opacity="0">
-            <Border.OpacityTransition>
+        <Grid CornerRadius="8" BorderThickness="1"
+              HorizontalAlignment="Center" VerticalAlignment="Center"
+              BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+              x:Name="InfoBorder" Opacity="0">
+            <Grid.OpacityTransition>
                 <ScalarTransition/>
-            </Border.OpacityTransition>
-            <Grid>
-                <controls:MediaPlayStateViewer x:Name="PlayStateElement" PlaybackState="Playing" Width="20" Height="20"/>
+            </Grid.OpacityTransition>
+            <SystemBackdropHost CornerRadius="8">
+                <SystemBackdropHost.SystemBackdrop>
+                    <DesktopAcrylicBackdrop/>
+                </SystemBackdropHost.SystemBackdrop>
+            </SystemBackdropHost>
+            <Grid Padding="20">
+                <controls:MediaPlayStateViewer x:Name="PlayStateElement" PlaybackState="Playing" Width="20" Height="20" />
             </Grid>
-        </Border>
+        </Grid>
         <Grid x:Name="progressRoot" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinWidth="200" Margin="0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto"/>
@@ -106,6 +111,11 @@
               HorizontalAlignment="Left"
               PointerEntered="ToolButtonsBase_PointerEntered"
               PointerExited="ToolButtonsBase_PointerExited">
+            <SystemBackdropHost CornerRadius="0,8,8,8">
+                <SystemBackdropHost.SystemBackdrop>
+                    <DesktopAcrylicBackdrop/>
+                </SystemBackdropHost.SystemBackdrop>
+            </SystemBackdropHost>
             <StackPanel Margin="0,0,0,0"
                         x:Name="ToolButtonsStackPanel"
                         VerticalAlignment="Top"

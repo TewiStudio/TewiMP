@@ -118,39 +118,39 @@ public static class PluginManager
     public static void AddPlugin(Plugin plugin)
     {
         Plugins.Add(plugin);
-        LogManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}.");
+        LogManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void AddPlugin(MusicSourcePlugin plugin)
     {
         MusicSourcePlugins.Add(plugin);
-        LogManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}.");
+        LogManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void RemovePlugin(Plugin plugin)
     {
         DisablePlugin(plugin);
         Plugins.Remove(plugin);
-        LogManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}.");
+        LogManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void RemovePlugin(MusicSourcePlugin plugin)
     {
         DisablePlugin(plugin);
         MusicSourcePlugins.Remove(plugin);
-        LogManager.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}.");
+        LogManager.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void EnablePlugin(Plugin plugin)
     {
         plugin.OnEnable();
-        LogManager.Log("PluginManager", $"Enabled plugin: {plugin.PluginInfo.Name}.");
+        LogManager.Log("PluginManager", $"Enabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void DisablePlugin(Plugin plugin)
     {
         plugin.OnDisable();
-        LogManager.Log("PluginManager", $"Disabled plugin: {plugin.PluginInfo.Name}.");
+        LogManager.Log("PluginManager", $"Disabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void UpdatePluginInfoSettings()

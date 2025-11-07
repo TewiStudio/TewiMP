@@ -128,13 +128,13 @@ namespace TewiMP
         private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e)
         {
             e.Handled = true;
-            LogManager.Error("App", $"UnhandledError: {e.Exception}");
+            LogManager.Error("App:UnhandledError", $"{e.Exception}");
         }
 
         private void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
             e.SetObserved();
-            LogManager.Error("App", $"UnobservedTaskError: {e.Exception}");
+            LogManager.Error("App:UnobservedTaskError", $"{e.Exception}");
         }
 
         private void CoreApplication_UnhandledErrorDetected(object sender, UnhandledErrorDetectedEventArgs e)
@@ -145,7 +145,7 @@ namespace TewiMP
 
         private void CurrentDomain_UnhandledException(object sender, System.UnhandledExceptionEventArgs e)
         {
-            LogManager.Error("App", $"AppDomain Fatal Error: {e.ExceptionObject}");
+            LogManager.Error("App:AppDomainFatalError", $"{e.ExceptionObject}");
         }
         #endregion
 

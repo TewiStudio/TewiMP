@@ -371,7 +371,7 @@ namespace TewiMP.Background.HotKeys
                         if (App.MainWindowInstance.DesktopLyricWindow != null)
                         {
                             App.MainWindowInstance.DesktopLyricWindow.Activate();
-                            App.MainWindowInstance.DesktopLyricWindow.overlappedPresenter.Restore();
+                            App.MainWindowInstance.DesktopLyricWindow.Restore();
                         }
                         break;
                     case HotKeyID.ReturnToFirstSong:

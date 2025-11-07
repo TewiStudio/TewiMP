@@ -255,6 +255,7 @@ public class PluginInfo
     public string Author { set; get; }
     public string Version { set; get; }
     public string Describe { set; get; }
+    public Guid ID { set; get; } = Guid.NewGuid();
 
     /// <summary>
     /// 获取拼接后的插件名称和作者字符串。
@@ -291,7 +292,7 @@ public class PluginInfo
         if (!matched.Any())
         {
             if (throwError)
-                throw new PluginNotFoundException($"找不到插件：{NameAndAuthor}");
+                throw new PluginNotFoundException($"找不到插件：{NameAndAuthor} / {ID}");
             else return null;
         }
         return matched.First();
@@ -322,10 +323,7 @@ public class PluginInfo
         return string.Equals(NameAndAuthor, (other as PluginInfo).NameAndAuthor, StringComparison.InvariantCulture);
     }
 
-    public override int GetHashCode()
-    {
-        return (string.IsNullOrEmpty(NameAndAuthor) ? StringComparer.InvariantCulture.GetHashCode(NameAndAuthor) : 0);
-    }
+    public override int GetHashCode() => NameAndAuthor?.GetHashCode() ?? 0;
 }
 
 public class PluginLoadException : Exception
