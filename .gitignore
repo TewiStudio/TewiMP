@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /Plugin/BuildInPlugins/Encryptor/Main.cs
 /Plugins/FFmpegPathSelector.dll
 /Plugins/NeteaseMusicSource.dll
+/Plugin/BuildInPlugins/NeteaseMusicSource/Cookie.cs
