@@ -1,25 +1,23 @@
-using CommunityToolkit.WinUI;
-using Microsoft.UI.Composition;
+using System;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.UI.Composition;
+using CommunityToolkit.WinUI;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using TewiMP.Background;
+using TewiMP.Media;
+using TewiMP.Helpers;
 using TewiMP.Controls;
 using TewiMP.DataEditor;
-using TewiMP.Helpers;
-using TewiMP.Media;
-using Windows.Storage.Pickers;
-using static NMeCab.Core.DoubleArray;
+using TewiMP.Background;
 
 namespace TewiMP.Pages.ListViewPages
 {
@@ -68,6 +66,7 @@ namespace TewiMP.Pages.ListViewPages
         {
             ItemsList_Header_Info_CommandBar.Width = 0;
             await Task.Delay(50);
+            InitShyHeader();
             ItemsList_Header_Info_CommandBar.Width = double.NaN;
         }
         void MultiSelectDo(bool isChecked)
@@ -92,7 +91,7 @@ namespace TewiMP.Pages.ListViewPages
             }
             ItemsList.SelectionMode = isChecked ? ListViewSelectionMode.Multiple : ListViewSelectionMode.None;
             UpdateCommandBarWidth();
-            MusicDataItem.SetIsCloseMouseEvent(isChecked ? true : false);
+            MusicDataItem.SetIsCloseMouseEvent(isChecked);
         }
         void MoveItemDo(bool isChecked)
         {
@@ -115,9 +114,9 @@ namespace TewiMP.Pages.ListViewPages
             ItemsList.CanDragItems = isChecked;
             ItemsList.CanReorderItems = isChecked;
             ItemsList.SelectionMode = isChecked ? ListViewSelectionMode.Multiple : ListViewSelectionMode.None;
-            UpdateCommandBarWidth();
             MusicDataItem.SetIsCloseMouseEvent(isChecked ? true : false, true);
             App.MainWindowInstance.AllowDragEvents = !isChecked;
+            UpdateCommandBarWidth();
         }
         async void MoveItemSave()
         {
@@ -137,6 +136,7 @@ namespace TewiMP.Pages.ListViewPages
             item.SetNotifyItemData("保存排序完成。", null, NotifySeverity.Complete);
             App.MainWindowInstance.NotifyCountDown(item);
             ItemsList_Header_Info_CommandBar.IsEnabled = true;
+            UpdateCommandBarWidth();
         }
 
         void SelectedReverseDo()
@@ -186,6 +186,7 @@ namespace TewiMP.Pages.ListViewPages
                     InitInfo();
                     InitBindings();
                 }
+                UpdateCommandBarWidth();
             }
         }
         void DownloadSelectedItemDo()
@@ -211,105 +212,7 @@ namespace TewiMP.Pages.ListViewPages
 
         async void AddLocalFilesDo()
         {
-            // 为什么我要这样写
-            StackPanel stackPanel = new() { HorizontalAlignment = HorizontalAlignment.Stretch, Spacing = 4, Orientation = Orientation.Vertical };
-
-            StackPanel stackPanelContent1 = new StackPanel() { Orientation = Orientation.Vertical };
-            Grid fontIconBaseGrid = new Grid() { Margin = new(12), HorizontalAlignment = HorizontalAlignment.Center, VerticalAlignment = VerticalAlignment.Center };
-            Grid fontIconGrid = new() { Margin = new(-16, -12, 0, 0) };
-            fontIconGrid.Children.Add(new FontIcon() { Glyph = "\uE729", FontSize = 30, Foreground = App.Current.Resources["ControlSolidFillColorDefaultBrush"] as SolidColorBrush });
-            fontIconGrid.Children.Add(new FontIcon() { Glyph = "\uE7C3", FontSize = 30 });
-            Grid fontIconGrid1 = new() { Margin = new(-8, -6, 0, 0) };
-            fontIconGrid1.Children.Add(new FontIcon() { Glyph = "\uE729", FontSize = 30, Foreground = App.Current.Resources["ControlSolidFillColorDefaultBrush"] as SolidColorBrush });
-            fontIconGrid1.Children.Add(new FontIcon() { Glyph = "\uE7C3", FontSize = 30 });
-            Grid fontIconGrid2 = new();
-            fontIconGrid2.Children.Add(new FontIcon() { Glyph = "\uE729", FontSize = 30, Foreground = App.Current.Resources["ControlSolidFillColorDefaultBrush"] as SolidColorBrush });
-            fontIconGrid2.Children.Add(new FontIcon() { Glyph = "\uE7C3", FontSize = 30 });
-            fontIconGrid2.Children.Add(new FontIcon() { Glyph = "\uEC4F", FontSize = 13, Margin = new(0, 10, 8, 0) });
-            fontIconBaseGrid.Children.Add(fontIconGrid);
-            fontIconBaseGrid.Children.Add(fontIconGrid1);
-            fontIconBaseGrid.Children.Add(fontIconGrid2);
-            stackPanelContent1.Children.Add(fontIconBaseGrid);
-            stackPanelContent1.Children.Add(new TextBlock() { Text = "添加 单个/多个 文件", TextTrimming = TextTrimming.CharacterEllipsis });
-
-            StackPanel stackPanelContent2 = new StackPanel() { Orientation = Orientation.Vertical };
-            Grid fontIconFolderGrid = new() { Margin = new(12) };
-            fontIconFolderGrid.Children.Add(new FontIcon() { Glyph = "\uE8D5", FontSize = 30, Foreground = App.Current.Resources["ControlSolidFillColorDefaultBrush"] as SolidColorBrush });
-            fontIconFolderGrid.Children.Add(new FontIcon() { Glyph = "\uE8B7", FontSize = 30 });
-            fontIconFolderGrid.Children.Add(new FontIcon() { Glyph = "\uEC4F", FontSize = 13, Margin = new(0, 4, -0, 0) });
-            stackPanelContent2.Children.Add(fontIconFolderGrid);
-            stackPanelContent2.Children.Add(new TextBlock() { Text = "扫描文件夹的音乐文件", TextTrimming = TextTrimming.CharacterEllipsis });
-
-            var ab = new Button() { Content = stackPanelContent1, HorizontalAlignment = HorizontalAlignment.Stretch, MinWidth = 164 };
-            var bb = new Button() { Content = stackPanelContent2, HorizontalAlignment = HorizontalAlignment.Stretch };
-
-            ab.Click += Ab_Click;
-            bb.Click += Bb_Click;
-
-            stackPanel.Children.Add(ab);
-            stackPanel.Children.Add(bb);
-
-            await App.MainWindowInstance.ShowDialog("添加本地文件", stackPanel);
-
-            ab.Click -= Ab_Click;
-            bb.Click -= Bb_Click;
-        }
-        async void Ab_Click(object sender, RoutedEventArgs e)
-        {
-            var files = await FileHelper.UserSelectFiles(
-                PickerViewMode.List, PickerLocationId.MusicLibrary);
-            //App.Instance.SupportedMediaFormats);
-            if (files.Any())
-            {
-                App.MainWindowInstance.HideDialog();
-                ItemsList_Header_Info_CommandBar.IsEnabled = false;
-                var item = App.MainWindowInstance.AddNotify("添加本地歌曲", "正在准备添加本地歌曲...", NotifySeverity.Loading, TimeSpan.MaxValue);
-                var jdata = await PlayListHelper.ReadData();
-                int count = 0;
-                string listName = musicListData.ListName;
-                foreach (var i in files)
-                {
-                    item.HorizontalAlignment = HorizontalAlignment.Stretch;
-                    item.SetNotifyItemData("添加本地歌曲", $"进度：{count}/{files.Count}，{Math.Round(((decimal)count / files.Count) * 100, 1)}%\n正在添加：{i.Name}", NotifySeverity.Loading);
-                    item.SetProcess(files.Count, count);
-                    FileInfo fi = null;
-                    await Task.Run(() => fi = new FileInfo(i.Path));
-                    jdata = await PlayListHelper.AddLocalMusicDataToPlayList(listName, fi, jdata);
-                    count++;
-                }
-                item.SetProcess(0, 0);
-                item.HorizontalAlignment = HorizontalAlignment.Center;
-                item.SetNotifyItemData("添加本地歌曲", "正在保存...", NotifySeverity.Loading);
-                await PlayListHelper.SaveData(jdata);
-                await App.Instance.PlayListReader.Refresh();
-                InitInfo();
-                InitBindings();
-                ItemsList_Header_Info_CommandBar.IsEnabled = true;
-                item.SetNotifyItemData("添加本地歌曲", "添加本地歌曲成功。", NotifySeverity.Complete);
-                App.MainWindowInstance.NotifyCountDown(item);
-            }
-        }
-        async void Bb_Click(object sender, RoutedEventArgs e)
-        {
-            Windows.Storage.StorageFolder folder = await FileHelper.UserSelectFolder(PickerLocationId.MusicLibrary);
-            if (folder != null)
-            {
-                var jdata = await PlayListHelper.ReadData();
-                DirectoryInfo directory = null;
-                await Task.Run(() => directory = Directory.CreateDirectory(folder.Path));
-                foreach (var i in directory.GetFiles())
-                {
-                    if (App.SupportedMediaFormats.Contains(i.Extension))
-                    {
-                        jdata = await PlayListHelper.AddLocalMusicDataToPlayList(musicListData.ListName, i, jdata);
-                    }
-                }
-                await PlayListHelper.SaveData(jdata);
-                await App.Instance.PlayListReader.Refresh();
-                InitInfo();
-                InitBindings();
-                App.MainWindowInstance.AddNotify("添加本地歌曲成功。", null, NotifySeverity.Complete);
-            }
+            await App.MainWindowInstance.ShowDialog("添加本地文件", new DialogPages.AddFilesToMusicListDataPage() { musicListData = this.musicListData });
         }
 
         CompositionPropertySet scrollerPropertySet;
@@ -611,6 +514,8 @@ namespace TewiMP.Pages.ListViewPages
 
         void InitEvents()
         {
+            App.Instance.PlayListReader.Updated -= PlayListReader_Updated;
+            App.Instance.PlayListReader.Updated += PlayListReader_Updated;
             App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
             App.MainWindowInstance.InKeyDownEvent += MainWindow_InKeyDownEvent;
             ItemList_Header_Search_Control.SearchingAItem -= ItemList_Header_Search_Control_SearchingAItem;
@@ -627,6 +532,7 @@ namespace TewiMP.Pages.ListViewPages
 
         void RemoveEvents()
         {
+            App.Instance.PlayListReader.Updated -= PlayListReader_Updated;
             App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
             ItemList_Header_Search_Control.SearchingAItem -= ItemList_Header_Search_Control_SearchingAItem;
             ItemList_Header_Search_Control.IsOpenChanged -= ItemList_Header_Search_Control_IsOpenChanged;
@@ -688,6 +594,12 @@ namespace TewiMP.Pages.ListViewPages
                 scrollViewer.ViewChanged -= ScrollViewer_ViewChanged;
             Bindings.StopTracking();
             UnloadObject(this);
+        }
+
+        private void PlayListReader_Updated()
+        {
+            InitInfo();
+            InitBindings();
         }
 
         bool isDelayInitShyHeaderWhenScroll = false;
@@ -773,6 +685,7 @@ namespace TewiMP.Pages.ListViewPages
                     App.Instance.PlayingList.SetRandomPlay(App.Instance.PlayingList.PlayBehavior);
                     break;
                 case "refresh":
+                    InitInfo();
                     InitBindings();
                     break;
                 case "addLocal":

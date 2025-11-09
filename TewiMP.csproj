@@ -81,6 +81,7 @@
 		<None Remove="Controls\ImageEx.xaml" />
 		<None Remove="DesktopLyricWindow.xaml" />
 		<None Remove="Pages\BrowsePage.xaml" />
+		<None Remove="Pages\DialogPages\AddFilesToMusicListDataPage.xaml" />
 		<None Remove="Pages\DialogPages\AddPlayListPage.xaml" />
 		<None Remove="Pages\DialogPages\AudioInfoPage.xaml" />
 		<None Remove="Pages\DialogPages\EditPlayListPage.xaml" />
@@ -191,6 +192,9 @@
 		<None Update="LICENSE">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<Page Update="Pages\DialogPages\AddFilesToMusicListDataPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</Page>
 		<None Update="Plugins\FFmpegPathSelector.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

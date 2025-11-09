@@ -166,7 +166,6 @@ namespace TewiMP.Controls
 
         private void AutoScrollView_Loaded(object sender, RoutedEventArgs e)
         {
-            Loaded -= AutoScrollView_Loaded;
             RepeatChangeView();
         }
 
@@ -180,6 +179,7 @@ namespace TewiMP.Controls
                 _scrollView.ScrollCompleted -= _scrollView_ScrollCompleted;
                 _scrollView.ViewChanged -= _scrollView_ViewChanged1;
             }
+            Loaded -= AutoScrollView_Loaded;
             Unloaded -= AutoScrollView_Unloaded;
         }
 

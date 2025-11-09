@@ -241,8 +241,8 @@
                                     <AppBarButton
                                         Click="multiButton_Click"
                                         Tag="multi_deleteSelect"
-                                        Label="删除选中歌曲"
-                                        ToolTipService.ToolTip="删除选中歌曲">
+                                        Label="移除选中歌曲"
+                                        ToolTipService.ToolTip="从此列表中移除选中歌曲">
                                         <AppBarButton.Icon>
                                             <FontIcon Glyph="&#xE74D;"/>
                                         </AppBarButton.Icon>
