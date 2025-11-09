@@ -217,7 +217,7 @@ namespace TewiMP.DataEditor
             { AudioEffectFlag.PassFilterEqEnable.ToString(), false },
             { AudioEffectFlag.EffectEnable.ToString(), false },
             { AudioEffectFlag.WasapiOnlyEnable.ToString(), false },
-            { AudioEffectFlag.Latency.ToString(), 200 },
+            { AudioEffectFlag.Latency.ToString(), 100 },
             { AudioEffectFlag.AudioEffectDatas.ToString(), new JArray() { 1.0, 1.0, 1.0 } },
             { AudioEffectFlag.GraphicEqString.ToString(), nameof(Media.AudioEqualizerBands.CustomBands) },
             { AudioEffectFlag.GraphicEqDatas.ToString(), "0,0,0,0,0,0,0,0,0,0" },
