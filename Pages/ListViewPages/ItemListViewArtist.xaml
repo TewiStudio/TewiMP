@@ -8,6 +8,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:helper="using:TewiMP.Helpers"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    Loaded="Page_Loaded" Unloaded="Page_Unloaded"
     mc:Ignorable="d" SizeChanged="Result_BaseGrid_SizeChanged">
     
     <Page.Resources>

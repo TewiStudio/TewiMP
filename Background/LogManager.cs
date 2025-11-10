@@ -30,30 +30,30 @@ namespace TewiMP.Background
         public delegate void LogEventHandler(LogData logData);
         public event LogEventHandler LogListAdded;
 
-        public static void Log(string name, string content, LogLevel logLevel = LogLevel.Info)
+        public static void Log(string name, string content, LogLevel logLevel = LogLevel.Info, bool writeToLogStream = true)
         {
-            App.Instance?.LogManager.LogInstance(name, content, logLevel);
+            App.Instance?.LogManager.LogInstance(name, content, logLevel, writeToLogStream);
         }
 
-        public static void LogIf(bool b, string name, string content, LogLevel logLevel = LogLevel.Info)
+        public static void LogIf(bool b, string name, string content, LogLevel logLevel = LogLevel.Info, bool writeToLogStream = true)
         {
-            if (b) Log(name, content, logLevel);
+            if (b) Log(name, content, logLevel, writeToLogStream);
         }
 
-        public static void Info(string name, string content) => Log(name, content, LogLevel.Info);
-        public static void Warning(string name, string content) => Log(name, content, LogLevel.Warning);
-        public static void Error(string name, string content) => Log(name, content, LogLevel.Error);
-        public static void LogDebug(string content) => Log("Debug", content, LogLevel.Info);
-        public static TimeSpan Elapsed(string name, string content, DateTime lastTime)
+        public static void Info(string name, string content, bool writeToLogStream = true) => Log(name, content, LogLevel.Info, writeToLogStream);
+        public static void Warning(string name, string content, bool writeToLogStream = true) => Log(name, content, LogLevel.Warning, writeToLogStream);
+        public static void Error(string name, string content, bool writeToLogStream = true) => Log(name, content, LogLevel.Error, writeToLogStream);
+        public static void LogDebug(string content, bool writeToLogStream = true) => Log("Debug", content, LogLevel.Info, writeToLogStream);
+        public static TimeSpan Elapsed(string name, string content, DateTime lastTime, bool writeToLogStream = true)
         {
             var elapsedTime = DateTime.Now - lastTime;
-            Log(name, string.Format(content, elapsedTime));
+            Log(name, string.Format(content, elapsedTime), writeToLogStream: writeToLogStream);
             return elapsedTime;
         }
 
         public ObservableCollection<LogData> LogDatas { get; set; } = [];
 
-        public void LogInstance(string name, string content, LogLevel logLevel = LogLevel.Info)
+        public void LogInstance(string name, string content, LogLevel logLevel = LogLevel.Info, bool writeToLogStream = true)
         {
             App.MainWindowInstance?.Invoke(() =>
             {
@@ -63,7 +63,7 @@ namespace TewiMP.Background
             });
             var str = $"[{DateTime.Now}][{logLevel}][{name}]: {content}";
             Debug.WriteLine(str);
-            WriteToLogStream(str);
+            if (writeToLogStream) WriteToLogStream(str);
         }
 
         public static string NowLogFilePath { get; private set; }
@@ -102,7 +102,7 @@ namespace TewiMP.Background
                 }
                 catch
                 {
-                    LogManager.Error("LogManager", "Failed to write to log stream.");
+                    LogManager.Error("LogManager", "Failed to write to log stream.", false); // 当文件无法写入时，取消写入以避免无限递归
                 }
             }
         }

@@ -202,7 +202,7 @@ public abstract class MusicSourcePlugin : Plugin
     public abstract Task<string> GetPicFromMusicData(MusicData musicData);
 
     /// <summary>
-    /// 通过 <paramref name="keyword"/> 搜索音乐，返回搜索结果对象。
+    /// 通过 <paramref name="keyword"/> 搜索音乐，返回搜索结果对象。对象类型由具体插件决定。
     /// TODO: 规范返回对象类型。
     /// </summary>
     /// <param name="keyword"></param>

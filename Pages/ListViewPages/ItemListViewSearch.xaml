@@ -9,6 +9,7 @@
     xmlns:controlszn="using:TewiMP.Controls"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    Loaded="Page_Loaded" Unloaded="Page_Unloaded"
     mc:Ignorable="d">
 
     <Page.Resources>

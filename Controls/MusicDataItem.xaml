@@ -61,6 +61,9 @@
                 Background="Transparent"
                 DoubleTapped="UserControl_DoubleTapped"
                 Padding="8">
+                <Grid.OpacityTransition>
+                    <ScalarTransition/>
+                </Grid.OpacityTransition>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto"/>
                     <ColumnDefinition Width="*"/>
@@ -85,6 +88,7 @@
                     Margin="4,0" UseLayoutRounding="True"
                     VerticalAlignment="Center">
                     <TextBlock
+                        x:Name="Info_Texts_Textblock"
                         Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"
                         FontSize="13"
                         TextTrimming="CharacterEllipsis">

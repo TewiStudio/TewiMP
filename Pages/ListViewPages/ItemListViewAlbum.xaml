@@ -9,6 +9,7 @@
     xmlns:helper="using:TewiMP.Helpers"
     xmlns:ui="using:CommunityToolkit.WinUI.Controls"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    Loaded="Page_Loaded" Unloaded="Page_Unloaded"
     mc:Ignorable="d" SizeChanged="Result_BaseGrid_SizeChanged">
 
     <Page.Resources>

@@ -21,9 +21,8 @@ using TewiMP.Pages.ListViewPages;
 
 namespace TewiMP.Pages
 {
-    public partial class ItemListViewAlbum : Page, IPage
+    public partial class ItemListViewAlbum : Page
     {
-        public bool IsNavigatedOutFromPage { get; set; } = false;
         private ScrollViewer scrollViewer { get; set; }
         public Album NavToObj { get; set; }
         public MusicFrom NowMusicFrom { get; set; } = MusicFrom.pluginMusicSource;
@@ -31,40 +30,32 @@ namespace TewiMP.Pages
         public ItemListViewAlbum()
         {
             InitializeComponent();
-            DataContext = this;
-            App.MainWindowInstance.InKeyDownEvent += MainWindow_InKeyDownEvent;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             //PlayAllButton.Foreground = new SolidColorBrush(CodeHelper.IsAccentColorDark() ? Colors.White : Colors.Black);
             base.OnNavigatedTo(e);
-            IsNavigatedOutFromPage = false;
             Album a = ((PageData)e.Parameter).Param as Album;
             NavToObj = a;
-            musicListData = new() { ListDataType = DataType.专辑 };
-            InitData();
-            App.MainWindowInstance.MainViewStateChanged += MainWindow_MainViewStateChanged;
         }
 
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            LeavingPageDo();
         }
 
         private async void LeavingPageDo()
         {
-            IsNavigatedOutFromPage = true;
             ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
             ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
             ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
             SearchBox.SearchingAItem -= SearchBox_SearchingAItem;
             SearchBox.IsOpenChanged -= SearchBox_IsOpenChanged;
-            await Task.Delay(500);
             App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
             App.MainWindowInstance.MainViewStateChanged -= MainWindow_MainViewStateChanged;
 
+            SongItemBindBase.RecycleBindItems(MusicDataList);
             MusicDataList?.Clear();
 
             if (Children != null)
@@ -78,7 +69,6 @@ namespace TewiMP.Pages
             if (Album_Image != null) Album_Image.Source = null;
             if (AlbumLogo != null) AlbumLogo.Source = null;
 
-            NavToObj?.Songs?.Songs.Clear();
             NavToObj = null;
 
             UnloadObject(this);
@@ -114,6 +104,7 @@ namespace TewiMP.Pages
         int pageSize = 30;
         public async void InitData()
         {
+            if (NavToObj is null) return;
             SelectorSeparator.Visibility = Visibility.Collapsed;
             AddSelectedToPlayingListButton.Visibility = Visibility.Collapsed;
             AddSelectedToPlayListButton.Visibility = Visibility.Collapsed;
@@ -123,7 +114,7 @@ namespace TewiMP.Pages
             SelectAllButton.Visibility = Visibility.Collapsed;
             LoadingTipControl.ShowLoading();
             var obj = await NavToObj.PluginInfo.GetMusicSourcePlugin().GetAlbum(NavToObj.ID);
-            if (IsNavigatedOutFromPage) return;
+            if (!IsLoaded) return;
             if (obj is null)
             {
                 App.MainWindowInstance.AddNotify("加载专辑信息时出现错误", "无法加载专辑信息，请重试。",
@@ -147,28 +138,24 @@ namespace TewiMP.Pages
             {
                 LoadImage();
                 DescribeeText.Text = obj.Describe;
-                await Task.Delay(100);
-                var dpi = CodeHelper.GetScaleAdjustment(App.Instance.MainWindow);
-
+                SongItemBindBase.RecycleBindItems(MusicDataList);
                 MusicDataList.Clear();
-                int count = 0;
+                int count = 1;
                 foreach (var i in musicListData.Songs)
                 {
-                    count++;
-                    i.Count = count;
-                    MusicDataList.Add(new() { MusicData = i, ImageScaleDPI = dpi, MusicListData = musicListData, ShowAlbumName = false });
+                    MusicDataList.Add(SongItemBindBase.GetBindItem(i, musicListData, count++));
                 }
             }
             LoadingTipControl.UnShowLoading();
-            LogManager.Log("ItemListViewAlbum", "加载完成");
+            LogManager.Log("ItemListViewAlbum", "Loaded.");
             await Task.Delay(1000);
             UpdateShyHeader();
         }
 
         private async void LoadImage()
         {
-            if (IsNavigatedOutFromPage) LeavingPageDo();
             AlbumLogo.BorderThickness = new(0);
+            if (NavToObj is null) return;
             if (musicListData.ListDataType == DataType.本地歌单)
             {
                 Album_Image.Source = musicListData.PicturePath.ToImageUri();
@@ -185,7 +172,7 @@ namespace TewiMP.Pages
             AlbumLogo.Source = Album_Image.Source;
             AlbumLogo.SaveName = NavToObj.Title;
             AlbumLogo.BorderThickness = new(1);
-            LogManager.Log("ItemListViewAlbum", "图片加载完成");
+            LogManager.Log("ItemListViewAlbum", "Image loaded.");
             UpdateShyHeader();
             await Task.Delay(10);
             UpdateShyHeader();
@@ -193,7 +180,7 @@ namespace TewiMP.Pages
             UpdateShyHeader();
             await Task.Delay(200);
             UpdateShyHeader();
-            if (IsNavigatedOutFromPage) LeavingPageDo();
+            if (!IsLoaded) LeavingPageDo();
         }
 
         CompositionPropertySet scrollerPropertySet;
@@ -617,6 +604,20 @@ namespace TewiMP.Pages
                     scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
                     break;
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = this;
+            musicListData = new() { ListDataType = DataType.专辑 };
+            App.MainWindowInstance.InKeyDownEvent += MainWindow_InKeyDownEvent;
+            App.MainWindowInstance.MainViewStateChanged += MainWindow_MainViewStateChanged;
+            InitData();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            LeavingPageDo();
         }
     }
 }

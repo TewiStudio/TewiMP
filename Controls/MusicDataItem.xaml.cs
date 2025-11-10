@@ -1,17 +1,18 @@
+using Microsoft.UI.Composition;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
 using System;
-using System.IO;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Composition;
-using TewiMP.Media;
-using TewiMP.Helpers;
 using TewiMP.DataEditor;
+using TewiMP.Helpers;
+using TewiMP.Media;
 
 namespace TewiMP.Controls
 {
@@ -33,6 +34,49 @@ namespace TewiMP.Controls
                     item.InitPlayingState();
                 }
             };
+        }
+
+        public static void StartConnectAnimation(MusicData targetData)
+        {
+            foreach (var i in staticMusicDataItem)
+            {
+                if (i?.songItemBind?.MusicData is not null)
+                {
+                    if (i.songItemBind.MusicData == targetData)
+                    {
+                        i.Info_Root.Opacity = 0;
+                        ConnectedAnimation canimation =
+                            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation", i.Info_Image);
+                        canimation.Configuration = new BasicConnectedAnimationConfiguration();
+                        ConnectedAnimation animation =
+                            ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation");
+                        if (animation != null)
+                        {
+                            animation.Completed += (_, __) => i.Info_Root.Opacity = 1;
+                            animation.TryStart(VisualTreeHelper.GetParent(App.MainWindowInstance.PlayContent) as UIElement);
+                        }
+
+                        ConnectedAnimation canimation1 =
+                            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation1", i.Info_Texts_Textblock);
+                        canimation1.Configuration = new BasicConnectedAnimationConfiguration();
+                        ConnectedAnimation animation1 =
+                            ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation1");
+                        if (animation1 != null)
+                        {
+                            animation1.TryStart(App.MainWindowInstance.PlayTitle);
+                        }
+                        ConnectedAnimation canimation2 =
+                            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation2", i.Info_Texts_ButtonNameTextBlock);
+                        canimation2.Configuration = new BasicConnectedAnimationConfiguration();
+                        ConnectedAnimation animation2 =
+                            ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation2");
+                        if (animation2 != null)
+                        {
+                            animation2.TryStart(App.MainWindowInstance.PlayArtist);
+                        }
+                    }
+                }
+            }
         }
 
         public static bool TryHighlightPlayingItem()
@@ -95,7 +139,7 @@ namespace TewiMP.Controls
         SongItemBindBase songItemBind;
         public MusicDataItem()
         {
-            initListen();
+            initListen(); // 静态初始化，只在程序第一次运行时执行一次
             InitializeComponent();
             InitVisuals();
             //arrayList = new ArrayList(10000000);
@@ -200,23 +244,29 @@ namespace TewiMP.Controls
             rightButtonVisual.Opacity = 0;
             strokeVisual.Opacity = 0;
 
-            AnimateHelper.AnimateScalar(rightButtonVisual, 1, 0.1,
+            AnimateHelper.AnimateScalar(
+                rightButtonVisual, 1, 0.1,
                 0, 0, 0, 0,
                 out rightButtonVisualShowAnimation);
-            AnimateHelper.AnimateScalar(rightButtonVisual, 0, 0.1,
+            AnimateHelper.AnimateScalar(
+                rightButtonVisual, 0, 0.1,
                 0, 0, 0, 0,
                 out rightButtonVisualHideAnimation);
-            AnimateHelper.AnimateScalar(backgroundFillVisual,
-                                        1, 0.1,
-                                        0, 0, 0, 0,
-                                        out backgroundFillVisualShowAnimation);
-            AnimateHelper.AnimateScalar(backgroundFillVisual,
+            AnimateHelper.AnimateScalar(
+                backgroundFillVisual,
+                1, 0.1,
+                0, 0, 0, 0,
+                out backgroundFillVisualShowAnimation);
+            AnimateHelper.AnimateScalar(
+                backgroundFillVisual,
                 0, 0.1,
                 0, 0, 0, 0,
                 out backgroundFillVisualHideAnimation);
-            AnimateHelper.AnimateScalar(strokeVisual, 0, 3, 0, 0, 0, 0,
+            AnimateHelper.AnimateScalar(
+                strokeVisual, 0, 3, 0, 0, 0, 0,
                 out strokeVisualShowAnimation);
-            AnimateHelper.AnimateScalar(strokeVisual, 0, 0.2, 0, 0, 0, 0,
+            AnimateHelper.AnimateScalar(
+                strokeVisual, 0, 0.2, 0, 0, 0, 0,
                 out strokeVisualHideAnimation);
         }
 
@@ -303,6 +353,12 @@ namespace TewiMP.Controls
             rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += MusicDataItem_Completed;
         }
 
+        async Task Play()
+        {
+            await App.Instance.PlayingList.Play(songItemBind.MusicData, true);
+
+        }
+
         private void MusicDataItem_Completed(object sender, CompositionBatchCompletedEventArgs args)
         {
             if (!isPointEnter) Info_Buttons_Root.Visibility = Visibility.Collapsed;
@@ -349,6 +405,13 @@ namespace TewiMP.Controls
             backgroundFillVisualHideAnimation.Dispose();
             strokeVisualShowAnimation.Dispose();
             strokeVisualHideAnimation.Dispose();
+
+            rightButtonVisualShowAnimation = null;
+            rightButtonVisualHideAnimation = null;
+            backgroundFillVisualShowAnimation = null;
+            backgroundFillVisualHideAnimation = null;
+            strokeVisualShowAnimation = null;
+            strokeVisualHideAnimation = null;
         }
 
         bool isPointEnter = false;
@@ -378,7 +441,7 @@ namespace TewiMP.Controls
         private async void UserControl_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e)
         {
             if (isMouseEventClosed) return;
-            await App.Instance.PlayingList.Play(songItemBind.MusicData, true);
+            await Play();
         }
 
         private void UserControl_RightTapped(object sender, RightTappedRoutedEventArgs e)
@@ -413,7 +476,7 @@ namespace TewiMP.Controls
                     App.Instance.AudioPlayer.SetPlay();
             }
             else
-                await App.Instance.PlayingList.Play(songItemBind.MusicData, true);
+                await Play();
         }
 
         private void Button_Click_2(object sender, RoutedEventArgs e)

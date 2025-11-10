@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using TewiMP.DataEditor;
@@ -85,6 +86,38 @@ namespace TewiMP.Helpers
             {
                 _searchText = value;
                 OnPropertyChanged(nameof(SearchText));
+            }
+        }
+
+        private static readonly Stack<SongItemBindBase> _bindPool = new();
+        public static SongItemBindBase GetBindItem(MusicData musicData, MusicListData listData, int count)
+        {
+            SongItemBindBase item;
+            if (_bindPool.Count > 0)
+            {
+                item = _bindPool.Pop();
+                item.MusicData = musicData;
+                item.MusicListData = listData;
+            }
+            else
+            {
+                item = new SongItemBindBase
+                {
+                    MusicData = musicData,
+                    MusicListData = listData
+                };
+            }
+            musicData.Count = count;
+            return item;
+        }
+
+        public static void RecycleBindItems(IEnumerable<SongItemBindBase> items)
+        {
+            foreach (var item in items)
+            {
+                item.MusicData = null;
+                item.MusicListData = null;
+                _bindPool.Push(item);
             }
         }
     }

@@ -44,7 +44,7 @@ namespace TewiMP.Controls
             "ScrollSpeedRatio",
             typeof(double),
             typeof(AutoScrollView),
-            new PropertyMetadata(1d, null)
+            new PropertyMetadata(.65d, null)
         );
 
         public double ScrollSpeedRatio
@@ -239,7 +239,7 @@ namespace TewiMP.Controls
                 // 计算 MaskSize 在新宽度中的占比
                 gs1Offset = MaskSize / ActualWidth;
                 gs2Offset = 1d - MaskSize / ActualWidth;
-                _contentPresenter.Margin = new(0, 0, MaskSize, 0);
+                _contentPresenter.Margin = new(0, 0, IsHorizontalContentOutOfBounds ? MaskSize : 0, 0);
             }
 
             _gs1a.Width = MaskSize;

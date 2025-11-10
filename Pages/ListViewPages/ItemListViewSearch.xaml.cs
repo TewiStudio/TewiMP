@@ -20,9 +20,8 @@ using TewiMP.Background;
 
 namespace TewiMP.Pages
 {
-    public partial class ItemListViewSearch : Page, IPage
+    public partial class ItemListViewSearch : Page
     {
-        public bool IsNavigatedOutFromPage { get; set; } = false;
         private ScrollViewer scrollViewer { get; set; }
         public object NavToObj { get; set; }
         public SearchDataType NowSearchMode { get; set; } = SearchDataType.歌曲;
@@ -32,7 +31,6 @@ namespace TewiMP.Pages
         public ItemListViewSearch()
         {
             InitializeComponent();
-            DataContext = this;
         }
 
         SearchData searchData { get; set; }
@@ -40,7 +38,6 @@ namespace TewiMP.Pages
         {
             //PlayAllButton.Foreground = new SolidColorBrush(CodeHelper.IsAccentColorDark() ? Colors.White : Colors.Black);
             base.OnNavigatedTo(e);
-            IsNavigatedOutFromPage = false;
             searchData =  ((PageData)e.Parameter).Param as SearchData;
             pageNumber = searchData.PageNumber;
             pageSize = searchData.PageSize;
@@ -48,25 +45,11 @@ namespace TewiMP.Pages
             NowMusicFrom = searchData.SourcePlugin;
             NowSearchMode = searchData.SearchDataType;
             musicListData = new() { ListDataType = DataType.歌曲 };
-            UpdateShyHeader();
-            InitData();
         }
 
         protected override async void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            IsNavigatedOutFromPage = true;
-
-            searchData.PageNumber = pageNumber;
-            searchData.PageSize = pageSize;
-            searchData = null;
-
-            await Task.Delay(500);
-            scrollViewer?.ScrollToVerticalOffset(0);
-            MusicDataList.Clear();
-            Children.ItemsSource = null;
-            Children.Items.Clear();
-            UnloadObject(this);
         }
 
         public ObservableCollection<SongItemBindBase> MusicDataList = new();
@@ -122,14 +105,13 @@ namespace TewiMP.Pages
                 }
             }
 
-            if (IsNavigatedOutFromPage) return;
+            if (!IsLoaded) return;
 
             if (searchDatas != null)
             {
+                SongItemBindBase.RecycleBindItems(MusicDataList);
                 MusicDataList.Clear();
                 SearchList.Clear();
-
-                var dpi = CodeHelper.GetScaleAdjustment(App.Instance.MainWindow);
 
                 var count = pageNumber * pageSize - pageSize;
                 switch (NowSearchMode)
@@ -138,12 +120,10 @@ namespace TewiMP.Pages
                         Children.ItemsSource = MusicDataList;
                         Children.ItemTemplate = this.Resources["SongItemTemplate"] as DataTemplate;
 
-                        MusicData[] array = (searchDatas as MusicListData).Songs.ToArray();
-                        foreach (var i in array)
+                        var musicListData = searchDatas as MusicListData;
+                        foreach (var i in musicListData.Songs)
                         {
-                            count++;
-                            i.Count = count;
-                            MusicDataList.Add(new() { MusicData = i, MusicListData = musicListData, ImageScaleDPI = dpi });
+                            MusicDataList.Add(SongItemBindBase.GetBindItem(i, musicListData, count++));
                         }
                         break;
                     default:
@@ -553,6 +533,27 @@ namespace TewiMP.Pages
                     }
                     break;
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = this;
+            UpdateShyHeader();
+            InitData();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            searchData.PageNumber = pageNumber;
+            searchData.PageSize = pageSize;
+            searchData = null;
+
+            scrollViewer?.ScrollToVerticalOffset(0);
+            SongItemBindBase.RecycleBindItems(MusicDataList);
+            MusicDataList.Clear();
+            Children.ItemsSource = null;
+            Children.Items.Clear();
+            UnloadObject(this);
         }
     }
 }

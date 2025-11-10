@@ -27,7 +27,7 @@ namespace TewiMP.Pages.ListViewPages
     public sealed partial class PlayListPage : Page
     {
         MusicListData musicListData { get; set; } = null;
-        ObservableCollection<SongItemBindBase> musicListBind { get; set; } = new();
+        ObservableCollection<SongItemBindBase> musicListBind { get; set; } = [];
         ScrollViewer scrollViewer;
         PageData PageData { get; set; }
         public string md5;
@@ -64,9 +64,15 @@ namespace TewiMP.Pages.ListViewPages
         // Items 更新时 CommandBar 宽度不会更新 >:(
         async void UpdateCommandBarWidth()
         {
+            // 创可贴写法 :(
             ItemsList_Header_Info_CommandBar.Width = 0;
             await Task.Delay(50);
             InitShyHeader();
+            ItemsList_Header_Info_CommandBar.Width = 0;
+            ItemsList_Header_Info_CommandBar.Width = double.NaN;
+            await Task.Delay(100);
+            InitShyHeader();
+            ItemsList_Header_Info_CommandBar.Width = 0;
             ItemsList_Header_Info_CommandBar.Width = double.NaN;
         }
         void MultiSelectDo(bool isChecked)
@@ -157,7 +163,7 @@ namespace TewiMP.Pages.ListViewPages
         {
             if (ItemsList.SelectedItems.Any())
             {
-                var result = await App.MainWindowInstance.ShowDialog("删除歌曲", $"真的要从歌单中删除这{ItemsList.SelectedItems.Count}首歌曲吗？", "取消", "确定", defaultButton: ContentDialogButton.Close);
+                var result = await App.MainWindowInstance.ShowDialog("移除歌曲", $"真的要从播放列表中移除这{ItemsList.SelectedItems.Count}首歌曲吗？", "取消", "确定", defaultButton: ContentDialogButton.Close);
                 if (result == ContentDialogResult.Primary)
                 {
                     ItemsList_Header_Info_CommandBar.IsEnabled = false;
@@ -377,68 +383,21 @@ namespace TewiMP.Pages.ListViewPages
                 InitInfo();
             }
 
-            var scs = musicListData.PlaySort;
-            List<MusicData> array = [];
-            await Task.Run(() =>
-            {
-                switch (scs)
-                {
-                    case PlaySort.默认升序:
-                        array = musicListData.Songs;
-                        break;
-                    case PlaySort.默认降序:
-                        MusicData[] list = new MusicData[musicListData.Songs.Count];
-                        musicListData.Songs.CopyTo(list, 0);
-                        var l = list.ToList();
-                        l.Reverse();
-                        array = l;
-                        break;
-                    case PlaySort.名称升序:
-                        array = [.. musicListData.Songs.OrderBy(m => m.Title)];
-                        break;
-                    case PlaySort.名称降序:
-                        array = [.. musicListData.Songs.OrderByDescending(m => m.Title)];
-                        break;
-                    case PlaySort.艺术家升序:
-                        array = [.. musicListData.Songs.OrderBy(m => m.Artists.Count != 0 ? m.Artists[0].Name : "未知")];
-                        break;
-                    case PlaySort.艺术家降序:
-                        array = [.. musicListData.Songs.OrderByDescending(m => m.Artists.Count != 0 ? m.Artists[0].Name : "未知")];
-                        break;
-                    case PlaySort.专辑升序:
-                        array = [.. musicListData.Songs.OrderBy(m => m.Album.Title)];
-                        break;
-                    case PlaySort.专辑降序:
-                        array = [.. musicListData.Songs.OrderByDescending(m => m.Album.Title)];
-                        break;
-                    case PlaySort.时间升序:
-                        array = [.. musicListData.Songs.OrderBy(m => m.ReleaseTime ?? DateTime.MinValue)];
-                        break;
-                    case PlaySort.时间降序:
-                        array = [.. musicListData.Songs.OrderByDescending(m => m.ReleaseTime ?? DateTime.MinValue)];
-                        break;
-                    case PlaySort.索引升序:
-                        array = [.. musicListData.Songs.OrderBy(m => m.Index)];
-                        break;
-                    case PlaySort.索引降序:
-                        array = [.. musicListData.Songs.OrderByDescending(m => m.Index)];
-                        break;
-                }
-            });
-
+            var sortedSongs = await GetSortedSongsAsync(musicListData);
+            SongItemBindBase.RecycleBindItems(musicListBind);
             musicListBind.Clear();
-            if (!IsLoaded || musicListData is null)
+            if (!IsLoaded || musicListData is null || sortedSongs is null)
             {
-                array = null; isInInitBindings = false;
+                sortedSongs = null; isInInitBindings = false;
                 LoadingTipControl.UnShowLoading();
                 return;
             }
+
             int count = 1;
-            foreach (var item in array)
+            foreach (var musicData in sortedSongs)
             {
-                item.Count = count;
-                musicListBind.Add(new() { MusicData = item, MusicListData = musicListData });
-                count++;
+                var bindItem = SongItemBindBase.GetBindItem(musicData, musicListData, count++);
+                musicListBind.Add(bindItem);
             }
 
             SortComboBox.SelectedIndex = (int)musicListData.PlaySort;
@@ -465,7 +424,8 @@ namespace TewiMP.Pages.ListViewPages
             }
 
             if (musicListData is null) return;
-            listSortEnum = Enum.GetValues(typeof(PlaySort)).Cast<PlaySort>().ToList();
+            listSortEnum = [.. Enum.GetValues<PlaySort>().Cast<PlaySort>()];
+            SortComboBox.ItemsSource = null;
             SortComboBox.ItemsSource = listSortEnum;
             SortComboBox.SelectedIndex = (int)musicListData.PlaySort;
 
@@ -566,6 +526,37 @@ namespace TewiMP.Pages.ListViewPages
             InitBindings();
         }
 
+        async Task<IEnumerable<MusicData>> GetSortedSongsAsync(MusicListData musicListData)
+        {
+            if (musicListData == null || musicListData.Songs == null)
+                return Enumerable.Empty<MusicData>();
+
+            var scs = musicListData.PlaySort;
+            var songs = musicListData.Songs;
+
+            var sortedSongs = await Task.Run(() =>
+            {
+                return scs switch
+                {
+                    PlaySort.默认升序 => songs.AsEnumerable(),
+                    PlaySort.默认降序 => songs.AsEnumerable().Reverse(),
+                    PlaySort.名称升序 => songs.OrderBy(m => m.Title),
+                    PlaySort.名称降序 => songs.OrderByDescending(m => m.Title),
+                    PlaySort.艺术家升序 => songs.OrderBy(m => m.Artists.Count > 0 ? m.Artists[0].Name : "未知"),
+                    PlaySort.艺术家降序 => songs.OrderByDescending(m => m.Artists.Count > 0 ? m.Artists[0].Name : "未知"),
+                    PlaySort.专辑升序 => songs.OrderBy(m => m.Album.Title),
+                    PlaySort.专辑降序 => songs.OrderByDescending(m => m.Album.Title),
+                    PlaySort.时间升序 => songs.OrderBy(m => m.ReleaseTime ?? DateTime.MinValue),
+                    PlaySort.时间降序 => songs.OrderByDescending(m => m.ReleaseTime ?? DateTime.MinValue),
+                    PlaySort.索引升序 => songs.OrderBy(m => m.Index),
+                    PlaySort.索引降序 => songs.OrderByDescending(m => m.Index),
+                    _ => songs.AsEnumerable()
+                };
+            });
+
+            return sortedSongs;
+        }
+
         public ArrayList arrayList { get; set; }
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
@@ -585,6 +576,7 @@ namespace TewiMP.Pages.ListViewPages
             if (ItemsList_Header_Image != null) ItemsList_Header_Image.Source = null;
             if (ItemsList != null) ItemsList.ItemsSource = null;
             if (SortComboBox != null) SortComboBox.ItemsSource = null;
+            SongItemBindBase.RecycleBindItems(musicListBind);
             musicListBind?.Clear();
             musicListBind = null;
             listSortEnum?.Clear();
@@ -600,6 +592,7 @@ namespace TewiMP.Pages.ListViewPages
         {
             InitInfo();
             InitBindings();
+            UpdateCommandBarWidth();
         }
 
         bool isDelayInitShyHeaderWhenScroll = false;
@@ -687,6 +680,7 @@ namespace TewiMP.Pages.ListViewPages
                 case "refresh":
                     InitInfo();
                     InitBindings();
+                    UpdateCommandBarWidth();
                     break;
                 case "addLocal":
                     AddLocalFilesDo();

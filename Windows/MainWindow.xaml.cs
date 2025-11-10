@@ -969,6 +969,7 @@ namespace TewiMP
             PlayTitle.Text = audioPlayer.MusicData.Title;
             PlayArtist.Text = audioPlayer.MusicData.ButtonName;
             //PlayingListBaseView.SelectedItem = audioPlayer.MusicData;
+            MusicDataItem.StartConnectAnimation(audioPlayer.MusicData);
 
             foreach (var i in SongItem.StaticSongItems)
             {

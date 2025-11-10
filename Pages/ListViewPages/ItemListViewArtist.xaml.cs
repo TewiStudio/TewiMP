@@ -19,9 +19,8 @@ using CommunityToolkit.WinUI;
 
 namespace TewiMP.Pages
 {
-    public partial class ItemListViewArtist : Page, IPage
+    public partial class ItemListViewArtist : Page
     {
-        public bool IsNavigatedOutFromPage { get; set; } = false;
         private ScrollViewer scrollViewer { get; set; }
         public Artist NavToObj { get; set; }
         public MusicFrom NowMusicFrom { get; set; } = MusicFrom.pluginMusicSource;
@@ -29,33 +28,19 @@ namespace TewiMP.Pages
         public ItemListViewArtist()
         {
             InitializeComponent();
-            DataContext = this;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             //PlayAllButton.Foreground = new SolidColorBrush(CodeHelper.IsAccentColorDark() ? Colors.White : Colors.Black);
             base.OnNavigatedTo(e);
-            IsNavigatedOutFromPage = false;
             Artist a = ((PageData)e.Parameter).Param as Artist;
             NavToObj = a;
-            InitData();
         }
 
         protected override async void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            IsNavigatedOutFromPage = true;
-            await Task.Delay(500);
-            scrollViewer?.ScrollToVerticalOffset(0);
-
-            MusicDataList.Clear();
-            Children.ItemsSource = null;
-            Children.Items.Clear();
-            Artist_Image.Source = null;
-            musicListData = null;
-            NavToObj = null;
-            UnloadObject(this);
         }
 /*
         private void CrateShadow()
@@ -97,7 +82,7 @@ namespace TewiMP.Pages
                 App.MainWindowInstance.AddNotify("加载艺术家信息时出现错误", "无法加载艺术家信息，请重试。", NotifySeverity.Error);
                 return;
             }
-            if (IsNavigatedOutFromPage) return;
+            if (!IsLoaded) return;
             NavToObj = obj;
             musicListData = NavToObj.HotSongs;
             Artist_SmallName.Text = string.IsNullOrEmpty(NavToObj.Name2) ? NavToObj.Name : $"{NavToObj.Name}（{NavToObj.Name2}）";
@@ -106,16 +91,13 @@ namespace TewiMP.Pages
             if (musicListData != null)
             {
                 LoadImage();
-                await Task.Delay(100);
-                var dpi = CodeHelper.GetScaleAdjustment(App.Instance.MainWindow);
 
+                SongItemBindBase.RecycleBindItems(MusicDataList);
                 MusicDataList.Clear();
-                int count = 0;
+                int count = 1;
                 foreach (var i in musicListData.Songs)
                 {
-                    count++;
-                    i.Count = count;
-                    MusicDataList.Add(new() { MusicData = i, MusicListData = musicListData, ImageScaleDPI = dpi });
+                    MusicDataList.Add(SongItemBindBase.GetBindItem(i, musicListData, count++));
                 }
             }
             LoadingTipControl.UnShowLoading();
@@ -123,6 +105,7 @@ namespace TewiMP.Pages
 
         private async void LoadImage()
         {
+            Artist_Image.Source = null;
             if (musicListData.ListDataType == DataType.本地歌单)
             {
                 Artist_Image.Source = musicListData.PicturePath.ToImageUri();
@@ -497,6 +480,26 @@ namespace TewiMP.Pages
                     }
                     break;
             }
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = this;
+            InitData();
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            scrollViewer?.ScrollToVerticalOffset(0);
+
+            SongItemBindBase.RecycleBindItems(MusicDataList);
+            MusicDataList.Clear();
+            Children.ItemsSource = null;
+            Children.Items.Clear();
+            Artist_Image.Source = null;
+            musicListData = null;
+            NavToObj = null;
+            UnloadObject(this);
         }
     }
 }
