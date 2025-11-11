@@ -453,7 +453,7 @@ namespace TewiMP.Pages.ListViewPages
             }
             else if (musicListData.ListDataType == DataType.¸èµ¥)
             {
-                var result = await ImageManage.GetImageUri(musicListData);
+                var result = await ImageManager.GetImageUri(musicListData);
                 imageSource = result.Item1;
                 resultPath = result.Item2;
             }

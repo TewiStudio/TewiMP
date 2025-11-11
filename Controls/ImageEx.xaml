@@ -36,25 +36,19 @@
                     <media:BlurEffect 
                         x:Name="ImageBlurEffect"
                         IsAnimatable="True"
-                        Amount="10"/>
+                        Amount="0"/>
                 </media:PipelineVisualFactory>
             </media:UIElementExtensions.VisualFactory>
             <ani:Explicit.Animations>
                 <ani:AnimationSet 
-                    x:Name="BlurAnimation"
-                    IsSequential="True">
+                    x:Name="BlurAnimation">
                     <ani:BlurEffectAnimation
+                        x:Name="ImageBlurAnimation"
                         Target="{x:Bind ImageBlurEffect}"
                         EasingMode="EaseOut"
                         Duration="0:0:4"
                         From="0"
-                        To="40"/>
-                    <ani:BlurEffectAnimation
-                        Target="{x:Bind ImageBlurEffect}"
-                        EasingMode="{x:Null}"
-                        Duration="0:0:0.1"
-                        From="0"
-                        To="0"/>
+                        To="60"/>
                 </ani:AnimationSet>
                 <ani:AnimationSet 
                     x:Name="ResetBlurAnimation">
@@ -83,17 +77,35 @@
                 <ani:AnimationSet 
                     x:Name="OpacityAnimation">
                     <ani:OpacityAnimation
+                        x:Name="ImageOpacityAnimation"
                         EasingMode="EaseOut"
                         Duration="0:0:5"
                         From="0"
                         To="1"/>
                 </ani:AnimationSet>
                 <ani:AnimationSet 
-                    x:Name="ResetOpacityAnimation">
+                    x:Name="ZeroOpacityAnimation">
                     <ani:OpacityAnimation
                         EasingMode="{x:Null}"
                         Duration="0:0:0.1"
                         From="0"
+                        To="0"/>
+                </ani:AnimationSet>
+                <ani:AnimationSet 
+                    x:Name="OneOpacityAnimation">
+                    <ani:OpacityAnimation
+                        EasingMode="{x:Null}"
+                        Duration="0:0:0.1"
+                        From="1"
+                        To="1"/>
+                </ani:AnimationSet>
+                <ani:AnimationSet 
+                    x:Name="SliderAnimation">
+                    <ani:TranslationAnimation
+                        x:Name="ImageSliderAnimation"
+                        EasingMode="EaseOut"
+                        Duration="0:0:5"
+                        From="32,0,0"
                         To="0"/>
                 </ani:AnimationSet>
             </ani:Explicit.Animations>

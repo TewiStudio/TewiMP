@@ -224,6 +224,7 @@ namespace TewiMP.Pages.MusicPages
         string imagePath;
         private void PlayingList_NowPlayingImageLoaded(Uri imageSource, string _)
         {
+            AlbumImageBase.TransitionType = App.Instance.PlayingList.IsNextPlay == SetPlayInfo.Previous ? ImageTransitionType.SlideRight : ImageTransitionType.SlideLeft;
             UpdateAccentColor();
             imagePath = _;
             if (imageSource is null)

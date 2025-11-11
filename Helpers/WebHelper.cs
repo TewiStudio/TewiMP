@@ -122,7 +122,7 @@ namespace TewiMP.Helpers
             while (loadingImages.Count > 1)
             {
                 //System.Diagnostics.LogManager.Log(musicData.Title);
-                await Task.Delay(400);
+                await Task.Delay(300);
             }
             loadingImages.Add(musicData);
 

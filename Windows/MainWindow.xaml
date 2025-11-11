@@ -257,13 +257,16 @@
                                         MinWidth="0"
                                         CornerRadius="4"
                                         CommonNavigationTransitionInfo.IsStaggerElement="True">
-                                        <Frame.ContentTransitions>
+                                        <!--<Frame.ContentTransitions>
                                             <TransitionCollection>
                                                 <ContentThemeTransition/>
                                             </TransitionCollection>
-                                        </Frame.ContentTransitions>
+                                        </Frame.ContentTransitions>-->
                                         <controls:ImageEx
+                                            x:Name="PlayContent_Image"
+                                            x:FieldModifier="public"
                                             CornerRadius="4"
+                                            TransitionType="None"
                                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"/>
                                     </Frame>
                                 </Border>

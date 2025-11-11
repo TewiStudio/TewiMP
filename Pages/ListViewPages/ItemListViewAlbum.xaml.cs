@@ -162,7 +162,7 @@ namespace TewiMP.Pages
             }
             else if (musicListData.ListDataType == DataType.歌单)
             {
-                Album_Image.Source =(await ImageManage.GetImageUri(musicListData)).Item1;
+                Album_Image.Source =(await ImageManager.GetImageUri(musicListData)).Item1;
             }
             else if (musicListData.ListDataType == DataType.专辑)
             {

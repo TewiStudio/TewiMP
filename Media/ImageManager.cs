@@ -8,9 +8,9 @@ using TewiMP.DataEditor;
 
 namespace TewiMP.Media
 {
-    public static class ImageManage
+    public static class ImageManager
     {
-        public static List<MusicData> LoadingImages = new();
+        public static List<string> LoadingImages = [];
         static int loadNum = 0;
         static int maxLoadNum = 0;
 
@@ -42,7 +42,6 @@ namespace TewiMP.Media
             return error;
         }
 
-        public static Dictionary<OnlyClass, Tuple<Uri, string>> localImageCache { get; set; } = new();
         /// <summary>
         /// 返回musicData对应的图像对象和图像所在的本地路径
         /// </summary>
@@ -58,15 +57,6 @@ namespace TewiMP.Media
         /// </returns>
         public static async Task<Tuple<Uri, string>> GetImageUri(MusicData musicData)
         {
-            foreach (var imageCache in localImageCache)
-            {
-                if (imageCache.Key.GetType() != typeof(MusicData)) continue;
-                if (imageCache.Key == musicData)
-                {
-                    return new(imageCache.Value.Item1, imageCache.Value.Item2);
-                }
-            }
-
             Uri source = null;
             string resultPath = null;
             resultPath = await FileHelper.GetImageCachePath(musicData);
@@ -110,9 +100,10 @@ namespace TewiMP.Media
             }
             else
             {
-                while (LoadingImages.Contains(musicData))
+                string filePath = $@"{DataFolderBase.ImageCacheFolder}\{musicData.PluginInfo}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
+                while (LoadingImages.Contains(filePath))
                 {
-                    await Task.Delay(1000);
+                    await Task.Delay(300);
                 }
                 if (resultPath is null)
                 {
@@ -121,11 +112,10 @@ namespace TewiMP.Media
                         await Task.Delay(400);
                     }
                     loadNum++;
-                    LoadingImages.Add(musicData);
+                    LoadingImages.Add(filePath);
 
                     if (WebHelper.IsNetworkConnected)
                     {
-                        string b = $@"{DataFolderBase.ImageCacheFolder}\{musicData.PluginInfo}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
                         string a;
                         if (musicData.Album?.PicturePath != null)
                         {
@@ -135,8 +125,8 @@ namespace TewiMP.Media
                         {
                             a = await WebHelper.GetPicturePathAsync(musicData);
                         }
-                        bool error = await DownloadPic(a, b);
-                        if (!error) resultPath = b;
+                        bool error = await DownloadPic(a, filePath);
+                        if (!error) resultPath = filePath;
                     }
                 }
 
@@ -146,7 +136,7 @@ namespace TewiMP.Media
                 }
                 finally
                 {
-                    LoadingImages.Remove(musicData);
+                    LoadingImages.Remove(filePath);
                     loadNum--;
                 }
             }
@@ -167,15 +157,6 @@ namespace TewiMP.Media
         public static async Task<Tuple<Uri, string>> GetImageUri(MusicListData musicListData, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
         {
             if (musicListData is null) return null;
-
-            foreach (var imageCache in localImageCache)
-            {
-                if (imageCache.Key.GetType() != typeof(MusicListData)) continue;
-                if (imageCache.Key == musicListData)
-                {
-                    return new(imageCache.Value.Item1, imageCache.Value.Item2);
-                }
-            }
 
             string cachePath = await FileHelper.GetImageCache(musicListData);
             string resultPath = null;

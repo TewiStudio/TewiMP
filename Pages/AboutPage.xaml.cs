@@ -71,7 +71,7 @@ namespace TewiMP.Pages
             try
             {
                 if (App.Instance.PlayingList.NowPlayingList.Any())
-                    abcd.Source = (await ImageManage.GetImageUri(App.Instance.PlayingList.NowPlayingList[new Random().Next(0, App.Instance.PlayingList.NowPlayingList.Count - 1)])).Item1;
+                    abcd.Source = (await ImageManager.GetImageUri(App.Instance.PlayingList.NowPlayingList[new Random().Next(0, App.Instance.PlayingList.NowPlayingList.Count - 1)])).Item1;
             }
             catch { }
             GC.Collect();/*
@@ -205,9 +205,10 @@ namespace TewiMP.Pages
         static Button installButton; static CancellationTokenSource? cts = null;
         static async Task DownloadInstallExeAsync(bool dontDownload = false)
         {
+            if (newestVersion is null || newestVersion.Version == new Version(0, 0, 0, 0)) return;
             if (string.IsNullOrEmpty(newestVersion.InstallUrl))
             {
-                App.MainWindowInstance.AddNotify("下载更新程序失败", "没有可用的更新程序，请前往发布详情页下载。",
+                App.MainWindowInstance.AddNotify("下载更新程序失败", "没有可用的更新程序，请前往发布详情页下载。", NotifySeverity.Warning,
                     buttonMessage: "详情页", buttonAction: async () => await CodeHelper.OpenInBrowser(newestVersion.Url));
                 return;
             }

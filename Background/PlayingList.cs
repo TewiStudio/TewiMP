@@ -176,8 +176,8 @@ namespace TewiMP.Background
             string path;
             Uri a = null;
 
-            var _ = await ImageManage.GetImageUri(audioPlayer.MusicData);
-            var thumbnail = await ImageManage.GetImageUri(audioPlayer.MusicData);
+            var _ = await ImageManager.GetImageUri(audioPlayer.MusicData);
+            var thumbnail = await ImageManager.GetImageUri(audioPlayer.MusicData);
             a = _.Item1;
             path = _.Item2;
 
@@ -193,7 +193,6 @@ namespace TewiMP.Background
 
         public void Add(MusicData musicData, bool invoke = true, bool insert = false)
         {
-            LogManager.Log("PlayingList", $"播放列表已添加：\"{musicData.Title}\"");
             bool isFind = Find(musicData);
             if (!isFind)
             {
@@ -225,13 +224,15 @@ namespace TewiMP.Background
                 PlayingListItemChange?.Invoke(NowPlayingList);
         }
 
+        public SetPlayInfo IsNextPlay = default;
         int nextErrorCount = 0;
         public async Task<bool> Play(MusicData musicData, bool isAutoPlay = true, SetPlayInfo isNextPlay = default)
         {
+            IsNextPlay = isNextPlay;
             var time = DateTime.Now;
             Add(musicData, true, true);
 
-            LogManager.Log("PlayingList", $"正在设置播放：\"{musicData.Title}\"");
+            LogManager.Log("PlayingList", $"Playing：\"{musicData.Title}\"");
             NAudio.Wave.PlaybackState playState;
             if (PauseWhenPreviousPause)
             {
@@ -257,7 +258,7 @@ namespace TewiMP.Background
                 await App.Instance.AudioPlayer.SetSourceAsync(musicData);
                 if (playState == NAudio.Wave.PlaybackState.Playing)
                     App.Instance.AudioPlayer.SetPlay(false);
-                LogManager.Log("PlayingList", $"设置播放完成：\"{musicData.Title}\"");
+                LogManager.Log("PlayingList", $"Now playing：\"{musicData.Title}\"");
                 clear = true;
             }
             catch (DivideByZeroException err)
@@ -345,7 +346,8 @@ namespace TewiMP.Background
                     a = 0;
                 }
 
-                return await Play(NowPlayingList[a], isAutoPlay, SetPlayInfo.Next);
+                var succes = await Play(NowPlayingList[a], isAutoPlay, SetPlayInfo.Next);
+                return succes;
             }
 
             return true;
@@ -361,7 +363,8 @@ namespace TewiMP.Background
                     a = NowPlayingList.Count - 1;
                 }
 
-                return await Play(NowPlayingList[a], isAutoPlay, SetPlayInfo.Previous);
+                var succes = await Play(NowPlayingList[a], isAutoPlay, SetPlayInfo.Previous);
+                return succes;
             }
 
             return true;

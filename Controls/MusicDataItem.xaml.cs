@@ -38,43 +38,54 @@ namespace TewiMP.Controls
 
         public static void StartConnectAnimation(MusicData targetData)
         {
+            MusicDataItem equaled = null;
             foreach (var i in staticMusicDataItem)
             {
                 if (i?.songItemBind?.MusicData is not null)
                 {
                     if (i.songItemBind.MusicData == targetData)
                     {
-                        i.Info_Root.Opacity = 0;
-                        ConnectedAnimation canimation =
-                            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation", i.Info_Image);
-                        canimation.Configuration = new BasicConnectedAnimationConfiguration();
-                        ConnectedAnimation animation =
-                            ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation");
-                        if (animation != null)
-                        {
-                            animation.Completed += (_, __) => i.Info_Root.Opacity = 1;
-                            animation.TryStart(VisualTreeHelper.GetParent(App.MainWindowInstance.PlayContent) as UIElement);
-                        }
-
-                        ConnectedAnimation canimation1 =
-                            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation1", i.Info_Texts_Textblock);
-                        canimation1.Configuration = new BasicConnectedAnimationConfiguration();
-                        ConnectedAnimation animation1 =
-                            ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation1");
-                        if (animation1 != null)
-                        {
-                            animation1.TryStart(App.MainWindowInstance.PlayTitle);
-                        }
-                        ConnectedAnimation canimation2 =
-                            ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation2", i.Info_Texts_ButtonNameTextBlock);
-                        canimation2.Configuration = new BasicConnectedAnimationConfiguration();
-                        ConnectedAnimation animation2 =
-                            ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation2");
-                        if (animation2 != null)
-                        {
-                            animation2.TryStart(App.MainWindowInstance.PlayArtist);
-                        }
+                        equaled = i;
                     }
+                }
+            }
+            if (equaled is null)
+            {
+                //App.MainWindowInstance.PlayContent_Image.TransitionType = App.Instance.PlayingList.IsNextPlay == TewiMP.Background.SetPlayInfo.Previous ? ImageTransitionType.SlideRight : ImageTransitionType.SlideLeft;
+                App.MainWindowInstance.PlayContent_Image.TransitionType = ImageTransitionType.Blur;
+            }
+            else
+            {
+                App.MainWindowInstance.PlayContent_Image.TransitionType = ImageTransitionType.None;
+                equaled.Info_Root.Opacity = 0;
+                ConnectedAnimation canimation =
+                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation", equaled.Info_Image);
+                canimation.Configuration = new BasicConnectedAnimationConfiguration();
+                ConnectedAnimation animation =
+                    ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation");
+                if (animation != null)
+                {
+                    animation.Completed += (_, __) => equaled.Info_Root.Opacity = 1;
+                    animation.TryStart(VisualTreeHelper.GetParent(App.MainWindowInstance.PlayContent) as UIElement);
+                }
+
+                ConnectedAnimation canimation1 =
+                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation1", equaled.Info_Texts_Textblock);
+                canimation1.Configuration = new BasicConnectedAnimationConfiguration();
+                ConnectedAnimation animation1 =
+                    ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation1");
+                if (animation1 != null)
+                {
+                    animation1.TryStart(App.MainWindowInstance.PlayTitle);
+                }
+                ConnectedAnimation canimation2 =
+                    ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation2", equaled.Info_Texts_ButtonNameTextBlock);
+                canimation2.Configuration = new BasicConnectedAnimationConfiguration();
+                ConnectedAnimation animation2 =
+                    ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation2");
+                if (animation2 != null)
+                {
+                    animation2.TryStart(App.MainWindowInstance.PlayArtist);
                 }
             }
         }
@@ -197,9 +208,16 @@ namespace TewiMP.Controls
 
             if (isExists)
             {
-                var bitmapTuple = await ImageManage.GetImageUri(musicData);
-                result = bitmapTuple.Item1;
-                FileNotExists_Root.Visibility = Visibility.Collapsed;
+                if (songItemBind.MusicData.From == MusicFrom.localMusic || true)
+                {
+                    var bitmapTuple = await ImageManager.GetImageUri(musicData);
+                    result = bitmapTuple.Item1;
+                    FileNotExists_Root.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    result = new(await WebHelper.GetPicturePathAsync(musicData));
+                }
             }
             else
             {
@@ -214,7 +232,6 @@ namespace TewiMP.Controls
                 if (musicData == songItemBind.MusicData)
                 {
                     Info_Image.Source = result;
-                    SetImageBorder(true);
                 }
             }
             else
@@ -524,6 +541,12 @@ namespace TewiMP.Controls
         private void UserControl_LostFocus(object sender, RoutedEventArgs e)
         {
             //OnMouseLeave();
+        }
+
+        private void Info_Image_ImageLoaded(bool isLoaded)
+        {
+            if (isLoaded)
+                SetImageBorder(true);
         }
     }
 }

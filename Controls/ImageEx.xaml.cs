@@ -1,14 +1,11 @@
-using Microsoft.Graphics.Canvas.Effects;
+using System;
+using System.Collections;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using System;
-using System.Collections;
-using System.Threading.Tasks;
-using TewiMP.Background;
 using TewiMP.Helpers;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -18,15 +15,17 @@ namespace TewiMP.Controls
 {
     public enum ImageTransitionType
     {
+        None,
         Fade,
+        SlideLeft,
         SlideRight,
-        SlideUp,
-        ZoomIn,
-        // BlurLater
+        Blur
     }
 
     public partial class ImageEx : Grid
     {
+        public delegate void ImageLoadedDelegate(bool isLoaded);
+        public event ImageLoadedDelegate ImageLoaded;
         public static bool ImageDarkMass { get; set; } = false;
         public ImageTransitionType TransitionType { get; set; } = ImageTransitionType.Fade;
         public enum PointInBehaviors { Tapped, OnlyLightUp, None }
@@ -124,14 +123,42 @@ namespace TewiMP.Controls
 
         Uri currentImageSource;
         Uri currentOldImageSource;
+        bool isInit = false; // 当之前的图片源为空时，值为 true
         private void SetImageSource(Uri imageSource)
         {
             if (controlVisual is null) return;
-            currentImageSource = imageSource;
+            ImageLoaded?.Invoke(false);
 
-            currentOldImageSource = Image_ControlSources.UriSource ?? imageSource;
-            if (currentOldImageSource == Image_Old_ControlSources.UriSource)
+            isInit = currentImageSource is null;
+
+            if (imageSource == null)
+            {
+                currentImageSource = null;
+                currentOldImageSource = null;
+                Image_ControlSources.UriSource = null;
                 Image_Old_ControlSources.UriSource = null;
+                Image_Control.Visibility = Visibility.Collapsed;
+                Image_Old.Visibility = Visibility.Collapsed;
+                Image_Control.Visibility = Visibility.Visible;
+                Image_Old.Visibility = Visibility.Visible;
+                return;
+            }
+
+            currentImageSource = imageSource;
+            currentOldImageSource = Image_ControlSources.UriSource ?? imageSource;
+
+            if (TransitionType == ImageTransitionType.None)
+            {
+                OneOpacityAnimation.Start();
+                Image_ControlSources.UriSource = imageSource;
+                return;
+            }
+
+            if (isInit) Image_Old.Visibility = Visibility.Collapsed;
+            if (currentOldImageSource == Image_Old_ControlSources.UriSource)
+            {
+                Image_Old_ControlSources.UriSource = null;
+            }
             Image_Old_ControlSources.UriSource = currentOldImageSource;
         }
 
@@ -158,24 +185,57 @@ namespace TewiMP.Controls
         private async void Image_Control_ImageOpened(object sender, RoutedEventArgs e)
         {
             if (sender is not Image image) return;
-            if (image.Tag is not string tag) return;
-            if (tag == "Old")
+
+            if (image.Tag as string == "Old")
             {
                 if (Image_Old_ControlSources.UriSource != currentOldImageSource) return;
+
+                Image_Old.Visibility = isInit ? Visibility.Collapsed : Visibility.Visible;
                 ResetBlurAnimation.Start();
-                ResetOpacityAnimation.Start();
-                Image_Old.Visibility = Visibility.Visible;
+                ZeroOpacityAnimation.Start();
                 Image_ControlSources.UriSource = currentImageSource;
             }
             else
             {
-                OpacityAnimation.Start();
-                await BlurAnimation.StartAsync();
-                if (Image_Old_ControlSources.PixelHeight != 0 && Image_ControlSources.PixelHeight != 0 &&
-                    Image_Old_ControlSources.PixelWidth / Image_Old_ControlSources.PixelHeight !=
-                        Image_ControlSources.PixelWidth / Image_ControlSources.PixelHeight)
+                ImageLoaded?.Invoke(true);
+                if (TransitionType == ImageTransitionType.None) return;
+
+                var oldUri = currentOldImageSource;
+
+                switch (TransitionType)
                 {
+                    case ImageTransitionType.Fade:
+                        ImageOpacityAnimation.Duration = TimeSpan.FromSeconds(4);
+                        await OpacityAnimation.StartAsync();
+                        break;
+
+                    case ImageTransitionType.SlideLeft:
+                    case ImageTransitionType.SlideRight:
+                        ImageBlurAnimation.Duration = TimeSpan.FromSeconds(8);
+                        ImageOpacityAnimation.Duration = TimeSpan.FromSeconds(4);
+                        ImageSliderAnimation.From = $"{(TransitionType == ImageTransitionType.SlideRight ? -1 : 1) * Image_Control.ActualWidth / 6},0,0";
+                        ImageSliderAnimation.To = "0,0,0";
+                        ImageSliderAnimation.Duration = TimeSpan.FromSeconds(1.5f);
+                        SliderAnimation.Start();
+                        BlurAnimation.Start();
+                        await OpacityAnimation.StartAsync();
+                        break;
+
+                    case ImageTransitionType.Blur:
+                        ImageOpacityAnimation.Duration = TimeSpan.FromSeconds(4);
+                        ImageBlurAnimation.Duration = TimeSpan.FromSeconds(4);
+                        OpacityAnimation.Start();
+                        if (!isInit)
+                            await BlurAnimation.StartAsync();
+                        break;
+                }
+
+                // Reset old image if necessary
+                if (Image_Old_ControlSources.UriSource == oldUri)
+                {
+                    Image_Old_ControlSources.UriSource = null;
                     Image_Old.Visibility = Visibility.Collapsed;
+                    Image_Old.Visibility = Visibility.Visible;
                 }
             }
         }

@@ -301,7 +301,7 @@ namespace TewiMP.Controls
                 }
                 if (!err)
                 {
-                    var b = await ImageManage.GetImageUri(musicData);
+                    var b = await ImageManager.GetImageUri(musicData);
                     a = b.Item1;
                 }
             }

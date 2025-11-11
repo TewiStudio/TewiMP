@@ -80,7 +80,8 @@
                         BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                         PointInBehavior="None"
                         SwitchImageImmediateSetOpacity="True"
-                        x:Name="Info_Image"/>
+                        x:Name="Info_Image"
+                        ImageLoaded="Info_Image_ImageLoaded"/>
                 </Border>
                 <StackPanel
                     x:Name="Info_Texts_StackPanel"

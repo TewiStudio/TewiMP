@@ -52,7 +52,6 @@ namespace TewiMP.Pages
             App.MainWindowInstance.MainViewStateChanged += MainWindow_MainViewStateChanged;
             App.Instance.PlayListReader.Updated += PlayListReader_Updated;
             App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-            ImageManage.localImageCache.Clear();
             /*
             ConnectedAnimation animation =
                 ConnectedAnimationService.GetForCurrentView().GetAnimation("forwardAnimation");
@@ -98,8 +97,6 @@ namespace TewiMP.Pages
             Children.ItemsSource = null;
             SearchBox.ItemsSource = null;
             SortComboBox.ItemsSource = null;
-
-            ImageManage.localImageCache.Clear();
 
             MusicDataList = null;
             searchMusicDatas = null;
@@ -334,7 +331,7 @@ namespace TewiMP.Pages
             }
             else if (NavToObj.ListDataType == DataType.歌单)
             {
-                PlayList_Image.Source = (await ImageManage.GetImageUri(NavToObj)).Item1;
+                PlayList_Image.Source = (await ImageManager.GetImageUri(NavToObj)).Item1;
             }
             if (NavToObj is null) return;
             if (PlayList_Image.Source is null)

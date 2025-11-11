@@ -58,7 +58,7 @@
 
     <Grid x:Name="_pageRoot">
         <controls:MusicDataFlyout x:Name="MusicDataFlyout"/>
-        <controls:ImageEx x:Name="BackgroundBaseImage" IsHitTestVisible="False"
+        <controls:ImageEx x:Name="BackgroundBaseImage" IsHitTestVisible="False" TransitionType="Blur"
                           VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="1"
                           Stretch="UniformToFill" Loaded="BackgroundBaseImage_Loaded"/>
         <TextBlock x:Name="BridgeTb" TextAlignment="Left" HorizontalAlignment="Left"/>
@@ -116,7 +116,7 @@
                             </TransitionCollection>
                         </Grid.Transitions>
                         <Border x:Name="AlbumImageShadowTarget"/>
-                        <controls:ImageEx x:Name="AlbumImageBase" CornerRadius="8" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1">
+                        <controls:ImageEx x:Name="AlbumImageBase" CornerRadius="8" BorderBrush="{ThemeResource ControlElevationBorderBrush}" BorderThickness="1" TransitionType="Blur">
                             <uis:Effects.Shadow>
                                 <uis:AttachedDropShadow BlurRadius="60" Color="#50000000" CastTo="{x:Bind AlbumImageShadowTarget}"
                                                         Offset="0,3"/>
