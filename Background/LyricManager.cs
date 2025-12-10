@@ -97,8 +97,9 @@ namespace TewiMP.Background
 
         public async Task InitLyricList(MusicData musicData)
         {
-            LogManager.Log("LyricManager", $"初始化歌词：\"{musicData.Title}\"");
+            //LogManager.Log("LyricManager", $"初始化歌词：\"{musicData.Title}\"");
             if (musicData is null) return;
+            var startTime = DateTime.Now;
             NowPlayingLyrics.Clear();
 
             string cachePath = await FileHelper.GetLyricCache(musicData);
@@ -107,7 +108,7 @@ namespace TewiMP.Background
             if (cachePath != null)
             {
                 resultPath = cachePath;
-                LogManager.Log("LyricManager", $"找到歌词缓存：\"{cachePath}\"");
+                //LogManager.Log("LyricManager", $"找到歌词缓存：\"{cachePath}\"");
             }
             else
             {
@@ -130,7 +131,7 @@ namespace TewiMP.Background
                     return;
                 }
 
-                LogManager.Log("LyricManager", "从网络中下载歌词");
+                //LogManager.Log("LyricManager", "从网络中下载歌词");
                 Tuple<string, string> lyricTuple;
                 if (musicData.From == MusicFrom.pluginMusicSource)
                 {
@@ -162,12 +163,12 @@ namespace TewiMP.Background
             }
 
             await InitLyricList(resultPath);
-            LogManager.Log("LyricManager", $"初始化歌词成功： \"{musicData.Title}\"");
+            LogManager.Log("LyricManager", $"初始化歌词成功： \"{musicData.Title}\"。Elapsed {DateTime.Now - startTime}");
         }
 
         public async Task InitLyricList(TagLib.File file)
         {
-            LogManager.Log("LyricManager", "从 IDv3 标签中获取歌词");
+            //LogManager.Log("LyricManager", "从 IDv3 标签中获取歌词");
             if (file is null)
             {
                 await InitLyricList("");
@@ -192,7 +193,7 @@ namespace TewiMP.Background
                 return;
             }
 
-            LogManager.Log("LyricManager", $"读取歌词文件：\"{lyricPath}\"");
+            //LogManager.Log("LyricManager", $"读取歌词文件：\"{lyricPath}\"");
             string f = null;
             var lrcEncode = FileHelper.GetEncodingType(lyricPath);
             if (lrcEncode == Encoding.Default)

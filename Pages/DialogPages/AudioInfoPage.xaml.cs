@@ -129,7 +129,7 @@ namespace TewiMP.Pages.DialogPages
             else
             {
                 var devices = await OutDevice.GetOutDevicesAsync();
-                if (devices.First().DeviceType == AudioPlayer.OutApi.None)
+                if (devices.First().DeviceType == OutApi.None)
                 {
                     ((TextBlock)OutInfoSp.Children[2]).Text = "当前无输出设备";
                     ((TextBlock)OutInfoSp.Children[3]).Visibility = Visibility.Collapsed;
@@ -144,7 +144,7 @@ namespace TewiMP.Pages.DialogPages
                 }
 
                 string outInfo = $"未知";
-                if ((App.Instance.AudioPlayer.WasapiOnly && App.Instance.AudioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi) || App.Instance.AudioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Asio)
+                if ((App.Instance.AudioPlayer.WasapiOnly && App.Instance.AudioPlayer.NowOutDevice.DeviceType == OutApi.Wasapi) || App.Instance.AudioPlayer.NowOutDevice.DeviceType == OutApi.Asio)
                 {
                     outInfo = $"{App.Instance.AudioPlayer.NowOutDevice.DeviceType} -> {App.Instance.AudioPlayer.NowOutDevice.DeviceName}";
                 }
@@ -156,12 +156,12 @@ namespace TewiMP.Pages.DialogPages
                 string sampleRateText = "未知";
                 string channelsText = "未知";
 
-                if (App.Instance.AudioPlayer.NowOutDevice.DeviceType != AudioPlayer.OutApi.Asio)
+                if (App.Instance.AudioPlayer.NowOutDevice.DeviceType != OutApi.Asio)
                 {
                     //var getd = await OutDevice.GetWasapiDeviceFromOtherAPI(App.Instance.AudioPlayer.NowOutDevice);
                     var outputFormat = await OutDevice.GetWasapiDeviceFromOtherAPI(App.Instance.AudioPlayer.NowOutDevice);
                     //var outputFormat = App.Instance.AudioPlayer.NowOutDevice;
-                    if (App.Instance.AudioPlayer.WasapiOnly && App.Instance.AudioPlayer.NowOutDevice.DeviceType == AudioPlayer.OutApi.Wasapi)
+                    if (App.Instance.AudioPlayer.WasapiOnly && App.Instance.AudioPlayer.NowOutDevice.DeviceType == OutApi.Wasapi)
                     {
                         if (App.Instance.AudioPlayer.NowOutObj.OutputWaveFormat.SampleRate != App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate)
                             sampleRateText = $"{App.Instance.AudioPlayer.FileReader.WaveFormat.SampleRate} Hz -> {App.Instance.AudioPlayer.NowOutObj.OutputWaveFormat.SampleRate} Hz（重采样）";

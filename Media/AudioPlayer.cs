@@ -1,18 +1,21 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using Melanchall.DryWetMidi.Core;
+﻿using Melanchall.DryWetMidi.Core;
 using Melanchall.DryWetMidi.Interaction;
 using Melanchall.DryWetMidi.Multimedia;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
-using NAudio.Wave;
 using NAudio.CoreAudioApi;
+using NAudio.Wave;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Threading.Tasks;
 using TewiMP.Background;
 using TewiMP.DataEditor;
+using Vanara.PInvoke;
 
 namespace TewiMP.Media
 {
@@ -33,18 +36,28 @@ namespace TewiMP.Media
         public event AudioPlayerDelegate EqBandChanged;
         public event AudioPlayerVolumeMeterDelegate VolumeMeter;
 
-        private DispatcherTimer timer;
+        private DispatcherTimer _timer;
         private List<float[]> _equalizerBand = AudioEqualizerBands.NormalBands;
+        private OutDevice _nowOutDevice = new(OutApi.None);
+        private MMDevice _wasapiMMDevice;
+        private SemaphoreSlim _loadingLock = new(1, 1);
+        private string _audioFilePath = null;
         private bool _eqEnalbed = false;
         private bool _wasapiOnly = false;
         private int _latency = 50;
-        private TimeSpan ct = TimeSpan.Zero;
-        private OutDevice _nowOutDevice = new(OutApi.None);
         private float _volume = 0f;
         private double _pitch = 1f;
         private double _tempo = 1f;
         private double _rate = 1f;
 
+        public MusicData pointMusicData = null;
+        public string FileType = null;
+        public int FileSize = 0;
+        public string AudioBitrate = null;
+        public bool InLoadingAudioFile = false;
+        public ATL.Track tfile = null;
+
+        public AudioThread AudioThread { get; private set; } = new();
         public ClientDeviceEvents ClientDeviceEvents { get; private set; } = new();
         public Media.AudioFileReader FileReader { get; set; } = null;
         public AudioEffects.SoundTouchWaveProvider FileProvider { get; set; } = null;
@@ -132,7 +145,7 @@ namespace TewiMP.Media
         {
             get
             {
-                if (localFileIniting) return TimeSpan.Zero;
+                if (InLoadingAudioFile) return TimeSpan.Zero;
                 if (FileReader != null)
                 {
                     if (FileReader.isMidi)
@@ -157,7 +170,7 @@ namespace TewiMP.Media
             }
             set
             {
-                if (localFileIniting) return;
+                if (InLoadingAudioFile) return;
                 if (FileReader != null)
                 {
                     if (FileReader.isMidi)
@@ -167,7 +180,6 @@ namespace TewiMP.Media
                     }
                     else
                     {
-                        ct = value;
                         if (MusicData.CUETrackData != null)
                         {
                             FileReader.CurrentTime = MusicData.CUETrackData.StartDuration + value;
@@ -186,7 +198,7 @@ namespace TewiMP.Media
         {
             get
             {
-                if (localFileIniting) return TimeSpan.MaxValue;
+                if (InLoadingAudioFile) return TimeSpan.MaxValue;
                 if (FileReader != null)
                 {
                     if (FileReader.isMidi)
@@ -303,8 +315,8 @@ namespace TewiMP.Media
         {
             LogManager.Log("Starting", "初始化 AudioPlayer.");
 
-            timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(200) };
-            timer.Tick += (_, __) => ReCallTiming();
+            _timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(200) };
+            _timer.Tick += (_, __) => ReCallTiming();
             CompositionTarget.Rendering += CompositionTarget_Rendering;
 
             App.Instance.CacheManager.AddingCacheMusicData += CacheManager_AddingCacheMusicData;
@@ -413,281 +425,195 @@ namespace TewiMP.Media
             LogManager.Log("DeviceManager", "Device Removed.");
         }
 
-        bool isInSetSource = false;
         public async Task SetSourceAsync(MusicData musicData)
         {
-            isInSetSource = true;
-            LogManager.Log("AudioPlayer", $"正在加载：\"{musicData}\"");
-            await SetSource(musicData);
-            LogManager.Log("AudioPlayer", $"加载完成：\"{musicData}\"");
-            isInSetSource = false;
-        }
-
-        public MusicData pointMusicData = null;
-        int freezeSetSourceCount = 0;
-        private async Task SetSource(MusicData musicData)
-        {
             pointMusicData = musicData;
-            freezeSetSourceCount++;
-            await Task.Delay(200);
-            freezeSetSourceCount--;
-            if (freezeSetSourceCount > 0) return;
-
-            if (isCUEEndCalled)
+            await _loadingLock.WaitAsync();
+            //LogManager.Log("AudioPlayer", $"Loading：\"{musicData}\"");
+            try
             {
-                isCUEEndCalled = false;
-                CurrentTime = TimeSpan.Zero;
-            }
-
-            if (MusicData is not null)
-                LogManager.Log("AudioPlayer", $"当前播放：{MusicData.Title}, Time: {CurrentTime}/{TotalTime}, IsMIDI: {FileReader.isMidi}, IsCUE: {MusicData.CUETrackData != null}");
-
-            if (musicData == MusicData)
-            {
-                if (FileReader != null)
+                //await SetSource(musicData);
+                if (isCUEEndCalled)
                 {
+                    isCUEEndCalled = false;
                     CurrentTime = TimeSpan.Zero;
                 }
-                return;
-            }
 
-            string resultPath = null;
-            if (musicData.From == MusicFrom.localMusic) resultPath = musicData.InLocal;
-            else
-            {
-                try
+                // 如果是同一首歌，重置时间即可。
+                if (musicData == MusicData)
                 {
+                    if (FileReader != null)
+                    {
+                        CurrentTime = TimeSpan.Zero;
+                    }
+                    return;
+                }
+
+                // 如果是本地文件，直接使用本地路径。否则先缓存音乐文件在返回本地路径。
+                string resultPath = null;
+                if (musicData.From == MusicFrom.localMusic) resultPath = musicData.InLocal;
+                else
+                {
+                    // 获取音频缓存文件
                     resultPath = await App.Instance.CacheManager.StartCacheMusic(musicData);
                 }
-                catch (Exception e) { throw; }
-            }
-
-            if (await Task.Run(() => !File.Exists(resultPath)))
-            {
-                throw new FileNotFoundException($"找不到位于 \"{resultPath}\" 的音频文件。");
-            }
-
-            if (pointMusicData == musicData)
-            {
-                var m = MusicData;
-                MusicData = musicData;
-                Exception exception = null;
-                _filePath = resultPath;
-                LogManager.Log("AudioPlayer", $"正在加载 \"{resultPath}\".");
-                try
+                if (await Task.Run(() => !File.Exists(resultPath)))
                 {
-                    CacheLoadingChanged?.Invoke(this, null);
-                    await SetSource(resultPath, musicData.CUETrackData != null);
-                }
-                catch (Exception err)
-                {
-                    MusicData = m;
-                    exception = err;
-                    LogManager.Log("AudioPlayer", $"{err}", Background.LogLevel.Error);
-                }
-                finally
-                {
-                    localFileIniting = false;
-                    CacheLoadedChanged?.Invoke(this);
-                    PlayStateChanged?.Invoke(this);
-                    TimingChanged?.Invoke(this);
+                    throw new FileNotFoundException($"找不到位于 \"{resultPath}\" 的音频文件。");
                 }
 
-                if (exception != null)
+                CacheLoadingChanged?.Invoke(this, null);
+
+                // 获取输出设备
+                var devices = await OutDevice.GetOutDevicesAsync();
+                if (devices.First().DeviceType == OutApi.None)
                 {
-                    throw exception;
+                    throw new Exception("当前没有音频输出设备。\n请检查音频设置是否正确、输出设备是否插入和音频设备驱动是否正常工作。");
                 }
-            }
-        }
-
-        List<IWavePlayer> WavePlayers { get; set; } = new();
-        int setSourceCallCounter = 0;
-        string _filePath = null;
-        public string FileType = null;
-        public int FileSize = 0;
-        public string AudioBitrate = null;
-        public bool localFileIniting = false;
-        public ATL.Track tfile = null;
-        private async Task SetSource(string filePath, bool cueFile = false)
-        {
-            //if (MusicData != pointMusicData) return;
-            MusicData musicData = pointMusicData;
-            if (localFileIniting) return;
-            if (filePath != _filePath) return;
-            if (FileReader != null)
-            {
-                if (filePath == FileReader.FileName)
-                {/*
-                    if (MusicData.CUETrackData != null)
-                        CurrentTime = MusicData.CUETrackData.StartDuration;
-                    else*/
-                    CurrentTime = TimeSpan.Zero;
-                    PreviewSourceChanged?.Invoke(this);
-                    SourceChanged?.Invoke(this);
-                    localFileIniting = false;
-                    return;
+                if (NowOutDevice.DeviceType == OutApi.None)
+                {
+                    NowOutDevice = devices.First();
                 }
-            }
 
-            var devices = await OutDevice.GetOutDevicesAsync();
-            if (devices.First().DeviceType == OutApi.None)
-            {
-                throw new Exception("当前没有音频输出设备。\n请检查音频设置是否正确、输出设备是否插入和音频设备驱动是否正常工作。");
-            }
-            if (NowOutDevice.DeviceType == OutApi.None)
-            {
-                NowOutDevice = devices.First();
-            }
-
-            localFileIniting = true;
-            AudioFileReader fileReader = null;
-            SpectrumAnalyzer audioAnalyzer = null;
-            AudioEffects.SoundTouchWaveProvider fileProvider = null;
-            VolumeSampleProvider volumeSampleProvider = null;
-
-            await Task.Run(() =>
-            {
-                UpdateInfo();
-                FileSize = (int)tfile.AudioDataSize;
-                fileReader = new AudioFileReader(filePath, cueFile);
-
-                if (fileReader.isMidi)
+                // 初始化音频读取
+                await AudioThread.InvokeAsync(() =>
                 {
-                    WaveInfo = "midi";
-                    return;
-                }
-                audioAnalyzer = new SpectrumAnalyzer(fileReader, 8192);
-                fileProvider = new AudioEffects.SoundTouchWaveProvider(audioAnalyzer.ToWaveProvider());
-                volumeSampleProvider = new VolumeSampleProvider(fileProvider.ToSampleProvider());
-                fileReader.EqEnabled = EqEnabled;
-                fileProvider.Pitch = Pitch;
-                fileProvider.Tempo = Tempo;
-                fileProvider.Rate = Rate;
-                volumeSampleProvider.Volume = Volume / 100f;
-            });
-            await Task.Run(DisposeAll);
-            FileReader = fileReader;
-            AudioAnalyzer = audioAnalyzer;
-            FileProvider = fileProvider;
-            VolumeSampleProvider = volumeSampleProvider;
-            LogManager.Log("AudioPlayer", $"FileReader filePath \"{fileReader.FileName}\".");
-            if (EqEnabled && !fileReader.isMidi)
-            {
-                EqualizerBand = EqualizerBand;
-            }
+                    // 释放非托管对象
+                    DisposeAll();
 
-            if (MusicData.CUETrackData != null)
-            {
-                FileReader.CurrentTime = musicData.CUETrackData.StartDuration;
-                TimingChanged += AudioPlayer_TimingChanged;
-            }
+                    // 获取音频信息
+                    UpdateInfo(resultPath);
+                    FileSize = (int)tfile.AudioDataSize;
 
-            PreviewSourceChanged?.Invoke(this);
-
-            if (FileReader.isMidi)
-            {
-                MidiOutputDevice = OutputDevice.GetByIndex(0);
-                MidiFile = MidiFile.Read(filePath, new()
-                {
-                    NotEnoughBytesPolicy = NotEnoughBytesPolicy.Ignore,
-                    InvalidChunkSizePolicy = InvalidChunkSizePolicy.Ignore,
-                    InvalidMetaEventParameterValuePolicy = InvalidMetaEventParameterValuePolicy.SnapToLimits,
-                });
-                MidiPlayback = MidiFile.GetPlayback(MidiOutputDevice);
-                MidiPlayback.Finished += (_, __) => App.MainWindowInstance.Invoke(() => AudioPlayer_PlaybackStopped(null, null));
-                MidiPlayback.Speed = Tempo;
-            }
-            else
-            {/*
-                bool notDefaultLatency = false;
-                if (Latency != (int)SettingDefault[SettingParams.AudioLatency.ToString()])
-                {
-                    notDefaultLatency = true;
-                }*/
-
-                switch (NowOutDevice.DeviceType)
-                {
-                    case OutApi.WaveOut:
-                        LogManager.Log("AudioPlayer", "Using WaveOut.");
-                        await Task.Run(() => NowOutObj = new WaveOutEvent());
-                        (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
-                        (NowOutObj as WaveOutEvent).NumberOfBuffers = Latency;
-                        NowOutObj.Init(VolumeSampleProvider);
-                        NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
-                        break;
-                    case OutApi.DirectSound:
-                        LogManager.Log("AudioPlayer", "Using DirectSound.");
-                        if (NowOutDevice.Device is null)
+                    // ffmpeg
+                    FileReader = new AudioFileReader(resultPath, musicData.CUETrackData != null);
+                    if (FileReader.isMidi)
+                    {
+                        WaveInfo = "midi";
+                        MidiOutputDevice = OutputDevice.GetByIndex(0);
+                        MidiFile = MidiFile.Read(resultPath, new ReadingSettings()
                         {
-                            await Task.Run(() => NowOutObj = new DirectSoundOut(Latency));
-                        }
-                        else
-                        {
-                            await Task.Run(() => NowOutObj = new DirectSoundOut((NowOutDevice.Device as DirectSoundDeviceInfo).Guid, Latency));
-                        }
-                        NowOutObj.Init(VolumeSampleProvider);
-                        NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
-                        break;
-                    case OutApi.Wasapi:
-                        LogManager.Log("AudioPlayer", "Using Wasapi.");
-                        MMDevice device = null;
-                        await Task.Run(() =>
-                        {
-                            device = new MMDeviceEnumerator().GetDevice(NowOutDevice.Device as string);
-                            NowOutObj = new WasapiOut(
-                                device,
-                                WasapiOnly ? AudioClientShareMode.Exclusive : AudioClientShareMode.Shared, false,
-                                Latency);
+                            NotEnoughBytesPolicy = NotEnoughBytesPolicy.Ignore,
+                            InvalidChunkSizePolicy = InvalidChunkSizePolicy.Ignore,
+                            InvalidMetaEventParameterValuePolicy = InvalidMetaEventParameterValuePolicy.SnapToLimits,
                         });
+                        MidiPlayback = MidiFile.GetPlayback(MidiOutputDevice);
+                        MidiPlayback.Finished += (_, __) => App.MainWindowInstance.Invoke(() => AudioPlayer_PlaybackStopped(null, null));
+                        MidiPlayback.Speed = Tempo;
+                    }
+                    else
+                    {
+                        // 频谱分析
+                        AudioAnalyzer = new SpectrumAnalyzer(FileReader, 8192);
+                        // 变速效果
+                        FileProvider = new AudioEffects.SoundTouchWaveProvider(AudioAnalyzer.ToWaveProvider());
+                        // 音量效果
+                        VolumeSampleProvider = new VolumeSampleProvider(FileProvider.ToSampleProvider());
+
+                        // 设置参数
+                        FileReader.EqEnabled = EqEnabled;
+                        FileProvider.Pitch = Pitch;
+                        FileProvider.Tempo = Tempo;
+                        FileProvider.Rate = Rate;
+                        VolumeSampleProvider.Volume = Volume / 100f;
+
+                        // 应用EQ
+                        if (EqEnabled && !FileReader.isMidi) EqualizerBand = _equalizerBand;
+
+                        // 如果播放的是 cue 表单，指定播放位置为当前播放的歌曲的开始时间
+                        if (musicData.CUETrackData != null)
+                        {
+                            FileReader.CurrentTime = musicData.CUETrackData.StartDuration;
+                            TimingChanged += AudioPlayer_TimingChanged; // 用于每次时间更新时检查此歌曲播放位置是否大于 cue 表单表示的位置，是则切换下一首
+                        }
+
+                        App.MainWindowInstance.Invoke(() => PreviewSourceChanged?.Invoke(this));
+
+                        // 初始化音频输出
+                        CreateOutputDevice(NowOutDevice, Latency);
                         try
                         {
                             NowOutObj.Init(VolumeSampleProvider);
                         }
                         catch (COMException err)
                         {
-                            if (WasapiOnly)
+                            if (NowOutDevice.DeviceType == OutApi.Wasapi && WasapiOnly)
                                 throw new Exception("当前输出设备似乎不支持独占模式。\n" +
-                                    $"请尝试到音频输出设备的 属性 页面的 高级 选项卡打开 允许应用程序独占控制该设备。\n错误信息：{err.Message}");
-                            throw new Exception($"无法初始化音频输出，可能是其它应用程序独占了此音频输出设备，请尝试重新播放。\n错误信息：{err.Message}");
+                                    $"请尝试到音频输出设备的 属性 页面的 高级 选项卡打开 允许应用程序独占控制该设备。\n错误信息：{err.Message}", err);
+                            throw new Exception($"无法初始化音频输出，可能是其它应用程序独占了此音频输出设备，请尝试重新播放。\n错误信息：{err.Message}", err);
                         }
                         NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
-                        device.Dispose();
-                        break;
-                    case OutApi.Asio:
-                        LogManager.Log("AudioPlayer", "Using Asio.");
-                        var asioOut = new AsioOut((int)NowOutDevice.Device);
-                        asioOut.AutoStop = false;
-                        NowOutObj = asioOut;
-                        NowOutObj.Init(VolumeSampleProvider);
-                        TimingChanged += AudioPlayer_TimingChanged;
-                        NowOutObj.PlaybackStopped += AudioPlayer_PlaybackStopped;
-                        break;
-                }
+                        MusicData = musicData;
+                    }
+                });
+            }
+            finally
+            {
+                _loadingLock.Release();
+                CacheLoadedChanged?.Invoke(this);
+                SourceChanged?.Invoke(this);
+            }
+            LogManager.Log("AudioPlayer", $"Loaded：\"{musicData}\"");
+        }
 
-                LogManager.Log("AudioPlayer", $"Inited FileReader filePath \"{fileReader.FileName}\".");
-                LogManager.Log("AudioPlayer", $"Inited MusicData \"{MusicData}\".");
+        private void CreateOutputDevice(OutDevice device, int latency)
+        {
+            switch (NowOutDevice.DeviceType)
+            {
+                case OutApi.WaveOut:
+                    LogManager.Log("AudioPlayer", "Using WaveOut.");
+                    NowOutObj = new WaveOutEvent();
+                    (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
+                    (NowOutObj as WaveOutEvent).NumberOfBuffers = Latency;
+                    break;
+                case OutApi.DirectSound:
+                    LogManager.Log("AudioPlayer", "Using DirectSound.");
+                    if (NowOutDevice.Device is null)
+                    {
+                        NowOutObj = new DirectSoundOut(Latency);
+                    }
+                    else
+                    {
+                        NowOutObj = new DirectSoundOut((NowOutDevice.Device as DirectSoundDeviceInfo).Guid, Latency);
+                    }
+                    break;
+                case OutApi.Wasapi:
+                    LogManager.Log("AudioPlayer", "Using Wasapi.");
+                    _wasapiMMDevice = new MMDeviceEnumerator().GetDevice(NowOutDevice.Device as string);
+                    NowOutObj = new WasapiOut(
+                        _wasapiMMDevice,
+                        WasapiOnly ? AudioClientShareMode.Exclusive : AudioClientShareMode.Shared, false,
+                        Latency);
+                    break;
+                case OutApi.Asio:
+                    LogManager.Log("AudioPlayer", "Using Asio.");
+                    var asioOut = new AsioOut((int)NowOutDevice.Device);
+                    asioOut.AutoStop = false;
+                    NowOutObj = asioOut;
+                    TimingChanged += AudioPlayer_TimingChanged;
+                    break;
             }
 
-            SourceChanged?.Invoke(this);
-            localFileIniting = false;
         }
 
         private void AudioPlayer_TimingChanged(AudioPlayer audioPlayer)
         {
-            if (NowOutDevice.DeviceType == OutApi.Asio)
+            App.MainWindowInstance.Invoke(() =>
             {
-                if ((NowOutObj as AsioOut).HasReachedEnd)
+                if (NowOutDevice.DeviceType == OutApi.Asio)
                 {
-                    AudioPlayer_PlaybackStopped(null, null);
-                    TimingChanged -= AudioPlayer_TimingChanged;
+                    if ((NowOutObj as AsioOut).HasReachedEnd)
+                    {
+                        AudioPlayer_PlaybackStopped(null, null);
+                        TimingChanged -= AudioPlayer_TimingChanged;
+                    }
                 }
-            }
+            });
         }
 
         public async Task Reload(TimeSpan? reloadedStreamPosition = null)
         {
             //if (IsInPlaybackStopped) return;
-            if (isInSetSource) return;
             if (FileReader is null) return;
             if (FileReader.isMidi) return;
 
@@ -696,7 +622,9 @@ namespace TewiMP.Media
             string filePath = FileReader.FileName;
 
             await Task.Run(DisposeAll);
-            await SetSource(filePath);
+            var musicData = MusicData;
+            MusicData = null;
+            await SetSourceAsync(musicData);
 
             if (FileReader != null)
             {
@@ -720,11 +648,11 @@ namespace TewiMP.Media
             catch (Exception err) { LogManager.Log("AudioPlayer", err.ToString(), Background.LogLevel.Error); }
         }
 
-        public void UpdateInfo()
+        public void UpdateInfo(string path)
         {
             try
             {
-                tfile = new ATL.Track(_filePath);
+                tfile = new ATL.Track(path);
             }
             catch { }
             if (tfile != null)
@@ -775,7 +703,7 @@ namespace TewiMP.Media
         bool isPlaying = false;
         public async void SetPlay(bool ifErrorReload = true)
         {
-            if (localFileIniting) return;
+            if (InLoadingAudioFile) return;
 
             try
             {
@@ -797,7 +725,7 @@ namespace TewiMP.Media
         
         public async void SetPause()
         {
-            if (localFileIniting) return;
+            if (InLoadingAudioFile) return;
             try
             {
                 NowOutObj?.Pause();
@@ -814,7 +742,7 @@ namespace TewiMP.Media
         
         public void SetStop()
         {
-            if (localFileIniting) return;
+            if (InLoadingAudioFile) return;
             NowOutObj?.Stop();
             MidiPlayback?.Stop();
             isPlaying = false;
@@ -824,13 +752,13 @@ namespace TewiMP.Media
         public void ReCallTiming()
         {
             //.WriteLine($"ReCall Audio Player Timing Count {TimingChanged?.GetInvocationList()?.Length}.");
-            timer.Start();
-            if (PlaybackState != PlaybackState.Playing) timer.Stop();
-            if (TimingChanged is null) timer.Stop();
-            if (!timer.IsEnabled) return;
+            _timer.Start();
+            if (PlaybackState != PlaybackState.Playing) _timer.Stop();
+            if (TimingChanged is null) _timer.Stop();
+            if (!_timer.IsEnabled) return;
 
             TimingChanged?.Invoke(this);
-            if (MusicData.CUETrackData != null) AudioPlayer_PlaybackStopped(null, null);
+            if (MusicData is not null && MusicData.CUETrackData != null) AudioPlayer_PlaybackStopped(null, null);
         }
 
         bool isDisposing = false;
@@ -839,6 +767,15 @@ namespace TewiMP.Media
             isDisposing = true;
             TimingChanged -= AudioPlayer_TimingChanged;
 
+            try
+            {
+                _wasapiMMDevice?.Dispose();
+            }
+            finally
+            {
+                _wasapiMMDevice = null;
+            }
+            
             try
             {
                 (NowOutObj as IDisposable)?.Dispose();

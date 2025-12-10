@@ -172,7 +172,7 @@ namespace TewiMP.Pages.DialogPages
 
         private void AudioPlayer_PreviewSourceChanged(Media.AudioPlayer audioPlayer)
         {
-            if (audioPlayer.WasapiOnly && audioPlayer.NowOutDevice.DeviceType == Media.AudioPlayer.OutApi.Wasapi)
+            if (audioPlayer.WasapiOnly && audioPlayer.NowOutDevice.DeviceType == Media.OutApi.Wasapi)
             {
                 LatencyNumberBox.Minimum = 0;
                 LatencyNumberBox.Maximum = 981;

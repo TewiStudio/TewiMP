@@ -70,7 +70,6 @@ namespace TewiMP.Media
         }
 
         public static string defaultName = "默认输出设备";
-        public static bool IsScaning = false;
         public static List<OutDevice> lastOutDevices = [];
         /// <summary>
         /// 获取可以播放的音频输出设备列表
@@ -78,17 +77,8 @@ namespace TewiMP.Media
         /// <returns><see cref="List{OutDevice}"/>OutDevice集合</returns>
         public static async Task<List<OutDevice>> GetOutDevicesAsync()
         {
-            if (IsScaning)
-            {
-                while (IsScaning)
-                {
-                    await Task.Delay(200);
-                }
-                return lastOutDevices;
-            }
-            IsScaning = true;
             List<OutDevice> outDevices = new List<OutDevice>();
-            await Task.Run(() =>
+            await App.Instance.AudioPlayer.AudioThread.InvokeAsync(() =>
             {
                 // Wasapi
                 var enumerator = new MMDeviceEnumerator();
@@ -152,8 +142,6 @@ namespace TewiMP.Media
                     outDevices.Add(new(OutApi.None, null, "无音频输出设备"));
                 }
             });
-
-            IsScaning = false;
             lastOutDevices = outDevices;
             return outDevices;
         }

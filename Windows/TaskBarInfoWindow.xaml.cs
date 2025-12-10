@@ -37,7 +37,10 @@ namespace TewiMP.Windowed
             App.Instance.AudioPlayer.SourceChanged += (_) =>
             {
                 if (_.MusicData is null)
+                {
                     Title = App.Instance.AppName;
+                    return;
+                }
                 else
                 {
                     Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {App.Instance.AppName}";

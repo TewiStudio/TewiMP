@@ -41,7 +41,7 @@ namespace TewiMP.Background
         /// <exception cref="CacheIsLoadingException"></exception>
         public async Task<string> StartCacheMusic(MusicData data)
         {
-            LogManager.Log("CacheManager", $"开始缓存：\"{data}\"");
+            //LogManager.Log("CacheManager", $"开始缓存：\"{data}\"");
             if (data.From == MusicFrom.localMusic) throw new Exception("无法缓存本地文件。");
             AddingCacheMusicData?.Invoke(data, "正在开始缓存");
             if (InCachingMusicData.Contains(data)) throw new CacheIsLoadingException("此音频正在缓冲中。");
@@ -50,7 +50,7 @@ namespace TewiMP.Background
             musicPathResult = await GetCachePath(data);
             if (musicPathResult != null)
             {
-                LogManager.Log("CacheManager", $"已存在缓存 \"{musicPathResult}\"！");
+                LogManager.Log("CacheManager", $"Cache already exists \"{musicPathResult}\"");
                 CachedMusicData?.Invoke(data, null);
                 return musicPathResult; // 当检测到已缓存时返回
             }

@@ -6,6 +6,7 @@ using NAudio;
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using TewiMP.DataEditor;
 using TewiMP.Helpers;
@@ -144,48 +145,95 @@ namespace TewiMP.Background
         }
 
         MusicData lastMusicData = null;
+        private CancellationTokenSource _imageLoadingCts;
         private async void AudioPlayer_SourceChanged(AudioPlayer audioPlayer)
         {
-            //System.Diagnostics.LogManager.Log(NowPlayingImageLoaded.GetInvocationList().Length);
-            if (audioPlayer.FileReader.isMidi ||
-                audioPlayer.MusicData is null)
+            if (audioPlayer?.FileReader is null) return;
+
+            // 检查是否为无需加载封面的情况 (MIDI 或 数据为空)
+            if (audioPlayer.FileReader.isMidi || audioPlayer.MusicData is null)
             {
                 lastMusicData = null;
                 NowPlayingImage = null;
+                NowPlayingImagePath = null;
                 NowPlayingImageLoaded?.Invoke(null, null);
                 return;
             }
-            if (audioPlayer.MusicData.InLocal != null)
+
+            // 如果是同一张专辑，则不重新加载图片
+            if (IsSameAlbum(audioPlayer.MusicData, lastMusicData))
             {
-                if (audioPlayer.MusicData.Album == lastMusicData?.Album)
-                {
-                    if (!audioPlayer.MusicData.Album.IsNull())
-                        return;
-                }
+                return;
+            }
+
+            // 如果上一次加载还在进行中，取消它
+            _imageLoadingCts?.Cancel();
+            _imageLoadingCts = new CancellationTokenSource();
+            var currentToken = _imageLoadingCts.Token;
+
+            try
+            {
+                // 更新 lastMusicData
+                lastMusicData = audioPlayer.MusicData;
+
+                // 通知 UI 开始加载
+                NowPlayingImageLoading?.Invoke(null, null);
+
+                // 异步获取图片
+                var (uri, path) = await ImageManager.GetImageUri(audioPlayer.MusicData);
+
+                // 如果 await 期间又切歌了，直接退出，不要覆盖新歌的数据
+                if (currentToken.IsCancellationRequested) return;
+
+                NowPlayingImage = uri;
+                NowPlayingImagePath = path;
+
+                // 处理空图片情况 TODO: FIX THIS
+                if (uri is null) lastMusicData = null;
+
+                // 提取颜色。确保此时 NowPlayingImagePath 已经是新的
+                await GetImageColor();
+
+                // 再次检查取消
+                if (currentToken.IsCancellationRequested) return;
+
+                // 加载完成
+                NowPlayingImageLoaded?.Invoke(NowPlayingImage, NowPlayingImagePath);
+            }
+            catch (OperationCanceledException)
+            {
+                // 任务被取消是预期行为，忽略
+            }
+            catch (Exception ex)
+            {
+                LogManager.Error("PlayingList", $"加载封面失败: {ex.Message}");
+                // 发生错误时，最好重置图片或显示默认图
+                NowPlayingImage = null;
+                NowPlayingImageLoaded?.Invoke(null, null);
+            }
+        }
+
+        /// <summary>
+        /// 辅助方法：判断两个 MusicData 是否属于同一张专辑
+        /// </summary>
+        private bool IsSameAlbum(MusicData current, MusicData last)
+        {
+            if (last is null) return false;
+            if (current.Album.IsNull()) return false; // 如果当前没有专辑信息，视为不同，强制刷新
+
+            // 如果是本地音乐
+            if (current.InLocal != null)
+            {
+                // 比较专辑对象是否相同 (或者你可以比较 current.Album.Name)
+                return current.Album == last.Album;
             }
             else
             {
-                if (!audioPlayer.MusicData.Album.IsNull())
-                    if (audioPlayer.MusicData.Album.ID == lastMusicData?.Album.ID) return;
+                // 在线音乐通常比较 ID
+                return current.Album.ID == last.Album.ID;
             }
-            lastMusicData = audioPlayer.MusicData;
-
-            NowPlayingImageLoading?.Invoke(null, null);
-            string path;
-            Uri a = null;
-
-            var _ = await ImageManager.GetImageUri(audioPlayer.MusicData);
-            a = _.Item1;
-            path = _.Item2;
-
-            if (a is null) { lastMusicData = null; }
-            NowPlayingImage = a;
-            NowPlayingImagePath = path;
-            
-            await GetImageColor();
-            NowPlayingImageLoaded?.Invoke(NowPlayingImage, path);
-            //System.Diagnostics.LogManager.Log(NowPlayingImageLoaded.GetInvocationList().Length);
         }
+
         public string NowPlayingImagePath = null;
 
         public void Add(MusicData musicData, bool invoke = true, bool insert = false)
@@ -229,7 +277,7 @@ namespace TewiMP.Background
             var time = DateTime.Now;
             Add(musicData, true, true);
 
-            LogManager.Log("PlayingList", $"Playing：\"{musicData.Title}\"");
+            LogManager.Log("PlayingList", $"Playing：\"{musicData}\"");
             NAudio.Wave.PlaybackState playState;
             if (PauseWhenPreviousPause)
             {
@@ -255,7 +303,6 @@ namespace TewiMP.Background
                 await App.Instance.AudioPlayer.SetSourceAsync(musicData);
                 if (playState == NAudio.Wave.PlaybackState.Playing)
                     App.Instance.AudioPlayer.SetPlay(false);
-                LogManager.Log("PlayingList", $"Now playing：\"{musicData.Title}\"");
                 clear = true;
             }
             catch (DivideByZeroException err)
@@ -401,20 +448,20 @@ namespace TewiMP.Background
 
         public async Task GetImageColor()
         {
-            // 1. 获取当前路径
+            // 获取当前路径
             var nowImagePath = NowPlayingImagePath;
 
-            if (string.Equals(nowImagePath, _lastProcessedImagePath, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(nowImagePath, _lastProcessedImagePath, StringComparison.OrdinalIgnoreCase) && _lastProcessedImagePath is not null)
             {
                 return;
             }
 
-            LogManager.Info("PlayingList", $"正在获取专辑封面主题色：From \"{_lastProcessedImagePath}\" To \"{nowImagePath}\"");
+            LogManager.Info("PlayingList", $"Album accent color source：From \"{_lastProcessedImagePath}\" To \"{nowImagePath}\"");
             _lastProcessedImagePath = nowImagePath;
 
             Windows.UI.Color albumColor, albumColorReverse, textColorOnAlbum;
 
-            // 判断逻辑：是重置默认还是提取新颜色
+            // 是重置默认还是提取新颜色
             if (string.IsNullOrEmpty(nowImagePath))
             {
                 // 路径为空，重置为系统主题色
@@ -442,7 +489,7 @@ namespace TewiMP.Background
                     albumColorReverse = themeColor.Item2;
                     textColorOnAlbum = themeColor.Item3;
 
-                    LogManager.Info("PlayingList", $"专辑封面主题色提取成功：{albumColor}");
+                    LogManager.Info("PlayingList", $"Current album color：{albumColor}");
                 }
                 catch (Exception ex)
                 {
