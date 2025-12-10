@@ -95,64 +95,117 @@ namespace TewiMP.Pages
             App.Instance.DownloadManager.OnDownloadError -= DownloadManager_OnDownloading;
         }
 
-        ScrollViewer scrollViewer;
         Visual headerVisual;
+        private ExpressionAnimation _headerOffsetAnim;
+        private ExpressionAnimation _logoScaleAnim;
+        private ExpressionAnimation _logoOffsetAnim;
+        private ExpressionAnimation _bgOpacityAnim;
+
+        private ScrollViewer _cachedScrollViewer;
+        private CompositionPropertySet _scrollerPropSet;
+        private Compositor _compositor;
+
+        // 预定义常量表达式
+        private const string ProgressExp = "Clamp(-scroller.Translation.Y / Padding, 0, 1.0)";
+
+        // 安全获取 ScrollViewer
+        private ScrollViewer GetScrollViewer(DependencyObject root)
+        {
+            // 如果已经缓存且有效，直接返回
+            if (_cachedScrollViewer != null) return _cachedScrollViewer;
+
+            // 尝试查找
+            if (VisualTreeHelper.GetChildrenCount(root) > 0)
+            {
+                var child = VisualTreeHelper.GetChild(root, 0) as Border;
+                if (child?.Child is ScrollViewer sv)
+                {
+                    _cachedScrollViewer = sv;
+                    _cachedScrollViewer.CanContentRenderOutsideBounds = true;
+                    return sv;
+                }
+            }
+            return null;
+        }
+
         public void UpdateShyHeader()
         {
-            // 设置header为顶层
-            var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ListViewBase.Header);
-            var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
-            Canvas.SetZIndex(headerContainer, 1);
+            // 1. 获取 ScrollViewer
+            var scrollViewer = GetScrollViewer(ListViewBase);
+            if (scrollViewer is null) return;
 
-            if (scrollViewer is null)
+            // 2. 处理 ZIndex (仅当需要时处理)
+            // 注意：修改 ListView 内部容器的 ZIndex 是为了让 Header 浮在 Item 上面
+            if (ListViewBase.Header != null)
             {
-                headerVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseGrid);
-                scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;
-                scrollViewer.CanContentRenderOutsideBounds = true;
-                scrollViewer.ViewChanging += ScrollViewer_ViewChanging;
+                var headerPresenter = VisualTreeHelper.GetParent((UIElement)ListViewBase.Header) as UIElement;
+                if (headerPresenter != null)
+                {
+                    var headerContainer = VisualTreeHelper.GetParent(headerPresenter) as UIElement;
+                    // 只有当 ZIndex 不对时才设置，避免重复调用
+                    if (headerContainer != null && Canvas.GetZIndex(headerContainer) != 1)
+                    {
+                        Canvas.SetZIndex(headerContainer, 1);
+                    }
+                }
             }
 
-            CompositionPropertySet scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
-            Compositor compositor = scrollerPropertySet.Compositor;
+            // 3. 初始化 Compositor 和 PropertySet
+            if (_scrollerPropSet is null)
+            {
+                _scrollerPropSet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
+                _compositor = _scrollerPropSet.Compositor;
+            }
 
-            var padingSize = 40;
-            // Get the visual that represents our HeaderTextBlock 
-            // And define the progress animation string
-            String progress = $"Clamp(-scroller.Translation.Y / {padingSize}, 0, 1.0)";
+            // 4. 准备参数
+            float paddingSize = 40f;
 
-            // Shift the header by 50 pixels when scrolling down
-            var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {padingSize}");
-            offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerVisual.StartAnimation("Offset.Y", offsetExpression);
-
-            /*
-            Visual textVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
-            Vector3 finalOffset = new Vector3(0, 10, 0);
-            var headerOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(0,0,0), finalOffset, {progress})");
-            headerOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerOffsetAnimation.SetVector3Parameter("finalOffset", finalOffset);
-            textVisual.StartAnimation(nameof(Visual.Offset), headerOffsetAnimation);
-            */
-
-            // Logo scale and transform                                          from               to
-            var logoHeaderScaleAnimation = compositor.CreateExpressionAnimation("Lerp(Vector2(1,1), Vector2(0.7, 0.7), " + progress + ")");
-            logoHeaderScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-
+            // 获取 Visuals
+            var headerVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseGrid);
             var logoVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
-            logoVisual.StartAnimation("Scale.xy", logoHeaderScaleAnimation);
-
-            var logoVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 24, {progress})");
-            logoVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation("Offset.Y", logoVisualOffsetYAnimation);
-
-            var logoVisualOffsetXAnimation = compositor.CreateExpressionAnimation($"Lerp(0, -12, {progress})");
-            logoVisualOffsetXAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation("Offset.X", logoVisualOffsetXAnimation);
-
             var backgroundVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseRectangle);
-            var backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
-            backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
+
+            // 动画 1: Header Offset Y (Sticky Effect)
+            if (_headerOffsetAnim is null)
+            {
+                // 逻辑: -scroller.Y - (Progress * Padding)
+                string exp = $"-scroller.Translation.Y - ({ProgressExp} * Padding)";
+                _headerOffsetAnim = _compositor.CreateExpressionAnimation(exp);
+                _headerOffsetAnim.SetReferenceParameter("scroller", _scrollerPropSet);
+            }
+            _headerOffsetAnim.SetScalarParameter("Padding", paddingSize);
+            headerVisual.StartAnimation("Offset.Y", _headerOffsetAnim);
+
+            // 动画 2: Logo Scale
+            if (_logoScaleAnim is null)
+            {
+                string exp = $"Lerp(Vector2(1,1), Vector2(0.7, 0.7), {ProgressExp})";
+                _logoScaleAnim = _compositor.CreateExpressionAnimation(exp);
+                _logoScaleAnim.SetReferenceParameter("scroller", _scrollerPropSet);
+            }
+            _logoScaleAnim.SetScalarParameter("Padding", paddingSize);
+            logoVisual.StartAnimation("Scale.xy", _logoScaleAnim);
+
+            // 动画 3: Logo Offset (合并 X 和 Y)
+            // X: 0 -> -12, Y: 0 -> 24
+            if (_logoOffsetAnim is null)
+            {
+                string exp = $"Lerp(Vector3(0,0,0), Vector3(-12, 24, 0), {ProgressExp})";
+                _logoOffsetAnim = _compositor.CreateExpressionAnimation(exp);
+                _logoOffsetAnim.SetReferenceParameter("scroller", _scrollerPropSet);
+            }
+            _logoOffsetAnim.SetScalarParameter("Padding", paddingSize);
+            logoVisual.StartAnimation(nameof(logoVisual.Offset), _logoOffsetAnim);
+
+            // 动画 4: Background Opacity
+            if (_bgOpacityAnim is null)
+            {
+                string exp = $"Lerp(0, 1, {ProgressExp})";
+                _bgOpacityAnim = _compositor.CreateExpressionAnimation(exp);
+                _bgOpacityAnim.SetReferenceParameter("scroller", _scrollerPropSet);
+            }
+            _bgOpacityAnim.SetScalarParameter("Padding", paddingSize);
+            backgroundVisual.StartAnimation("Opacity", _bgOpacityAnim);
         }
 
         private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)

@@ -271,72 +271,171 @@ namespace TewiMP.Pages.ListViewPages
         ExpressionAnimation commandBarVisualOffsetAnimation;
         ExpressionAnimation headerFootRootVisualOffsetAnimation;
         ExpressionAnimation searchRootVisualOffsetAnimation;
-        async void InitShyHeader(bool imageSizeOnly = false, bool delay = false)
+        private ExpressionAnimation _logoScaleAnim;
+        private ExpressionAnimation _headerOffsetAnim;
+        private ExpressionAnimation _bgOpacityAnim;
+        private ExpressionAnimation _imgOffsetAnim;
+        private ExpressionAnimation _infoOffsetAnim;
+        private ExpressionAnimation _cmdBarOffsetAnim;
+        private ExpressionAnimation _footerOffsetAnim;
+        private ExpressionAnimation _searchOffsetAnim;
+
+        // 建议将常量表达式定义为 const 字符串，避免重复和拼写错误
+        private const string ProgressExp = "Clamp(-scroller.Translation.Y / HeightParam, 0, 1.0)";
+
+        // ==============================================================================
+        // 2. 优化后的方法
+        // ==============================================================================
+        async Task InitShyHeader(bool imageSizeOnly = false, bool delay = false)
         {
-            if (scrollViewer is null) return;
-            if (compositor is null) return;
-            if (!IsLoaded) return;
-            var anotherHeight = 154;
-            double imageSizeEnd = 0.45;
-            string progress = $"Clamp(-scroller.Translation.Y / {anotherHeight}, 0, 1.0)";
+            // 基础检查
+            if (scrollViewer is null || compositor is null || !IsLoaded) return;
 
-            logoHeaderScaleAnimation?.Dispose();
-            logoHeaderScaleAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector2(1, 1), Vector2({imageSizeEnd}, {imageSizeEnd}), {progress})");
-            logoHeaderScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            imageVisual.StartAnimation("Scale.xy", logoHeaderScaleAnimation);
-            if (ItemsList_Header_Root.ActualWidth != 0)
-            {
-                var width = ItemsList_Header_Root.ActualWidth - ItemsList_Header_Image_Root.ActualWidth * imageVisual.Scale.X - 32 - 16;
-                ItemsList_Header_Info_Root_SizeChanger.Width = width <= 0 ? 0 : width;
-            }
-            if (imageSizeOnly) return;
-
+            // 如果需要延迟等待布局更新 (虽然建议尽量用 SizeChanged 事件代替 delay)
             if (delay) await Task.Delay(10);
 
-            offsetExpression?.Dispose();
-            offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {anotherHeight}");
-            offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerVisual.StartAnimation("Offset.Y", offsetExpression);
+            // ---------------------------------------------------------
+            // 准备参数数值
+            // ---------------------------------------------------------
+            float anotherHeight = 154f;
+            float imageSizeEnd = 0.45f;
 
-            backgroundVisualOpacityAnimation?.Dispose();
-            backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
-            backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
+            // 获取当前控件的尺寸 (注意：确保此时布局已完成，否则 ActualWidth 可能为 0)
+            float imgRootWidth = (float)ItemsList_Header_Image_Root.ActualWidth;
+            float headerRootWidth = (float)ItemsList_Header_Root.ActualWidth;
+            float headerRootHeight = (float)ItemsList_Header_Root.ActualHeight;
+            float visualH = headerFootRootVisual.Size.Y;
+            float actualH = (float)ActualHeight;
 
-            imageVisualOffsetAnimation?.Dispose();
-            imageVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector2(0, 0), Vector2(0, {anotherHeight}), {progress})");
-            imageVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            imageVisual.StartAnimation("Offset.xy", imageVisualOffsetAnimation);
+            // 计算 Width 逻辑 (保持你的原有逻辑)
+            // 注意：imageVisual.Scale.X 这里读取的是 C# 属性值，不是动画实时值。
+            // 如果 Scale 是由动画驱动的，这里读取的可能是初始值 1。
+            if (headerRootWidth != 0)
+            {
+                // 假设当前 Scale.X 近似为 1 或你需要基于当前状态计算
+                float currentScaleX = imageVisual.Scale.X;
+                var calculatedWidth = headerRootWidth - imgRootWidth * currentScaleX - 32 - 16;
+                ItemsList_Header_Info_Root_SizeChanger.Width = calculatedWidth <= 0 ? 0 : calculatedWidth;
+            }
 
-            infoVisualOffsetAnimation?.Dispose();
-            infoVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3({ItemsList_Header_Image_Root.ActualWidth + 16}, 0, 0), Vector3({(int)(ItemsList_Header_Image_Root.ActualWidth * imageSizeEnd) + 16}, {anotherHeight}, 0), {progress})");
-            infoVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            infoVisual.StartAnimation(nameof(infoVisual.Offset), infoVisualOffsetAnimation);
+            // ---------------------------------------------------------
+            // 1. Logo Scale 动画
+            // ---------------------------------------------------------
+            if (_logoScaleAnim is null)
+            {
+                // 表达式：Lerp(Start, End, Progress)
+                string exp = $"Lerp(Vector2(1, 1), Vector2(TargetScale, TargetScale), {ProgressExp})";
+                _logoScaleAnim = compositor.CreateExpressionAnimation(exp);
+                _logoScaleAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            // 更新参数
+            _logoScaleAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _logoScaleAnim.SetScalarParameter("TargetScale", imageSizeEnd);
 
-            commandBarVisualOffsetAnimation?.Dispose();
-            commandBarVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(-6, {imageVisual.Size.Y - commandBarVisual.Size.Y + 6}, 0), Vector3(-6, {imageVisual.Size.Y * imageSizeEnd - commandBarVisual.Size.Y + 6}, 0), {progress})");
-            commandBarVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            commandBarVisual.StartAnimation(nameof(infoVisual.Offset), commandBarVisualOffsetAnimation);
+            // 启动动画 (Composition 允许重复调用 StartAnimation，开销很小)
+            imageVisual.StartAnimation("Scale.xy", _logoScaleAnim);
 
-            headerFootRootVisualOffsetAnimation?.Dispose();
-            headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
-                $"Lerp(" +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"{progress})");
-            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
+            if (imageSizeOnly) return;
 
-            searchRootVisualOffsetAnimation?.Dispose();
-            searchRootVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(0, {ItemsList_Header_Root.ActualHeight + 4}, 0), Vector3(0, {ItemsList_Header_Root.ActualHeight + 4}, 0), {progress})");
-            searchRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            searchRootVisual.StartAnimation(nameof(infoVisual.Offset), searchRootVisualOffsetAnimation);
+            // ---------------------------------------------------------
+            // 2. Header Offset 动画
+            // ---------------------------------------------------------
+            if (_headerOffsetAnim is null)
+            {
+                // 表达式：-scroller.Y - (Progress * Height)
+                string exp = $"-scroller.Translation.Y - ({ProgressExp} * HeightParam)";
+                _headerOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _headerOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _headerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            headerVisual.StartAnimation("Offset.Y", _headerOffsetAnim);
+
+            // ---------------------------------------------------------
+            // 3. Background Opacity 动画
+            // ---------------------------------------------------------
+            if (_bgOpacityAnim is null)
+            {
+                string exp = $"Lerp(0, 1, {ProgressExp})";
+                _bgOpacityAnim = compositor.CreateExpressionAnimation(exp);
+                _bgOpacityAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _bgOpacityAnim.SetScalarParameter("HeightParam", anotherHeight);
+            backgroundVisual.StartAnimation("Opacity", _bgOpacityAnim);
+
+            // ---------------------------------------------------------
+            // 4. Image Visual Offset 动画
+            // ---------------------------------------------------------
+            if (_imgOffsetAnim is null)
+            {
+                string exp = $"Lerp(Vector3(0,0,0), Vector3(0, HeightParam, 0), {ProgressExp})";
+                _imgOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _imgOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _imgOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            imageVisual.StartAnimation("Offset", _imgOffsetAnim); // 建议用 Offset 而不是 Offset.xy，减少转换
+
+            // ---------------------------------------------------------
+            // 5. Info Visual Offset 动画
+            // ---------------------------------------------------------
+            if (_infoOffsetAnim is null)
+            {
+                // 这里的 X 和 Y 都是动态的，所以全部参数化
+                // Start: (StartX, 0, 0) -> End: (EndX, HeightParam, 0)
+                string exp = $"Lerp(Vector3(StartX, 0, 0), Vector3(EndX, HeightParam, 0), {ProgressExp})";
+                _infoOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _infoOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _infoOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _infoOffsetAnim.SetScalarParameter("StartX", imgRootWidth + 16);
+            _infoOffsetAnim.SetScalarParameter("EndX", (int)(imgRootWidth * imageSizeEnd) + 16);
+            infoVisual.StartAnimation(nameof(infoVisual.Offset), _infoOffsetAnim);
+
+            // ---------------------------------------------------------
+            // 6. Command Bar Offset 动画
+            // ---------------------------------------------------------
+            if (_cmdBarOffsetAnim is null)
+            {
+                // Start: (-6, StartY, 0) -> End: (-6, EndY, 0)
+                string exp = $"Lerp(Vector3(-6, StartY, 0), Vector3(-6, EndY, 0), {ProgressExp})";
+                _cmdBarOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _cmdBarOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            float cmdBarH = commandBarVisual.Size.Y;
+            float imgVisualH = imageVisual.Size.Y;
+
+            _cmdBarOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _cmdBarOffsetAnim.SetScalarParameter("StartY", imgVisualH - cmdBarH + 6);
+            _cmdBarOffsetAnim.SetScalarParameter("EndY", imgVisualH * imageSizeEnd - cmdBarH + 6);
+            commandBarVisual.StartAnimation(nameof(commandBarVisual.Offset), _cmdBarOffsetAnim);
+
+            // ---------------------------------------------------------
+            // 7. Header Foot Root Offset 动画
+            // ---------------------------------------------------------
+            if (_footerOffsetAnim is null)
+            {
+                string exp = $"Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), {ProgressExp})";
+                _footerOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _footerOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _footerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _footerOffsetAnim.SetScalarParameter("StartY", actualH - visualH - 8);
+            _footerOffsetAnim.SetScalarParameter("EndY", anotherHeight + actualH - visualH - 8);
+            headerFootRootVisual.StartAnimation("Offset", _footerOffsetAnim);
+
+            // ---------------------------------------------------------
+            // 8. Search Root Offset 动画 (原代码 Lerp 是一样的值)
+            // ---------------------------------------------------------
+            // 原代码逻辑：Start.Y = ActualHeight+4, End.Y = ActualHeight+4
+            // 除非你有计划让它动，否则这不需要 Lerp。但为了保持一致性：
+            if (_searchOffsetAnim is null)
+            {
+                string exp = $"Vector3(0, TargetY, 0)"; // 简化了，既然不动，直接定位即可
+                                                        // 或者如果未来要动： $"Lerp(Vector3(0, StartY, 0), Vector3(0, EndY, 0), {ProgressExp})"
+                _searchOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                // _searchOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet); // 如果不动就不需要监听 scroller
+            }
+            _searchOffsetAnim.SetScalarParameter("TargetY", headerRootHeight + 4);
+            searchRootVisual.StartAnimation(nameof(searchRootVisual.Offset), _searchOffsetAnim);
         }
         void DisposeVisuals()
         {

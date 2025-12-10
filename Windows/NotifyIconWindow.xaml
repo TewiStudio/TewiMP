@@ -40,7 +40,6 @@
                         <Border x:Name="AlbumImageShadowTarget"/>
                         <c:ImageEx
                             x:Name="LogoImage"
-                            TransitionType="Blur"
                             CornerRadius="4"
                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                             BorderThickness="1">

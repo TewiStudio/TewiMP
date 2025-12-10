@@ -104,7 +104,6 @@ namespace TewiMP.Pages
         int pageSize = 30;
         public async void InitData()
         {
-            if (NavToObj is null) return;
             SelectorSeparator.Visibility = Visibility.Collapsed;
             AddSelectedToPlayingListButton.Visibility = Visibility.Collapsed;
             AddSelectedToPlayListButton.Visibility = Visibility.Collapsed;
@@ -113,11 +112,23 @@ namespace TewiMP.Pages
             SelectReverseButton.Visibility = Visibility.Collapsed;
             SelectAllButton.Visibility = Visibility.Collapsed;
             LoadingTipControl.ShowLoading();
+            if (NavToObj is null)
+            {
+                LoadingTipControl.UnShowLoading();
+                return;
+            }
+            if (NavToObj.PluginInfo is null)
+            {
+                LoadingTipControl.UnShowLoading();
+                App.MainWindowInstance.AddNotify("找不到此专辑的信息", "无插件源查询专辑信息。", NotifySeverity.Error);
+                return;
+            }
             var obj = await NavToObj.PluginInfo.GetMusicSourcePlugin().GetAlbum(NavToObj.ID);
             if (!IsLoaded) return;
             if (obj is null)
             {
-                App.MainWindowInstance.AddNotify("加载专辑信息时出现错误", "无法加载专辑信息，请重试。",
+                LoadingTipControl.UnShowLoading();
+                App.MainWindowInstance.AddNotify("加载专辑信息时出现错误", "无法获取专辑信息，请重试。",
                     NotifySeverity.Error);
                 return;
             }
@@ -154,6 +165,8 @@ namespace TewiMP.Pages
 
         private async void LoadImage()
         {
+            Album_Image.Source = null;
+            AlbumLogo.Source = null;
             AlbumLogo.BorderThickness = new(0);
             if (NavToObj is null) return;
             if (musicListData.ListDataType == DataType.本地歌单)
@@ -196,20 +209,35 @@ namespace TewiMP.Pages
         Visual describeeRootVisual;
         Visual searchBaseVisual;
         Visual headerFootRootVisual;
+
+        private ExpressionAnimation _headerOffsetAnim;
+        private ExpressionAnimation _blurOpacityAnim;
+        private ExpressionAnimation _massOpacityAnim;
+        private ExpressionAnimation _describeeOpacityAnim;
+        private ExpressionAnimation _imgScrollOffsetAnim;
+        private ExpressionAnimation _logoScaleAnim; // Logo 和 Shadow 共用这一个
+        private ExpressionAnimation _cmdBarOffsetAnim;
+        private ExpressionAnimation _infoTextOffsetAnim;
+        private ExpressionAnimation _searchBaseOffsetAnim;
+        private ExpressionAnimation _footerOffsetAnim;
+
+        // 预定义常量表达式字符串 (方便阅读和复用)
+        // HeightParam 是动态传入的高度 (168)
+        private const string ProgressExp = "Clamp(-scroller.Translation.Y / HeightParam, 0, 1.0)";
+        // Describee 也就是固定除以 80 的进度
+        private const string DescProgressExp = "Clamp(-scroller.Translation.Y / 80.0, 0, 1.0)";
+
         public void UpdateShyHeader()
         {
             if (scrollViewer is null) return;
 
-            double anotherHeight = 168;
-            String progress = $"Clamp(-scroller.Translation.Y / {anotherHeight}, 0, 1.0)";
-            String describeeProgress = $"Clamp(-scroller.Translation.Y / 80, 0, 1.0)";
-            String blurProgress = $"Clamp((-scroller.Translation.Y - 20) / {anotherHeight}, 0, 1.0)";
-            String massProgress = $"Clamp((-scroller.Translation.Y - 150) / {anotherHeight}, 0, 1.0)";
-
+            // 1. 初始化 Visuals (只执行一次)
             if (scrollerPropertySet is null)
             {
                 scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
                 compositor = scrollerPropertySet.Compositor;
+
+                // 获取所有 Visual
                 headerVisual = ElementCompositionPreview.GetElementVisual(menu_border);
                 massAlbumRootVisual = ElementCompositionPreview.GetElementVisual(MassAlbumRoot);
                 blurAlbumRootVisual = ElementCompositionPreview.GetElementVisual(BlurAlbumRoot);
@@ -221,70 +249,157 @@ namespace TewiMP.Pages
                 describeeRootVisual = ElementCompositionPreview.GetElementVisual(DescribeeTextRoot);
                 searchBaseVisual = ElementCompositionPreview.GetElementVisual(SearchBase);
                 headerFootRootVisual = ElementCompositionPreview.GetElementVisual(ItemsList_Header_Foot_Root);
+
                 CrateShadow();
             }
 
-            logoVisual.CenterPoint = new(0, logoVisual.Size.Y, 1);
-            logoShadowVisual.CenterPoint = new(0, logoVisual.Size.Y, 1);
+            // 2. 准备参数 (提取变量，避免在表达式里重复计算)
+            float anotherHeight = 168f;
+            float sizeDouble = 0.391f;
 
-            var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {anotherHeight}");
-            offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerVisual.StartAnimation("Offset.Y", offsetExpression);
+            // 更新中心点 (CenterPoint 依赖 Size，如果 Size 会变，这行必须保留)
+            // 注意：Vector3 的 Z 轴设为 1 没问题，但在 2D 变换中通常用不到
+            logoVisual.CenterPoint = new System.Numerics.Vector3(0, logoVisual.Size.Y, 1);
+            logoShadowVisual.CenterPoint = new System.Numerics.Vector3(0, logoVisual.Size.Y, 1);
 
-            var blurAlbumRootVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(1, 0, {progress})");
-            blurAlbumRootVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            blurAlbumRootVisual.StartAnimation("Opacity", blurAlbumRootVisualOpacityAnimation);
+            // --------------------------------------------------------------------------
+            // 动画 1: Header Offset
+            // --------------------------------------------------------------------------
+            if (_headerOffsetAnim is null)
+            {
+                string exp = $"-scroller.Translation.Y - ({ProgressExp} * HeightParam)";
+                _headerOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _headerOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _headerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            headerVisual.StartAnimation("Offset.Y", _headerOffsetAnim);
 
-            var massAlbumRootVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
-            massAlbumRootVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            massAlbumRootVisual.StartAnimation("Opacity", massAlbumRootVisualOpacityAnimation);
-/*
-            var backgroundVisualScaleAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(1, 1, 1), Vector3(1, 0.4, 1), {progress})");
-            backgroundVisualScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            backgroundVisual.StartAnimation(nameof(backgroundVisual.Scale), backgroundVisualScaleAnimation);
-*/
-            var describeeVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(1, 0, {describeeProgress})");
-            describeeVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            describeeRootVisual.StartAnimation("Opacity", describeeVisualOpacityAnimation);
+            // --------------------------------------------------------------------------
+            // 动画 2 & 3: Opacity (Blur & Mass)
+            // --------------------------------------------------------------------------
+            // Blur: Lerp(1, 0, P)
+            if (_blurOpacityAnim is null)
+            {
+                string exp = $"Lerp(1, 0, {ProgressExp})";
+                _blurOpacityAnim = compositor.CreateExpressionAnimation(exp);
+                _blurOpacityAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _blurOpacityAnim.SetScalarParameter("HeightParam", anotherHeight);
+            blurAlbumRootVisual.StartAnimation("Opacity", _blurOpacityAnim);
 
-            var ImageVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(0,0,0), Vector3(0,{anotherHeight / 1.2},0), {progress})");
-            ImageVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            ImageScrollVisual.StartAnimation(nameof(ImageScrollVisual.Offset), ImageVisualOffsetAnimation);
+            // Mass: Lerp(0, 1, P)
+            if (_massOpacityAnim is null)
+            {
+                string exp = $"Lerp(0, 1, {ProgressExp})";
+                _massOpacityAnim = compositor.CreateExpressionAnimation(exp);
+                _massOpacityAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _massOpacityAnim.SetScalarParameter("HeightParam", anotherHeight);
+            massAlbumRootVisual.StartAnimation("Opacity", _massOpacityAnim);
 
-            var sizeDouble = 0.391;
-            var logoVisualScaleAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(1, 1, 1), Vector3({sizeDouble}, {sizeDouble}, 1), {progress})");
-            logoVisualScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation(nameof(logoVisual.Scale), logoVisualScaleAnimation);
-            
-            var logoShadowVisualScaleAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(1, 1, 1), Vector3({sizeDouble}, {sizeDouble}, 1), {progress})");
-            logoShadowVisualScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoShadowVisual.StartAnimation(nameof(logoShadowVisual.Scale), logoShadowVisualScaleAnimation);
+            // --------------------------------------------------------------------------
+            // 动画 4: Describee Opacity (使用独立的进度 /80)
+            // --------------------------------------------------------------------------
+            if (_describeeOpacityAnim is null)
+            {
+                string exp = $"Lerp(1, 0, {DescProgressExp})";
+                _describeeOpacityAnim = compositor.CreateExpressionAnimation(exp);
+                _describeeOpacityAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            describeeRootVisual.StartAnimation("Opacity", _describeeOpacityAnim);
 
-            var toolsCommandBarVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp({(282 - commandbarVisual.Size.Y)}, {114 - commandbarVisual.Size.Y}, {progress})");
-            toolsCommandBarVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            commandbarVisual.StartAnimation("Offset.Y", toolsCommandBarVisualOffsetYAnimation);
+            // --------------------------------------------------------------------------
+            // 动画 5: Image Scroll Offset
+            // --------------------------------------------------------------------------
+            if (_imgScrollOffsetAnim is null)
+            {
+                // Lerp(0, TargetY, P)
+                string exp = $"Lerp(Vector3(0,0,0), Vector3(0, TargetY, 0), {ProgressExp})";
+                _imgScrollOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _imgScrollOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _imgScrollOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _imgScrollOffsetAnim.SetScalarParameter("TargetY", anotherHeight / 1.2f);
+            ImageScrollVisual.StartAnimation("Offset", _imgScrollOffsetAnim);
 
-            var infoTextsRootVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3({logoVisual.Size.X + 12},0,0), Vector3({logoVisual.Size.X * sizeDouble + 12},{anotherHeight},0), {progress})");
-            infoTextsRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            infoTextsRootVisual.StartAnimation(nameof(infoTextsRootVisual.Offset), infoTextsRootVisualOffsetAnimation);
+            // --------------------------------------------------------------------------
+            // 动画 6 & 7: Logo & Shadow Scale (共用一个动画对象！)
+            // --------------------------------------------------------------------------
+            if (_logoScaleAnim is null)
+            {
+                string exp = $"Lerp(Vector3(1, 1, 1), Vector3(TargetScale, TargetScale, 1), {ProgressExp})";
+                _logoScaleAnim = compositor.CreateExpressionAnimation(exp);
+                _logoScaleAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _logoScaleAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _logoScaleAnim.SetScalarParameter("TargetScale", sizeDouble);
 
-            var searchBaseVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(16,{headerVisual.Size.Y + 12},0), Vector3(16,{anotherHeight + 132 + 12},0), {progress})");
-            searchBaseVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            searchBaseVisual.StartAnimation(nameof(searchBaseVisual.Offset), searchBaseVisualOffsetAnimation);
+            // 同时应用给两个 Visual
+            logoVisual.StartAnimation("Scale", _logoScaleAnim);
+            logoShadowVisual.StartAnimation("Scale", _logoScaleAnim);
 
-            var headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
-                $"Lerp(" +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"{progress})");
-            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
+            // --------------------------------------------------------------------------
+            // 动画 8: CommandBar Offset Y
+            // --------------------------------------------------------------------------
+            if (_cmdBarOffsetAnim is null)
+            {
+                string exp = $"Lerp(StartY, EndY, {ProgressExp})";
+                _cmdBarOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _cmdBarOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            float cmdBarH = commandbarVisual.Size.Y;
+            _cmdBarOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _cmdBarOffsetAnim.SetScalarParameter("StartY", 282f - cmdBarH);
+            _cmdBarOffsetAnim.SetScalarParameter("EndY", 114f - cmdBarH);
+            commandbarVisual.StartAnimation("Offset.Y", _cmdBarOffsetAnim);
+
+            // --------------------------------------------------------------------------
+            // 动画 9: Info Text Root Offset
+            // --------------------------------------------------------------------------
+            if (_infoTextOffsetAnim is null)
+            {
+                // Start: (StartX, 0, 0) -> End: (EndX, HeightParam, 0)
+                string exp = $"Lerp(Vector3(StartX, 0, 0), Vector3(EndX, HeightParam, 0), {ProgressExp})";
+                _infoTextOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _infoTextOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            float logoW = logoVisual.Size.X;
+            _infoTextOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _infoTextOffsetAnim.SetScalarParameter("StartX", logoW + 12f);
+            _infoTextOffsetAnim.SetScalarParameter("EndX", logoW * sizeDouble + 12f);
+            infoTextsRootVisual.StartAnimation("Offset", _infoTextOffsetAnim);
+
+            // --------------------------------------------------------------------------
+            // 动画 10: Search Base Offset
+            // --------------------------------------------------------------------------
+            if (_searchBaseOffsetAnim is null)
+            {
+                // StartY -> EndY
+                string exp = $"Lerp(Vector3(16, StartY, 0), Vector3(16, EndY, 0), {ProgressExp})";
+                _searchBaseOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _searchBaseOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _searchBaseOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _searchBaseOffsetAnim.SetScalarParameter("StartY", headerVisual.Size.Y + 12f);
+            _searchBaseOffsetAnim.SetScalarParameter("EndY", anotherHeight + 132f + 12f);
+            searchBaseVisual.StartAnimation("Offset", _searchBaseOffsetAnim);
+
+            // --------------------------------------------------------------------------
+            // 动画 11: Header Foot Root Offset
+            // --------------------------------------------------------------------------
+            if (_footerOffsetAnim is null)
+            {
+                string exp = $"Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), {ProgressExp})";
+                _footerOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _footerOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            float footerH = headerFootRootVisual.Size.Y;
+            float actualH = (float)ActualHeight;
+
+            _footerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+            _footerOffsetAnim.SetScalarParameter("StartY", actualH - footerH - 8f);
+            _footerOffsetAnim.SetScalarParameter("EndY", anotherHeight + actualH - footerH - 8f);
+            headerFootRootVisual.StartAnimation("Offset", _footerOffsetAnim);
         }
 
         private async void UpdateCommandToolBarWidth()

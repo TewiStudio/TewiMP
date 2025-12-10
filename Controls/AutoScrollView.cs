@@ -44,7 +44,7 @@ namespace TewiMP.Controls
             "ScrollSpeedRatio",
             typeof(double),
             typeof(AutoScrollView),
-            new PropertyMetadata(.65d, null)
+            new PropertyMetadata(.55d, null)
         );
 
         public double ScrollSpeedRatio

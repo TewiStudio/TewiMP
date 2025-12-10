@@ -52,11 +52,11 @@ namespace TewiMP.Controls
             if (equaled is null)
             {
                 //App.MainWindowInstance.PlayContent_Image.TransitionType = App.Instance.PlayingList.IsNextPlay == TewiMP.Background.SetPlayInfo.Previous ? ImageTransitionType.SlideRight : ImageTransitionType.SlideLeft;
-                App.MainWindowInstance.PlayContent_Image.TransitionType = ImageTransitionType.Blur;
+                //App.MainWindowInstance.PlayContent_Image.TransitionType = ImageTransitionType.Blur;
             }
             else
             {
-                App.MainWindowInstance.PlayContent_Image.TransitionType = ImageTransitionType.None;
+                //App.MainWindowInstance.PlayContent_Image.TransitionType = ImageTransitionType.None;
                 equaled.Info_Root.Opacity = 0;
                 ConnectedAnimation canimation =
                     ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation", equaled.Info_Image);

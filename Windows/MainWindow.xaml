@@ -249,7 +249,7 @@
                                 </Grid.ColumnDefinitions>
                                 <Border
                                     Height="66"
-                                    Margin="0,0,10,0">
+                                    Margin="0,0,4,0">
                                     <Frame
                                         x:Name="PlayContent"
                                         x:FieldModifier="public"
@@ -266,7 +266,6 @@
                                             x:Name="PlayContent_Image"
                                             x:FieldModifier="public"
                                             CornerRadius="4"
-                                            TransitionType="None"
                                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"/>
                                     </Frame>
                                 </Border>
@@ -286,6 +285,7 @@
                                         ScrollSpeedRatio=".5">
                                         <TextBlock
                                             x:Name="PlayTitle"
+                                            Margin="6,0,0,0"
                                             x:FieldModifier="public"
                                             Text="TewiMP"
                                             FontSize="20"
@@ -299,6 +299,7 @@
                                         ScrollSpeedRatio=".5">
                                         <TextBlock
                                             x:Name="PlayArtist"
+                                            Margin="6,0,0,0"
                                             x:FieldModifier="public"
                                             Text="No media playing"
                                             FontSize="14"

@@ -106,6 +106,7 @@ namespace TewiMP.Pages
         private async void LoadImage()
         {
             Artist_Image.Source = null;
+            Artist_Image1.Source = null;
             if (musicListData.ListDataType == DataType.本地歌单)
             {
                 Artist_Image.Source = musicListData.PicturePath.ToImageUri();
@@ -129,13 +130,13 @@ namespace TewiMP.Pages
         Visual backgroundVisual;
         Visual tbVisual;
         Visual ImageScrollVisual;
-        Visual headerFootRootVisual;
+        Visual headerFootRootVisual; private ExpressionAnimation _offsetAnimation;
+        ExpressionAnimation _opacityAnimation;
+        ExpressionAnimation _imageOffsetAnimation;
+        ExpressionAnimation _footOffsetAnimation;
         public void UpdateShyHeader(bool footBarUpdate = true)
         {
             if (scrollViewer is null) return;
-
-            double anotherHeight = menu_border.ActualHeight - LittleBarGrid.ActualHeight + 2;
-            String progress = $"Clamp(-scroller.Translation.Y / {anotherHeight}, 0, 1.0)";
 
             if (scrollerPropertySet is null)
             {
@@ -148,32 +149,64 @@ namespace TewiMP.Pages
                 headerFootRootVisual = ElementCompositionPreview.GetElementVisual(ItemsList_Header_Foot_Root);
             }
 
-            var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {anotherHeight}");
-            offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerVisual.StartAnimation("Offset.Y", offsetExpression);
+            // 计算动态数值
+            double anotherHeight = menu_border.ActualHeight - LittleBarGrid.ActualHeight + 2;
 
-            var backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(1, 0, {progress})");
-            backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            ImageScrollVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
+            // 创建或更新 Offset 动画
+            if (_offsetAnimation is null)
+            {
+                // Logic: -scroller.Y - (Progress * HeightParam)
+                string exp = "-scroller.Translation.Y - (Clamp(-scroller.Translation.Y / HeightParam, 0, 1.0) * HeightParam)";
+                _offsetAnimation = compositor.CreateExpressionAnimation(exp);
+                _offsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _offsetAnimation.SetScalarParameter("HeightParam", (float)anotherHeight);
+            headerVisual.StartAnimation("Offset.Y", _offsetAnimation);
 
-            var ImageVisualOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(0,0,0), Vector3(0,{menu_border.ActualHeight / 2},0), {progress})");
-            ImageVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            ImageScrollVisual.StartAnimation(nameof(ImageScrollVisual.Offset), ImageVisualOffsetAnimation);
 
-            if (!footBarUpdate) return;
-            var headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
-                $"Lerp(" +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"{progress})");
-            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
+            // 创建或更新 Opacity 动画
+            if (_opacityAnimation is null)
+            {
+                string exp = "Lerp(1, 0, Clamp(-scroller.Translation.Y / HeightParam, 0, 1.0))";
+                _opacityAnimation = compositor.CreateExpressionAnimation(exp);
+                _opacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _opacityAnimation.SetScalarParameter("HeightParam", (float)anotherHeight);
+            ImageScrollVisual.StartAnimation("Opacity", _opacityAnimation);
+
+
+            // Image Offset 动画
+            if (_imageOffsetAnimation is null)
+            {
+                // TargetY 也是动态的，所以做成参数
+                string exp = "Lerp(Vector3(0,0,0), Vector3(0, TargetY, 0), Clamp(-scroller.Translation.Y / HeightParam, 0, 1.0))";
+                _imageOffsetAnimation = compositor.CreateExpressionAnimation(exp);
+                _imageOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _imageOffsetAnimation.SetScalarParameter("HeightParam", (float)anotherHeight);
+            _imageOffsetAnimation.SetScalarParameter("TargetY", (float)(menu_border.ActualHeight / 2));
+            ImageScrollVisual.StartAnimation(nameof(ImageScrollVisual.Offset), _imageOffsetAnimation);
+
+
+            // Footer 动画
+            if (footBarUpdate)
+            {
+                if (_footOffsetAnimation is null)
+                {
+                    string exp = "Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), Clamp(-scroller.Translation.Y / HeightParam, 0, 1.0))";
+                    _footOffsetAnimation = compositor.CreateExpressionAnimation(exp);
+                    _footOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+                }
+
+                float visualH = headerFootRootVisual.Size.Y;
+                float actualH = (float)ActualHeight;
+
+                _footOffsetAnimation.SetScalarParameter("HeightParam", (float)anotherHeight);
+                _footOffsetAnimation.SetScalarParameter("StartY", actualH - visualH - 8);
+                _footOffsetAnimation.SetScalarParameter("EndY", (float)anotherHeight + actualH - visualH - 8);
+
+                headerFootRootVisual.StartAnimation("Offset", _footOffsetAnimation);
+            }
         }
 
         private async void UpdateCommandToolBarWidth()

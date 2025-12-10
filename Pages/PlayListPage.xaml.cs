@@ -119,69 +119,95 @@ namespace TewiMP.Pages
             backgroundVisual = ElementCompositionPreview.GetElementVisual(BaseGridView_HeaderRectangle);
             headerFootRootVisual = ElementCompositionPreview.GetElementVisual(BaseGridView_HeaderGrid_Foot_Root);
         }
+        // 类成员变量 (保持引用，不要 Dispose)
+        private ExpressionAnimation _offsetAnim;
+        private ExpressionAnimation _logoScaleAnim;
+        private ExpressionAnimation _logoOffsetAnim;
+        private ExpressionAnimation _bgOpacityAnim;
+        private ExpressionAnimation _footerOffsetAnim;
 
-        ExpressionAnimation offsetExpression;
-        ExpressionAnimation logoHeaderScaleAnimation;
-        ExpressionAnimation logoVisualOffsetYAnimation;
-        ExpressionAnimation logoVisualOffsetXAnimation;
-        ExpressionAnimation backgroundVisualOpacityAnimation;
-        ExpressionAnimation headerFootRootVisualOffsetAnimation;
+        // Progress = Clamp(-scroller.Translation.Y / Padding, 0, 1.0)
+        private const string ProgressExp = "Clamp(-scroller.Translation.Y / Padding, 0, 1.0)";
+
         void InitShyHeader()
         {
-            if (!IsLoaded) return;
-            if (scrollViewer is null) return;
+            // 基础检查
+            if (!IsLoaded || scrollViewer is null) return;
 
-            var paddingSize = 40;
-            var progress = $"Clamp(-scroller.Translation.Y / {paddingSize}, 0, 1.0)";
+            // 准备参数
+            float paddingSize = 40f;
 
-            offsetExpression?.Dispose();
-            offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - Round({progress} * {paddingSize})");
-            offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerVisual.StartAnimation("Offset.Y", offsetExpression);
+            // 动画 1: Header Sticky Offset
+            if (_offsetAnim is null)
+            {
+                // -scroller.Y - (Progress * Padding)
+                string exp = $"-scroller.Translation.Y - ({ProgressExp} * Padding)";
+                _offsetAnim = compositor.CreateExpressionAnimation(exp);
+                _offsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            // 更新参数
+            _offsetAnim.SetScalarParameter("Padding", paddingSize);
+            headerVisual.StartAnimation("Offset.Y", _offsetAnim);
 
-            logoHeaderScaleAnimation?.Dispose();
-            logoHeaderScaleAnimation = compositor.CreateExpressionAnimation("Lerp(Vector2(1,1), Vector2(0.7, 0.7), " + progress + ")");
-            logoHeaderScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation("Scale.xy", logoHeaderScaleAnimation);
+            // 动画 2: Logo Scale
+            if (_logoScaleAnim is null)
+            {
+                string exp = $"Lerp(Vector2(1,1), Vector2(0.7, 0.7), {ProgressExp})";
+                _logoScaleAnim = compositor.CreateExpressionAnimation(exp);
+                _logoScaleAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _logoScaleAnim.SetScalarParameter("Padding", paddingSize);
+            logoVisual.StartAnimation("Scale.xy", _logoScaleAnim);
 
-            logoVisualOffsetYAnimation?.Dispose();
-            logoVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 24, {progress})");
-            logoVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation("Offset.Y", logoVisualOffsetYAnimation);
+            // X: 0 -> -12, Y: 0 -> 24
+            if (_logoOffsetAnim is null)
+            {
+                string exp = $"Lerp(Vector3(0,0,0), Vector3(-12, 24, 0), {ProgressExp})";
+                _logoOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _logoOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _logoOffsetAnim.SetScalarParameter("Padding", paddingSize);
+            logoVisual.StartAnimation(nameof(logoVisual.Offset), _logoOffsetAnim);
 
-            logoVisualOffsetXAnimation?.Dispose();
-            logoVisualOffsetXAnimation = compositor.CreateExpressionAnimation($"Lerp(0, -12, {progress})");
-            logoVisualOffsetXAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation("Offset.X", logoVisualOffsetXAnimation);
+            // 动画 4: Background Opacity
+            if (_bgOpacityAnim is null)
+            {
+                string exp = $"Lerp(0, 1, {ProgressExp})";
+                _bgOpacityAnim = compositor.CreateExpressionAnimation(exp);
+                _bgOpacityAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _bgOpacityAnim.SetScalarParameter("Padding", paddingSize);
+            backgroundVisual.StartAnimation("Opacity", _bgOpacityAnim);
 
-            backgroundVisualOpacityAnimation?.Dispose();
-            backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
-            backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
+            // 动画 5: Footer Offset (复杂参数)
+            if (_footerOffsetAnim is null)
+            {
+                // 表达式逻辑：Lerp(StartPos, EndPos, Progress)
+                // StartPos = Vector3(-16, StartY, 0)
+                // EndPos   = Vector3(-16, EndY,   0)
+                string exp = $"Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), {ProgressExp})";
+                _footerOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                _footerOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
 
-            headerFootRootVisualOffsetAnimation?.Dispose();
-            headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
-                $"Lerp(" +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{paddingSize} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"{progress})");
-            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
+            // 计算动态数值
+            float footerVisualH = headerFootRootVisual.Size.Y;
+            float actualH = (float)ActualHeight;
+
+            // 参数化更新 (这是性能最高的做法)
+            _footerOffsetAnim.SetScalarParameter("Padding", paddingSize);
+            _footerOffsetAnim.SetScalarParameter("StartY", actualH - footerVisualH - 8f);
+            _footerOffsetAnim.SetScalarParameter("EndY", paddingSize + actualH - footerVisualH - 8f);
+
+            headerFootRootVisual.StartAnimation("Offset", _footerOffsetAnim);
         }
         void DisposeVisuals()
         {
-            offsetExpression?.Dispose();
-            logoHeaderScaleAnimation?.Dispose();
-            logoVisualOffsetYAnimation?.Dispose();
-            logoVisualOffsetXAnimation?.Dispose();
-            backgroundVisualOpacityAnimation?.Dispose();
-            headerFootRootVisualOffsetAnimation?.Dispose();
+            _offsetAnim?.Dispose();
+            _logoScaleAnim?.Dispose();
+            _logoOffsetAnim?.Dispose();
+            _bgOpacityAnim?.Dispose();
+            _footerOffsetAnim?.Dispose();
 
             scrollViewer = null;
             scrollerPropertySet = null;
@@ -190,12 +216,11 @@ namespace TewiMP.Pages
             backgroundVisual = null;
             logoVisual = null;
             headerFootRootVisual = null;
-            offsetExpression = null;
-            logoHeaderScaleAnimation = null;
-            logoVisualOffsetYAnimation = null;
-            logoVisualOffsetXAnimation = null;
-            backgroundVisualOpacityAnimation = null;
-            headerFootRootVisualOffsetAnimation = null;
+            _offsetAnim = null;
+            _logoScaleAnim = null;
+            _logoOffsetAnim = null;
+            _bgOpacityAnim = null;
+            _footerOffsetAnim = null;
         }
 
         void InitEvent()

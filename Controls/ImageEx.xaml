@@ -3,8 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TewiMP.Controls"
-    xmlns:media="using:CommunityToolkit.WinUI.Media"
-    xmlns:ani="using:CommunityToolkit.WinUI.Animations"
+    xmlns:brushs="using:CommunityToolkit.WinUI.Media"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" x:Name="control"
@@ -25,94 +24,16 @@
         x:Name="root"
         CornerRadius="{Binding ElementName=control,Path=CornerRadius}">
         <Image
-            x:Name="Image_Old" ImageOpened="Image_Control_ImageOpened" Tag="Old" Stretch="{Binding ElementName=Image_Control,Path=Stretch}"
-            HorizontalAlignment="{Binding ElementName=Image_Control, Path=HorizontalAlignment}"
-            VerticalAlignment="{Binding ElementName=Image_Control, Path=VerticalAlignment}">
-            <Image.Source>
-                <BitmapImage x:Name="Image_Old_ControlSources"/>
-            </Image.Source>
-            <media:UIElementExtensions.VisualFactory>
-                <media:PipelineVisualFactory>
-                    <media:BlurEffect 
-                        x:Name="ImageBlurEffect"
-                        IsAnimatable="True"
-                        Amount="0"/>
-                </media:PipelineVisualFactory>
-            </media:UIElementExtensions.VisualFactory>
-            <ani:Explicit.Animations>
-                <ani:AnimationSet 
-                    x:Name="BlurAnimation">
-                    <ani:BlurEffectAnimation
-                        x:Name="ImageBlurAnimation"
-                        Target="{x:Bind ImageBlurEffect}"
-                        EasingMode="EaseOut"
-                        Duration="0:0:4"
-                        From="0"
-                        To="60"/>
-                </ani:AnimationSet>
-                <ani:AnimationSet 
-                    x:Name="ResetBlurAnimation">
-                    <ani:BlurEffectAnimation
-                        Target="{x:Bind ImageBlurEffect}"
-                        EasingMode="{x:Null}"
-                        Duration="0:0:0.1"
-                        From="0"
-                        To="0"/>
-                </ani:AnimationSet>
-            </ani:Explicit.Animations>
-        </Image>
-        <Image
-            x:Name="Image_Control" ImageOpened="Image_Control_ImageOpened" Tag="Current"
+            x:Name="Image_Control" ImageOpened="Image_Control_ImageOpened"
             HorizontalAlignment="{Binding ElementName=control, Path=HorizontalAlignment}"
             VerticalAlignment="{Binding ElementName=control, Path=VerticalAlignment}">
             <Image.Source>
                 <BitmapImage x:Name="Image_ControlSources"/>
             </Image.Source>
-            <media:UIElementExtensions.VisualFactory>
-                <media:PipelineVisualFactory>
-                    <media:OpacityEffect x:Name="ImageOpacityEffect" Value="0"/>
-                </media:PipelineVisualFactory>
-            </media:UIElementExtensions.VisualFactory>
-            <ani:Explicit.Animations>
-                <ani:AnimationSet 
-                    x:Name="OpacityAnimation">
-                    <ani:OpacityAnimation
-                        x:Name="ImageOpacityAnimation"
-                        EasingMode="EaseOut"
-                        Duration="0:0:5"
-                        From="0"
-                        To="1"/>
-                </ani:AnimationSet>
-                <ani:AnimationSet 
-                    x:Name="ZeroOpacityAnimation">
-                    <ani:OpacityAnimation
-                        EasingMode="{x:Null}"
-                        Duration="0:0:0.1"
-                        From="0"
-                        To="0"/>
-                </ani:AnimationSet>
-                <ani:AnimationSet 
-                    x:Name="OneOpacityAnimation">
-                    <ani:OpacityAnimation
-                        EasingMode="{x:Null}"
-                        Duration="0:0:0.1"
-                        From="1"
-                        To="1"/>
-                </ani:AnimationSet>
-                <ani:AnimationSet 
-                    x:Name="SliderAnimation">
-                    <ani:TranslationAnimation
-                        x:Name="ImageSliderAnimation"
-                        EasingMode="EaseOut"
-                        Duration="0:0:5"
-                        From="32,0,0"
-                        To="0"/>
-                </ani:AnimationSet>
-            </ani:Explicit.Animations>
         </Image>
         <Rectangle x:Name="Image_GammaMass">
             <Rectangle.Fill>
-                <media:BackdropGammaTransferBrush
+                <brushs:BackdropGammaTransferBrush
                     BlueDisable="True" RedDisable="True" GreenDisable="True"
                     AlphaAmplitude="0.2" AlphaExponent="1" AlphaOffset="1"/>
             </Rectangle.Fill>

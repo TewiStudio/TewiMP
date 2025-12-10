@@ -77,19 +77,21 @@ namespace TewiMP.Media
                             f.Dispose();
                         });
                         source = b.ToImageUri();
+                        resultPath = b;
                     }
                     else
                     {
-                        Uri coverPath = await Task.Run(() =>
+                        string coverPath = await Task.Run(() =>
                         {
                             FileInfo fileInfo = new FileInfo(musicData.InLocal);
                             string coverPath = $"{fileInfo.DirectoryName}\\Cover.jpg";
-                            if (File.Exists(coverPath)) return new Uri(coverPath);
+                            if (File.Exists(coverPath)) return coverPath;
                             else return null;
                         });
                         if (coverPath != null)
                         {
-                            source = coverPath;
+                            source = coverPath.ToImageUri();
+                            resultPath = coverPath;
                         }
                     }
                 }

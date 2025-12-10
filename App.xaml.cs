@@ -193,6 +193,18 @@ namespace TewiMP
             SMTC.DisplayUpdater.MusicProperties.Artist = "没有正在播放的歌曲";
             SMTC.DisplayUpdater.Update();
 
+            int saveSettingsWhenSourceChangedCount = 0;
+            AudioPlayer.SourceChanged += async (audioPlayer) =>
+            {
+                await SongHistoryHelper.AddHistory(new() { MusicData = audioPlayer.MusicData, Time = DateTime.Now });
+                if (saveSettingsWhenSourceChangedCount > 1)
+                {
+                    saveSettingsWhenSourceChangedCount = 0;
+                    SaveSettings();
+                    await SaveNowPlaying();
+                }
+                saveSettingsWhenSourceChangedCount++;
+            };
             AudioPlayer.CacheLoadingChanged += (_, __) =>
             {
                 SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData?.Title;

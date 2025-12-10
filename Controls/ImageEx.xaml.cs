@@ -1,33 +1,26 @@
-using System;
-using System.Collections;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Hosting;
+Ôªøusing Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Composition;
 using TewiMP.Helpers;
+using System.Collections;
+using System;
+using System.Threading.Tasks;
+using TewiMP.Background;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace TewiMP.Controls
 {
-    public enum ImageTransitionType
-    {
-        None,
-        Fade,
-        SlideLeft,
-        SlideRight,
-        Blur
-    }
-
     public partial class ImageEx : Grid
     {
         public delegate void ImageLoadedDelegate(bool isLoaded);
         public event ImageLoadedDelegate ImageLoaded;
         public static bool ImageDarkMass { get; set; } = false;
-        public ImageTransitionType TransitionType { get; set; } = ImageTransitionType.Fade;
+
         public enum PointInBehaviors { Tapped, OnlyLightUp, None }
 
         public static readonly DependencyProperty SourceProperty =
@@ -48,7 +41,7 @@ namespace TewiMP.Controls
             var value = e.NewValue as Uri;
             ie.SetImageSource(value);
         }
-        
+
         public Stretch Stretch
         {
             get => Image_Control.Stretch;
@@ -57,7 +50,7 @@ namespace TewiMP.Controls
         public PointInBehaviors PointInBehavior { get; set; } = PointInBehaviors.Tapped;
         public string SaveName { get; set; } = null;
         /// <summary>
-        /// Œ™ true  ±Õº∆¨«–ªª ±≤ªª·µ»µΩœ¬“ª’≈Õº∆¨º”‘ÿÕÍ≥…∫Û‘Ÿœ‘ æ∂Øª≠
+        /// ‰∏∫ true Êó∂ÂõæÁâáÂàáÊç¢Êó∂‰∏ç‰ºöÁ≠âÂà∞‰∏ã‰∏ÄÂº†ÂõæÁâáÂä†ËΩΩÂÆåÊàêÂêéÂÜçÊòæÁ§∫Âä®Áîª
         /// </summary>
         public bool SwitchImageImmediateSetOpacity { get; set; } = false;
 
@@ -71,7 +64,8 @@ namespace TewiMP.Controls
         bool isInitedVisuals = false;
         Visual controlVisual;
         Visual rootVisual;
-        Visual gammaMassVisual; 
+        Visual gammaMassVisual;
+        ScalarKeyFrameAnimation animationOpacity_SourceChanged = null;
         ScalarKeyFrameAnimation animationMassOpacity_MouseIn = null;
         ScalarKeyFrameAnimation animationMassOpacity_MouseExited = null;
         ScalarKeyFrameAnimation animationSize_MouseIn = null;
@@ -89,77 +83,48 @@ namespace TewiMP.Controls
             rootVisual.Opacity = 1;
             gammaMassVisual.Opacity = 0;
 
-            //  Û±Í“∆»Î’⁄’÷∂Øª≠
+            // Ê∫êÊõ¥ÊîπÊ∏êÂÖ•Âä®Áîª
+            AnimateHelper.AnimateScalar(
+                controlVisual, 1, 02,
+                0.2f, 1, 0.22f, 1f,
+                out animationOpacity_SourceChanged);
+            // Èº†Ê†áÁßªÂÖ•ÈÅÆÁΩ©Âä®Áîª
             AnimateHelper.AnimateScalar(
                 gammaMassVisual, 1f, 0.2,
                 0.2f, 1, 0.22f, 1f,
                 out animationMassOpacity_MouseIn);
-            //  Û±Í“∆»Î Size ∂Øª≠
+            // Èº†Ê†áÁßªÂÖ• Size Âä®Áîª
             AnimateHelper.AnimateScalar(
                 rootVisual, 1.07f, 0.2,
                 0.2f, 1, 0.22f, 1f,
                 out animationSize_MouseIn);
-            //  Û±Í“∆≥ˆ’⁄’÷∂Øª≠
+            // Èº†Ê†áÁßªÂá∫ÈÅÆÁΩ©Âä®Áîª
             AnimateHelper.AnimateScalar(
                 gammaMassVisual, 0, 1.3,
                 0, 0, 0, 0,
                 out animationMassOpacity_MouseExited);
-            //  Û±Í“∆≥ˆ Size ∂Øª≠
+            // Èº†Ê†áÁßªÂá∫ Size Âä®Áîª
             AnimateHelper.AnimateScalar(
                 rootVisual, 1f, 1.5,
                 0.2f, 1, 0.22f, 1f,
                 out animationSize_MouseExited);
-            //  Û±Í∞¥œ¬ Size ∂Øª≠
+            // Èº†Ê†áÊåâ‰∏ã Size Âä®Áîª
             AnimateHelper.AnimateScalar(
                 rootVisual, 0.93f, 0.5,
                 0.2f, 1, 0.22f, 1f,
                 out animationSize_MousePressed);
-            //  Û±ÍÀ…∆ Size ∂Øª≠
+            // Èº†Ê†áÊùæËµ∑ Size Âä®Áîª
             AnimateHelper.AnimateScalar(
                 rootVisual, 1.07f, 1.5,
                 0.2f, 1, 0.22f, 1f,
                 out animationSize_MouseReleased);
         }
 
-        Uri currentImageSource;
-        Uri currentOldImageSource;
-        bool isInit = false; // µ±÷Æ«∞µƒÕº∆¨‘¥Œ™ø’ ±£¨÷µŒ™ true
         private void SetImageSource(Uri imageSource)
         {
             if (controlVisual is null) return;
-            ImageLoaded?.Invoke(false);
-
-            isInit = currentImageSource is null;
-
-            if (imageSource == null)
-            {
-                currentImageSource = null;
-                currentOldImageSource = null;
-                Image_ControlSources.UriSource = null;
-                Image_Old_ControlSources.UriSource = null;
-                Image_Control.Visibility = Visibility.Collapsed;
-                Image_Old.Visibility = Visibility.Collapsed;
-                Image_Control.Visibility = Visibility.Visible;
-                Image_Old.Visibility = Visibility.Visible;
-                return;
-            }
-
-            currentImageSource = imageSource;
-            currentOldImageSource = Image_ControlSources.UriSource ?? imageSource;
-
-            if (TransitionType == ImageTransitionType.None)
-            {
-                OneOpacityAnimation.Start();
-                Image_ControlSources.UriSource = imageSource;
-                return;
-            }
-
-            if (isInit) Image_Old.Visibility = Visibility.Collapsed;
-            if (currentOldImageSource == Image_Old_ControlSources.UriSource)
-            {
-                Image_Old_ControlSources.UriSource = null;
-            }
-            Image_Old_ControlSources.UriSource = currentOldImageSource;
+            if (isInitedVisuals || SwitchImageImmediateSetOpacity) controlVisual.Opacity = 0;
+            Image_ControlSources.UriSource = imageSource;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
@@ -170,74 +135,24 @@ namespace TewiMP.Controls
 
         private void UserControl_Unloaded(object sender, RoutedEventArgs e)
         {
+            Image_Control.Source = null;
+            animationOpacity_SourceChanged?.Dispose();
+            animationMassOpacity_MouseIn?.Dispose();
+            animationMassOpacity_MouseExited?.Dispose();
+            animationSize_MouseIn?.Dispose();
+            animationSize_MouseExited?.Dispose();
+            animationSize_MousePressed?.Dispose();
+            animationSize_MouseReleased?.Dispose();
             rootVisual = null;
             controlVisual = null;
             gammaMassVisual = null;
+            animationOpacity_SourceChanged = null;
             animationMassOpacity_MouseIn = null;
             animationMassOpacity_MouseExited = null;
             animationSize_MouseIn = null;
             animationSize_MouseExited = null;
             animationSize_MousePressed = null;
             animationSize_MouseReleased = null;
-        }
-
-        // Õº∆¨º”‘ÿÕÍ≥… ±º”»Îµ≠»Î∂Øª≠
-        private async void Image_Control_ImageOpened(object sender, RoutedEventArgs e)
-        {
-            if (sender is not Image image) return;
-
-            if (image.Tag as string == "Old")
-            {
-                if (Image_Old_ControlSources.UriSource != currentOldImageSource) return;
-
-                Image_Old.Visibility = isInit ? Visibility.Collapsed : Visibility.Visible;
-                ResetBlurAnimation.Start();
-                ZeroOpacityAnimation.Start();
-                Image_ControlSources.UriSource = currentImageSource;
-            }
-            else
-            {
-                ImageLoaded?.Invoke(true);
-                if (TransitionType == ImageTransitionType.None) return;
-
-                var oldUri = currentOldImageSource;
-
-                switch (TransitionType)
-                {
-                    case ImageTransitionType.Fade:
-                        ImageOpacityAnimation.Duration = TimeSpan.FromSeconds(4);
-                        await OpacityAnimation.StartAsync();
-                        break;
-
-                    case ImageTransitionType.SlideLeft:
-                    case ImageTransitionType.SlideRight:
-                        ImageBlurAnimation.Duration = TimeSpan.FromSeconds(8);
-                        ImageOpacityAnimation.Duration = TimeSpan.FromSeconds(4);
-                        ImageSliderAnimation.From = $"{(TransitionType == ImageTransitionType.SlideRight ? -1 : 1) * Image_Control.ActualWidth / 6},0,0";
-                        ImageSliderAnimation.To = "0,0,0";
-                        ImageSliderAnimation.Duration = TimeSpan.FromSeconds(1.5f);
-                        SliderAnimation.Start();
-                        BlurAnimation.Start();
-                        await OpacityAnimation.StartAsync();
-                        break;
-
-                    case ImageTransitionType.Blur:
-                        ImageOpacityAnimation.Duration = TimeSpan.FromSeconds(4);
-                        ImageBlurAnimation.Duration = TimeSpan.FromSeconds(4);
-                        OpacityAnimation.Start();
-                        if (!isInit)
-                            await BlurAnimation.StartAsync();
-                        break;
-                }
-
-                // Reset old image if necessary
-                if (Image_Old_ControlSources.UriSource == oldUri)
-                {
-                    Image_Old_ControlSources.UriSource = null;
-                    Image_Old.Visibility = Visibility.Collapsed;
-                    Image_Old.Visibility = Visibility.Visible;
-                }
-            }
         }
 
         private void UserControl_Tapped(object sender, TappedRoutedEventArgs e)
@@ -274,10 +189,9 @@ namespace TewiMP.Controls
             rootVisual.StartAnimation("Scale.X", animationSize_MouseExited);
             rootVisual.StartAnimation("Scale.Y", animationSize_MouseExited);
             pointerExitBatch = rootVisual.Compositor.CreateScopedBatch(CompositionBatchTypes.Animation);
-            pointerExitBatch.Completed += OnPointerExitCompleted;
+            pointerExitBatch.Completed += ImageEx_Completed;
             pointerExitBatch.End();
         }
-
         bool IsMouse4Click = false;
         private void UserControl_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
@@ -307,11 +221,17 @@ namespace TewiMP.Controls
             rootVisual.CenterPoint = new((float)ActualWidth / 2, (float)ActualHeight / 2, 1);
         }
 
-        private void OnPointerExitCompleted(object sender, CompositionBatchCompletedEventArgs args)
+        private void Image_Control_ImageOpened(object sender, RoutedEventArgs e)
+        {
+            controlVisual.StartAnimation("Opacity", animationOpacity_SourceChanged);
+            ImageLoaded?.Invoke(true);
+        }
+
+        private void ImageEx_Completed(object sender, CompositionBatchCompletedEventArgs args)
         {
             if (rootVisual != null)
             {
-                pointerExitBatch.Completed -= OnPointerExitCompleted;
+                pointerExitBatch.Completed -= ImageEx_Completed;
                 pointerExitBatch.Dispose();
             }
             if (isPointEnter) return;

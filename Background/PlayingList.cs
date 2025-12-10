@@ -5,7 +5,6 @@ using Microsoft.UI.Xaml.Media;
 using NAudio;
 using System;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using TewiMP.DataEditor;
@@ -123,7 +122,6 @@ namespace TewiMP.Background
         private async void AudioPlayer_PlayEnd(Media.AudioPlayer audioPlayer)
         {
             isPlayEndCallPlay = true;
-            AddHistory(audioPlayer.MusicData);
             switch (PlayBehavior)
             {
                 case PlayBehavior.循环播放:
@@ -177,15 +175,14 @@ namespace TewiMP.Background
             Uri a = null;
 
             var _ = await ImageManager.GetImageUri(audioPlayer.MusicData);
-            var thumbnail = await ImageManager.GetImageUri(audioPlayer.MusicData);
             a = _.Item1;
             path = _.Item2;
 
             if (a is null) { lastMusicData = null; }
             NowPlayingImage = a;
             NowPlayingImagePath = path;
+            
             await GetImageColor();
-
             NowPlayingImageLoaded?.Invoke(NowPlayingImage, path);
             //System.Diagnostics.LogManager.Log(NowPlayingImageLoaded.GetInvocationList().Length);
         }
@@ -390,7 +387,6 @@ namespace TewiMP.Background
 
         public async Task UpdateImageColor()
         {
-            lastImagePath = null;
             await GetImageColor();
             NowPlayingImageLoaded?.Invoke(NowPlayingImage, NowPlayingImagePath);
         }
@@ -399,39 +395,101 @@ namespace TewiMP.Background
         public Windows.UI.Color AlbumAccentColorReverse { get; set; }
         public Windows.UI.Color TextOnAlbumAccentColor { get; set; }
         public Windows.UI.Color TextColor { get; set; }
-        string lastImagePath;
+
+        // 记录上一次处理成功的图片路径，避免重复计算
+        private string _lastProcessedImagePath;
+
         public async Task GetImageColor()
         {
+            // 1. 获取当前路径
             var nowImagePath = NowPlayingImagePath;
-            if (string.IsNullOrEmpty(nowImagePath) || nowImagePath == lastImagePath)
+
+            if (string.Equals(nowImagePath, _lastProcessedImagePath, StringComparison.OrdinalIgnoreCase))
             {
-                AlbumAccentColor = (App.Current.Resources["SystemControlBackgroundAccentBrush"] as SolidColorBrush).Color;
-                AlbumAccentColorReverse = (App.Current.Resources["SystemControlBackgroundAccentBrush"] as SolidColorBrush).Color;
-                TextOnAlbumAccentColor = CodeHelper.IsAccentColorDark(AlbumAccentColor) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0);
+                return;
+            }
+
+            LogManager.Info("PlayingList", $"正在获取专辑封面主题色：From \"{_lastProcessedImagePath}\" To \"{nowImagePath}\"");
+            _lastProcessedImagePath = nowImagePath;
+
+            Windows.UI.Color albumColor, albumColorReverse, textColorOnAlbum;
+
+            // 判断逻辑：是重置默认还是提取新颜色
+            if (string.IsNullOrEmpty(nowImagePath))
+            {
+                // 路径为空，重置为系统主题色
+                var systemAccent = (Windows.UI.Color)App.Current.Resources["SystemAccentColor"];
+                albumColor = systemAccent;
+                albumColorReverse = systemAccent;
+                textColorOnAlbum = CodeHelper.IsAccentColorDark(albumColor) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0);
             }
             else
             {
-                lastImagePath = nowImagePath;
-                LogManager.Info("PlayingList", "正在获取专辑封面主题色...");
-                var themeColor = await CodeHelper.GetThemeColorAsync(nowImagePath);
-                LogManager.Info("PlayingList", $"专辑封面主题色：{themeColor}");
-                if (nowImagePath != NowPlayingImagePath) return; // 确保图片路径没有被更改
-                AlbumAccentColor = themeColor.Item1;
-                AlbumAccentColorReverse = themeColor.Item2;
-                TextOnAlbumAccentColor = themeColor.Item3;
+                try
+                {
+                    // 异步提取颜色
+                    var themeColor = await CodeHelper.GetThemeColorAsync(nowImagePath);
+
+                    // 并发保护：await 回来后，检查当前播放图片是否已经又变了
+                    // 如果变了，说明这次计算已经过时，直接丢弃
+                    if (nowImagePath != NowPlayingImagePath)
+                    {
+                        LogManager.Info("PlayingList", "图片路径已变更，放弃应用旧的颜色计算结果。");
+                        return;
+                    }
+
+                    albumColor = themeColor.Item1;
+                    albumColorReverse = themeColor.Item2;
+                    textColorOnAlbum = themeColor.Item3;
+
+                    LogManager.Info("PlayingList", $"专辑封面主题色提取成功：{albumColor}");
+                }
+                catch (Exception ex)
+                {
+                    LogManager.Error("PlayingList", $"提取颜色失败，回退到默认颜色: {ex.Message}");
+                    // 发生异常时的回退逻辑
+                    var systemAccent = (Windows.UI.Color)App.Current.Resources["SystemAccentColor"];
+                    albumColor = systemAccent;
+                    albumColorReverse = systemAccent;
+                    textColorOnAlbum = Colors.White;
+                }
             }
 
-            TextColor = App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Dark ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0);
-            (App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush).Color = AlbumAccentColor;
-            (App.Current.Resources["MusicAlbumAccentBrushDark1"] as SolidColorBrush).Color = AlbumAccentColor.Darken(.1f);
-            (App.Current.Resources["MusicAlbumAccentBrushDark2"] as SolidColorBrush).Color = AlbumAccentColor.Darken(.2f);
-            (App.Current.Resources["MusicAlbumAccentBrushReverse"] as SolidColorBrush).Color = AlbumAccentColorReverse;
-            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrush"] as SolidColorBrush).Color = TextOnAlbumAccentColor;
-            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrushDark1"] as SolidColorBrush).Color = TextOnAlbumAccentColor.Darken(.1f);
-            (App.Current.Resources["TextOnMusicAlbumAccentForegroundBrushDark2"] as SolidColorBrush).Color = TextOnAlbumAccentColor.Darken(.2f);
-            // TextBox
-            (App.Current.Resources["TextControlElevationBorderMusicAlbumAccentColorFocusedBrush"] as LinearGradientBrush).GradientStops[0].Color = AlbumAccentColor;
+            // 更新属性
+            AlbumAccentColor = albumColor;
+            AlbumAccentColorReverse = albumColorReverse;
+            TextOnAlbumAccentColor = textColorOnAlbum;
 
+            TextColor = App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Dark
+                ? Colors.White
+                : Windows.UI.Color.FromArgb(228, 0, 0, 0);
+
+            // 更新资源字典
+            UpdateColorResource("MusicAlbumAccentBrush", albumColor);
+            UpdateColorResource("MusicAlbumAccentBrushDark1", albumColor.Darken(.1f));
+            UpdateColorResource("MusicAlbumAccentBrushDark2", albumColor.Darken(.2f));
+            UpdateColorResource("MusicAlbumAccentBrushReverse", albumColorReverse);
+
+            UpdateColorResource("TextOnMusicAlbumAccentForegroundBrush", textColorOnAlbum);
+            UpdateColorResource("TextOnMusicAlbumAccentForegroundBrushDark1", textColorOnAlbum.Darken(.1f));
+            UpdateColorResource("TextOnMusicAlbumAccentForegroundBrushDark2", textColorOnAlbum.Darken(.2f));
+
+            // 更新 GradientStop (特殊处理)
+            if (App.Current.Resources.TryGetValue("TextControlElevationBorderMusicAlbumAccentColorFocusedBrush", out var brushObj)
+                && brushObj is LinearGradientBrush lgb
+                && lgb.GradientStops.Count > 0)
+            {
+                lgb.GradientStops[0].Color = albumColor;
+            }
+        }
+
+        // 安全更新 SolidColorBrush
+        private void UpdateColorResource(string resourceKey, Windows.UI.Color newColor)
+        {
+            if (App.Current.Resources.TryGetValue(resourceKey, out var obj) && obj is SolidColorBrush brush)
+            {
+                brush.Color = newColor;
+            }
         }
     }
 }
