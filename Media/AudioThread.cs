@@ -25,12 +25,11 @@ public class AudioThread : IDisposable
             IsBackground = true // 确保程序关闭时线程自动结束
         };
 
-        // 关键：设置为 STA 模式，这对 WasapiOut 和 DirectSoundOut 非常重要
         _thread.SetApartmentState(ApartmentState.STA);
         _thread.Start();
     }
 
-    // 线程的主循环：不断从队列里取任务执行
+    // 线程的主循环
     private void ThreadLoop()
     {
         // 设置线程为音频优先级
@@ -102,7 +101,7 @@ public class AudioThread : IDisposable
     {
         _cts.Cancel();
         _actionQueue.CompleteAdding();
-        // _thread.Join(1000); // 可选：等待线程结束
+        // _thread.Join(1000); // 待线程结束
         _actionQueue.Dispose();
         _cts.Dispose();
     }

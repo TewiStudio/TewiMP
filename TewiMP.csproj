@@ -2,10 +2,10 @@
 	<PropertyGroup>
 		<Product>TewiMP</Product>
 		<Title>TewiMP</Title>
-		<Version>0.0.5</Version>
-		<AssemblyVersion>0.0.5</AssemblyVersion>
-		<FileVersion>0.0.5</FileVersion>
-		<VersionPrefix>0.0.5</VersionPrefix>
+		<Version>0.0.6</Version>
+		<AssemblyVersion>0.0.6</AssemblyVersion>
+		<FileVersion>0.0.6</FileVersion>
+		<VersionPrefix>0.0.6</VersionPrefix>
 		<VersionSuffix>beta</VersionSuffix>
 		<Company>TewiStudio</Company>
 		<Authors>TewiStudio</Authors>
