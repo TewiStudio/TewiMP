@@ -6,8 +6,8 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using TewiMP.Background;
-using TewiMP.DataEditor;
+using TewiMP.Services;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Helpers
 {
@@ -86,14 +86,14 @@ namespace TewiMP.Helpers
             }
             catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
             {
-                LogManager.Info("DownloadFileAsync", "下载已取消。");
+                LogService.Info("DownloadFileAsync", "下载已取消。");
                 // 取消时删除未完成文件
                 if (File.Exists(downloadPath)) File.Delete(downloadPath);
                 throw;
             }
             catch (Exception ex)
             {
-                LogManager.Error("DownloadFileAsync", $"下载失败：{ex.Message}");
+                LogService.Error("DownloadFileAsync", $"下载失败：{ex.Message}");
                 throw;
             }
             finally

@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Graphics.Imaging;
 using Windows.System;
 using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
-using static NMeCab.Core.DoubleArray;
+using TewiMP.Services.Storage;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Helpers
 {
@@ -24,11 +24,11 @@ namespace TewiMP.Helpers
         /// !=null - 音频缓存文件路径 /
         /// null - 未查询到音频缓存
         /// </returns>
-        public static async Task<string> GetAudioCache(DataEditor.MusicData musicData)
+        public static async Task<string> GetAudioCache(MusicData musicData)
         {
             return await Task.Run(() =>
             {
-                DirectoryInfo directory = new DirectoryInfo(DataEditor.DataFolderBase.AudioCacheFolder);
+                DirectoryInfo directory = new DirectoryInfo(DataFolderBase.AudioCacheFolder);
                 FileInfo[] fileInfo = directory.GetFiles();
                 foreach (FileInfo file in fileInfo)
                 {
@@ -54,7 +54,7 @@ namespace TewiMP.Helpers
         {
             return await Task.Run(() =>
             {
-                DirectoryInfo directory = new(DataEditor.DataFolderBase.ImageCacheFolder);
+                DirectoryInfo directory = new(DataFolderBase.ImageCacheFolder);
                 FileInfo[] fileInfo = directory.GetFiles();
                 foreach (FileInfo file in fileInfo)
                 {
@@ -75,9 +75,9 @@ namespace TewiMP.Helpers
         /// !=null - 图片缓存文件路径 /
         /// null - 未查询到图片缓存
         /// </returns>
-        public static async Task<string> GetImageCachePath(DataEditor.MusicData musicData)
+        public static async Task<string> GetImageCachePath(MusicData musicData)
         {
-            var filename = musicData.From == DataEditor.MusicFrom.localMusic ?
+            var filename = musicData.From == MusicFrom.localMusic ?
                 $"{musicData.From}{musicData.MD5.Replace(@"/", "#")}" :
                 $"{musicData.PluginInfo}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
             return await GetImageCache(filename);
@@ -91,9 +91,9 @@ namespace TewiMP.Helpers
         /// !=null - 图片缓存文件路径 /
         /// null - 未查询到图片缓存。如果为本地歌单会返回歌单记录的图片文件地址
         /// </returns>
-        public static async Task<string> GetImageCache(DataEditor.MusicListData musicListData)
+        public static async Task<string> GetImageCache(MusicListData musicListData)
         {
-            if (musicListData.ListDataType == DataEditor.DataType.本地歌单)
+            if (musicListData.ListDataType == DataType.本地歌单)
             {
                 return musicListData.PicturePath;
             }
@@ -108,11 +108,11 @@ namespace TewiMP.Helpers
         /// !=null - 歌词缓存文件路径 /
         /// null - 未查询到歌词缓存
         /// </returns>
-        public static async Task<string> GetLyricCache(DataEditor.MusicData musicData)
+        public static async Task<string> GetLyricCache(MusicData musicData)
         {
             return await Task.Run(() =>
             {
-                if (musicData.From == DataEditor.MusicFrom.localMusic)
+                if (musicData.From == MusicFrom.localMusic)
                 {
                     var file = new FileInfo(musicData.InLocal);
                     string lrcPath = $"{file.FullName.Replace(file.Extension, "")}.lrc";
@@ -120,7 +120,7 @@ namespace TewiMP.Helpers
                 }
                 else
                 {
-                    DirectoryInfo directory = new DirectoryInfo(DataEditor.DataFolderBase.LyricCacheFolder);
+                    DirectoryInfo directory = new DirectoryInfo(DataFolderBase.LyricCacheFolder);
                     FileInfo[] fileInfo = directory.GetFiles();
                     foreach (FileInfo file in fileInfo)
                     {
@@ -139,7 +139,7 @@ namespace TewiMP.Helpers
             //System.Diagnostics.LogManager.Log(filePath);
             if (string.IsNullOrEmpty(filePath))
             {
-                filePath = @"ms-appx:///Images/icon.png";
+                filePath = DataFolderBase.IconPNGPath;
             }
             return new Uri(filePath);
         }

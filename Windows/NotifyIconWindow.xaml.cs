@@ -17,10 +17,12 @@ using Vanara.PInvoke;
 using TewiMP.Pages;
 using TewiMP.Media;
 using TewiMP.Helpers;
-using TewiMP.DataEditor;
-using TewiMP.Background;
+using TewiMP.Services;
 using TewiMP.WindowHelpers;
 using WinUIEx;
+using TewiMP.Media.Audio;
+using TewiMP.Core.Models.Music;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.Windowed
 {
@@ -50,12 +52,12 @@ namespace TewiMP.Windowed
         nint hwnd = 0;
         public NotifyIconWindow()
         {
-            LogManager.Log("Starting", "初始化 NotifyIconWindow.");
+            LogService.Log("Starting", "初始化 NotifyIconWindow.");
             InitializeComponent();
 
             notifyIcon = new System.Windows.Forms.NotifyIcon();
             notifyIcon.Text = App.Instance.AppName;
-            notifyIcon.Icon = new(Path.Combine(Directory.GetCurrentDirectory(), "Images", "Icons", "icon.ico"));
+            notifyIcon.Icon = new(DataFolderBase.IconPath);
             notifyIcon.Visible = isVisible;
 
             #region others
@@ -70,6 +72,7 @@ namespace TewiMP.Windowed
             
             presenter = OverlappedPresenter.CreateForContextMenu(); // FIX: https://github.com/microsoft/microsoft-ui-xaml/issues/9978#issuecomment-2456461855
             AppWindow.SetPresenter(presenter);
+            AppWindow.SetIcon(DataFolderBase.IconPath);
             UpdateWindowDisplay();
 
             AppWindow.Closing += AppWindow_Closing;
@@ -90,7 +93,6 @@ namespace TewiMP.Windowed
             AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
             AppWindow.IsShownInSwitchers = false;
             AppWindow.Title = $"NotifyIcon Window";
-            AppWindow.SetIcon(Path.Combine("Images", "Icons", "icon_nobackground.ico"));
 
             AppWindow.TitleBar.ButtonBackgroundColor = Color.FromArgb(0, 0, 0, 0);
             AppWindow.TitleBar.ButtonForegroundColor = Color.FromArgb(0, 255, 255, 255);
@@ -114,9 +116,9 @@ namespace TewiMP.Windowed
             AudioPlayer_PlayStateChanged(App.Instance.AudioPlayer);
             AudioPlayer_TimingChanged(App.Instance.AudioPlayer);
             AudioPlayer_VolumeChanged(App.Instance.AudioPlayer, App.Instance.AudioPlayer.Volume);
-            PlayingList_NowPlayingImageLoaded(App.Instance.PlayingList.NowPlayingImage, null);
+            PlayingList_NowPlayingImageLoaded(App.Instance.PlayingListService.NowPlayingImage, null);
             App.Instance.AudioPlayer.ReCallTiming();
-            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
+            SetPlayModeIconAndName(App.Instance.PlayingListService.PlayBehavior);
             AudioPlayer_CacheLoadedChanged(App.Instance.AudioPlayer);
 
             isCodeChangedDesktopLyricWindow = true;
@@ -137,13 +139,13 @@ namespace TewiMP.Windowed
                 App.Instance.AudioPlayer.PlayStateChanged -= AudioPlayer_PlayStateChanged;
                 App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
                 App.Instance.AudioPlayer.VolumeChanged -= AudioPlayer_VolumeChanged;
-                App.Instance.PlayingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+                App.Instance.PlayingListService.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
                 App.MainWindowInstance.DesktopLyricWindowOpenedEvent -= MainWindow_DesktopLyricWindowOpenedEvent;
                 App.MainWindowInstance.DesktopLyricWindowClosedEvent -= MainWindow_DesktopLyricWindowClosedEvent;
                 TitleTBBase.Pause = true;
                 ArtistTBBase.Pause = true;
                 AlbumTBBase.Pause = true;
-                LogManager.Log("NotifyIconWindow", "Removed Events");
+                LogService.Log("NotifyIconWindow", "Removed Events");
             }
             else
             {
@@ -153,14 +155,14 @@ namespace TewiMP.Windowed
                 App.Instance.AudioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
                 App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged;
                 App.Instance.AudioPlayer.VolumeChanged += AudioPlayer_VolumeChanged;
-                App.Instance.PlayingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+                App.Instance.PlayingListService.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
                 App.MainWindowInstance.DesktopLyricWindowOpenedEvent += MainWindow_DesktopLyricWindowOpenedEvent;
                 App.MainWindowInstance.DesktopLyricWindowClosedEvent += MainWindow_DesktopLyricWindowClosedEvent;
                 TitleTBBase.Pause = false;
                 ArtistTBBase.Pause = false;
                 AlbumTBBase.Pause = false;
                 UpdateDatas();
-                LogManager.Log("NotifyIconWindow", "Added Events");
+                LogService.Log("NotifyIconWindow", "Added Events");
             }
         }
 
@@ -541,7 +543,7 @@ namespace TewiMP.Windowed
             switch ((sender as Button).Tag)
             {
                 case "0":
-                    App.Instance.PlayingList.PlayPrevious();
+                    App.Instance.PlayingListService.PlayPrevious();
                     break;
                 case "1":
                     if (App.Instance.AudioPlayer.PlaybackState == PlaybackState.Playing)
@@ -554,7 +556,7 @@ namespace TewiMP.Windowed
                     }
                     break;
                 case "2":
-                    App.Instance.PlayingList.PlayNext();
+                    App.Instance.PlayingListService.PlayNext();
                     break;
             }
         }
@@ -648,8 +650,8 @@ namespace TewiMP.Windowed
         private void B_Click(object sender, RoutedEventArgs e)
         {
             var a = (PlayBehavior)(sender as MenuFlyoutItem).Tag;
-            App.Instance.PlayingList.PlayBehavior = a;
-            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
+            App.Instance.PlayingListService.PlayBehavior = a;
+            SetPlayModeIconAndName(App.Instance.PlayingListService.PlayBehavior);
         }
 
         private void SetPlayModeIconAndName(PlayBehavior playBehavior)
@@ -686,7 +688,7 @@ namespace TewiMP.Windowed
 
         private void TB_PlayModeSelector_Base_Loaded(object sender, RoutedEventArgs e)
         {
-            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
+            SetPlayModeIconAndName(App.Instance.PlayingListService.PlayBehavior);
         }
     }
 

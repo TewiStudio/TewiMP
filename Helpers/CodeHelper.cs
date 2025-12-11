@@ -18,12 +18,14 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TewiMP.Background;
-using TewiMP.DataEditor;
+using TewiMP.Services;
+using TewiMP.Core.Models;
 using Windows.Graphics.Imaging;
 using Windows.Storage.Streams;
 using Windows.System;
 using WinRT.Interop;
+using TewiMP.Core.Models.Music;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.Helpers
 {
@@ -386,7 +388,7 @@ namespace TewiMP.Helpers
                 }
                 catch (Exception ex)
                 {
-                    LogManager.Log("ImageFromBytes", ex.Message, Background.LogLevel.Error);
+                    LogService.Log("ImageFromBytes", ex.Message, LogLevel.Error);
                 }
             });
             await image.SetSourceAsync(stream);
@@ -654,7 +656,7 @@ namespace TewiMP.Helpers
             saturation = s + (elementTheme == ElementTheme.Dark ? .1 : .6);
             value = v + (elementTheme == ElementTheme.Dark ? 1 : .1);
             var color2 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
-            LogManager.Elapsed("CodeHelper.GetThemeColorAsync", $"Get \"{file}\" theme color elapsed: {{0}}.", time);
+            LogService.Elapsed("CodeHelper.GetThemeColorAsync", $"Get \"{file}\" theme color elapsed: {{0}}.", time);
             return (color1, color2, IsAccentColorDark(color1) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0));
         }
 
@@ -789,7 +791,7 @@ namespace TewiMP.Helpers
             });
 
             List<LyricData> lyricList = new();
-            Kawazu.KawazuConverter converter = new();
+            Kawazu.KawazuConverter converter = new(DataFolderBase.KawazuDicFolder);
             foreach (var l in sorter)
             {
                 if (useRomaji && l.Value.Lyric?.First() != null)
@@ -836,7 +838,7 @@ namespace TewiMP.Helpers
                     case 1: timeMillsStr += "00"; break;
                     case 2: timeMillsStr += "0"; break;
                     case 3: break;
-                    default: LogManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Warning); break;
+                    default: LogService.Log("LyricManager", "歌词源文件时间精度较低。", LogLevel.Warning); break;
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
                 return timesb + timeMills;
@@ -859,7 +861,7 @@ namespace TewiMP.Helpers
                         case 1: timeMillsStr += "00"; break;
                         case 2: timeMillsStr += "0"; break;
                         case 3: break;
-                        default: LogManager.Log("LyricManager", "歌词源文件时间精度较低。", Background.LogLevel.Warning); break;
+                        default: LogService.Log("LyricManager", "歌词源文件时间精度较低。", LogLevel.Warning); break;
                     }
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));

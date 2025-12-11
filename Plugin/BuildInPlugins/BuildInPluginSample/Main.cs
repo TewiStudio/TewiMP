@@ -1,7 +1,7 @@
 ﻿namespace TewiMP.Plugin.BuildInPlugins.BuildInPluginSample; // 使用 namespace 区别不同的插件
 
 using System.Collections.Generic;
-using TewiMP.Background;
+using TewiMP.Services;
 
 // 每个插件的入口，需要继承自 Plugin 类，否则无法被识别为插件
 public class Main : Plugin
@@ -27,21 +27,21 @@ public class Main : Plugin
     public override void OnEnable()
     {
         base.OnEnable();
-        LogManager.Log("BuildIn Plugin Sample", "I have been enabled!");
+        LogService.Log("BuildIn Plugin Sample", "I have been enabled!");
     }
 
     // 当插件被禁用时调用
     public override void OnDisable()
     {
         base.OnDisable();
-        LogManager.Log("BuildIn Plugin Sample", "I have been disabled!");
+        LogService.Log("BuildIn Plugin Sample", "I have been disabled!");
     }
 
     // 当插件设置被更改时调用
     protected override void OnSettingsChanged(string key, object value)
     {
         base.OnSettingsChanged(key, value);
-        LogManager.Log("BuildIn Plugin Sample", $"Settings \"{key}\" has been changed to {value}!");
+        LogService.Log("BuildIn Plugin Sample", $"Settings \"{key}\" has been changed to {value}!");
     }
 
     // 当插件的所有设置被更改时调用

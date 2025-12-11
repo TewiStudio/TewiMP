@@ -10,10 +10,11 @@ using Newtonsoft.Json.Linq;
 using Windows.UI;
 using TewiMP.Media;
 using TewiMP.Helpers;
-using TewiMP.DataEditor;
+using TewiMP.Services.Storage;
 using TewiMP.Pages.ListViewPages;
-using TewiMP.Background;
+using TewiMP.Services;
 using Windows.UI.ViewManagement;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Controls
 {
@@ -277,7 +278,7 @@ namespace TewiMP.Controls
             }
             catch (Exception ex)
             {
-                LogManager.Error("PlayingList Update Error", ex.ToString());
+                LogService.Error("PlayingList Update Error", ex.ToString());
                 App.MainWindowInstance.AddNotify("更新歌单失败", $"更新歌单时遇到错误，请重试。\n错误信息：{ex}", NotifySeverity.Error);
             }
         }

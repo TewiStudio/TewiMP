@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.DataEditor;
+using TewiMP.Core.Models.Music;
 using Windows.ApplicationModel.Appointments.AppointmentsProvider;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -69,7 +69,7 @@ namespace TewiMP.Controls
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            App.Instance.PlayingList.NowPlayingList.Remove(DataContext as MusicData);
+            App.Instance.PlayingListService.NowPlayingList.Remove(DataContext as MusicData);
         }
 
         private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
@@ -92,7 +92,7 @@ namespace TewiMP.Controls
         private async void Grid_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             if (IsPlaying) return;
-            await App.Instance.PlayingList.Play(MusicData);
+            await App.Instance.PlayingListService.Play(MusicData);
         }
 
         private void UserControl_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)

@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Microsoft.UI.Xaml;
 using Vanara.PInvoke;
 using WinUIEx;
-using TewiMP.Background;
+using TewiMP.Services;
 using TewiMP.Helpers.TransparentWindowHelper;
 
 namespace TewiMP.Windowed
@@ -28,8 +28,8 @@ namespace TewiMP.Windowed
             SetWindowSubclass(handle, sUBCLASSPROC, 0, 0);
             var result = User32.SetLayeredWindowAttributes(handle, new COLORREF(255, 255, 255), 255, User32.LayeredWindowAttributes.LWA_COLORKEY);
             TransparentHelper.SetTransparent(this);
-            LogManager.Log("Test", $"{result}");
-            LogManager.Log("Test", $"{((App)Application.Current)}");
+            LogService.Log("Test", $"{result}");
+            LogService.Log("Test", $"{((App)Application.Current)}");
         }
 
         private IntPtr SubClassWndProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, uint dwRefData)

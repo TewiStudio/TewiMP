@@ -6,11 +6,10 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:TewiMP"
     xmlns:c="using:TewiMP.Controls"
-    xmlns:data="using:TewiMP.DataEditor"
+    xmlns:data="using:TewiMP.Core.Models.Music"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
-    xmlns:cc="using:TewiMP.Controls"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded"
     mc:Ignorable="d" SizeChanged="Page_SizeChanged">
 
@@ -26,7 +25,7 @@
                         BorderThickness="0,0,0,1"/>
                 <TextBlock x:Name="BaseGridView_HeaderTextBlock" Text="播放列表" Style="{ThemeResource TBHeader}"/>
                 <Grid x:Name="BaseGridView_HeaderGrid_Foot_Root">
-                    <cc:ScrollFootButton
+                    <c:ScrollFootButton
                         x:Name="BaseGridView_HeaderGrid_Foot_Buttons"
                         IsPositionToNowPlayingButtonShow="False"
                         VerticalAlignment="Bottom"
@@ -64,7 +63,7 @@
             <ItemsView.ItemTemplate>
                 <DataTemplate x:DataType="data:MusicListData">
                     <ItemContainer>
-                        <cc:PlayListCard/>
+                        <c:PlayListCard/>
                     </ItemContainer>
                 </DataTemplate>
             </ItemsView.ItemTemplate>

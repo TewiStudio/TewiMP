@@ -9,8 +9,9 @@ using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Composition;
+using TewiMP.Services.Storage;
 using TewiMP.Controls;
-using TewiMP.DataEditor;
+using TewiMP.Core.Models;
 
 namespace TewiMP.Pages
 {
@@ -137,7 +138,7 @@ namespace TewiMP.Pages
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            await App.Instance.PlayingList.Play(((sender as Button).DataContext as SongHistoryData).MusicData);
+            await App.Instance.PlayingListService.Play(((sender as Button).DataContext as SongHistoryData).MusicData);
         }
 
         ScrollViewer scrollViewer;

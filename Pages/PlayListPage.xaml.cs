@@ -6,10 +6,10 @@ using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Composition;
-using TewiMP.DataEditor;
 using TewiMP.Controls;
 using System.Collections;
 using TewiMP.Pages.ListViewPages;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Pages
 {

@@ -2,18 +2,18 @@
     x:Class="TewiMP.Pages.SettingEqPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:TewiMP.Pages"
-    xmlns:dialogs="using:TewiMP.Pages.DialogPages"
-    xmlns:controls="using:TewiMP.Controls"
-    xmlns:datas="using:TewiMP.Media"
-    xmlns:i="using:Microsoft.Xaml.Interactivity"
-    xmlns:ui="using:CommunityToolkit.WinUI"
-    xmlns:controlsPrimitives="using:CommunityToolkit.WinUI.Controls"
-    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
-    xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="using:Microsoft.Xaml.Interactivity"
+    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
+    xmlns:controlsPrimitives="using:CommunityToolkit.WinUI.Controls"
+    xmlns:local="using:TewiMP.Pages"
+    xmlns:controls="using:TewiMP.Controls"
+    xmlns:data="using:TewiMP.Core.Models.Audio"
+    xmlns:dialogs="using:TewiMP.Pages.DialogPages"
     mc:Ignorable="d" SizeChanged="Page_SizeChanged"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded">
 
@@ -331,7 +331,7 @@
                                             </ItemsPanelTemplate>
                                         </GridView.ItemsPanel>
                                         <GridView.ItemTemplate>
-                                            <DataTemplate x:DataType="datas:EQData">
+                                            <DataTemplate x:DataType="data:EQData">
                                                 <controls:EQCard Margin="0,0,0,0"/>
                                             </DataTemplate>
                                         </GridView.ItemTemplate>
@@ -410,7 +410,7 @@
                                             </ItemsPanelTemplate>
                                         </GridView.ItemsPanel>
                                         <GridView.ItemTemplate>
-                                            <DataTemplate x:DataType="datas:PassFilterData">
+                                            <DataTemplate x:DataType="data:PassFilterData">
                                                 <controls:PassFilterCard Margin="0,0,0,0"/>
                                             </DataTemplate>
                                         </GridView.ItemTemplate>

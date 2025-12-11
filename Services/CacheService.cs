@@ -1,0 +1,141 @@
+﻿namespace TewiMP.Services;
+
+using System;
+using System.IO;
+using System.Net;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using TewiMP.Plugin;
+using TewiMP.Helpers;
+using TewiMP.Services.Storage;
+using TewiMP.Core.Models.Music;
+
+public class CacheService
+{
+    public delegate void CachingValueMusicData(MusicData musicData, object value);
+    public event CachingValueMusicData AddingCacheMusicData;
+    public event CachingValueMusicData CachedMusicData;
+    public event CachingValueMusicData CachingStateChangeMusicData;
+    public List<MusicData> InCachingMusicData = new();
+
+    public CacheService()
+    {
+        LogService.Log("Starting", "初始化 CacheManager.");
+    }
+
+    /// <summary>
+    /// 获取歌曲缓存地址
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns>null = not exists</returns>
+    public async Task<string> GetCachePath(MusicData data)
+    {
+        return await FileHelper.GetAudioCache(data);
+    }
+
+    /// <summary>
+    /// 开始缓存歌曲
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    /// <exception cref="CacheIsLoadingException"></exception>
+    public async Task<string> StartCacheMusic(MusicData data)
+    {
+        //LogManager.Log("CacheManager", $"开始缓存：\"{data}\"");
+        if (data.From == MusicFrom.localMusic) throw new Exception("无法缓存本地文件。");
+        AddingCacheMusicData?.Invoke(data, "正在开始缓存");
+        if (InCachingMusicData.Contains(data)) throw new CacheIsLoadingException("此音频正在缓冲中。");
+
+        string musicPathResult = null;
+        musicPathResult = await GetCachePath(data);
+        if (musicPathResult != null)
+        {
+            LogService.Log("CacheManager", $"Cache already exists \"{musicPathResult}\"");
+            CachedMusicData?.Invoke(data, null);
+            return musicPathResult; // 当检测到已缓存时返回
+        }
+
+        if (!WebHelper.IsNetworkConnected)
+        {
+            InCachingMusicData.Remove(data);
+            CachedMusicData?.Invoke(data, "网络未连接，请连接网络后重试。");
+            throw new WebException("网络未连接，请连接网络后重试。");
+        }
+
+        if (data.PluginInfo.GetMusicSourcePlugin(false) is null)
+        {
+            InCachingMusicData.Remove(data);
+            CachedMusicData?.Invoke(data, $"未找到此音乐源插件：{data.PluginInfo.NameAndAuthor} ({data.PluginInfo.Version})。");
+            throw new PluginNotFoundException($"未找到此音乐源插件：{data.PluginInfo.NameAndAuthor} ({data.PluginInfo.Version})。");
+        }
+
+        InCachingMusicData.Add(data);
+        string musicWebAddress = await data.PluginInfo.GetMusicSourcePlugin().GetUrl(data.ID, 960);
+        if (musicWebAddress is null)
+        {
+            InCachingMusicData.Remove(data);
+            CachedMusicData?.Invoke(data, "无法获取歌曲链接。");
+            throw new WebException($"无法获取歌曲链接。");
+        }
+
+        LogService.Log("CacheManager", "正在下载缓存文件...");
+        musicPathResult = @$"{DataFolderBase.AudioCacheFolder}\{data.PluginInfo}{data.ID}";
+        await Task.Run(() => File.Create(musicPathResult).Close()); // 创建缓存文件
+
+        try
+        {
+            WebClient TheDownloader = new WebClient();
+            TheDownloader.DownloadProgressChanged += (s, e) =>
+            {
+                if (e is null) return;
+                CachingStateChangeMusicData?.Invoke(data, e.ProgressPercentage);
+            };
+            TheDownloader.DownloadFileCompleted += (s, e) =>
+            {
+                TheDownloader?.Dispose();
+            };
+            var fileBytes = await TheDownloader.DownloadDataTaskAsync(new Uri(musicWebAddress));
+            await Task.Run(() => File.WriteAllBytes(musicPathResult, fileBytes));
+        }
+        catch (Exception err)
+        {
+            await Task.Run(() => File.Delete(musicPathResult));
+            InCachingMusicData.Remove(data);
+            CachedMusicData?.Invoke(data, $"加载缓存文件失败: {err.Message}");
+            throw new FileLoadException($"加载缓存文件失败: {err.Message}");
+        }
+
+        bool notDownloaded = await Task.Run(() => File.ReadAllBytes(musicPathResult).Length <= 10);
+        // 当文件没有下载完成
+        if (notDownloaded)
+        {
+            InCachingMusicData.Remove(data);
+            CachedMusicData?.Invoke(data, $"加载缓存文件失败: 下载的缓存不完整。");
+            await Task.Run(() =>
+            {
+                if (File.Exists(musicPathResult))
+                    File.Delete(musicPathResult);
+            });
+            throw new CacheIsIncompleteException($"加载缓存文件失败: 下载的缓存不完整。");
+        }
+
+        InCachingMusicData.Remove(data);
+        CachedMusicData?.Invoke(data, null);
+        LogService.Log("CacheManager", $"缓存完成：\"{musicPathResult}\"");
+        return musicPathResult;
+    }
+}
+
+public class CacheIsLoadingException: Exception
+{
+    public CacheIsLoadingException() : base() { }
+    public CacheIsLoadingException(string message) : base(message) { }
+    public CacheIsLoadingException(string message, Exception innerException) : base(message, innerException) { }
+}
+
+public class CacheIsIncompleteException: Exception
+{
+    public CacheIsIncompleteException() : base() { }
+    public CacheIsIncompleteException(string message) : base(message) { }
+    public CacheIsIncompleteException(string message, Exception innerException) : base(message, innerException) { }
+}

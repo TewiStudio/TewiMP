@@ -7,7 +7,8 @@ using System.Diagnostics;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Windowing;
-using TewiMP.Background;
+using TewiMP.Services;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.Windowed
 {
@@ -21,7 +22,7 @@ namespace TewiMP.Windowed
 
         public TaskBarInfoWindow()
         {
-            LogManager.Log("Starting", "初始化 TaskBarInfoWindow.");
+            LogService.Log("Starting", "初始化 TaskBarInfoWindow.");
 
             InitializeComponent();
             Handle = WindowHelpers.WindowHelper.GetWindowHandle(this);
@@ -33,7 +34,7 @@ namespace TewiMP.Windowed
 
             App.MainWindowInstance.WindowViewStateChanged += MainWindow_WindowViewStateChanged;
             App.Instance.AudioPlayer.PlayStateChanged += (_) => SetTaskbarButtonIcon(_.PlaybackState);
-            App.Instance.PlayingList.NowPlayingImageLoaded += (_, __) => IconPath = __;
+            App.Instance.PlayingListService.NowPlayingImageLoaded += (_, __) => IconPath = __;
             App.Instance.AudioPlayer.SourceChanged += (_) =>
             {
                 if (_.MusicData is null)
@@ -53,7 +54,7 @@ namespace TewiMP.Windowed
             {
                 Title = $"{App.Instance.AudioPlayer.MusicData.Title} - {App.Instance.AudioPlayer.MusicData.ArtistName} · {App.Instance.AppName}";
             }
-            IconPath = App.Instance.PlayingList.NowPlayingImagePath;
+            IconPath = App.Instance.PlayingListService.NowPlayingImagePath;
 
             Activated += (_, __) =>
             {
@@ -81,7 +82,7 @@ namespace TewiMP.Windowed
             AppWindow.TitleBar.BackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
             AppWindow.TitleBar.ButtonBackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
             AppWindow.TitleBar.ButtonInactiveBackgroundColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
-            AppWindow.SetIcon(Path.Combine("Images", "Icons", "icon.ico"));
+            AppWindow.SetIcon(DataFolderBase.IconPath);
             AppWindow.MoveAndResize(new(0, 0, 0, 0));
             AppWindow.SetPresenter(overlappedPresenter);
         }
@@ -157,15 +158,14 @@ namespace TewiMP.Windowed
             }
             catch(Exception ex)
             {
-                LogManager.Error("SetTaskbarButtonIcon", ex.ToString());
+                LogService.Error("SetTaskbarButtonIcon", ex.ToString());
             }
         }
-
-        static string localPath = Path.Combine(Path.GetDirectoryName(Environment.ProcessPath), "Images");
-        nint pauseIconHandle = (Bitmap.FromFile(Path.Combine(localPath, "任务栏暂停.png")) as Bitmap).GetHicon();
-        nint playIconHandle = (Bitmap.FromFile(Path.Combine(localPath, "任务栏播放.png")) as Bitmap).GetHicon();
-        nint nextPlayIconHandle = (Bitmap.FromFile(Path.Combine(localPath, "下一首.png")) as Bitmap).GetHicon();
-        nint perviousPlayIconHandle = (Bitmap.FromFile(Path.Combine(localPath, "上一首.png")) as Bitmap).GetHicon();
+        
+        nint pauseIconHandle = (Bitmap.FromFile(DataFolderBase.TaskbarAssetPausePath) as Bitmap).GetHicon();
+        nint playIconHandle = (Bitmap.FromFile(DataFolderBase.TaskbarAssetPlayPath) as Bitmap).GetHicon();
+        nint nextPlayIconHandle = (Bitmap.FromFile(DataFolderBase.TaskbarAssetNextPath) as Bitmap).GetHicon();
+        nint perviousPlayIconHandle = (Bitmap.FromFile(DataFolderBase.TaskbarAssetPreviousPath) as Bitmap).GetHicon();
         private void ShowTaskBarButtons()
         {
             Helpers.SDKs.TaskbarProgress.THUMBBUTTON[] taskbarInfoButtonPauseStyle = new[]
@@ -180,10 +180,10 @@ namespace TewiMP.Windowed
 
         public async void SetTaskbarImage(string filePath)
         {
-            LogManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail updated to \"{filePath}\".");
+            LogService.Log("TaskBarInfoWindow", $"TaskBar thumbnail updated to \"{filePath}\".");
             if (string.IsNullOrEmpty(filePath))
             {
-                filePath = Path.Combine(localPath, "icon.png");
+                filePath = DataFolderBase.IconRoundedPNGPath;
             }
             if (IconPathUsing == filePath) return;
             if (!await Task.Run(() => File.Exists(filePath))) return;
@@ -206,7 +206,7 @@ namespace TewiMP.Windowed
                     }
                     else
                     {
-                        LogManager.Log("TaskBarInfoWindow", $"TaskBar thumbnail {size}x{size} completed.");
+                        LogService.Log("TaskBarInfoWindow", $"TaskBar thumbnail {size}x{size} completed.");
                         IconPathUsing = filePath;
                         canBreak = true;
                     }
@@ -217,7 +217,7 @@ namespace TewiMP.Windowed
             }
         }
 
-        nint appIconHandle = (Bitmap.FromFile(Path.Combine(localPath, "opacityMask.png")).GetThumbnailImage(1, 1, null, 0) as Bitmap).GetHbitmap();
+        static nint appIconHandle = (Bitmap.FromFile(DataFolderBase.TaskbarAssetPlayPath).GetThumbnailImage(1, 1, null, 0) as Bitmap).GetHbitmap();
         private const uint WM_HOTKEY = 0x0312;
         private Windows.Win32.UI.WindowsAndMessaging.WNDPROC origPrc;
         private Windows.Win32.UI.WindowsAndMessaging.WNDPROC taskBarPrc;
@@ -272,7 +272,7 @@ namespace TewiMP.Windowed
             switch (wParam.Value)
             {
                 case 402653185:
-                    await App.Instance.PlayingList.PlayPrevious();
+                    await App.Instance.PlayingListService.PlayPrevious();
                     break;
                 case 402653186:
                     if (App.Instance.AudioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
@@ -281,15 +281,15 @@ namespace TewiMP.Windowed
                         App.Instance.AudioPlayer.SetPlay();
                     break;
                 case 402653187:
-                    await App.Instance.PlayingList.PlayNext();
+                    await App.Instance.PlayingListService.PlayNext();
                     break;
             }
-            App.Instance.PlayingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+            App.Instance.PlayingListService.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
         }
 
         private void PlayingList_NowPlayingImageLoaded(Uri imageSource, string path)
         {
-            App.Instance.PlayingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.PlayingListService.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
             SetTaskbarImage(path);
         }
 

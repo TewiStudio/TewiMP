@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.DataEditor;
+using TewiMP.Core.Models;
 
 namespace TewiMP.Controls
 {

@@ -3,8 +3,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using TewiMP.DataEditor;
-using TewiMP.Background;
+using TewiMP.Services;
+using TewiMP.Core.Models;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
 {
@@ -427,7 +428,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                             //System.Diagnostics.LogManager.Log(pls["message"]);
                         }
                     }
-                    catch (Exception err) { LogManager.Log("NeteaseMeting", $"GetPlayList Error: {err}", LogLevel.Error); }
+                    catch (Exception err) { LogService.Log("NeteaseMeting", $"GetPlayList Error: {err}", LogLevel.Error); }
                     return null;
                 };
 
@@ -516,7 +517,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                     }
                     catch (Exception err)
                     {
-                        LogManager.Log("NeteaseMeting", $"GetAlbum Error: {err}", LogLevel.Error);
+                        LogService.Log("NeteaseMeting", $"GetAlbum Error: {err}", LogLevel.Error);
                     }
 
                     return album;
@@ -605,7 +606,7 @@ namespace TewiMP.Plugin.BuildInPlugins.NeteaseMusicSource
                     }
                     catch (Exception err)
                     {
-                        LogManager.Log("NeteaseMeting", $"GetPicFromMusicData Error: {err}", LogLevel.Error);
+                        LogService.Log("NeteaseMeting", $"GetPicFromMusicData Error: {err}", LogLevel.Error);
                     }
 
                     return result;

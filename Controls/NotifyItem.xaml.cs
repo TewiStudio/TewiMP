@@ -2,7 +2,7 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.Background;
+using TewiMP.Services;
 
 namespace TewiMP.Controls
 {

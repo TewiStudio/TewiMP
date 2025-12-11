@@ -3,7 +3,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.DataEditor;
+using TewiMP.Services.Storage;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Controls
 {

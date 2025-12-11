@@ -3,7 +3,7 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Vanara.PInvoke;
 using Windows.System;
-using TewiMP.Background.HotKeys;
+using TewiMP.Core.Models;
 
 namespace TewiMP.Controls
 {

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.Background.HotKeys;
+using TewiMP.Core.Models;
 
 namespace TewiMP.Controls
 {
@@ -18,10 +18,10 @@ namespace TewiMP.Controls
 
         private async void HotKeyPage_Loaded(object sender, RoutedEventArgs e)
         {
-            HotKeyRoot.ItemsSource = App.Instance.HotKeyManager.RegisteredHotKeys;
+            HotKeyRoot.ItemsSource = App.Instance.HotKeyService.RegisteredHotKeys;
             await Task.Delay(100);
             if (HotKeyRoot.ItemsSource is null)
-                HotKeyRoot.ItemsSource = App.Instance.HotKeyManager.RegisteredHotKeys;
+                HotKeyRoot.ItemsSource = App.Instance.HotKeyService.RegisteredHotKeys;
         }
 
         private void HotKey_Unloaded(object sender, RoutedEventArgs e)
@@ -39,7 +39,7 @@ namespace TewiMP.Controls
             {
                 case "0":
                     nowChangedHotKey.IsDisabled = !nowChangedHotKey.IsDisabled;
-                    App.Instance.HotKeyManager.ChangeHotKey(nowChangedHotKey);
+                    App.Instance.HotKeyService.ChangeHotKey(nowChangedHotKey);
                     break;
                 case "1":
                     Pages.DialogPages.HotKeyEditor a = new();

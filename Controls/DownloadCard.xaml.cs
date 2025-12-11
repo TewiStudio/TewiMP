@@ -4,8 +4,8 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
-using TewiMP.Background;
-using TewiMP.DataEditor;
+using TewiMP.Core.Models;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.Controls
 {
@@ -23,19 +23,19 @@ namespace TewiMP.Controls
 
         private void DownloadCard_Loaded(object sender, RoutedEventArgs e)
         {
-            App.Instance.DownloadManager.OnDownloading += DownloadManager_OnDownloading;
-            App.Instance.DownloadManager.OnDownloadedSaving += DownloadManager_OnDownloadedSaving;
-            App.Instance.DownloadManager.OnDownloadedPreview += DownloadManager_OnDownloadedPreview;
-            App.Instance.DownloadManager.OnDownloaded += DownloadManager_OnDownloaded;
-            App.Instance.DownloadManager.OnDownloadError += DownloadManager_OnDownloadError;
+            App.Instance.DownloadService.OnDownloading += DownloadManager_OnDownloading;
+            App.Instance.DownloadService.OnDownloadedSaving += DownloadManager_OnDownloadedSaving;
+            App.Instance.DownloadService.OnDownloadedPreview += DownloadManager_OnDownloadedPreview;
+            App.Instance.DownloadService.OnDownloaded += DownloadManager_OnDownloaded;
+            App.Instance.DownloadService.OnDownloadError += DownloadManager_OnDownloadError;
         }
 
         private void DownloadCard_Unloaded(object sender, RoutedEventArgs e)
         {
-            App.Instance.DownloadManager.OnDownloading -= DownloadManager_OnDownloading;
-            App.Instance.DownloadManager.OnDownloadedPreview -= DownloadManager_OnDownloadedPreview;
-            App.Instance.DownloadManager.OnDownloaded -= DownloadManager_OnDownloaded;
-            App.Instance.DownloadManager.OnDownloadError -= DownloadManager_OnDownloadError;
+            App.Instance.DownloadService.OnDownloading -= DownloadManager_OnDownloading;
+            App.Instance.DownloadService.OnDownloadedPreview -= DownloadManager_OnDownloadedPreview;
+            App.Instance.DownloadService.OnDownloaded -= DownloadManager_OnDownloaded;
+            App.Instance.DownloadService.OnDownloadError -= DownloadManager_OnDownloadError;
         }
 
         private void DownloadManager_OnDownloaded(DownloadData data)
@@ -253,9 +253,9 @@ namespace TewiMP.Controls
                             if (File.Exists(downloadData.Path)) File.Delete(downloadData.Path);
                             if (File.Exists(downloadData.LrcPath)) File.Delete(downloadData.LrcPath);
                         });
-                        App.Instance.DownloadManager.WaitingDownloadData.Remove(downloadData);
-                        App.Instance.DownloadManager.DownloadedData.Remove(downloadData);
-                        App.Instance.DownloadManager.NowDownloadPage.DownloadDatas.Remove(downloadData);
+                        App.Instance.DownloadService.WaitingDownloadData.Remove(downloadData);
+                        App.Instance.DownloadService.DownloadedData.Remove(downloadData);
+                        App.Instance.DownloadService.NowDownloadPage.DownloadDatas.Remove(downloadData);
                     }
                 }
             }

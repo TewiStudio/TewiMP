@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using TewiMP.DataEditor;
 using TewiMP.Pages.DialogPages;
+using TewiMP.Core.Models.Music;
 
 /// <summary>
 /// 插件基类。继承此类可被插件系统识别为插件。

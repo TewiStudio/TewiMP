@@ -11,6 +11,8 @@ using System.Numerics;
 using System.Threading.Tasks;
 using TewiMP.Controls;
 using TewiMP.Media;
+using TewiMP.Media.Audio;
+using TewiMP.Media.Audio.AudioEffects;
 using Windows.UI;
 
 namespace TewiMP.Pages

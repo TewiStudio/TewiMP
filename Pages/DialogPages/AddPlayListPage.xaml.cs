@@ -3,9 +3,10 @@ using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
-using TewiMP.DataEditor;
+using TewiMP.Services.Storage;
 using TewiMP.Plugin;
-using TewiMP.Background;
+using TewiMP.Services;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Pages.DialogPages
 {
@@ -71,7 +72,7 @@ namespace TewiMP.Pages.DialogPages
                     }
                     catch (Exception err)
                     {
-                        LogManager.Error("AddPlayListPage", err.ToString());
+                        LogService.Error("AddPlayListPage", err.ToString());
                         var b = await App.MainWindowInstance.ShowDialog("添加播放列表时出现错误", err.Message, "确定", "重试", defaultButton: ContentDialogButton.Primary);
                         if (b == ContentDialogResult.Primary)
                         {

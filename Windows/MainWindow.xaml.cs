@@ -24,11 +24,13 @@ using NAudio.Wave;
 using TewiMP.Helpers;
 using TewiMP.Controls;
 using TewiMP.Windowed;
-using TewiMP.DataEditor;
-using TewiMP.Background;
-using TewiMP.Background.HotKeys;
+using TewiMP.Services.Storage;
+using TewiMP.Services;
 using TewiMP.Pages;
 using TewiMP.Pages.MusicPages;
+using TewiMP.Media.Audio;
+using TewiMP.Core.Models;
+using TewiMP.Core.Models.Music;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -82,7 +84,7 @@ namespace TewiMP
         public MainWindow()
         {
             App.MainWindowCount++;
-            LogManager.Info("Staring", "初始化 MainWindow.");
+            LogService.Info("Staring", "初始化 MainWindow.");
             InitializeComponent();
 
             Handle = this.GetWindowHandle();
@@ -99,12 +101,12 @@ namespace TewiMP
             //SubClassing();
 
             AppWindow.Title = App.Instance.AppName;
-            AppWindow.SetIcon(System.IO.Path.Combine("Images", "Icons", "icon.ico"));
+            AppWindow.SetIcon(DataFolderBase.IconPath);
 
             InitializeTitleBar(WindowGridBase.RequestedTheme);
             SetDragRegionForCustomTitleBar();
 
-            LogManager.Info("MainWindow", "Inited");
+            LogService.Info("MainWindow", "Inited");
         }
 
         internal SystemBackdropConfiguration systemBackdropConfiguration;
@@ -167,7 +169,7 @@ namespace TewiMP
         static bool isShowClosingDialog = false;
         public void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
         {
-            LogManager.Log("MainWindow", "Closing...");
+            LogService.Log("MainWindow", "Closing...");
             App.Instance.SaveSettings();
             App.Instance.SaveNowPlaying();
 
@@ -305,7 +307,7 @@ namespace TewiMP
             if (isPreparedActivate) Activate();
 
             List<string> hotKeyUsed = new();
-            foreach (var hotKey in App.Instance.HotKeyManager.RegisteredHotKeys)
+            foreach (var hotKey in App.Instance.HotKeyService.RegisteredHotKeys)
             {
                 if (hotKey.IsUsed)
                 {
@@ -329,12 +331,12 @@ namespace TewiMP
             {
                 foreach (var musicData in await MusicData.FromFile(str))
                 {
-                    App.Instance.PlayingList.Add(musicData); mlist.Add(musicData);
+                    App.Instance.PlayingListService.Add(musicData); mlist.Add(musicData);
                 }
             }
             if (mlist.Count > 0)
             {
-                await App.Instance.PlayingList.Play(mlist.First());
+                await App.Instance.PlayingListService.Play(mlist.First());
             }
         }
 
@@ -376,7 +378,7 @@ namespace TewiMP
             NavView.SelectedItem = NavView.MenuItems[1];
             NavView.IsBackEnabled = false;
 
-            PlayingListBaseView.ItemsSource = App.Instance.PlayingList.NowPlayingList;
+            PlayingListBaseView.ItemsSource = App.Instance.PlayingListService.NowPlayingList;
             //SystemNavigationManager.GetForCurrentView().BackRequested += (_, __) => { TryGoBack(); };
 #if DEBUG
             DebugViewPopup.XamlRoot = WindowGridBase.XamlRoot;
@@ -391,7 +393,7 @@ namespace TewiMP
                 SetBackdrop(CurrentBackdrop);
             }
             InitializeTitleBar(WindowGridBase.RequestedTheme);
-            await App.Instance.PlayingList.UpdateImageColor();
+            await App.Instance.PlayingListService.UpdateImageColor();
         }
 
         private void UpdateWhenDataLated()
@@ -401,12 +403,12 @@ namespace TewiMP
             AudioPlayer_CacheLoadedChanged(App.Instance.AudioPlayer);
             AudioPlayer_TimingChanged(App.Instance.AudioPlayer);
             AudioPlayer_VolumeChanged(App.Instance.AudioPlayer, App.Instance.AudioPlayer.Volume);
-            PlayingList_NowPlayingImageLoaded(App.Instance.PlayingList.NowPlayingImage, null);
-            LyricManager_PlayingLyricSelectedChange(App.Instance.LyricManager.NowLyricsData);
-            PlayingList_PlayingListItemChange(App.Instance.PlayingList.NowPlayingList);
+            PlayingList_NowPlayingImageLoaded(App.Instance.PlayingListService.NowPlayingImage, null);
+            LyricManager_PlayingLyricSelectedChange(App.Instance.LyricService.NowLyricsData);
+            PlayingList_PlayingListItemChange(App.Instance.PlayingListService.NowPlayingList);
             UpdataDownloadPageButtonInfoBadgeText();
             App.Instance.AudioPlayer.ReCallTiming();
-            LogManager.Log("MainWindow", "Data Updated.");
+            LogService.Log("MainWindow", "Data Updated.");
         }
 
         bool isFirstWindowActivity = true;
@@ -429,20 +431,20 @@ namespace TewiMP
             App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged;
             App.Instance.AudioPlayer.CacheLoadedChanged += AudioPlayer_CacheLoadedChanged;
             App.Instance.AudioPlayer.CacheLoadingChanged += AudioPlayer_CacheLoadingChanged;
-            App.Instance.PlayingList.NowPlayingImageLoading += PlayingList_NowPlayingImageLoading;
-            App.Instance.PlayingList.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
-            App.Instance.PlayingList.PlayingListItemChange += PlayingList_PlayingListItemChange;
+            App.Instance.PlayingListService.NowPlayingImageLoading += PlayingList_NowPlayingImageLoading;
+            App.Instance.PlayingListService.NowPlayingImageLoaded += PlayingList_NowPlayingImageLoaded;
+            App.Instance.PlayingListService.PlayingListItemChange += PlayingList_PlayingListItemChange;
 
-            App.Instance.DownloadManager.AddDownload += DownloadManager_AddDownload;
-            App.Instance.DownloadManager.OnDownloadedSaving += DownloadManager_AddDownload;
-            App.Instance.DownloadManager.OnDownloadedPreview += DownloadManager_AddDownload;
-            App.Instance.DownloadManager.OnDownloaded += DownloadManager_AddDownload;
-            App.Instance.DownloadManager.OnDownloadError += DownloadManager_AddDownload;
+            App.Instance.DownloadService.AddDownload += DownloadManager_AddDownload;
+            App.Instance.DownloadService.OnDownloadedSaving += DownloadManager_AddDownload;
+            App.Instance.DownloadService.OnDownloadedPreview += DownloadManager_AddDownload;
+            App.Instance.DownloadService.OnDownloaded += DownloadManager_AddDownload;
+            App.Instance.DownloadService.OnDownloadError += DownloadManager_AddDownload;
 
             isAddEvents = true;
             UpdateWhenDataLated();
             MainViewStateChanged?.Invoke(true);
-            LogManager.Log("MainWindow", "Added Events.");
+            LogService.Log("MainWindow", "Added Events.");
         }
 
         private void RemoveEvents()
@@ -457,20 +459,20 @@ namespace TewiMP
             App.Instance.AudioPlayer.TimingChanged -= AudioPlayer_TimingChanged;
             App.Instance.AudioPlayer.CacheLoadedChanged -= AudioPlayer_CacheLoadedChanged;
             App.Instance.AudioPlayer.CacheLoadingChanged -= AudioPlayer_CacheLoadingChanged;
-            App.Instance.PlayingList.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
-            App.Instance.PlayingList.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-            App.Instance.LyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
-            App.Instance.PlayingList.PlayingListItemChange -= PlayingList_PlayingListItemChange;
+            App.Instance.PlayingListService.NowPlayingImageLoading -= PlayingList_NowPlayingImageLoading;
+            App.Instance.PlayingListService.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
+            App.Instance.LyricService.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
+            App.Instance.PlayingListService.PlayingListItemChange -= PlayingList_PlayingListItemChange;
 
-            App.Instance.DownloadManager.AddDownload -= DownloadManager_AddDownload;
-            App.Instance.DownloadManager.OnDownloadedSaving -= DownloadManager_AddDownload;
-            App.Instance.DownloadManager.OnDownloadedPreview -= DownloadManager_AddDownload;
-            App.Instance.DownloadManager.OnDownloaded -= DownloadManager_AddDownload;
-            App.Instance.DownloadManager.OnDownloadError -= DownloadManager_AddDownload;
+            App.Instance.DownloadService.AddDownload -= DownloadManager_AddDownload;
+            App.Instance.DownloadService.OnDownloadedSaving -= DownloadManager_AddDownload;
+            App.Instance.DownloadService.OnDownloadedPreview -= DownloadManager_AddDownload;
+            App.Instance.DownloadService.OnDownloaded -= DownloadManager_AddDownload;
+            App.Instance.DownloadService.OnDownloadError -= DownloadManager_AddDownload;
 
             isAddEvents = false;
             MainViewStateChanged?.Invoke(false);
-            LogManager.Log("MainWindow", "Removed Events.");
+            LogService.Log("MainWindow", "Removed Events.");
         }
 
         public bool isMinSize = false;
@@ -779,19 +781,19 @@ namespace TewiMP
         #endregion
 
         #region AudioPlayer Events
-        private void DownloadManager_AddDownload(Background.DownloadData data)
+        private void DownloadManager_AddDownload(DownloadData data)
         {
             UpdataDownloadPageButtonInfoBadgeText();
         }
 
         private void UpdataDownloadPageButtonInfoBadgeText()
         {
-            if (App.Instance.DownloadManager.AllDownloadData.Any())
+            if (App.Instance.DownloadService.AllDownloadData.Any())
             {
-                if (App.Instance.DownloadManager.DownloadingData.Any())
+                if (App.Instance.DownloadService.DownloadingData.Any())
                 {
                     DownloadPageButtonInfoBadge.Opacity = 1;
-                    DownloadPageButtonInfoBadge.Value = App.Instance.DownloadManager.AllDownloadData.Count - App.Instance.DownloadManager.DownloadedData.Count;
+                    DownloadPageButtonInfoBadge.Value = App.Instance.DownloadService.AllDownloadData.Count - App.Instance.DownloadService.DownloadedData.Count;
                 }
                 else
                 {
@@ -822,10 +824,10 @@ namespace TewiMP
                 if (!_.Lyric.Any()) { SetLyricToNormal(); return; }
 
                 int tcount = 1;
-                int num = App.Instance.LyricManager.NowPlayingLyrics.IndexOf(_);
+                int num = App.Instance.LyricService.NowPlayingLyrics.IndexOf(_);
                 try
                 {
-                    while (_?.Lyric?.FirstOrDefault() == App.Instance.LyricManager.NowPlayingLyrics[num + tcount]?.Lyric?.FirstOrDefault())
+                    while (_?.Lyric?.FirstOrDefault() == App.Instance.LyricService.NowPlayingLyrics[num + tcount]?.Lyric?.FirstOrDefault())
                     {
                         tcount++;
                     }
@@ -841,7 +843,7 @@ namespace TewiMP
             }
             catch (Exception err)
             {
-                LogManager.Log("MainWindow", "LyricManager_PlayingLyricSelectedChange: " + err.Message);
+                LogService.Log("MainWindow", "LyricManager_PlayingLyricSelectedChange: " + err.Message);
             }
         }
 
@@ -860,7 +862,7 @@ namespace TewiMP
             //PlayingListBaseView.SelectedItem = App.Instance.audioPlayer.MusicData;
         }
 
-        private void AudioPlayer_VolumeChanged(Media.AudioPlayer audioPlayer, object data)
+        private void AudioPlayer_VolumeChanged(AudioPlayer audioPlayer, object data)
         {
             float volume = (float)data;
             VolumeSlider.Value = (int)volume;
@@ -890,7 +892,7 @@ namespace TewiMP
             }
         }
 
-        private void AudioPlayer_PlayEnd(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_PlayEnd(AudioPlayer audioPlayer)
         {
             if (true)
             {
@@ -899,7 +901,7 @@ namespace TewiMP
         }
 
         bool doNotChangeTiming = false;
-        private void AudioPlayer_CacheLoadedChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_CacheLoadedChanged(AudioPlayer audioPlayer)
         {
             PlayRing.Value = 0;
             PlayRing.IsIndeterminate = false;
@@ -909,7 +911,7 @@ namespace TewiMP
             PlayRing.Foreground = App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush;
         }
 
-        private void AudioPlayer_CacheLoadingChanged(Media.AudioPlayer audioPlayer, object data)
+        private void AudioPlayer_CacheLoadingChanged(AudioPlayer audioPlayer, object data)
         {
             doNotChangeTiming = true;
             PlayRing.Foreground = App.Current.Resources["SystemFillColorCautionBrush"] as SolidColorBrush;
@@ -961,7 +963,7 @@ namespace TewiMP
         }
 
         MusicData pointConnectAnimationMusicData = null;
-        private void AudioPlayer_SourceChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_SourceChanged(AudioPlayer audioPlayer)
         {
             if (audioPlayer.MusicData is null) return;
             if (pointConnectAnimationMusicData == audioPlayer.MusicData) return;
@@ -1013,24 +1015,24 @@ namespace TewiMP
             }
         }
 
-        private void AudioPlayer_PlayStateChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_PlayStateChanged(AudioPlayer audioPlayer)
         {
             if (audioPlayer.PlaybackState == PlaybackState.Playing)
             {
                 PlayRing.Foreground = App.Current.Resources["MusicAlbumAccentBrush"] as SolidColorBrush;
-                App.Instance.LyricManager.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
-                App.Instance.LyricManager.StartTimer();
+                App.Instance.LyricService.PlayingLyricSelectedChanged += LyricManager_PlayingLyricSelectedChange;
+                App.Instance.LyricService.StartTimer();
             }
             else
             {
                 PlayRing.Foreground = App.Current.Resources["SystemFillColorCautionBrush"] as SolidColorBrush;
-                App.Instance.LyricManager.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
+                App.Instance.LyricService.PlayingLyricSelectedChanged -= LyricManager_PlayingLyricSelectedChange;
             }
 
             MediaPlayStateViewer.PlaybackState = audioPlayer.PlaybackState;
         }
 
-        private void AudioPlayer_TimingChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_TimingChanged(AudioPlayer audioPlayer)
         {
             if (doNotChangeTiming) return;
             if (audioPlayer.FileReader is null) return;
@@ -1162,7 +1164,7 @@ namespace TewiMP
                 // TOFIX: 快速切换到 PlayList 页面会导致 SelectedItem 为 null
                 if (sender.SelectedItem is null)
                 {
-                    LogManager.Log("MainWindow", "NavigationSelectionChanged: SelectedItem 为 null");
+                    LogService.Log("MainWindow", "NavigationSelectionChanged: SelectedItem 为 null");
                 }
                 else if ((sender.SelectedItem as NavigationViewItem)?.Tag.GetType() == typeof(MusicListData))
                 {
@@ -1335,12 +1337,12 @@ namespace TewiMP
 
         private async void PlayBeforeButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.Instance.PlayingList.PlayPrevious();
+            await App.Instance.PlayingListService.PlayPrevious();
         }
 
         private async void PlayNextButton_Click(object sender, RoutedEventArgs e)
         {
-            await App.Instance.PlayingList.PlayNext();
+            await App.Instance.PlayingListService.PlayNext();
         }
 
         // VolumeButton
@@ -1412,8 +1414,8 @@ namespace TewiMP
 
         private void TeachingTipPlayingList_Opened(object sender, object e)
         {
-            ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{App.Instance.PlayingList.PlayBehavior}");
-            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
+            ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{App.Instance.PlayingListService.PlayBehavior}");
+            SetPlayModeIconAndName(App.Instance.PlayingListService.PlayBehavior);
             PlayingListScrollControl.Translation = new(
                 -16,
                 (float)(PlayingListBaseView.ActualHeight - PlayingListScrollControl.ActualHeight - 20 - 16),
@@ -1452,8 +1454,8 @@ namespace TewiMP
         private void B_Click(object sender, RoutedEventArgs e)
         {
             var a = (PlayBehavior)(sender as MenuFlyoutItem).Tag;
-            App.Instance.PlayingList.PlayBehavior = a;
-            SetPlayModeIconAndName(App.Instance.PlayingList.PlayBehavior);
+            App.Instance.PlayingListService.PlayBehavior = a;
+            SetPlayModeIconAndName(App.Instance.PlayingListService.PlayBehavior);
             ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{a}");
         }
 
@@ -1506,7 +1508,7 @@ namespace TewiMP
                 InOpenMusicPage = false;
                 isHiddenMusicPageAnimationNotCompleted = true;
 
-                LogManager.Log("MainWindow", "主界面被显示。");
+                LogService.Log("MainWindow", "主界面被显示。");
                 GridBase.Visibility = Visibility.Visible;
                 InitializeTitleBar(WindowGridBase.ActualTheme);
                 musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualClosingAnimation);
@@ -1541,7 +1543,7 @@ namespace TewiMP
                     canimation2.TryStart(PlayArtist);
                 }
 
-                if (App.Instance.LyricManager.NowPlayingLyrics.Any())
+                if (App.Instance.LyricService.NowPlayingLyrics.Any())
                 {
                     ConnectedAnimation canimation3 =
                     ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation3");
@@ -1565,7 +1567,7 @@ namespace TewiMP
                     {
                         GridBase.Visibility = Visibility.Collapsed;
 #if DEBUG
-                        LogManager.Log("MainWindow", "主界面被隐藏。");
+                        LogService.Log("MainWindow", "主界面被隐藏。");
 #endif
                     }
                 };
@@ -1580,7 +1582,7 @@ namespace TewiMP
             if (visibility)
             {
                 GridBase.Visibility = Visibility.Visible;
-                LogManager.Log("MainWindow", "主界面被显示。");
+                LogService.Log("MainWindow", "主界面被显示。");
                 await Task.Delay(220);
                 if (!InOpenMusicPage)
                     MusicPageBaseFrame.Visibility = Visibility.Collapsed;
@@ -1592,7 +1594,7 @@ namespace TewiMP
                 if (InOpenMusicPage)
                 {
                     GridBase.Visibility = Visibility.Collapsed;
-                    LogManager.Log("MainWindow", "主界面被隐藏。");
+                    LogService.Log("MainWindow", "主界面被隐藏。");
                 }
             }
         }
@@ -1800,14 +1802,14 @@ namespace TewiMP
 
         private void Button_Click_5(object sender, RoutedEventArgs e)
         {
-            App.Instance.PlayingList.ClearAll();
+            App.Instance.PlayingListService.ClearAll();
         }
 
         private async void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
             var name = $"{DateTime.Now} 时的播放列表";
             var musicPlayList = new MusicListData(
-                name, name, "", MusicFrom.localMusic, null, [.. App.Instance.PlayingList.NowPlayingList], DataType.本地歌单);
+                name, name, "", MusicFrom.localMusic, null, [.. App.Instance.PlayingListService.NowPlayingList], DataType.本地歌单);
             await PlayListHelper.AddPlayList(musicPlayList);
             await App.Instance.PlayListReader.Refresh();
             AddNotify("播放列表已添加！", $"播放列表 \"{name}\" 已添加。", buttonMessage: "打开播放列表", buttonAction: () =>
@@ -1962,7 +1964,7 @@ namespace TewiMP
             PlayTimeSlider.ValueChanged -= PlayTimeSlider_ValueChanged;
         }
 
-        private void AudioPlayer_TimingChanged1(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_TimingChanged1(AudioPlayer audioPlayer)
         {
             if (audioPlayer.FileReader != null)
             {

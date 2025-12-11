@@ -5,8 +5,8 @@ using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using TewiMP.Helpers;
-using TewiMP.DataEditor;
-using TewiMP.Background;
+using TewiMP.Services;
+using TewiMP.Core.Models;
 
 namespace TewiMP.Media
 {
@@ -160,7 +160,7 @@ namespace TewiMP.Media
                 if (device.DeviceType == OutApi.Wasapi)
                 {
                     var diff = device.DeviceName.GetSimilarity(outDevice.DeviceName); // 比对字符串相似度，相似度最高的认为是同一个设备
-                    LogManager.LogDebug($"device: {device.DeviceName} / {outDevice.DeviceName}, by {diff}");
+                    LogService.LogDebug($"device: {device.DeviceName} / {outDevice.DeviceName}, by {diff}");
                     if (diff > lastDiff)
                     {
                         lastDiff = diff;
@@ -169,7 +169,7 @@ namespace TewiMP.Media
                 }
             }
 
-            LogManager.LogDebug($"Final device: {result.DeviceName}, by {lastDiff}");
+            LogService.LogDebug($"Final device: {result.DeviceName}, by {lastDiff}");
             return result;
         }
     }
@@ -199,31 +199,31 @@ namespace TewiMP.Media
             defaultDeviceChangedCounter--;
             if (defaultDeviceChangedCounter != 0) return;
 
-            LogManager.Log("DeviceManager", $"系统默认设备已变更为：\"{defaultDeviceId}\"");
+            LogService.Log("DeviceManager", $"系统默认设备已变更为：\"{defaultDeviceId}\"");
             OnDefaultDeviceChangedEvent?.Invoke(dataFlow, deviceRole, defaultDeviceId);
         }
 
         public void OnDeviceAdded(string deviceId)
         {
-            LogManager.Log("DeviceManager", $"新增设备：\"{deviceId}\"");
+            LogService.Log("DeviceManager", $"新增设备：\"{deviceId}\"");
             OnDeviceAddedEvent?.Invoke(deviceId);
         }
 
         public void OnDeviceRemoved(string deviceId)
         {
-            LogManager.Log("DeviceManager", $"已移除设备：\"{deviceId}\"");
+            LogService.Log("DeviceManager", $"已移除设备：\"{deviceId}\"");
             OnDeviceRemovedEvent?.Invoke(deviceId);
         }
 
         public void OnDeviceStateChanged(string deviceId, DeviceState newState)
         {
-            LogManager.Log("DeviceManager", $"设备状态已更新。deviceId:{deviceId} / newState:{newState}");
+            LogService.Log("DeviceManager", $"设备状态已更新。deviceId:{deviceId} / newState:{newState}");
             OnDeviceStateChangedEvent?.Invoke(deviceId, newState);
         }
 
         public void OnPropertyValueChanged(string deviceId, PropertyKey propertyKey)
         {
-            LogManager.Log("DeviceManager", $"设备属性已更新。deviceId: {deviceId} / propertyKey:{propertyKey.formatId.ToString()}");
+            LogService.Log("DeviceManager", $"设备属性已更新。deviceId: {deviceId} / propertyKey:{propertyKey.formatId.ToString()}");
             OnPropertyValueChangedEvent?.Invoke(deviceId, propertyKey);
         }
 

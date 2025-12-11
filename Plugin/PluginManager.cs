@@ -7,8 +7,8 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json.Linq;
-using TewiMP.DataEditor;
-using TewiMP.Background;
+using TewiMP.Services.Storage;
+using TewiMP.Services;
 
 public static class PluginManager
 {
@@ -19,7 +19,7 @@ public static class PluginManager
 
     public static void Init()
     {
-        LogManager.Log("PluginManager", "初始化 PluginManager.");
+        LogService.Log("PluginManager", "初始化 PluginManager.");
         RemoveAllPlugin();
         /*
         assemblyLoadContext?.Unload();
@@ -29,7 +29,7 @@ public static class PluginManager
 #if !DEBUG
         DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
         var dllFiles = directoryInfo.GetFiles();
-        LogManager.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}.");
+        LogService.Log("PluginManager", $"Scanned plugins count: {dllFiles.Length}.");
 
         for (int i = 0; i < dllFiles.Length; i++)
         {
@@ -54,7 +54,7 @@ public static class PluginManager
             else
             {
                 App.MainWindowInstance.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 Plugin 类。");
-                LogManager.Log("PluginManager", $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
+                LogService.Log("PluginManager", $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
                 continue;
             }
 
@@ -86,7 +86,7 @@ public static class PluginManager
             else
             {
                 App.MainWindowInstance.AddNotify("加载插件失败", $"\"{type}\" 加载失败：未继承 IPlugin 接口。");
-                LogManager.Log("PluginManager", $"Load plugin failed: {type} does not inherit the IPlugin interface.");
+                LogService.Log("PluginManager", $"Load plugin failed: {type} does not inherit the IPlugin interface.");
                 continue;
             }
             if (isMusicSourcePlugin)
@@ -118,39 +118,39 @@ public static class PluginManager
     public static void AddPlugin(Plugin plugin)
     {
         Plugins.Add(plugin);
-        LogManager.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log("PluginManager", $"Loaded plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void AddPlugin(MusicSourcePlugin plugin)
     {
         MusicSourcePlugins.Add(plugin);
-        LogManager.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log("PluginManager", $"Loaded source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void RemovePlugin(Plugin plugin)
     {
         DisablePlugin(plugin);
         Plugins.Remove(plugin);
-        LogManager.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log("PluginManager", $"Removed plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void RemovePlugin(MusicSourcePlugin plugin)
     {
         DisablePlugin(plugin);
         MusicSourcePlugins.Remove(plugin);
-        LogManager.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log("PluginManager", $"Removed source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void EnablePlugin(Plugin plugin)
     {
         plugin.OnEnable();
-        LogManager.Log("PluginManager", $"Enabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log("PluginManager", $"Enabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void DisablePlugin(Plugin plugin)
     {
         plugin.OnDisable();
-        LogManager.Log("PluginManager", $"Disabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log("PluginManager", $"Disabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
     }
 
     public static void UpdatePluginInfoSettings()

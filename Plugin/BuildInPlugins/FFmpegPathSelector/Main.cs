@@ -1,8 +1,8 @@
 ﻿namespace TewiMP.Plugin.BuildInPlugins.FFmpegPathSelector;
 
 using System.Collections.Generic;
-using TewiMP.Media;
-using TewiMP.DataEditor;
+using TewiMP.Media.Audio;
+using TewiMP.Services.Storage;
 
 public class Main : Plugin
 {
@@ -32,7 +32,7 @@ public class Main : Plugin
     {
         if (key == "ffmpegPath")
         {
-            AudioFileReader.FFmpegPath = string.IsNullOrEmpty(value as string) ? DataEditor.DataFolderBase.FFmpegPath : value as string;
+            AudioFileReader.FFmpegPath = string.IsNullOrEmpty(value as string) ? DataFolderBase.FFmpegPath : value as string;
         }
         else
         {

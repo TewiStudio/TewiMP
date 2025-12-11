@@ -13,8 +13,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using TewiMP.Core.Models.Audio;
 using TewiMP.Helpers;
-using TewiMP.Media;
+using TewiMP.Media.Audio;
+using TewiMP.Media.Audio.AudioEffects;
 using Windows.UI;
 using static Vanara.PInvoke.Gdi32;
 
@@ -241,7 +243,7 @@ namespace TewiMP.Controls
             }
         }
 
-        private void AudioPlayer_VolumeMeter(Media.AudioPlayer audioPlayer, float[] sample)
+        private void AudioPlayer_VolumeMeter(AudioPlayer audioPlayer, float[] sample)
         {
             if (Visibility == Visibility.Visible && !IsStop)
                 _spectrumCanvas.Invalidate();
@@ -559,7 +561,7 @@ namespace TewiMP.Controls
             {
                 // === 绘制平均 FPS 信息 ===
                 string info = $"FPS: {_avgFps:0.0} ({_avgFrameMs:0.0} ms)";
-                ds.DrawText(info, 10, 10, App.Instance.PlayingList.TextColor, canvasTextFormat ??= new CanvasTextFormat { FontSize = 14 });
+                ds.DrawText(info, 10, 10, App.Instance.PlayingListService.TextColor, canvasTextFormat ??= new CanvasTextFormat { FontSize = 14 });
             }
         }
 
@@ -592,7 +594,7 @@ namespace TewiMP.Controls
             }
 
             // ===== 渐变刷 =====
-            var accent = App.Instance.PlayingList.AlbumAccentColor;
+            var accent = App.Instance.PlayingListService.AlbumAccentColor;
             if (_gradientBrush == null || w != _lastWidth || h != _lastHeight || accent != _lastAccentColor)
             {
                 _gradientBrush?.Dispose();
@@ -717,7 +719,7 @@ namespace TewiMP.Controls
                 UpdateHoverData();
                 string hoverText = $"{_hoverFreq:0.#} Hz / {_hoverDb:0.0} dB";
                 var textFormat = new CanvasTextFormat { FontSize = 14 };
-                var brush = App.Instance.PlayingList.TextColor;
+                var brush = App.Instance.PlayingListService.TextColor;
 
                 float textWidth = (float)new CanvasTextLayout(ds, hoverText, textFormat, w, h).DrawBounds.Width;
                 float textX = _hoverX + 10;
@@ -784,7 +786,7 @@ namespace TewiMP.Controls
             float height = (float)_gridCache.Size.Height;
             var dash = gridDash ??= new CanvasStrokeStyle { DashStyle = CanvasDashStyle.Dash };
             var textFormat = gridTextFormat ??= new CanvasTextFormat { FontSize = 12 };
-            var textColor = App.Instance.PlayingList.TextColor;
+            var textColor = App.Instance.PlayingListService.TextColor;
             float range = maxDb - minDb;
             for (float db = minDb + stepDb; db < maxDb; db += stepDb)
             {
@@ -1037,7 +1039,7 @@ namespace TewiMP.Controls
                 // 绘制曲线
                 using (var geometry = CanvasGeometry.CreatePath(pathBuilder))
                 {
-                    ds.DrawGeometry(geometry, App.Instance.PlayingList.TextColor.A(180), (float)DrawEqLinesStrokeWidth);
+                    ds.DrawGeometry(geometry, App.Instance.PlayingListService.TextColor.A(180), (float)DrawEqLinesStrokeWidth);
                 }
             }
         }

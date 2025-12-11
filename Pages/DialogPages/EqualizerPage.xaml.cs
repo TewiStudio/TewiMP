@@ -3,12 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using TewiMP.Media.Audio;
+using TewiMP.Media.Audio.AudioEffects;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.Pages.DialogPages
 {
     public partial class EqualizerPage : Page
     {
-        public Media.AudioPlayer AudioPlayer => App.Instance.AudioPlayer;
+        public AudioPlayer AudioPlayer => App.Instance.AudioPlayer;
         public List<Slider> EqSliders { get; set; } = new();
 
         public bool WasapiOnly
@@ -21,7 +24,7 @@ namespace TewiMP.Pages.DialogPages
                 }
                 else
                 {
-                    return (bool)DataEditor.DataFolderBase.JSettingData[DataEditor.DataFolderBase.SettingParams.WasapiOnly.ToString()];
+                    return (bool)DataFolderBase.JSettingData[DataFolderBase.SettingParams.WasapiOnly.ToString()];
                 }
             }
             set
@@ -116,12 +119,12 @@ namespace TewiMP.Pages.DialogPages
             AudioPlayer.PreviewSourceChanged -= AudioPlayer_PreviewSourceChanged;
         }
 
-        private void AudioPlayer_EqEnableChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_EqEnableChanged(AudioPlayer audioPlayer)
         {
             EqEnableTS.IsOn = audioPlayer.EqEnabled;
         }
 
-        private void AudioPlayer_SourceChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_SourceChanged(AudioPlayer audioPlayer)
         {
             OutDevicesTextBlock.Text = audioPlayer.NowOutDevice.ToString();
         }
@@ -133,11 +136,11 @@ namespace TewiMP.Pages.DialogPages
 
             inComboxChange = true;
             var a = sender as ComboBox;
-            foreach (var b in Media.AudioEqualizerBands.BandNames)
+            foreach (var b in AudioEqualizerBands.BandNames)
             {
                 if (b.Item2 == (a.SelectedItem as string))
                 {
-                    AudioPlayer.EqualizerBand = Media.AudioEqualizerBands.GetBandFromString(b.Item1);
+                    AudioPlayer.EqualizerBand = AudioEqualizerBands.GetBandFromString(b.Item1);
                     AudioPlayer.NameOfBand = b.Item1;
                     AudioPlayer.NameOfBandCH = b.Item2;
                     break;
@@ -155,7 +158,7 @@ namespace TewiMP.Pages.DialogPages
         }
 
         bool inChange = false;
-        private void AudioPlayer_EqualizerBandChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_EqualizerBandChanged(AudioPlayer audioPlayer)
         {
             if (!inChange)
             {
@@ -165,12 +168,12 @@ namespace TewiMP.Pages.DialogPages
                     EqSliders[f].Value = audioPlayer.EqualizerBand[f][2] * 10;
                 }
                 if (!inComboxChange)
-                    EqComboBox.SelectedItem = Media.AudioEqualizerBands.NameGetCHName(Media.AudioEqualizerBands.GetNameFromBands(audioPlayer.EqualizerBand));
+                    EqComboBox.SelectedItem = AudioEqualizerBands.NameGetCHName(AudioEqualizerBands.GetNameFromBands(audioPlayer.EqualizerBand));
                 inChange = false;
             }
         }
 
-        private void AudioPlayer_PreviewSourceChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_PreviewSourceChanged(AudioPlayer audioPlayer)
         {
             if (audioPlayer.WasapiOnly && audioPlayer.NowOutDevice.DeviceType == Media.OutApi.Wasapi)
             {
@@ -193,8 +196,8 @@ namespace TewiMP.Pages.DialogPages
                 var a = sender as Slider;
 
                 EqComboBox.SelectedItem = "自定义";
-                Media.AudioEqualizerBands.CustomBands[int.Parse(a.Name.Remove(0, 2))][2] = (float)a.Value / 10;
-                AudioPlayer.EqualizerBand = Media.AudioEqualizerBands.CustomBands;
+                AudioEqualizerBands.CustomBands[int.Parse(a.Name.Remove(0, 2))][2] = (float)a.Value / 10;
+                AudioPlayer.EqualizerBand = AudioEqualizerBands.CustomBands;
             }
         }
 
@@ -214,11 +217,11 @@ namespace TewiMP.Pages.DialogPages
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var a in Media.AudioEqualizerBands.CustomBands)
+            foreach (var a in AudioEqualizerBands.CustomBands)
             {
                 a[2] = 0;
             }
-            AudioPlayer.EqualizerBand = Media.AudioEqualizerBands.CustomBands;
+            AudioPlayer.EqualizerBand = AudioEqualizerBands.CustomBands;
         }
 
         private void OutDevicesDropDownButton_Click(object sender, RoutedEventArgs e)

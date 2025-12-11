@@ -16,8 +16,10 @@ using Newtonsoft.Json.Linq;
 using TewiMP.Media;
 using TewiMP.Helpers;
 using TewiMP.Controls;
-using TewiMP.DataEditor;
-using TewiMP.Background;
+using TewiMP.Services.Storage;
+using TewiMP.Services;
+using TewiMP.Core.Models;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Pages.ListViewPages
 {
@@ -201,7 +203,7 @@ namespace TewiMP.Pages.ListViewPages
             {
                 foreach (SongItemBindBase songItem in ItemsList.SelectedItems)
                 {
-                    App.Instance.DownloadManager.Add(songItem.MusicData);
+                    App.Instance.DownloadService.Add(songItem.MusicData);
                 }
             }
         }
@@ -211,7 +213,7 @@ namespace TewiMP.Pages.ListViewPages
             {
                 foreach (SongItemBindBase item in ItemsList.SelectedItems.Cast<SongItemBindBase>())
                 {
-                    App.Instance.PlayingList.Add(item.MusicData);
+                    App.Instance.PlayingListService.Add(item.MusicData);
                 }
             }
         }
@@ -559,7 +561,7 @@ namespace TewiMP.Pages.ListViewPages
             if (imageSource is null)
             {
                 imageSource ="".ToImageUri();
-                resultPath = Path.Combine(Environment.CurrentDirectory, "Images", "icon.png");
+                resultPath = DataFolderBase.IconPNGPath;
             }
 
             if (!IsLoaded || musicListData is null) return;
@@ -663,7 +665,7 @@ namespace TewiMP.Pages.ListViewPages
             Init();
             ItemsList.ItemsSource = musicListBind;
             ItemList_Header_Search_Control.SongItemBinds = musicListBind;
-            LogManager.Elapsed("PlayListPage", "Loaded in {0}.", time);
+            LogService.Elapsed("PlayListPage", "Loaded in {0}.", time);
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
@@ -765,16 +767,16 @@ namespace TewiMP.Pages.ListViewPages
             {
                 case "playAll":
                     if (musicListBind.Count == 0) return;
-                    if (App.Instance.PlayingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
+                    if (App.Instance.PlayingListService.PlayBehavior == TewiMP.Services.PlayBehavior.随机播放)
                     {
-                        App.Instance.PlayingList.ClearAll();
+                        App.Instance.PlayingListService.ClearAll();
                     }
                     foreach (var songItem in musicListBind)
                     {
-                        App.Instance.PlayingList.Add(songItem.MusicData, false);
+                        App.Instance.PlayingListService.Add(songItem.MusicData, false);
                     }
-                    await App.Instance.PlayingList.Play(musicListBind.First().MusicData, true);
-                    App.Instance.PlayingList.SetRandomPlay(App.Instance.PlayingList.PlayBehavior);
+                    await App.Instance.PlayingListService.Play(musicListBind.First().MusicData, true);
+                    App.Instance.PlayingListService.SetRandomPlay(App.Instance.PlayingListService.PlayBehavior);
                     break;
                 case "refresh":
                     InitInfo();

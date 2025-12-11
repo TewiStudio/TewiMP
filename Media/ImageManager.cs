@@ -4,7 +4,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml.Media;
 using TewiMP.Helpers;
-using TewiMP.DataEditor;
+using TewiMP.Services.Storage;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Media
 {
@@ -182,7 +183,7 @@ namespace TewiMP.Media
                 }
                 else
                 {
-                    resultPath = "/Images/icon.png";
+                    resultPath = DataFolderBase.IconPNGPath;
                 }
             }
 

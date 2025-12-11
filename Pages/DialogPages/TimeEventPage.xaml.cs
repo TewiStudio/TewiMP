@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using TewiMP.Media.Audio;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -137,7 +138,7 @@ namespace TewiMP.Pages.DialogPages
             StartButton.IsEnabled = TimingTimePicker.Time >= TimeSpan.Zero;
         }
 
-        private void AudioPlayer_SourceChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_SourceChanged(AudioPlayer audioPlayer)
         {
             App.Instance.AudioPlayer.PlayEnd -= AudioPlayer_SourceChanged;
             TimingEndEventDo();

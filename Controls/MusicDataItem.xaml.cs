@@ -10,9 +10,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using TewiMP.DataEditor;
+using TewiMP.Core.Models.Music;
 using TewiMP.Helpers;
 using TewiMP.Media;
+using TewiMP.Media.Audio;
 
 namespace TewiMP.Controls
 {
@@ -372,7 +373,7 @@ namespace TewiMP.Controls
 
         async Task Play()
         {
-            await App.Instance.PlayingList.Play(songItemBind.MusicData, true);
+            await App.Instance.PlayingListService.Play(songItemBind.MusicData, true);
 
         }
 

@@ -8,7 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TewiMP.DataEditor;
+using TewiMP.Services.Storage;
 using TewiMP.Helpers;
 using TewiMP.Media;
 
@@ -70,8 +70,8 @@ namespace TewiMP.Pages
 
             try
             {
-                if (App.Instance.PlayingList.NowPlayingList.Any())
-                    abcd.Source = (await ImageManager.GetImageUri(App.Instance.PlayingList.NowPlayingList[new Random().Next(0, App.Instance.PlayingList.NowPlayingList.Count - 1)])).Item1;
+                if (App.Instance.PlayingListService.NowPlayingList.Any())
+                    abcd.Source = (await ImageManager.GetImageUri(App.Instance.PlayingListService.NowPlayingList[new Random().Next(0, App.Instance.PlayingListService.NowPlayingList.Count - 1)])).Item1;
             }
             catch { }
             GC.Collect();/*

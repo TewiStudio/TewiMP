@@ -2,7 +2,8 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
-using TewiMP.Background.HotKeys;
+using TewiMP.Core.Models;
+using TewiMP.Services;
 using Vanara.PInvoke;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -109,16 +110,16 @@ namespace TewiMP.Pages.DialogPages
                 if (hotKey != null)
                 {
                     hotKey.HotKeyID = changedHotKey.HotKeyID;
-                    App.Instance.HotKeyManager.ChangeHotKey(hotKey);
+                    App.Instance.HotKeyService.ChangeHotKey(hotKey);
                 }
             }
             else if (r == ContentDialogResult.Secondary)
             {
-                foreach (var k in HotKeyManager.DefaultRegisterHotKeysList)
+                foreach (var k in HotKeyService.DefaultRegisterHotKeysList)
                 {
                     if (k.HotKeyID == changedHotKey.HotKeyID)
                     {
-                        App.Instance.HotKeyManager.ChangeHotKey(k);
+                        App.Instance.HotKeyService.ChangeHotKey(k);
                         break;
                     }
                 }

@@ -1,7 +1,7 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.DataEditor;
+using TewiMP.Core.Models;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -37,7 +37,7 @@ namespace TewiMP.Controls
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            await App.Instance.PlayingList.Play(songHistoryData.MusicData);
+            await App.Instance.PlayingListService.Play(songHistoryData.MusicData);
         }
     }
 }

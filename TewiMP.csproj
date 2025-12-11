@@ -30,7 +30,7 @@
 		<ProduceReferenceAssembly>True</ProduceReferenceAssembly>
 		<PublishTrimmed>False</PublishTrimmed>
 		<PublishAot>False</PublishAot>
-		<ApplicationIcon>Images\Icons\icon.ico</ApplicationIcon>
+		<ApplicationIcon>Assets\Images\Icons\icon.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
 		<ImplicitUsings>disable</ImplicitUsings>
 		<GenerateDocumentationFile>False</GenerateDocumentationFile>
@@ -107,14 +107,6 @@
 		<None Remove="Windows\NotifyIconWindow.xaml" />
 		<None Remove="Windows\TaskBarInfoWindow.xaml" />
 	</ItemGroup>
-	
-	<ItemGroup>
-		<Content Include="Images\Icons\icon.ico" />
-		<Content Include="IpaDic\char.bin" />
-		<Content Include="IpaDic\matrix.bin" />
-		<Content Include="IpaDic\sys.dic" />
-		<Content Include="IpaDic\unk.dic" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CoelWu.Music.SDK" Version="1.0.7" />
@@ -186,7 +178,7 @@
 		<None Update="ffmpeg.exe">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<None Update="Images\Icons\icon.ico">
+		<None Update="Assets\Images\Icons\icon.ico">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="LICENSE">

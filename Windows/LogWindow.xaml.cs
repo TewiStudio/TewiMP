@@ -7,12 +7,11 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.Helpers;
-using TewiMP.Background;
-using WinUIEx;
-using System.Diagnostics;
-using System.Collections.Generic;
 using CommunityToolkit.WinUI;
+using WinUIEx;
+using TewiMP.Helpers;
+using TewiMP.Services;
+using TewiMP.Core.Models;
 
 namespace TewiMP.Windowed
 {
@@ -67,7 +66,7 @@ namespace TewiMP.Windowed
             //LogList.ItemsSource = null;
             if (VisibleLogLevel == LogLevel.All)
             {
-                LogList.ItemsSource = App.Instance.LogManager.LogDatas;
+                LogList.ItemsSource = App.Instance.LogService.LogDatas;
             }
             else
             {
@@ -77,7 +76,7 @@ namespace TewiMP.Windowed
                 }
                 else
                 {
-                    var processList = App.Instance.LogManager.LogDatas.ToList();
+                    var processList = App.Instance.LogService.LogDatas.ToList();
                     if (!VisibleLogLevel.HasFlag(LogLevel.Info)) processList.RemoveAll(t => t.LogLevel == LogLevel.Info);
                     if (!VisibleLogLevel.HasFlag(LogLevel.Warning)) processList.RemoveAll(t => t.LogLevel == LogLevel.Warning);
                     if (!VisibleLogLevel.HasFlag(LogLevel.Error)) processList.RemoveAll(t => t.LogLevel == LogLevel.Error);
@@ -93,8 +92,8 @@ namespace TewiMP.Windowed
 
         private void UpdateBtnContent()
         {
-            AllLogCounter.Content = $"共 {App.Instance.LogManager.LogDatas.Count} 条";
-            var l = App.Instance.LogManager.LogDatas.GroupBy(t => t.LogLevel);
+            AllLogCounter.Content = $"共 {App.Instance.LogService.LogDatas.Count} 条";
+            var l = App.Instance.LogService.LogDatas.GroupBy(t => t.LogLevel);
             foreach (var i in l)
             {
                 CommunityToolkit.Labs.WinUI.TokenItem tokenItem = null;
@@ -120,8 +119,8 @@ namespace TewiMP.Windowed
             scrollViewer = (VisualTreeHelper.GetChild(LogList, 0) as Border).Child as ScrollViewer;
             scrollViewer.LayoutUpdated -= ScrollViewer_LayoutUpdated;
             scrollViewer.LayoutUpdated += ScrollViewer_LayoutUpdated;
-            App.Instance.LogManager.LogListAdded -= LogManager_LogListAdded;
-            App.Instance.LogManager.LogListAdded += LogManager_LogListAdded;
+            App.Instance.LogService.LogListAdded -= LogManager_LogListAdded;
+            App.Instance.LogService.LogListAdded += LogManager_LogListAdded;
             UpdateLogListItemSource();
             UpdateBtnContent();
             isLoading = true;
@@ -134,7 +133,7 @@ namespace TewiMP.Windowed
         private void Grid_Unloaded(object sender, RoutedEventArgs e)
         {
             scrollViewer.LayoutUpdated -= ScrollViewer_LayoutUpdated;
-            App.Instance.LogManager.LogListAdded -= LogManager_LogListAdded;
+            App.Instance.LogService.LogListAdded -= LogManager_LogListAdded;
             LogList.ItemsSource = null;
         }
 
@@ -151,7 +150,7 @@ namespace TewiMP.Windowed
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            await FileHelper.ExploreFile(LogManager.NowLogFilePath);
+            await FileHelper.ExploreFile(LogService.NowLogFilePath);
         }
 
         private void LogManager_LogListAdded(LogData logData)

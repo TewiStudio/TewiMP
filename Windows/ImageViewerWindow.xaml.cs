@@ -9,8 +9,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using TewiMP.Background;
-using TewiMP.DataEditor;
+using TewiMP.Services;
+using TewiMP.Services.Storage;
 using TewiMP.Helpers;
 using Windows.Graphics.Imaging;
 using Windows.Storage;
@@ -114,7 +114,7 @@ namespace TewiMP.Windowed
                 }
                 catch (Exception err)
                 {
-                    LogManager.Error("ImageEx MenuFlyoutItem_Click", err.ToString());
+                    LogService.Error("ImageEx MenuFlyoutItem_Click", err.ToString());
                     await ShowDialog("保存图片失败", $"保存图片时出现错误：\n{err.Message}");
                 }
             }

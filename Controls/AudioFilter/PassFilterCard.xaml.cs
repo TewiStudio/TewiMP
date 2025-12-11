@@ -2,7 +2,9 @@ using System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using TewiMP.Media;
+using TewiMP.Core.Models.Audio;
+using TewiMP.Media.Audio;
+using TewiMP.Media.Audio.AudioEffects;
 
 namespace TewiMP.Controls
 {

@@ -1,8 +1,8 @@
-using System;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.Controls
 {
@@ -19,7 +19,7 @@ namespace TewiMP.Controls
         {
             if (!this.IsLoaded) return;
             musicFolders.Clear();
-            var folderPaths = await DataEditor.LocalMusicHelper.GetAllMusicFolders();
+            var folderPaths = await LocalMusicHelper.GetAllMusicFolders();
             foreach (string folder in folderPaths) musicFolders?.Add(folder);
         }
 
@@ -38,16 +38,16 @@ namespace TewiMP.Controls
                 {
                     await DataEditor.LocalMusicHelper.RemoveLocalMusicFolder(folder);
                 }*/
-                var data = await DataEditor.LocalMusicHelper.GetLocalMusicData();
-                foreach (string folder in await DataEditor.LocalMusicHelper.GetAllMusicFolders(data))
+                var data = await LocalMusicHelper.GetLocalMusicData();
+                foreach (string folder in await LocalMusicHelper.GetAllMusicFolders(data))
                 {
-                    await DataEditor.LocalMusicHelper.RemoveLocalMusicFolder(folder, data);
+                    await LocalMusicHelper.RemoveLocalMusicFolder(folder, data);
                 }
                 foreach (string folderPath in musicFolders)
                 {
-                    await DataEditor.LocalMusicHelper.AddLocalMusicFolder(folderPath, data);
+                    await LocalMusicHelper.AddLocalMusicFolder(folderPath, data);
                 }
-                await DataEditor.LocalMusicHelper.SaveLocalMusicData(data);
+                await LocalMusicHelper.SaveLocalMusicData(data);
             }
 
             musicFolders = null;

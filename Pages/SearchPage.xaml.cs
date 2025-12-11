@@ -4,7 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using TewiMP.Plugin;
-using TewiMP.DataEditor;
+using TewiMP.Core.Models;
 
 namespace TewiMP.Pages
 {

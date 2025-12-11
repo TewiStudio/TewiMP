@@ -12,7 +12,9 @@ using Windows.Storage;
 using TewiMP.Media;
 using TewiMP.Pages;
 using TewiMP.Helpers;
-using TewiMP.DataEditor;
+using TewiMP.Services.Storage;
+using TewiMP.Media.Audio;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Controls
 {
@@ -135,7 +137,7 @@ namespace TewiMP.Controls
             }*/
         }
 
-        private void AudioPlayer_PlayStateChanged(Media.AudioPlayer audioPlayer)
+        private void AudioPlayer_PlayStateChanged(AudioPlayer audioPlayer)
         {
             SetPlayingIcon(audioPlayer.PlaybackState);
         }
@@ -532,19 +534,19 @@ namespace TewiMP.Controls
                     App.Instance.AudioPlayer.SetPlay();
             }
             else
-                await App.Instance.PlayingList.Play(MusicData, true);
+                await App.Instance.PlayingListService.Play(MusicData, true);
         }
         
         // 单击添加到播放中列表按钮
         private void AddPlay_Click(object sender, RoutedEventArgs e)
         {
-            App.Instance.PlayingList.Add(MusicData);
+            App.Instance.PlayingListService.Add(MusicData);
         }
         
         // 单击下一首播放按钮
         private void NextPlay_Click(object sender, RoutedEventArgs e)
         {
-            App.Instance.PlayingList.SetNextPlay(App.Instance.AudioPlayer.MusicData, MusicData);
+            App.Instance.PlayingListService.SetNextPlay(App.Instance.AudioPlayer.MusicData, MusicData);
         }
         
         // 单击详细信息按钮
@@ -573,7 +575,7 @@ namespace TewiMP.Controls
 
         private void Download_Click(object sender, RoutedEventArgs e)
         {
-            App.Instance.DownloadManager.Add(MusicData);
+            App.Instance.DownloadService.Add(MusicData);
         }
 
         private void rmf_Opened(object sender, object e)
@@ -750,22 +752,22 @@ namespace TewiMP.Controls
 
         private async void MenuFlyoutItem_Click_2(object sender, RoutedEventArgs e)
         {
-            await App.Instance.PlayingList.Play(MusicData, true);
+            await App.Instance.PlayingListService.Play(MusicData, true);
         }
 
         NotifyItem item = null;
         private async void Menuflyout_CacheItem_Click(object sender, RoutedEventArgs e)
         {
-            if (await App.Instance.CacheManager.GetCachePath(MusicData) is not null)
+            if (await App.Instance.CacheService.GetCachePath(MusicData) is not null)
             {
                 App.MainWindowInstance.AddNotify($"此歌曲已缓存！", null, NotifySeverity.Warning);
                 return;
             }
 
             item = App.MainWindowInstance.AddNotify($"正在缓存：{MusicData.Title}", "加载中...", NotifySeverity.Loading, TimeSpan.MaxValue);
-            App.Instance.CacheManager.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
-            App.Instance.CacheManager.CachedMusicData += CacheManager_CachedMusicData;
-            await App.Instance.CacheManager.StartCacheMusic(MusicData);
+            App.Instance.CacheService.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
+            App.Instance.CacheService.CachedMusicData += CacheManager_CachedMusicData;
+            await App.Instance.CacheService.StartCacheMusic(MusicData);
         }
 
         private void CacheManager_CachingStateChangeMusicData(MusicData musicData, object value)
@@ -778,8 +780,8 @@ namespace TewiMP.Controls
         private void CacheManager_CachedMusicData(MusicData musicData, object value)
         {
             if (musicData != MusicData) return;
-            App.Instance.CacheManager.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
-            App.Instance.CacheManager.CachedMusicData -= CacheManager_CachedMusicData;
+            App.Instance.CacheService.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
+            App.Instance.CacheService.CachedMusicData -= CacheManager_CachedMusicData;
             item.SetNotifyItemData(item.GetNotifyItemData().Title, "缓存完成。", NotifySeverity.Complete);
             App.MainWindowInstance.NotifyCountDown(item);
             item = null;
@@ -787,7 +789,7 @@ namespace TewiMP.Controls
 
         private async void Menuflyout_DeleteCacheItem_Click(object sender, RoutedEventArgs e)
         {
-            var path = await App.Instance.CacheManager.GetCachePath(MusicData);
+            var path = await App.Instance.CacheService.GetCachePath(MusicData);
             if (string.IsNullOrEmpty(path))
             {
                 App.MainWindowInstance.AddNotify("此歌曲的缓存文件不存在。", null, NotifySeverity.Error);

@@ -6,7 +6,7 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
-using TewiMP.Background.HotKeys;
+using TewiMP.Services;
 
 namespace TewiMP.Pages
 {
@@ -22,7 +22,7 @@ namespace TewiMP.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             isInLoading = true;
-            HotkeyEnableToggleSwitch.IsOn = App.Instance.HotKeyManager.EnableHotKey;
+            HotkeyEnableToggleSwitch.IsOn = App.Instance.HotKeyService.EnableHotKey;
             isInLoading = false;
         }
 
@@ -33,18 +33,18 @@ namespace TewiMP.Pages
 
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            var list = App.Instance.HotKeyManager.RegisteredHotKeys.ToList();
-            App.Instance.HotKeyManager.UnregisterHotKeys(list);
+            var list = App.Instance.HotKeyService.RegisteredHotKeys.ToList();
+            App.Instance.HotKeyService.UnregisterHotKeys(list);
             await Task.Delay(200);
-            App.Instance.HotKeyManager.RegisterHotKeys(list);
+            App.Instance.HotKeyService.RegisterHotKeys(list);
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
         {
-            var list = App.Instance.HotKeyManager.RegisteredHotKeys.ToList();
-            App.Instance.HotKeyManager.UnregisterHotKeys(list);
+            var list = App.Instance.HotKeyService.RegisteredHotKeys.ToList();
+            App.Instance.HotKeyService.UnregisterHotKeys(list);
             await Task.Delay(200);
-            App.Instance.HotKeyManager.RegisterHotKeys(HotKeyManager.DefaultRegisterHotKeysList);
+            App.Instance.HotKeyService.RegisterHotKeys(HotKeyService.DefaultRegisterHotKeysList);
         }
 
         private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
@@ -52,7 +52,7 @@ namespace TewiMP.Pages
             if (isInLoading) return;
             if (sender is ToggleSwitch toggleSwitch)
             {
-                App.Instance.HotKeyManager.EnableHotKey = toggleSwitch.IsOn;
+                App.Instance.HotKeyService.EnableHotKey = toggleSwitch.IsOn;
             }
         }
 

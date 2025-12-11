@@ -14,9 +14,11 @@ using CommunityToolkit.WinUI;
 using TewiMP.Helpers;
 using TewiMP.Plugin;
 using TewiMP.Controls;
-using TewiMP.DataEditor;
+using TewiMP.Services.Storage;
 using TewiMP.Pages.ListViewPages;
-using TewiMP.Background;
+using TewiMP.Services;
+using TewiMP.Core.Models;
+using TewiMP.Core.Models.Music;
 
 namespace TewiMP.Pages
 {
@@ -96,7 +98,7 @@ namespace TewiMP.Pages
             }
             catch (Exception ex)
             {
-                LogManager.Error("SearchError", ex.ToString());
+                LogService.Error("SearchError", ex.ToString());
                 string errString = $"搜索时出现错误：\n{ex.Message}";
                 var d = await App.MainWindowInstance.ShowDialog("搜索失败", errString, "重试", "确定", defaultButton: ContentDialogButton.Primary);
                 if (d == ContentDialogResult.Primary)
@@ -303,16 +305,16 @@ namespace TewiMP.Pages
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (!Children.Items.Any()) return;
-            if (App.Instance.PlayingList.PlayBehavior == TewiMP.Background.PlayBehavior.随机播放)
+            if (App.Instance.PlayingListService.PlayBehavior == TewiMP.Services.PlayBehavior.随机播放)
             {
-                App.Instance.PlayingList.ClearAll();
+                App.Instance.PlayingListService.ClearAll();
             }
             foreach (var songItem in MusicDataList)
             {
-                App.Instance.PlayingList.Add(songItem.MusicData, false);
+                App.Instance.PlayingListService.Add(songItem.MusicData, false);
             }
-            await App.Instance.PlayingList.Play(MusicDataList.First().MusicData, true);
-            App.Instance.PlayingList.SetRandomPlay(App.Instance.PlayingList.PlayBehavior);
+            await App.Instance.PlayingListService.Play(MusicDataList.First().MusicData, true);
+            App.Instance.PlayingListService.SetRandomPlay(App.Instance.PlayingListService.PlayBehavior);
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -413,7 +415,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase item in Children.SelectedItems)
                 {
-                    App.Instance.PlayingList.Add(item.MusicData);
+                    App.Instance.PlayingListService.Add(item.MusicData);
                 }
             }
         }
@@ -465,7 +467,7 @@ namespace TewiMP.Pages
             {
                 foreach (SongItemBindBase songItem in Children.Items)
                 {
-                    App.Instance.DownloadManager.Add(songItem.MusicData);
+                    App.Instance.DownloadService.Add(songItem.MusicData);
                 }
             }
         }

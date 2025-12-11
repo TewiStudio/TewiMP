@@ -5,9 +5,9 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Shapes;
 using Microsoft.UI.Xaml.Controls;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
+using TewiMP.Services;
+using System.Diagnostics;
+using System.Threading;
 
 namespace TewiMP.Controls
 {
@@ -226,21 +226,22 @@ namespace TewiMP.Controls
             double gs1Offset = 0;
             double gs2Offset = 0;
 
+            // 导致布局死循环
             // 渐变效果的偏移量计算，无论实际宽度是多少，偏移量的结果都应该是 MaskSize
-            if (ActualWidth <= MaskSize)
+            /*if (ActualWidth <= MaskSize)
             {
                 // 当实际宽度太小时将偏移值设置为实际宽度的四分之一
                 gs1Offset = ActualWidth / 2d;
                 gs2Offset = 1d - ActualWidth / 2d;
-                _contentPresenter.Margin = new(0, 0, ActualWidth / 2d, 0);
+                _contentPresenter.Padding = new(0, 0, ActualWidth / 4d, 0);
             }
-            else
-            {
-                // 计算 MaskSize 在新宽度中的占比
-                gs1Offset = MaskSize / ActualWidth;
-                gs2Offset = 1d - MaskSize / ActualWidth;
-                _contentPresenter.Margin = new(0, 0, IsHorizontalContentOutOfBounds ? MaskSize : 0, 0);
-            }
+            else*/
+            
+            // 计算 MaskSize 在新宽度中的占比
+            gs1Offset = MaskSize / ActualWidth;
+            gs2Offset = 1d - MaskSize / ActualWidth;
+            _contentPresenter.Padding = new(0, 0, IsHorizontalContentOutOfBounds ? MaskSize : 0, 0);
+            
 
             _gs1a.Width = MaskSize;
             _gs2a.Width = MaskSize;
@@ -296,9 +297,10 @@ namespace TewiMP.Controls
         {
             if (_contentPresenter is null) return;
             var content = _contentPresenter;
+
             if (content.ActualWidth > ActualWidth) IsHorizontalContentOutOfBounds = true;
             else IsHorizontalContentOutOfBounds = false;
-            if (content.ActualHeight > ActualSize.Y) IsVerticalContentOutOfBounds = true;
+            if (content.ActualHeight > ActualHeight) IsVerticalContentOutOfBounds = true;
             else IsVerticalContentOutOfBounds = false;
             //LogManager.Info("Debug", $"IsHorizontalContentOutOfBounds: {IsHorizontalContentOutOfBounds} / IsVerticalContentOutOfBounds: {IsVerticalContentOutOfBounds}");
         }

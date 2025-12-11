@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:helper="using:TewiMP.Helpers"
-    xmlns:data="using:TewiMP.DataEditor"
+    xmlns:data="using:TewiMP.Storage"
     xmlns:c="using:CommunityToolkit.WinUI"
     xmlns:controls="using:TewiMP.Controls"
     xmlns:local="using:TewiMP.Pages.ListViewPages"
