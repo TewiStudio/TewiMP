@@ -1,9 +1,9 @@
-﻿namespace TewiMP.Services.Media.Audio.AudioEffects;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using TewiMP.Core.Audio;
+
+namespace TewiMP.Services.Media.Audio.AudioEffects;
 
 public static class AudioFilterStatic
 {

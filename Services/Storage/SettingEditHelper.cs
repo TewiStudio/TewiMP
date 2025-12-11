@@ -1,8 +1,8 @@
-﻿namespace TewiMP.Services.Storage;
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
+
+namespace TewiMP.Services.Storage;
 
 public static class SettingEditHelper
 {

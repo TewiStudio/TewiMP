@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
@@ -9,6 +7,8 @@ using TewiMP.Helpers;
 using TewiMP.Services.Plugin;
 using TewiMP.Services.Storage;
 using TewiMP.Core.Music;
+
+namespace TewiMP.Services;
 
 public class CacheService
 {

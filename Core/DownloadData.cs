@@ -1,6 +1,6 @@
-﻿namespace TewiMP.Core;
+﻿using TewiMP.Core.Music;
 
-using TewiMP.Core.Music;
+namespace TewiMP.Core;
 
 public class DownloadData
 {

@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services;
-
-using System;
+﻿using System;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
@@ -12,10 +10,12 @@ using Melanchall.DryWetMidi.Core;
 using System.Threading.Tasks;
 using TewiMP.Helpers;
 using TewiMP.UI.Windows;
+using TewiMP.Core.Music;
 using TewiMP.Services.Media;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
-using TewiMP.Core.Music;
+
+namespace TewiMP.Services;
 
 public enum PlayBehavior { 循环播放, 顺序播放, 单曲循环, 随机播放, 播放完成后停止 }
 public enum SetPlayInfo { Normal, Next, Previous }

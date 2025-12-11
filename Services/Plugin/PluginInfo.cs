@@ -1,8 +1,8 @@
-﻿namespace TewiMP.Services.Plugin;
-
-using System;
+﻿using System;
 using System.Linq;
 using Newtonsoft.Json;
+
+namespace TewiMP.Services.Plugin;
 
 /// <summary>
 /// 插件信息类。用于描述插件的基本信息。会被以 json 格式保存到配置文件中，程序在运行时读取这些信息以识别和获取对应插件。

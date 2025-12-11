@@ -1,7 +1,7 @@
-﻿namespace TewiMP.Core;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
+
+namespace TewiMP.Core;
 
 public class LyricData : OnlyClass
 {

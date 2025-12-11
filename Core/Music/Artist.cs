@@ -1,6 +1,6 @@
-﻿namespace TewiMP.Core.Music;
+﻿using TewiMP.Services.Plugin;
 
-using TewiMP.Services.Plugin;
+namespace TewiMP.Core.Music;
 
 public class Artist : OnlyClass, IIsListPage
 {

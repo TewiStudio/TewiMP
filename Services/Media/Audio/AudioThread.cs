@@ -1,11 +1,11 @@
-﻿namespace TewiMP.Services.Media.Audio;
-
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using TewiMP.Services;
+
+namespace TewiMP.Services.Media.Audio;
 
 public class AudioThread : IDisposable
 {

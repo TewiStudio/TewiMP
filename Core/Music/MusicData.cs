@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Core.Music;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,6 +8,8 @@ using TewiMP.Helpers;
 using TewiMP;
 using TewiMP.Core;
 using TewiMP.Services.Plugin;
+
+namespace TewiMP.Core.Music;
 
 public class MusicData : OnlyClass
 {

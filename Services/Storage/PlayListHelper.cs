@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services.Storage;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,6 +7,8 @@ using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using TewiMP.Core;
 using TewiMP.Core.Music;
+
+namespace TewiMP.Services.Storage;
 
 public static class PlayListHelper
 {

@@ -1,8 +1,8 @@
-﻿namespace TewiMP.Services;
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using TewiMP.Helpers;
+
+namespace TewiMP.Services;
 
 /// <summary>
 /// 本地音乐解析

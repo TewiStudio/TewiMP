@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services.Media.Audio;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,11 +13,13 @@ using Melanchall.DryWetMidi.Multimedia;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using SoundTouch;
-using TewiMP.Services;
-using TewiMP.UI.Windows;
-using TewiMP.Core.Music;
-using TewiMP.Services.Media.Audio.AudioEffects;
 using TewiMP.Core;
+using TewiMP.Core.Music;
+using TewiMP.Services;
+using TewiMP.Services.Media.Audio.AudioEffects;
+using TewiMP.UI.Windows;
+
+namespace TewiMP.Services.Media.Audio;
 
 public class AudioService
 {

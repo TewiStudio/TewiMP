@@ -1,6 +1,6 @@
-﻿namespace TewiMP.Core;
+﻿using TewiMP.Services.Plugin;
 
-using TewiMP.Services.Plugin;
+namespace TewiMP.Core;
 
 public class SearchData : OnlyClass, IIsListPage
 {

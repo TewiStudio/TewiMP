@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services.Storage;
-
-using System;
+﻿using System;
 using System.IO;
 using Microsoft.UI.Xaml;
 using Newtonsoft.Json.Linq;
@@ -8,6 +6,8 @@ using TewiMP.UI.Windows;
 using TewiMP.Services.Media.Audio.AudioEffects;
 using TewiMP.Core.Music;
 using TewiMP.Services.Plugin;
+
+namespace TewiMP.Services.Storage;
 
 public static class DataFolderBase
 {

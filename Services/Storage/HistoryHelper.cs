@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services.Storage;
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +6,8 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TewiMP.Core;
+
+namespace TewiMP.Services.Storage;
 
 public static class HistoryHelper
 {

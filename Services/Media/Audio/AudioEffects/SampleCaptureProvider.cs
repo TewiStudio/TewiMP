@@ -1,8 +1,8 @@
-﻿namespace TewiMP.Services.Media.Audio.AudioEffects;
-
-using NAudio.Wave;
+﻿using NAudio.Wave;
 using System;
 using System.Numerics;
+
+namespace TewiMP.Services.Media.Audio.AudioEffects;
 
 public class SpectrumAnalyzer : ISampleProvider
 {

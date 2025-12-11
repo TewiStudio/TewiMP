@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,9 +6,11 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using TewiMP.UI.Pages;
 using TewiMP.Helpers;
-using TewiMP.Services.Storage;
 using TewiMP.Core;
 using TewiMP.Core.Music;
+using TewiMP.Services.Storage;
+
+namespace TewiMP.Services;
 
 public class DownloadService
 {

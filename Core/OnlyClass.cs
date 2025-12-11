@@ -1,7 +1,7 @@
-﻿namespace TewiMP.Core;
-
-using System;
+﻿using System;
 using Newtonsoft.Json;
+
+namespace TewiMP.Core;
 
 public abstract class OnlyClass
 {

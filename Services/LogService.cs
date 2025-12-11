@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,6 +6,8 @@ using System.Diagnostics;
 using System.Collections.ObjectModel;
 using TewiMP.Core;
 using TewiMP.Services.Storage;
+
+namespace TewiMP.Services;
 
 public class LogService
 {

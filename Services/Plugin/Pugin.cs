@@ -1,11 +1,11 @@
-﻿namespace TewiMP.Services.Plugin;
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using TewiMP.UI.Pages.DialogPages;
 using TewiMP;
+
+namespace TewiMP.Services.Plugin;
 
 /// <summary>
 /// 插件基类。继承此类可被插件系统识别为插件。

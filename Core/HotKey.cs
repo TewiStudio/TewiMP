@@ -1,7 +1,7 @@
-﻿namespace TewiMP.Core;
-
-using Vanara.PInvoke;
+﻿using Vanara.PInvoke;
 using Newtonsoft.Json;
+
+namespace TewiMP.Core;
 
 public class HotKey : OnlyClass
 {

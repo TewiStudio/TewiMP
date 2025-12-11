@@ -1,6 +1,6 @@
-﻿namespace TewiMP.Core.Audio;
+﻿using Windows.UI;
 
-using Windows.UI;
+namespace TewiMP.Core.Audio;
 
 public class EQData
 {

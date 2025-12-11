@@ -1,8 +1,8 @@
-﻿namespace TewiMP.Services.Plugin;
-
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using TewiMP.Core.Music;
+
+namespace TewiMP.Services.Plugin;
 
 /// <summary>
 /// 音乐源插件基类。继承此类可被插件系统识别为音乐源插件，会被系统用于加载音乐数据。

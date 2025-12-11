@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services;
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,8 +6,10 @@ using System.Runtime.InteropServices;
 using WinUIEx;
 using Vanara.PInvoke;
 using Microsoft.UI.Xaml;
-using TewiMP.UI.Windows;
 using TewiMP.Core;
+using TewiMP.UI.Windows;
+
+namespace TewiMP.Services;
 
 public class HotKeyService
 {

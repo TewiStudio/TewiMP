@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -12,6 +10,8 @@ using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
 using TewiMP.Core;
 using TewiMP.Core.Music;
+
+namespace TewiMP.Services;
 
 public class LyricService
 {

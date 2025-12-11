@@ -1,6 +1,6 @@
-﻿namespace TewiMP.Core;
+﻿using System;
 
-using System;
+namespace TewiMP.Core;
 
 public class LogData
 {

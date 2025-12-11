@@ -1,6 +1,6 @@
-﻿namespace TewiMP.Core.Music;
+﻿using System;
 
-using System;
+namespace TewiMP.Core.Music;
 
 public class CUETrackData
 {

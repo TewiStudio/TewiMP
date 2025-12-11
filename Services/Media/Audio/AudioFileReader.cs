@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services.Media.Audio;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
@@ -12,6 +10,8 @@ using TewiMP.Services;
 using TewiMP.Services.Storage;
 using TewiMP.Core.Audio;
 using TewiMP.Services.Media.Audio.AudioEffects;
+
+namespace TewiMP.Services.Media.Audio;
 
 public class AudioFileReader : WaveStream, ISampleProvider
 {

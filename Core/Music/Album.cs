@@ -1,10 +1,10 @@
-﻿namespace TewiMP.Core.Music;
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using TewiMP.Services.Plugin;
+
+namespace TewiMP.Core.Music;
 
 public class Album : OnlyClass, IIsListPage
 {

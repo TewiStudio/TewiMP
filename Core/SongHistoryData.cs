@@ -1,7 +1,7 @@
-﻿namespace TewiMP.Core;
-
-using System;
+﻿using System;
 using TewiMP.Core.Music;
+
+namespace TewiMP.Core;
 
 public class SongHistoryData : OnlyClass
 {

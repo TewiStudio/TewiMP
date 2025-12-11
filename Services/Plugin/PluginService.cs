@@ -1,6 +1,4 @@
-﻿namespace TewiMP.Services.Plugin;
-
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,6 +7,8 @@ using System.Collections.ObjectModel;
 using Newtonsoft.Json.Linq;
 using TewiMP.Services;
 using TewiMP.Services.Storage;
+
+namespace TewiMP.Services.Plugin;
 
 public static class PluginService
 {

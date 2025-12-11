@@ -1,8 +1,8 @@
-﻿namespace TewiMP.Services;
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using TewiMP.Core.Music;
+
+namespace TewiMP.Services;
 
 /// <summary>
 /// 用于读取播放列表

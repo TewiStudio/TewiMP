@@ -1,8 +1,8 @@
-﻿namespace TewiMP.Core.Music;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using TewiMP.Services.Plugin;
+
+namespace TewiMP.Core.Music;
 
 public class MusicListData : OnlyClass, IIsListPage
 {
