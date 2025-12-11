@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="TewiMP.UI.Pages.DialogPages.AddFilesToMusicListDataPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.UI.Pages.DialogPages"
+    xmlns:community="using:CommunityToolkit.WinUI"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Loaded="AddFilesToPlaylistPage_Loaded" Unloaded="AddFilesToPlaylistPage_Unloaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.Resources>
+            <Style TargetType="FontIcon">
+                <Setter Property="FontSize" Value="30"/>
+                <Setter Property="Margin" Value="12"/>
+            </Style>
+        </Grid.Resources>
+        <Button
+            x:Name="PART_FilesPickerButton"
+            Grid.Row="0" HorizontalAlignment="Stretch"
+            Click="FilePickerButton_Click">
+            <StackPanel>
+                <FontIcon
+                    Glyph="&#xE8E5;"
+                    Margin="12"/>
+                <TextBlock Text="选择单个或多个文件"/>
+            </StackPanel>
+        </Button>
+        <Button
+            x:Name="PART_FolderPickerButton"
+            Grid.Row="1" HorizontalAlignment="Stretch"
+            Margin="0,4,0,0"
+            Click="FolderPickerButton_Click">
+            <StackPanel>
+                <FontIcon
+                     Glyph="&#xE8DA;"/>
+                    <TextBlock Text="扫描文件夹中的所有文件"/>
+            </StackPanel>
+        </Button>
+    </Grid>
+</UserControl>

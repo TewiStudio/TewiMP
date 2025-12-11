@@ -1,0 +1,144 @@
+﻿<Window
+    x:Class="TewiMP.UI.Windows.LogWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:TewiMP.UI.Windows"
+    xmlns:helper="using:TewiMP.Services"
+    xmlns:control="using:TewiMP.UI.Controls"
+    xmlns:data="using:TewiMP.Core"
+    xmlns:community="using:CommunityToolkit.Labs.WinUI"
+    mc:Ignorable="d"
+    Closed="LogWindow_Closed">
+
+    <Grid Loaded="Grid_Loaded" Unloaded="Grid_Unloaded">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <Grid x:Name="TitleBar" VerticalAlignment="Top">
+            <TextBlock Text="Log Viewer" Margin="18,8" FontSize="12"/>
+        </Grid>
+        <Grid
+            x:Name="LogArea" Grid.Row="1"
+            Margin="4,0,4,0" CornerRadius="4" BorderThickness="1"
+            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+            <ListView
+                x:Name="LogList"
+                SelectionMode="None">
+                <ListView.Resources>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListViewItem">
+                                    <ListViewItemPresenter
+                                    Padding="0"
+                                    ContentTransitions="{TemplateBinding ContentTransitions}"
+                                    Control.IsTemplateFocusTarget="True"
+                                    FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
+                                    FocusVisualPrimaryBrush="{TemplateBinding FocusVisualPrimaryBrush}"
+                                    FocusVisualPrimaryThickness="{TemplateBinding FocusVisualPrimaryThickness}"
+                                    FocusVisualSecondaryBrush="{TemplateBinding FocusVisualSecondaryBrush}"
+                                    FocusVisualSecondaryThickness="{TemplateBinding FocusVisualSecondaryThickness}"
+                                    SelectionCheckMarkVisualEnabled="{ThemeResource ListViewItemSelectionCheckMarkVisualEnabled}"
+                                    CheckBrush="{ThemeResource ListViewItemCheckBrush}"
+                                    CheckBoxBrush="{ThemeResource ListViewItemCheckBoxBrush}"
+                                    DragBackground="{ThemeResource ListViewItemDragBackground}"
+                                    DragForeground="{ThemeResource ListViewItemDragForeground}"
+                                    FocusBorderBrush="{ThemeResource ListViewItemFocusBorderBrush}"
+                                    FocusSecondaryBorderBrush="{ThemeResource ListViewItemFocusSecondaryBorderBrush}"
+                                    PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}"
+                                    PointerOverBackground="{ThemeResource ListViewItemBackgroundPointerOver}"
+                                    PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}"
+                                    SelectedBackground="{ThemeResource ListViewItemBackgroundSelected}"
+                                    SelectedForeground="{ThemeResource ListViewItemForegroundSelected}"
+                                    SelectedPointerOverBackground="{ThemeResource ListViewItemBackgroundSelectedPointerOver}"
+                                    PressedBackground="{ThemeResource ListViewItemBackgroundPressed}"
+                                    SelectedPressedBackground="{ThemeResource ListViewItemBackgroundSelectedPressed}"
+                                    DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
+                                    DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
+                                    ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
+                                    CheckMode="{ThemeResource ListViewItemCheckMode}"
+                                    CornerRadius="0"
+                                    CheckPressedBrush="{ThemeResource ListViewItemCheckPressedBrush}"
+                                    CheckDisabledBrush="{ThemeResource ListViewItemCheckDisabledBrush}"
+                                    CheckBoxPointerOverBrush="{ThemeResource ListViewItemCheckBoxPointerOverBrush}"
+                                    CheckBoxPressedBrush="{ThemeResource ListViewItemCheckBoxPressedBrush}"
+                                    CheckBoxDisabledBrush="{ThemeResource ListViewItemCheckBoxDisabledBrush}"
+                                    CheckBoxSelectedBrush="{ThemeResource ListViewItemCheckBoxSelectedBrush}"
+                                    CheckBoxSelectedPointerOverBrush="{ThemeResource ListViewItemCheckBoxSelectedPointerOverBrush}"
+                                    CheckBoxSelectedPressedBrush="{ThemeResource ListViewItemCheckBoxSelectedPressedBrush}"
+                                    CheckBoxSelectedDisabledBrush="{ThemeResource ListViewItemCheckBoxSelectedDisabledBrush}"
+                                    CheckBoxBorderBrush="{ThemeResource ListViewItemCheckBoxBorderBrush}"
+                                    CheckBoxPointerOverBorderBrush="{ThemeResource ListViewItemCheckBoxPointerOverBorderBrush}"
+                                    CheckBoxPressedBorderBrush="{ThemeResource ListViewItemCheckBoxPressedBorderBrush}"
+                                    CheckBoxDisabledBorderBrush="{ThemeResource ListViewItemCheckBoxDisabledBorderBrush}"
+                                    CheckBoxCornerRadius="{ThemeResource ListViewItemCheckBoxCornerRadius}"
+                                    SelectionIndicatorCornerRadius="{ThemeResource ListViewItemSelectionIndicatorCornerRadius}"
+                                    SelectionIndicatorVisualEnabled="{ThemeResource ListViewItemSelectionIndicatorVisualEnabled}"
+                                    SelectionIndicatorBrush="{ThemeResource ListViewItemSelectionIndicatorBrush}"
+                                    SelectionIndicatorPointerOverBrush="{ThemeResource ListViewItemSelectionIndicatorPointerOverBrush}"
+                                    SelectionIndicatorPressedBrush="{ThemeResource ListViewItemSelectionIndicatorPressedBrush}"
+                                    SelectionIndicatorDisabledBrush="{ThemeResource ListViewItemSelectionIndicatorDisabledBrush}"
+                                    SelectedDisabledBackground="{ThemeResource ListViewItemBackgroundSelectedDisabled}">
+                                    </ListViewItemPresenter>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListView.Resources>
+                <ListView.ItemTemplate>
+                    <DataTemplate x:DataType="data:LogData">
+                        <control:LogItem/>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+        <Grid Grid.Row="2" Margin="4,4,4,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.Resources>
+                <CornerRadius x:Key="TokenItemCornerRadius">4</CornerRadius>
+                <StaticResource x:Key="TokenItemBorderBrush" ResourceKey="ControlElevationBorderBrush"/>
+                <StaticResource x:Key="TokenItemBorderBrushPointerOver" ResourceKey="ControlElevationBorderBrush"/>
+                <StaticResource x:Key="TokenItemBorderBrushPressed" ResourceKey="ControlElevationBorderBrush"/>
+                <StaticResource x:Key="TokenItemBorderBrushSelected" ResourceKey="ControlElevationBorderBrush"/>
+                <StaticResource x:Key="TokenItemBorderBrushPointerOverSelected" ResourceKey="ControlElevationBorderBrush"/>
+                <StaticResource x:Key="TokenItemBorderBrushPressedSelected" ResourceKey="ControlElevationBorderBrush"/>
+                <StaticResource x:Key="TokenItemBackgroundSelected" ResourceKey="MusicAlbumAccentBrush"/>
+                <StaticResource x:Key="TokenItemBackgroundPointerOverSelected" ResourceKey="MusicAlbumAccentBrushDark1"/>
+                <StaticResource x:Key="TokenItemBackgroundPressedSelected" ResourceKey="MusicAlbumAccentBrushDark2"/>
+                <StaticResource x:Key="TokenItemForegroundSelected" ResourceKey="TextOnMusicAlbumAccentForegroundBrush"/>
+                <StaticResource x:Key="TokenItemForegroundPointerOverSelected" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1"/>
+                <StaticResource x:Key="TokenItemForegroundPressedSelected" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2"/>
+            </Grid.Resources>
+            <community:TokenView HorizontalAlignment="Left"
+                                 x:Name="ShowLevelControl"
+                                 SelectionMode="Multiple"
+                                 SelectionChanged="ShowLevelControl_SelectionChanged">
+                <community:TokenItem x:Name="InfoBtn">Info (0)</community:TokenItem>
+                <community:TokenItem x:Name="WarningBtn">Warning (0)</community:TokenItem>
+                <community:TokenItem x:Name="ErrorBtn">Error (0)</community:TokenItem>
+                <community:TokenItem x:Name="AllLogCounter" IsEnabled="False">0</community:TokenItem>
+            </community:TokenView>
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Center"
+                        Spacing="12"
+                        Grid.Column="1">
+                <CheckBox x:Name="AutoScrollCheckBox" Content="自动滚动" IsChecked="True" MinWidth="0"/>
+                <Button Click="Button_Click">
+                    <StackPanel Orientation="Horizontal" Spacing="4">
+                        <FontIcon Glyph="&#xE8E5;" FontSize="16"/>
+                        <TextBlock Text="转到日志文件"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

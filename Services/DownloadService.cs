@@ -6,11 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using TewiMP.Pages;
+using TewiMP.UI.Pages;
 using TewiMP.Helpers;
 using TewiMP.Services.Storage;
-using TewiMP.Core.Models;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core;
+using TewiMP.Core.Music;
 
 public class DownloadService
 {
@@ -85,7 +85,7 @@ public class DownloadService
                 dm.ErrorMessage = err.Message;
                 OnDownloadError?.Invoke(dm);
 #if DEBUG
-                LogService.Log("DownloadManager", err.Message, LogLevel.Error);
+                LogService.Log(nameof(DownloadService), err.Message, LogLevel.Error);
 #endif
             }
         }
@@ -101,14 +101,14 @@ public class DownloadService
             try
             {
 #if DEBUG
-                LogService.Log("DownloadManager", $"下载中：{dm.MusicData.Title}");
+                LogService.Log(nameof(DownloadService), $"下载中：{dm.MusicData.Title}");
 #endif
                 StartDownload(dm);
             }
             catch (Exception err)
             {
 #if DEBUG
-                LogService.Log("DownloadManager", err.Message);
+                LogService.Log(nameof(DownloadService), err.Message);
 #endif
                 DownloadingData.Remove(dm);
                 DownloadErrorData.Add(dm);
@@ -225,7 +225,7 @@ public class DownloadService
         }
         catch (Exception err)
         {
-            LogService.Log("DownloadManager", err.ToString(), LogLevel.Error);
+            LogService.Log(nameof(DownloadService), err.ToString(), LogLevel.Error);
         }
 
         dm.DownloadState = DownloadStates.DownloadedSaving;
@@ -260,7 +260,7 @@ public class DownloadService
                 }
                 catch (Exception err)
                 {
-                    LogService.Log("DownloadManager", err.ToString(), LogLevel.Error);
+                    LogService.Log(nameof(DownloadService), err.ToString(), LogLevel.Error);
                 }
             }
         }
@@ -350,7 +350,7 @@ public class DownloadService
         DownloadingData.Remove(dm);
         DownloadedData.Add(dm);
         OnDownloaded?.Invoke(dm);
-        LogService.Log("DownloadManager", $"下载完成：{dm.MusicData.Title}");
+        LogService.Log(nameof(DownloadService), $"下载完成：{dm.MusicData.Title}");
     }
 
     public void CallOnDownloadingEvent(DownloadData dm)

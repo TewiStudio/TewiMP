@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using TewiMP.Core.Models;
+using TewiMP.Core;
 
 public static class HistoryHelper
 {
@@ -41,7 +41,7 @@ public static class HistoryHelper
                 }
                 catch
                 {
-                    LogService.Error("DataFolderBase", "Failed to save history data.");
+                    LogService.Error(nameof(DataFolderBase), "Failed to save history data.");
                 }
             }
         });
@@ -67,7 +67,7 @@ public static class SongHistoryHelper
         }
         catch (Exception ex)
         {
-            LogService.Log("DataFolderBase", ex.Message, LogLevel.Error);
+            LogService.Log(nameof(DataFolderBase), ex.Message, LogLevel.Error);
         }
     }
     

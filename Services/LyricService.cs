@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using TewiMP.Helpers;
-using TewiMP.Media.Audio;
+using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
-using TewiMP.Core.Models;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core;
+using TewiMP.Core.Music;
 
 public class LyricService
 {
@@ -60,7 +60,7 @@ public class LyricService
     private void InvokeLyricChangeEvent(LyricData lyricData)
     {
         PlayingLyricSelectedChanged?.Invoke(lyricData);
-        //LogManager.Log("LyricManager", $"当前歌词已设置为：\"{lyricData?.Lyric?.FirstOrDefault()}\"");
+        //LogManager.Log(nameof(LyricService), $"当前歌词已设置为：\"{lyricData?.Lyric?.FirstOrDefault()}\"");
     }
 
     public LyricService()
@@ -75,14 +75,14 @@ public class LyricService
         };
 
         //App.MainWindowInstance.WindowViewStateChanged += MainWindow_WindowViewStateChanged;
-        App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-        App.Instance.AudioPlayer.PlayStateChanged += AudioPlayer_PlayStateChanged;
-        App.Instance.AudioPlayer.TimingChanged += AudioPlayer_TimingChanged;
+        App.Instance.AudioService.SourceChanged += AudioService_SourceChanged;
+        App.Instance.AudioService.PlayStateChanged += AudioService_PlayStateChanged;
+        App.Instance.AudioService.TimingChanged += AudioService_TimingChanged;
     }
 
-    private void AudioPlayer_PlayStateChanged(AudioPlayer audioPlayer)
+    private void AudioService_PlayStateChanged(AudioService AudioService)
     {
-        if (App.Instance.AudioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+        if (App.Instance.AudioService.PlaybackState == NAudio.Wave.PlaybackState.Playing)
         {
             StartTimer();
         }
@@ -92,15 +92,15 @@ public class LyricService
         }
     }
 
-    private void AudioPlayer_TimingChanged(AudioPlayer audioPlayer)
+    private void AudioService_TimingChanged(AudioService AudioService)
     {
         // 使暂停时更改播放进度可以改变歌词
-        if (audioPlayer.PlaybackState != NAudio.Wave.PlaybackState.Playing) ReCallUpdate();
+        if (AudioService.PlaybackState != NAudio.Wave.PlaybackState.Playing) ReCallUpdate();
     }
 
     public async Task InitLyricList(MusicData musicData)
     {
-        //LogManager.Log("LyricManager", $"初始化歌词：\"{musicData.Title}\"");
+        //LogManager.Log(nameof(LyricService), $"初始化歌词：\"{musicData.Title}\"");
         if (musicData is null) return;
         var startTime = DateTime.Now;
         NowPlayingLyrics.Clear();
@@ -111,7 +111,7 @@ public class LyricService
         if (cachePath != null)
         {
             resultPath = cachePath;
-            //LogManager.Log("LyricManager", $"找到歌词缓存：\"{cachePath}\"");
+            //LogManager.Log(nameof(LyricService), $"找到歌词缓存：\"{cachePath}\"");
         }
         else
         {
@@ -134,7 +134,7 @@ public class LyricService
                 return;
             }
 
-            //LogManager.Log("LyricManager", "从网络中下载歌词");
+            //LogManager.Log(nameof(LyricService), "从网络中下载歌词");
             Tuple<string, string> lyricTuple;
             if (musicData.From == MusicFrom.pluginMusicSource)
             {
@@ -161,17 +161,17 @@ public class LyricService
                     File.WriteAllText(path, $"{lyricTuple.Item1}\n{lyricTuple.Item2}");
                 });
                 resultPath = path;
-                LogService.Log("LyricManager", "下载网络歌词完成");
+                LogService.Log(nameof(LyricService), "下载网络歌词完成");
             }
         }
 
         await InitLyricList(resultPath);
-        LogService.Log("LyricManager", $"初始化歌词成功： \"{musicData.Title}\"。Elapsed {DateTime.Now - startTime}");
+        LogService.Log(nameof(LyricService), $"初始化歌词成功： \"{musicData.Title}\"。Elapsed {DateTime.Now - startTime}");
     }
 
     public async Task InitLyricList(TagLib.File file)
     {
-        //LogManager.Log("LyricManager", "从 IDv3 标签中获取歌词");
+        //LogManager.Log(nameof(LyricService), "从 IDv3 标签中获取歌词");
         if (file is null)
         {
             await InitLyricList("");
@@ -179,7 +179,7 @@ public class LyricService
         }
         if (string.IsNullOrEmpty(file.Tag.Lyrics))
         {
-            LogService.Log("LyricManager", "IDv3 标签中找不到歌词。", LogLevel.Warning);
+            LogService.Log(nameof(LyricService), "IDv3 标签中找不到歌词。", LogLevel.Warning);
             await InitLyricList("");
             return;
         }
@@ -192,11 +192,11 @@ public class LyricService
         {
             NowPlayingLyrics.Clear();
             NowLyricsData = null;
-            LogService.Log("LyricManager", "无法获取有效歌词。", LogLevel.Warning);
+            LogService.Log(nameof(LyricService), "无法获取有效歌词。", LogLevel.Warning);
             return;
         }
 
-        //LogManager.Log("LyricManager", $"读取歌词文件：\"{lyricPath}\"");
+        //LogManager.Log(nameof(LyricService), $"读取歌词文件：\"{lyricPath}\"");
         string f = null;
         var lrcEncode = FileHelper.GetEncodingType(lyricPath);
         if (lrcEncode == Encoding.Default)
@@ -213,7 +213,7 @@ public class LyricService
         {
             NowPlayingLyrics.Clear();
             NowLyricsData = null;
-            LogService.Log("LyricManager", "歌词文件大小未超过 10 字节，不会使用此歌词文件", LogLevel.Warning);
+            LogService.Log(nameof(LyricService), "歌词文件大小未超过 10 字节，不会使用此歌词文件", LogLevel.Warning);
             //System.IO.File.Delete(lyricPath);
             return;
         }
@@ -257,11 +257,11 @@ public class LyricService
         if (PlayingLyricSelectedChanged is null) StopTimer();
         if (!NowPlayingLyrics.Any()) StopTimer();
         if (NowPlayingLyrics.Count <= 3) StopTimer();
-        if (App.Instance.AudioPlayer.PlaybackState != NAudio.Wave.PlaybackState.Playing) StopTimer();
+        if (App.Instance.AudioService.PlaybackState != NAudio.Wave.PlaybackState.Playing) StopTimer();
 
         foreach (var data in NowPlayingLyrics)
         {
-            if (data.LyricTimeSpan < App.Instance.AudioPlayer.CurrentTime)
+            if (data.LyricTimeSpan < App.Instance.AudioService.CurrentTime)
             {
                 lastLyricData = data;
             }
@@ -274,15 +274,15 @@ public class LyricService
     }
     
 
-    private async void AudioPlayer_SourceChanged(AudioPlayer audioPlayer)
+    private async void AudioService_SourceChanged(AudioService AudioService)
     {
-        if (MusicData != audioPlayer.MusicData)
+        if (MusicData != AudioService.MusicData)
         {
-            MusicData = audioPlayer.MusicData;
-            await InitLyricList(audioPlayer.MusicData);
+            MusicData = AudioService.MusicData;
+            await InitLyricList(AudioService.MusicData);
             PlayingLyricSourceChanged?.Invoke(NowPlayingLyrics);
 
-            //if (audioPlayer.NowOutDevice.DeviceType == Media.AudioPlayer.OutApi.Wasapi) timer.Interval = TimeSpan.FromMilliseconds(audioPlayer.Latency);
+            //if (AudioService.NowOutDevice.DeviceType == Media.AudioService.OutApi.Wasapi) timer.Interval = TimeSpan.FromMilliseconds(AudioService.Latency);
             //else timer.Interval = TimeSpan.FromMilliseconds(100);
             StartTimer();
         }

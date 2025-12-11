@@ -8,7 +8,8 @@ using System.Runtime.InteropServices;
 using WinUIEx;
 using Vanara.PInvoke;
 using Microsoft.UI.Xaml;
-using TewiMP.Core.Models;
+using TewiMP.UI.Windows;
+using TewiMP.Core;
 
 public class HotKeyService
 {
@@ -61,7 +62,7 @@ public class HotKeyService
         RegisteredHotKeys = [.. WillRegisterHotKeysList];
         EnableHotKey = enableHotKey;
         InitCallBack();
-        LogService.Log("HotKeyManager", $"Window: {RegisteredWindowHandle}, EnableHotKey: {EnableHotKey}, Registered HotKey Count: {RegisteredHotKeys.Count}");
+        LogService.Log(nameof(HotKeyService), $"Window: {RegisteredWindowHandle}, EnableHotKey: {EnableHotKey}, Registered HotKey Count: {RegisteredHotKeys.Count}");
     }
 
     public bool RegisterHotKey(HotKey hotKey, int? insertIndex = null)
@@ -205,24 +206,24 @@ public class HotKeyService
                     PlayNext();
                     break;
                 case HotKeyID.Pause:
-                    if (App.Instance.AudioPlayer.PlaybackState == NAudio.Wave.PlaybackState.Playing)
+                    if (App.Instance.AudioService.PlaybackState == NAudio.Wave.PlaybackState.Playing)
                     {
-                        App.Instance.AudioPlayer.SetPause();
+                        App.Instance.AudioService.SetPause();
                     }
                     else
                     {
-                        App.Instance.AudioPlayer.SetPlay();
+                        App.Instance.AudioService.SetPlay();
                     }
                     break;
                 case HotKeyID.Stop:
-                    App.Instance.AudioPlayer.CurrentTime = TimeSpan.Zero;
-                    App.Instance.AudioPlayer.SetStop();
+                    App.Instance.AudioService.CurrentTime = TimeSpan.Zero;
+                    App.Instance.AudioService.SetStop();
                     break;
                 case HotKeyID.VolumeAdd:
-                    App.Instance.AudioPlayer.Volume += 1f;
+                    App.Instance.AudioService.Volume += 1f;
                     break;
                 case HotKeyID.VolumeRemove:
-                    App.Instance.AudioPlayer.Volume -= 1f;
+                    App.Instance.AudioService.Volume -= 1f;
                     break;
                 case HotKeyID.OpenLyricWindow:
                     App.MainWindowInstance.OpenDesktopLyricWindow();

@@ -2,7 +2,7 @@
 
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core.Music;
 
 /// <summary>
 /// 用于读取播放列表

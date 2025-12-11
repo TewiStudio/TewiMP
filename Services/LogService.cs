@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
-using TewiMP.Core.Models;
+using TewiMP.Core;
 using TewiMP.Services.Storage;
 
 public class LogService

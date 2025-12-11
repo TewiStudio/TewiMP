@@ -1,0 +1,63 @@
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Controls;
+using TewiMP.Core;
+
+namespace TewiMP.UI.Controls
+{
+    public sealed partial class LogItem : UserControl
+    {
+        public new LogData DataContext => (LogData)base.DataContext;
+
+        public LogItem()
+        {
+            InitializeComponent();
+        }
+
+        private void t1_2_ColorManager()
+        {
+            if (DataContext is null) return;
+            if (DataContext.LogLevel == LogLevel.Info)
+            {
+                t2.Foreground = App.Current.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush;
+                t1_2.Foreground = App.Current.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush;
+            }
+            else if (DataContext.LogLevel == LogLevel.Warning)
+            {
+                t2.Foreground = App.Current.Resources["TextOnAccentFillColorPrimaryBrush"] as SolidColorBrush;
+                t1_2.Foreground = App.Current.Resources["SystemFillColorCautionBackgroundBrush"] as SolidColorBrush;
+            }
+            else if (DataContext.LogLevel == LogLevel.Error)
+            {
+                t2.Foreground = App.Current.Resources["TextOnAccentFillColorPrimaryBrush"] as SolidColorBrush;
+                t1_2.Foreground = App.Current.Resources["SystemFillColorCriticalBackgroundBrush"] as SolidColorBrush;
+            }
+        }
+
+        private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        {
+            if (DataContext is null) return;
+            t1_1.Text = $"[{DataContext.LogTime}]";
+            t1_2.Text = $"[{DataContext.LogLevel}]";
+            t2_1.Text = $" ¡ñ {DataContext.LogName}£º";
+            t2_2.Text = $"{DataContext.LogContent}";
+            t1_2_ColorManager();
+            swp.Value = DataContext.LogLevel;
+        }
+
+        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void UserControl_ActualThemeChanged(FrameworkElement sender, object args)
+        {
+            t1_2_ColorManager();
+        }
+    }
+}

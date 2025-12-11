@@ -10,7 +10,7 @@ using Windows.Storage;
 using Windows.Storage.Pickers;
 using Windows.Storage.Streams;
 using TewiMP.Services.Storage;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core.Music;
 
 namespace TewiMP.Helpers
 {

@@ -13,24 +13,24 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using TewiMP.Core.Models;
-using TewiMP.Core.Models.Audio;
-using TewiMP.Core.Models.Music;
-using TewiMP.Services.Storage;
-using TewiMP.Helpers;
-using TewiMP.Media.Audio;
-using TewiMP.Media.Audio.AudioEffects;
-using TewiMP.Pages;
-using TewiMP.Plugin;
-using TewiMP.Services;
-using TewiMP.Windowed;
-using Windows.ApplicationModel.Core;
-using Windows.Media;
-using Windows.Media.Playback;
-using Windows.Storage;
-using Windows.Storage.Streams;
 using Windows.UI.Popups;
+using Windows.Media;
+using Windows.Storage;
+using Windows.Media.Playback;
+using Windows.Storage.Streams;
+using Windows.ApplicationModel.Core;
+using TewiMP.UI.Pages;
+using TewiMP.Services;
+using TewiMP.Services.Storage;
+using TewiMP.UI.Windows;
+using TewiMP.Helpers;
+using TewiMP.Services.Media.Audio;
+using TewiMP.Services.Media.Audio.AudioEffects;
+using TewiMP.Core;
+using TewiMP.Core.Audio;
+using TewiMP.Core.Music;
 using WinRT.Interop;
+using TewiMP.Services.Plugin;
 
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.
@@ -49,7 +49,7 @@ public partial class App : Application
     public static App Instance => (App)Application.Current;
 
     /// <summary>
-    /// 从 <see cref="App.Instance"/> 获取 <see cref="MainWindow"/> 的实例。"
+    /// 从 <see cref="App.Instance"/> 获取 <see cref=nameof(MainWindow)/> 的实例。"
     /// </summary>
     public static MainWindow MainWindowInstance => (MainWindow)Instance.MainWindow;
     #endregion
@@ -60,7 +60,7 @@ public partial class App : Application
     #endregion
 
     #region Services
-    public AudioPlayer AudioPlayer { get; private set; } = null;
+    public AudioService AudioService { get; private set; } = null;
     public CacheService CacheService { get; private set; } = null;
     public PlayingListService PlayingListService { get; private set; } = null;
     public LyricService LyricService { get; private set; } = null;
@@ -181,7 +181,7 @@ public partial class App : Application
         DataFolderBase.InitFiles();
         LogService.InitNowLog();
         CacheService = new();
-        AudioPlayer = new();
+        AudioService = new();
         PlayingListService = new();
         LocalMusicManagerService = new();
         LyricService = new();
@@ -206,9 +206,9 @@ public partial class App : Application
         SMTC.DisplayUpdater.Update();
 
         int saveSettingsWhenSourceChangedCount = 0;
-        AudioPlayer.SourceChanged += async (audioPlayer) =>
+        AudioService.SourceChanged += async (AudioService) =>
         {
-            //await SongHistoryHelper.AddHistory(new() { MusicData = audioPlayer.MusicData, Time = DateTime.Now });
+            //await SongHistoryHelper.AddHistory(new() { MusicData = AudioService.MusicData, Time = DateTime.Now });
             if (saveSettingsWhenSourceChangedCount > 2)
             {
                 saveSettingsWhenSourceChangedCount = 0;
@@ -217,13 +217,13 @@ public partial class App : Application
             }
             saveSettingsWhenSourceChangedCount++;
         };
-        AudioPlayer.CacheLoadingChanged += (_, __) =>
+        AudioService.CacheLoadingChanged += (_, __) =>
         {
             SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData?.Title;
             SMTC.DisplayUpdater.MusicProperties.Artist = "加载中...";
             SMTC.DisplayUpdater.Update();
         };
-        AudioPlayer.CacheLoadedChanged += (_) =>
+        AudioService.CacheLoadedChanged += (_) =>
         {
             if (_.MusicData is null)
             {
@@ -238,7 +238,7 @@ public partial class App : Application
             }
             SMTC.DisplayUpdater.Update();
         };
-        AudioPlayer.PlayStateChanged += (_) =>
+        AudioService.PlayStateChanged += (_) =>
         {
             if (_.PlaybackState == PlaybackState.Playing)
             {
@@ -261,10 +261,10 @@ public partial class App : Application
                 switch (__.Button)
                 {
                     case SystemMediaTransportControlsButton.Play:
-                        AudioPlayer.SetPlay();
+                        AudioService.SetPlay();
                         break;
                     case SystemMediaTransportControlsButton.Pause:
-                        AudioPlayer.SetPause();
+                        AudioService.SetPause();
                         break;
                     case SystemMediaTransportControlsButton.Previous:
                         PlayingListService.PlayPrevious();
@@ -273,7 +273,7 @@ public partial class App : Application
                         PlayingListService.PlayNext();
                         break;
                     case SystemMediaTransportControlsButton.Stop:
-                        AudioPlayer.SetStop();
+                        AudioService.SetStop();
                         break;
                 }
             });
@@ -323,7 +323,7 @@ public partial class App : Application
         NotifyIconWindow = new();
         taskBarInfoWindow = new();
         LaunchAsync();
-        PluginManager.Init();
+        PluginService.Init();
         LoadLastPlaying();
         LogService.Log("Starting", $"初始化完成。耗时：{DateTime.Now - time}");
     }
@@ -352,7 +352,7 @@ public partial class App : Application
         taskBarInfoWindow.Close();
         SMTC.DisplayUpdater.ClearAll();
         SMTC.DisplayUpdater.Update();
-        AudioPlayer.DisposeAll();
+        AudioService.DisposeAll();
         HotKeyService.UnregisterHotKeys([.. HotKeyService.RegisteredHotKeys]);
         await SaveNowPlaying();
         MainWindowInstance.Close();
@@ -412,7 +412,7 @@ public partial class App : Application
 
     public async Task SaveNowPlaying()
     {
-        if (AudioPlayer.MusicData is null) return;
+        if (AudioService.MusicData is null) return;
 
         var path = Path.Combine(DataFolderBase.UserDataFolder, "LastPlaying");
         if (!LoadLastExitPlayingSongAndSongList)
@@ -431,7 +431,7 @@ public partial class App : Application
             foreach (var a in PlayingListService.PlayBehavior == PlayBehavior.随机播放 ? PlayingListService.RandomSavePlayingList : PlayingListService.NowPlayingList)
                 array.Add(JObject.FromObject(a));
             jObject = new JObject() {
-                    { "music", JObject.FromObject(AudioPlayer.MusicData) },
+                    { "music", JObject.FromObject(AudioService.MusicData) },
                     { "list", array }
             };
         });
@@ -444,7 +444,7 @@ public partial class App : Application
     #region 加载和保存设置
     bool loadFailed = false;
     int retryCount = 0;
-    public Windows.UI.Color AccentColor = Windows.UI.Color.FromArgb(0, 0, 0, 0);
+    public global::Windows.UI.Color AccentColor = global::Windows.UI.Color.FromArgb(0, 0, 0, 0);
 
     public void LoadSettings(bool loadDefaultSettings = false)
     {
@@ -467,8 +467,8 @@ public partial class App : Application
             //DataFolderBase.ImageCacheFolder = SettingEditHelper.GetSetting<string>(settingData, DataFolderBase.SettingParams.ImageCacheFolderPath);
             //DataFolderBase.LyricCacheFolder = SettingEditHelper.GetSetting<string>(settingData, DataFolderBase.SettingParams.LyricCacheFolderPath);
 
-            AudioPlayer.Volume = SettingEditHelper.GetSetting<float>(settingData, DataFolderBase.SettingParams.Volume);
-            AudioPlayer.EqEnabled = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.EqualizerEnable);
+            AudioService.Volume = SettingEditHelper.GetSetting<float>(settingData, DataFolderBase.SettingParams.Volume);
+            AudioService.EqEnabled = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.EqualizerEnable);
             //MainWindowInstance.SMusicPage.ShowLrcPage = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.MusicPageShowLyricPage);
 
             DownloadService.DownloadQuality = (DataFolderBase.DownloadQuality)SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.DownloadQuality);
@@ -498,7 +498,7 @@ public partial class App : Application
             DesktopLyricWindow.LyricOpacity = SettingEditHelper.GetSetting<double>(settingData, DataFolderBase.SettingParams.DesktopLyricOpacity);
             NotifyIconWindow.IsVisible = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.TaskbarShowIcon);
             MainWindowInstance.RunInBackground = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.BackgroundRun);
-            Controls.ImageEx.ImageDarkMass = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.ImageDarkMass);
+            UI.Controls.ImageEx.ImageDarkMass = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.ImageDarkMass);
             LoadLastExitPlayingSongAndSongList = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.LoadLastExitPlayingSongAndSongList);
             MainWindowInstance.NavView.PaneDisplayMode = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.TopNavigationStyle) ? NavigationViewPaneDisplayMode.Top : NavigationViewPaneDisplayMode.Auto;
             LocalAudioPage.ItemSortBy = SettingEditHelper.GetSetting<int>(settingData, DataFolderBase.SettingParams.LocalMusicPageItemSortBy);
@@ -513,12 +513,12 @@ public partial class App : Application
             AudioFilterStatic.ParametricEqEnable = SettingEditHelper.GetSetting<bool>(audioEffectData, DataFolderBase.AudioEffectFlag.ParametricEqEnable);
             AudioFilterStatic.PassFilterEqEnable = SettingEditHelper.GetSetting<bool>(audioEffectData, DataFolderBase.AudioEffectFlag.PassFilterEqEnable);
             AudioFilterStatic.EffectEnable = SettingEditHelper.GetSetting<bool>(audioEffectData, DataFolderBase.AudioEffectFlag.EffectEnable);
-            AudioPlayer.WasapiOnly = SettingEditHelper.GetSetting<bool>(audioEffectData, DataFolderBase.AudioEffectFlag.WasapiOnlyEnable);
-            AudioPlayer.Latency = SettingEditHelper.GetSetting<int>(audioEffectData, DataFolderBase.AudioEffectFlag.Latency);
-            AudioPlayer.Pitch = (double)audioEffects[0];
-            AudioPlayer.Tempo = (double)audioEffects[1];
-            AudioPlayer.Rate = (double)audioEffects[2];
-            AudioPlayer.EqualizerBand = AudioEqualizerBands.GetBandFromString(SettingEditHelper.GetSetting<string>(audioEffectData, DataFolderBase.AudioEffectFlag.GraphicEqString));
+            AudioService.WasapiOnly = SettingEditHelper.GetSetting<bool>(audioEffectData, DataFolderBase.AudioEffectFlag.WasapiOnlyEnable);
+            AudioService.Latency = SettingEditHelper.GetSetting<int>(audioEffectData, DataFolderBase.AudioEffectFlag.Latency);
+            AudioService.Pitch = (double)audioEffects[0];
+            AudioService.Tempo = (double)audioEffects[1];
+            AudioService.Rate = (double)audioEffects[2];
+            AudioService.EqualizerBand = AudioEqualizerBands.GetBandFromString(SettingEditHelper.GetSetting<string>(audioEffectData, DataFolderBase.AudioEffectFlag.GraphicEqString));
             var bData = SettingEditHelper.GetSetting<string>(audioEffectData, DataFolderBase.AudioEffectFlag.GraphicEqDatas).Split(',');
             for (int i = 0; i < 10; i++) AudioEqualizerBands.CustomBands[i][2] = float.Parse(bData[i]);
             AudioFilterStatic.ParametricEqDatas = SettingEditHelper.GetSetting<JArray>(audioEffectData, DataFolderBase.AudioEffectFlag.ParametricEqDatas).ToObject<ObservableCollection<EQData>>();
@@ -552,7 +552,7 @@ public partial class App : Application
             {
                 SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.CacheFolderPath, DataFolderBase.CacheFolder);
             }
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.Volume, AudioPlayer.Volume == 0 ? MainWindowInstance.NoVolumeValue : AudioPlayer.Volume);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.Volume, AudioService.Volume == 0 ? MainWindowInstance.NoVolumeValue : AudioService.Volume);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.DownloadFolderPath, DataFolderBase.DownloadFolder);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.AudioCacheFolderPath, DataFolderBase.AudioCacheFolder);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ImageCacheFolderPath, DataFolderBase.ImageCacheFolder);
@@ -571,17 +571,17 @@ public partial class App : Application
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.PlayPauseWhenPreviousPause, PlayingListService.PauseWhenPreviousPause);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.PlayNextWhenPlayError, PlayingListService.NextWhenPlayError);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.DownloadMaximum, DownloadService.DownloadingMaximum);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.EqualizerEnable, AudioPlayer.EqEnabled);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.EqualizerString, AudioEqualizerBands.GetNameFromBands(AudioPlayer.EqualizerBand));
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.WasapiOnly, AudioPlayer.WasapiOnly);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.AudioLatency, AudioPlayer.Latency < 50 ? 50 : AudioPlayer.Latency);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.EqualizerEnable, AudioService.EqEnabled);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.EqualizerString, AudioEqualizerBands.GetNameFromBands(AudioService.EqualizerBand));
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.WasapiOnly, AudioService.WasapiOnly);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.AudioLatency, AudioService.Latency < 50 ? 50 : AudioService.Latency);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.MusicPageShowLyricPage, MainWindowInstance.SMusicPage.ShowLrcPage);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeColorMode, (int)MainWindowInstance.WindowGridBase.RequestedTheme);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeMusicPageColorMode, (int)MainWindowInstance.SMusicPage.pageRoot.RequestedTheme);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropEffect, (int)MainWindowInstance.CurrentBackdrop);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropImagePath, MainWindowInstance.ImagePath);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeBackdropImageMassOpacity, MainWindowInstance.BackgroundMass.Opacity);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeAccentColor, AccentColor == Windows.UI.Color.FromArgb(0, 0, 0, 0) ? null : AccentColor.ToString());
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ThemeAccentColor, AccentColor == global::Windows.UI.Color.FromArgb(0, 0, 0, 0) ? null : AccentColor.ToString());
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.DesktopLyricOptions, new JArray()
             {
                 DesktopLyricWindow.PauseButtonVisible, DesktopLyricWindow.ProgressUIVisible,
@@ -600,7 +600,7 @@ public partial class App : Application
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.DesktopLyricOpacity, DesktopLyricWindow.LyricOpacity);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.TaskbarShowIcon, NotifyIconWindow.IsVisible);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.BackgroundRun, MainWindowInstance.RunInBackground);
-            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ImageDarkMass, Controls.ImageEx.ImageDarkMass);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.ImageDarkMass, UI.Controls.ImageEx.ImageDarkMass);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.LoadLastExitPlayingSongAndSongList, LoadLastExitPlayingSongAndSongList);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeyEnable, HotKeyService.EnableHotKey);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.HotKeySettings, JArray.FromObject(App.Instance.HotKeyService.RegisteredHotKeys));
@@ -615,17 +615,17 @@ public partial class App : Application
             SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.ParametricEqEnable, AudioFilterStatic.ParametricEqEnable);
             SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.PassFilterEqEnable, AudioFilterStatic.PassFilterEqEnable);
             SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.EffectEnable, AudioFilterStatic.EffectEnable);
-            SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.WasapiOnlyEnable, AudioPlayer.WasapiOnly);
-            SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.Latency, AudioPlayer.Latency < 50 ? 50 : AudioPlayer.Latency);
-            SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.AudioEffectDatas, new JArray() { AudioPlayer.Pitch, AudioPlayer.Tempo, AudioPlayer.Rate });
-            SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.GraphicEqString, AudioEqualizerBands.GetNameFromBands(AudioPlayer.EqualizerBand));
+            SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.WasapiOnlyEnable, AudioService.WasapiOnly);
+            SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.Latency, AudioService.Latency < 50 ? 50 : AudioService.Latency);
+            SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.AudioEffectDatas, new JArray() { AudioService.Pitch, AudioService.Tempo, AudioService.Rate });
+            SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.GraphicEqString, AudioEqualizerBands.GetNameFromBands(AudioService.EqualizerBand));
             SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.GraphicEqDatas, b);
             SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.ParametricEqDatas, AudioFilterStatic.ParametricEqDatas);
             SettingEditHelper.EditSetting(audioEffectData, DataFolderBase.AudioEffectFlag.PassFilterEqDatas, AudioFilterStatic.PassFilterDatas);
 
             DataFolderBase.JSettingData = settingData;
             DataFolderBase.JAudioEffectData = audioEffectData;
-            PluginManager.SavePluginInfoSettings();
+            PluginService.SavePluginInfoSettings();
 
             LogService.Log("App", $"设置配置已存储。Elapsed {DateTime.Now - startTime}");
         }

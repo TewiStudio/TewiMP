@@ -5,10 +5,10 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using TewiMP.Plugin;
 using TewiMP.Helpers;
+using TewiMP.Services.Plugin;
 using TewiMP.Services.Storage;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core.Music;
 
 public class CacheService
 {
@@ -41,7 +41,7 @@ public class CacheService
     /// <exception cref="CacheIsLoadingException"></exception>
     public async Task<string> StartCacheMusic(MusicData data)
     {
-        //LogManager.Log("CacheManager", $"开始缓存：\"{data}\"");
+        //LogManager.Log(nameof(CacheService), $"开始缓存：\"{data}\"");
         if (data.From == MusicFrom.localMusic) throw new Exception("无法缓存本地文件。");
         AddingCacheMusicData?.Invoke(data, "正在开始缓存");
         if (InCachingMusicData.Contains(data)) throw new CacheIsLoadingException("此音频正在缓冲中。");
@@ -50,7 +50,7 @@ public class CacheService
         musicPathResult = await GetCachePath(data);
         if (musicPathResult != null)
         {
-            LogService.Log("CacheManager", $"Cache already exists \"{musicPathResult}\"");
+            LogService.Log(nameof(CacheService), $"Cache already exists \"{musicPathResult}\"");
             CachedMusicData?.Invoke(data, null);
             return musicPathResult; // 当检测到已缓存时返回
         }
@@ -78,7 +78,7 @@ public class CacheService
             throw new WebException($"无法获取歌曲链接。");
         }
 
-        LogService.Log("CacheManager", "正在下载缓存文件...");
+        LogService.Log(nameof(CacheService), "正在下载缓存文件...");
         musicPathResult = @$"{DataFolderBase.AudioCacheFolder}\{data.PluginInfo}{data.ID}";
         await Task.Run(() => File.Create(musicPathResult).Close()); // 创建缓存文件
 
@@ -121,7 +121,7 @@ public class CacheService
 
         InCachingMusicData.Remove(data);
         CachedMusicData?.Invoke(data, null);
-        LogService.Log("CacheManager", $"缓存完成：\"{musicPathResult}\"");
+        LogService.Log(nameof(CacheService), $"缓存完成：\"{musicPathResult}\"");
         return musicPathResult;
     }
 }

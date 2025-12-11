@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core.Music;
 
 public static class LocalMusicHelper
 {

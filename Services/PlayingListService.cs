@@ -10,11 +10,12 @@ using Microsoft.UI.Xaml.Media;
 using NAudio;
 using Melanchall.DryWetMidi.Core;
 using System.Threading.Tasks;
-using TewiMP.Core.Models.Music;
 using TewiMP.Helpers;
-using TewiMP.Media;
-using TewiMP.Media.Audio;
+using TewiMP.UI.Windows;
+using TewiMP.Services.Media;
+using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
+using TewiMP.Core.Music;
 
 public enum PlayBehavior { 循环播放, 顺序播放, 单曲循环, 随机播放, 播放完成后停止 }
 public enum SetPlayInfo { Normal, Next, Previous }
@@ -80,8 +81,8 @@ public class PlayingListService
     {
         LogService.Log("Starting", "初始化 PlayingList.");
 
-        App.Instance.AudioPlayer.SourceChanged += AudioPlayer_SourceChanged;
-        App.Instance.AudioPlayer.PlayEnd += AudioPlayer_PlayEnd;
+        App.Instance.AudioService.SourceChanged += AudioService_SourceChanged;
+        App.Instance.AudioService.PlayEnd += AudioService_PlayEnd;
     }
 
     public void SetRandomPlay(PlayBehavior value)
@@ -122,7 +123,7 @@ public class PlayingListService
     }
 
     bool isPlayEndCallPlay = false;
-    private async void AudioPlayer_PlayEnd(AudioPlayer audioPlayer)
+    private async void AudioService_PlayEnd(AudioService AudioService)
     {
         isPlayEndCallPlay = true;
         switch (PlayBehavior)
@@ -136,11 +137,11 @@ public class PlayingListService
                 await Play(NowPlayingList[new Random().Next(NowPlayingList.Count - 1)], true);
                 break;*/
             case PlayBehavior.单曲循环:
-                await Play(App.Instance.AudioPlayer.MusicData, true);
+                await Play(App.Instance.AudioService.MusicData, true);
                 break;
             case PlayBehavior.播放完成后停止:
-                App.Instance.AudioPlayer.CurrentTime = TimeSpan.Zero;
-                App.Instance.AudioPlayer.SetStop();
+                App.Instance.AudioService.CurrentTime = TimeSpan.Zero;
+                App.Instance.AudioService.SetStop();
                 break;
         }
         isPlayEndCallPlay = true;
@@ -148,12 +149,12 @@ public class PlayingListService
 
     MusicData lastMusicData = null;
     private CancellationTokenSource _imageLoadingCts;
-    private async void AudioPlayer_SourceChanged(AudioPlayer audioPlayer)
+    private async void AudioService_SourceChanged(AudioService AudioService)
     {
-        if (audioPlayer?.FileReader is null) return;
+        if (AudioService?.FileReader is null) return;
 
         // 检查是否为无需加载封面的情况 (MIDI 或 数据为空)
-        if (audioPlayer.FileReader.isMidi || audioPlayer.MusicData is null)
+        if (AudioService.FileReader.isMidi || AudioService.MusicData is null)
         {
             lastMusicData = null;
             NowPlayingImage = null;
@@ -163,7 +164,7 @@ public class PlayingListService
         }
 
         // 如果是同一张专辑，则不重新加载图片
-        if (IsSameAlbum(audioPlayer.MusicData, lastMusicData))
+        if (IsSameAlbum(AudioService.MusicData, lastMusicData))
         {
             return;
         }
@@ -176,13 +177,13 @@ public class PlayingListService
         try
         {
             // 更新 lastMusicData
-            lastMusicData = audioPlayer.MusicData;
+            lastMusicData = AudioService.MusicData;
 
             // 通知 UI 开始加载
             NowPlayingImageLoading?.Invoke(null, null);
 
             // 异步获取图片
-            var (uri, path) = await ImageManager.GetImageUri(audioPlayer.MusicData);
+            var (uri, path) = await ImageService.GetImageUri(AudioService.MusicData);
 
             // 如果 await 期间又切歌了，直接退出，不要覆盖新歌的数据
             if (currentToken.IsCancellationRequested) return;
@@ -208,7 +209,7 @@ public class PlayingListService
         }
         catch (Exception ex)
         {
-            LogService.Error("PlayingList", $"加载封面失败: {ex.Message}");
+            LogService.Error(nameof(PlayingListService), $"加载封面失败: {ex.Message}");
             // 发生错误时，最好重置图片或显示默认图
             NowPlayingImage = null;
             NowPlayingImageLoaded?.Invoke(null, null);
@@ -246,7 +247,7 @@ public class PlayingListService
             if (insert)
             {
                 int index = 0;
-                if (App.Instance.AudioPlayer.MusicData != null) index = NowPlayingList.IndexOf(App.Instance.AudioPlayer.MusicData) + 1;
+                if (App.Instance.AudioService.MusicData != null) index = NowPlayingList.IndexOf(App.Instance.AudioService.MusicData) + 1;
                 NowPlayingList.Insert(index, musicData);
             }
             else
@@ -258,7 +259,7 @@ public class PlayingListService
                 if (insert)
                 {
                     int index = 0;
-                    if (App.Instance.AudioPlayer.MusicData is not null) index = RandomSavePlayingList.IndexOf(App.Instance.AudioPlayer.MusicData) + 1;
+                    if (App.Instance.AudioService.MusicData is not null) index = RandomSavePlayingList.IndexOf(App.Instance.AudioService.MusicData) + 1;
                     RandomSavePlayingList.Insert(index, musicData);
                 }
                 else
@@ -279,12 +280,12 @@ public class PlayingListService
         var time = DateTime.Now;
         Add(musicData, true, true);
 
-        LogService.Log("PlayingList", $"Playing：\"{musicData}\"");
+        LogService.Log(nameof(PlayingListService), $"Playing：\"{musicData}\"");
         NAudio.Wave.PlaybackState playState;
         if (PauseWhenPreviousPause)
         {
-            if (App.Instance.AudioPlayer.NowOutObj != null)
-                playState = App.Instance.AudioPlayer.NowOutObj.PlaybackState;
+            if (App.Instance.AudioService.NowOutObj != null)
+                playState = App.Instance.AudioService.NowOutObj.PlaybackState;
             else
                 playState = NAudio.Wave.PlaybackState.Playing; 
         }
@@ -302,9 +303,9 @@ public class PlayingListService
         //System.Diagnostics.LogManager.Log(musicData.Title);
         try
         {
-            await App.Instance.AudioPlayer.SetSourceAsync(musicData);
+            await App.Instance.AudioService.SetSourceAsync(musicData);
             if (playState == NAudio.Wave.PlaybackState.Playing)
-                App.Instance.AudioPlayer.SetPlay(false);
+                App.Instance.AudioService.SetPlay(false);
             clear = true;
         }
         catch (DivideByZeroException err)
@@ -312,7 +313,7 @@ public class PlayingListService
             var data = DataFolderBase.JSettingData;
             data[DataFolderBase.SettingParams.AudioLatency.ToString()] =
                 DataFolderBase.SettingDefault[DataFolderBase.SettingParams.AudioLatency.ToString()];
-            App.Instance.AudioPlayer.Latency = (int)data[DataFolderBase.SettingParams.AudioLatency.ToString()];
+            App.Instance.AudioService.Latency = (int)data[DataFolderBase.SettingParams.AudioLatency.ToString()];
             DataFolderBase.JSettingData = data;
 
             App.MainWindowInstance.AddNotify(
@@ -320,21 +321,21 @@ public class PlayingListService
                 $"播放音频时出现错误，可能是播放延迟设置不正确导致的。\n" +
                     $"已将播放延迟设置到默认值，请尝试重新播放。",
                 NotifySeverity.Error);
-            LogService.Error("PlayingList", $"播放音频时出现错误，可能是播放延迟设置不正确导致的。\n错误信息：{err}");
+            LogService.Error(nameof(PlayingListService), $"播放音频时出现错误，可能是播放延迟设置不正确导致的。\n错误信息：{err}");
         }
         catch (NotEnoughBytesException err)
         {
-            LogService.Error("PlayingList", $"播放Midi音频时出现错误，似乎不支持此Midi音频文件。\n错误信息：{err}");
+            LogService.Error(nameof(PlayingListService), $"播放Midi音频时出现错误，似乎不支持此Midi音频文件。\n错误信息：{err}");
             App.MainWindowInstance.AddNotify("播放Midi音频时出现错误", $"似乎不支持此Midi音频文件。\n错误信息：{err.Message}", NotifySeverity.Error);
         }
         catch (MmException err)
         {
-            LogService.Error("PlayingList", $"无法初始化音频输出。请尝试重新播放音频，如果仍然无法初始化，请检查是否有其它应用程序独占此音频设备。\n错误信息：{err}");
+            LogService.Error(nameof(PlayingListService), $"无法初始化音频输出。请尝试重新播放音频，如果仍然无法初始化，请检查是否有其它应用程序独占此音频设备。\n错误信息：{err}");
             App.MainWindowInstance.AddNotify("无法初始化音频输出", $"请尝试重新播放音频，如果仍然无法初始化，请检查是否有其它应用程序独占此音频设备。\n错误信息：{err.Message}", NotifySeverity.Error);
         }
         catch (Exception e)
         {
-            LogService.Error("PlayingList", $"播放音频时出现错误。\n错误信息：{e}");
+            LogService.Error(nameof(PlayingListService), $"播放音频时出现错误。\n错误信息：{e}");
 #if DEBUG
             App.MainWindowInstance.AddNotify("播放音频时出现错误", e.ToString(), NotifySeverity.Error);
 #else
@@ -386,7 +387,7 @@ public class PlayingListService
     {
         if (NowPlayingList.Any())
         {
-            var a = NowPlayingList.IndexOf(App.Instance.AudioPlayer.pointMusicData) + 1;
+            var a = NowPlayingList.IndexOf(App.Instance.AudioService.pointMusicData) + 1;
             if (a > NowPlayingList.Count - 1)
             {
                 a = 0;
@@ -403,7 +404,7 @@ public class PlayingListService
     {
         if (NowPlayingList.Any())
         {
-            var a = NowPlayingList.IndexOf(App.Instance.AudioPlayer.pointMusicData) - 1;
+            var a = NowPlayingList.IndexOf(App.Instance.AudioService.pointMusicData) - 1;
             if (a < 0)
             {
                 a = NowPlayingList.Count - 1;
@@ -458,7 +459,7 @@ public class PlayingListService
             return;
         }
 
-        LogService.Info("PlayingList", $"Album accent color source：From \"{_lastProcessedImagePath}\" To \"{nowImagePath}\"");
+        LogService.Info(nameof(PlayingListService), $"Album accent color source：From \"{_lastProcessedImagePath}\" To \"{nowImagePath}\"");
         _lastProcessedImagePath = nowImagePath;
 
         Windows.UI.Color albumColor, albumColorReverse, textColorOnAlbum;
@@ -483,7 +484,7 @@ public class PlayingListService
                 // 如果变了，说明这次计算已经过时，直接丢弃
                 if (nowImagePath != NowPlayingImagePath)
                 {
-                    LogService.Info("PlayingList", "图片路径已变更，放弃应用旧的颜色计算结果。");
+                    LogService.Info(nameof(PlayingListService), "图片路径已变更，放弃应用旧的颜色计算结果。");
                     return;
                 }
 
@@ -491,11 +492,11 @@ public class PlayingListService
                 albumColorReverse = themeColor.Item2;
                 textColorOnAlbum = themeColor.Item3;
 
-                LogService.Info("PlayingList", $"Current album color：{albumColor}");
+                LogService.Info(nameof(PlayingListService), $"Current album color：{albumColor}");
             }
             catch (Exception ex)
             {
-                LogService.Error("PlayingList", $"提取颜色失败，回退到默认颜色: {ex.Message}");
+                LogService.Error(nameof(PlayingListService), $"提取颜色失败，回退到默认颜色: {ex.Message}");
                 // 发生异常时的回退逻辑
                 var systemAccent = (Windows.UI.Color)App.Current.Resources["SystemAccentColor"];
                 albumColor = systemAccent;

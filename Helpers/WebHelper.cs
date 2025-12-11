@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using TewiMP.Services;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core.Music;
 
 namespace TewiMP.Helpers
 {

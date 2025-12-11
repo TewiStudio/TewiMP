@@ -1,0 +1,239 @@
+﻿<winex:WindowEx
+    x:Class="TewiMP.UI.Windows.DesktopLyricWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winex="using:WinUIEx"
+    xmlns:local="using:TewiMP.UI.Windows"
+    xmlns:controls="using:TewiMP.UI.Controls"
+    mc:Ignorable="d" SizeChanged="Window_SizeChanged" Closed="DesktopLyricWindow_Closed"
+    xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:media="using:CommunityToolkit.WinUI.Media">
+    <Grid x:Name="root" SizeChanged="root_SizeChanged" Loaded="root_Loaded"
+          Padding="0" Background="Transparent">
+        <Grid.Resources>
+            <ResourceDictionary>
+                <SolidColorBrush x:Key="LrcForeground" Color="#E0FFFFFF"/>
+                <SolidColorBrush x:Key="LrcSecondForeground" Color="#A0AAAAAA"/>
+                <StaticResource x:Key="AccentLrcForeground" ResourceKey="MusicAlbumAccentBrush"/>
+            </ResourceDictionary>
+        </Grid.Resources>
+        <Rectangle
+            VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+            Fill="{ThemeResource ControlOnImageFillColorDefaultBrush}" x:Name="BackgroundFill">
+            <Rectangle.OpacityTransition>
+                <ScalarTransition/>
+            </Rectangle.OpacityTransition>
+        </Rectangle>
+        <Grid Padding="24" Loaded="Grid_Loaded">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid x:Name="V1" Grid.Row="0" HorizontalAlignment="Stretch">
+                <Viewbox x:Name="T1BaseViewbox">
+                    <Grid x:Name="T1BaseParent">
+                        <Grid.Transitions>
+                            <TransitionCollection>
+                                <ContentThemeTransition/>
+                            </TransitionCollection>
+                        </Grid.Transitions>
+                        <Border x:Name="T1ShadowTarget"/>
+                        <TextBlock x:Name="T1Base">
+                            <ui:Effects.Shadow>
+                                <ui:AttachedDropShadow Opacity="1" BlurRadius="10" Offset="0,0.2" Color="#555555" CastTo="{x:Bind T1ShadowTarget}"/>
+                            </ui:Effects.Shadow>
+                            <Run x:Name="T1" Text="TewiMP" Foreground="{ThemeResource LrcForeground}"/>
+                            <Run x:Name="T11" Foreground="{ThemeResource LrcSecondForeground}" FontSize="10"/>
+                        </TextBlock>
+                    </Grid>
+                </Viewbox>
+            </Grid>
+            <Grid x:Name="V2" Grid.Row="1" HorizontalAlignment="Stretch">
+                <Viewbox x:Name="T2BaseViewbox">
+                    <Grid x:Name="T2BaseParent">
+                        <Grid.Transitions>
+                            <TransitionCollection>
+                                <ContentThemeTransition/>
+                            </TransitionCollection>
+                        </Grid.Transitions>
+                        <Border x:Name="T2ShadowTarget"/>
+                        <TextBlock x:Name="T2Base" Grid.Column="1">
+                            <ui:Effects.Shadow>
+                                <ui:AttachedDropShadow Opacity=".8" BlurRadius="10" Offset="0,0.2" Color="#555555" CastTo="{x:Bind T2ShadowTarget}"/>
+                            </ui:Effects.Shadow>
+                            <Run x:Name="T2" Text="无歌词" Foreground="{ThemeResource LrcForeground}"/>
+                            <Run x:Name="T21" Foreground="{ThemeResource LrcSecondForeground}" FontSize="10"/>
+                        </TextBlock>
+                    </Grid>
+                </Viewbox>
+            </Grid>
+        </Grid>
+        <Border x:Name="InfoTBBorder"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" Opacity="0"
+                CornerRadius="4" BorderThickness="1" Background="{ThemeResource ControlOnImageFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+            <Border.OpacityTransition>
+                <ScalarTransition/>
+            </Border.OpacityTransition>
+            <TextBlock Text="正在播放：" x:Name="InfoTB"
+                   TextAlignment="Center" TextTrimming="CharacterEllipsis"
+                   FontWeight="Light" Margin="4,1">
+            </TextBlock>
+        </Border>
+        <Grid CornerRadius="8" BorderThickness="1"
+              HorizontalAlignment="Center" VerticalAlignment="Center"
+              BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+              x:Name="InfoBorder" Opacity="0">
+            <Grid.OpacityTransition>
+                <ScalarTransition/>
+            </Grid.OpacityTransition>
+            <SystemBackdropHost CornerRadius="8">
+                <SystemBackdropHost.SystemBackdrop>
+                    <DesktopAcrylicBackdrop/>
+                </SystemBackdropHost.SystemBackdrop>
+            </SystemBackdropHost>
+            <Grid Padding="20">
+                <controls:MediaPlayStateViewer x:Name="PlayStateElement" PlaybackState="Playing" Width="20" Height="20" />
+            </Grid>
+        </Grid>
+        <Grid x:Name="progressRoot" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinWidth="200" Margin="0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="progressPresent" Width="32" FontSize="13" Text="0%" HorizontalAlignment="Center" Margin="0,0,4,0" Foreground="Silver" Opacity="0.8"/>
+            <ProgressBar x:Name="progressBase" Grid.Column="1" Background="{ThemeResource SystemAccentColorDark2}"/>
+            <Rectangle Fill="{ThemeResource SystemAccentColorLight2}" Grid.Column="1" Width="4" Height="3" RadiusX="3" RadiusY="3" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        </Grid>
+        <Grid x:Name="ToolButtonsBase"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Left"
+              PointerEntered="ToolButtonsBase_PointerEntered"
+              PointerExited="ToolButtonsBase_PointerExited">
+            <SystemBackdropHost CornerRadius="0,8,8,8">
+                <SystemBackdropHost.SystemBackdrop>
+                    <DesktopAcrylicBackdrop/>
+                </SystemBackdropHost.SystemBackdrop>
+            </SystemBackdropHost>
+            <StackPanel Margin="0,0,0,0"
+                        x:Name="ToolButtonsStackPanel"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal"
+                        Opacity="0.7">
+                <StackPanel.Resources>
+                    <Style TargetType="FontIcon">
+                        <Setter Property="FontSize" Value="16"/>
+                    </Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button CornerRadius="0,0,4,0"
+                        x:Name="LockButton" Click="LockButton_Click" Width="50" Height="34" ToolTipService.ToolTip="锁定">
+                    <FontIcon Glyph="&#xE72E;"/>
+                </Button>
+                <Button CornerRadius="0,0,4,4"
+                        x:Name="ResizeButton" Click="ResizeButton_Click" Width="50" Height="34" ToolTipService.ToolTip="恢复窗口大小到默认">
+                    <FontIcon Glyph="&#xE61F;"/>
+                </Button>
+                <Button CornerRadius="0,0,4,0" Visibility="Collapsed"
+                        x:Name="MusicControlButton" Click="MusicControlButton_Click" Width="50" Height="34" ToolTipService.ToolTip="">
+                    <FontIcon Glyph="&#xEA69;"/>
+                </Button>
+            </StackPanel>
+            <FontIcon HorizontalAlignment="Left" VerticalAlignment="Top"
+                      Glyph="&#xE788;" FontSize="16"
+                      ui:VisualExtensions.RotationAngleInDegrees="180"
+                      Margin="19,20,0,0" Opacity="0.8"
+                      IsHitTestVisible="False"/>
+        </Grid>
+        <Grid x:Name="TRBaseParent"
+              HorizontalAlignment="Center">
+            <Grid.Transitions>
+                <TransitionCollection>
+                    <ContentThemeTransition/>
+                </TransitionCollection>
+            </Grid.Transitions>
+            <Border x:Name="TRShadowTarget"/>
+            <TextBlock x:Name="LyricRomajiPopup_tb"
+                       FontSize="14"
+                       Margin="24,6,24,0"
+                       Foreground="{ThemeResource LrcForeground}"
+                       IsHitTestVisible="False"
+                       VerticalAlignment="Top"
+                       HorizontalAlignment="Center">
+                <ui:Effects.Shadow>
+                    <ui:AttachedDropShadow Opacity="1" BlurRadius="3" Offset="0,0.5" CastTo="{x:Bind TRShadowTarget}"/>
+                </ui:Effects.Shadow>
+            </TextBlock>
+
+            <StackPanel
+                x:Name="LyricIntervalRoot"
+                RequestedTheme="Dark"
+                Visibility="Collapsed"
+                Orientation="Horizontal"
+                Spacing="2" Margin="0,0,0,4"
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Center">
+                <StackPanel.Resources>
+                    <Style TargetType="Rectangle">
+                        <Setter Property="Width" Value="15"/>
+                        <Setter Property="Height" Value="15"/>
+                        <Setter Property="Fill" Value="{ThemeResource MusicAlbumAccentBrush}"/>
+                        <Setter Property="Stroke" Value="{ThemeResource AccentControlElevationBorderBrush}"/>
+                        <Setter Property="StrokeThickness" Value="1"/>
+                        <Setter Property="RadiusX" Value="7.5"/>
+                        <Setter Property="RadiusY" Value="7.5"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Rectangle x:Name="LyricIntervalCircle1"/>
+                <Rectangle x:Name="LyricIntervalCircle2"/>
+                <Rectangle x:Name="LyricIntervalCircle3"/>
+                <Rectangle x:Name="LyricIntervalCircle4"/>
+                <Rectangle x:Name="LyricIntervalCircle5"/>
+            </StackPanel>
+        </Grid>
+        <Popup x:Name="MusicControlPopup" ShouldConstrainToRootBounds="False"
+               VerticalOffset="-40" Opened="MusicControlPopup_Opened" Closed="MusicControlPopup_Closed">
+            <Popup.Transitions>
+                <TransitionCollection>
+                    <PopupThemeTransition/>
+                </TransitionCollection>
+            </Popup.Transitions>
+            <Popup.SystemBackdrop>
+                <DesktopAcrylicBackdrop/>
+            </Popup.SystemBackdrop>
+            <Grid Background="Transparent"
+                  BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+                  BorderThickness="1"
+                  HorizontalAlignment="Stretch"
+                  Padding="16" CornerRadius="10"
+                  SizeChanged="Grid_SizeChanged">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <controls:ImageEx x:Name="MusicControl_Image" VerticalAlignment="Center" HorizontalAlignment="Center"
+                                          MaxHeight="150" MaxWidth="150" CornerRadius="4"/>
+                        <Grid Grid.Column="1">
+                            <StackPanel Margin="12,0,0,0">
+                                <TextBlock Text="TewiMP" x:Name="MusicControl_TitleTb" FontSize="20"/>
+                                <TextBlock Text="artist" x:Name="MusicControl_ButtonNameTb"/>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                    <Slider Grid.Row="1" HorizontalAlignment="Stretch" x:Name="MusicControl_TimeSlider"/>
+                </Grid>
+            </Grid>
+        </Popup>
+    </Grid>
+</winex:WindowEx>

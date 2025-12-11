@@ -1,0 +1,47 @@
+﻿<Page
+    x:Class="TewiMP.UI.Pages.TestPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TewiMP.UI.Pages"
+    xmlns:controls="using:TewiMP.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
+
+    <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None">
+
+        <ListView.Header>
+            <Grid x:Name="HeaderBaseGrid">
+                <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1"/>
+                <TextBlock x:Name="HeaderBaseTextBlock" Text="Test" Style="{ThemeResource TBHeader}"/>
+            </Grid>
+        </ListView.Header>
+        
+        
+        <Grid Margin="80,0,0,0" Background="Gray" HorizontalAlignment="Left">
+            <controls:AutoScrollView Background="red" MaskSize="100" x:Name="asv">
+                <controls:AutoScrollView.Content>
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+                </controls:AutoScrollView.Content>
+            </controls:AutoScrollView>
+        </Grid>
+        <controls:AutoScrollView>
+            <controls:AutoScrollView.Content>
+                ASD asda asdasdasd ASDCVXVCXCVXCVXCVXFDGFDHGHhd vcbcvbfhdfdhtrtrqrf
+            </controls:AutoScrollView.Content>
+        </controls:AutoScrollView>
+        <controls:AutoScrollView>
+            <controls:AutoScrollView.Content>
+                <TextBlock FontSize="30">
+                    ASD asda asdasdasd ASDCVXVCXCVXCVXCVXFDGFDHGHhd vcbcvbfhdfdhtrtrqrf
+                </TextBlock>
+            </controls:AutoScrollView.Content>
+        </controls:AutoScrollView>
+        <Button Content="Pause" Click="Button_Click"/>
+
+    </ListView>
+</Page>

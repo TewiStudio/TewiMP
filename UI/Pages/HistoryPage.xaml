@@ -1,0 +1,83 @@
+﻿<Page
+    x:Class="TewiMP.UI.Pages.HistoryPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="using:TewiMP"
+    xmlns:data="using:TewiMP.Core"
+    xmlns:controls="using:TewiMP.UI.Controls"
+    xmlns:cc="using:CommunityToolkit.WinUI.Controls"
+    mc:Ignorable="d" SizeChanged="Page_SizeChanged" Loaded="Page_Loaded">
+    <Page.Resources>
+        <DataTemplate x:Key="HistoryDataTemplate" x:DataType="data:SongHistoryData">
+            <controls:SongHistoryCard HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
+        </DataTemplate>
+        <Style TargetType="ListViewItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <ListViewItemPresenter
+                            Padding="0"
+                            Margin="16,0"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+    
+    <ListView
+        x:Name="ListViewBase"
+        HorizontalContentAlignment="Center"
+        SelectionMode="None"
+        Padding="0,0,0,14">
+
+        <ListView.Header>
+            <Grid x:Name="HeaderBaseGrid">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                    </Grid.RowDefinitions>
+                    <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                            BorderThickness="0,0,0,0" Visibility="Collapsed"/>
+                    <Grid x:Name="HeaderBaseTextBlock_Base">
+                        <TextBlock x:Name="HeaderBaseTextBlock" Text="历史" Style="{ThemeResource TBHeader}"/>
+                        <SelectorBar x:Name="HeaderSelectBase"
+                                      SelectionChanged="HeaderSelectBase_SelectionChanged"
+                                      Loaded="HeaderSelectBase_Loaded">
+                            <SelectorBarItem Text="播放历史"/>
+                            <SelectorBarItem Text="统计"/>
+                        </SelectorBar>
+                    </Grid>
+                    <Grid x:Name="HeaderText" VerticalAlignment="Bottom" Opacity="1"
+                          Grid.Row="1" CornerRadius="4" BorderThickness="1"
+                          Background="{ThemeResource CardBackgroundFillColorDefault}" Margin="16,0,16,8"
+                          BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+                        <Grid Margin="12,4,140,4">
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock">
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="auto"/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Width="38" Margin="0,0,12,0">
+                                <TextBlock Text="#" HorizontalAlignment="Center"/>
+                            </Border>
+                            <TextBlock Text="标题" Grid.Column="1" Margin="0,0,12,0"/>
+                            <TextBlock Text="艺术家" Grid.Column="2" Margin="8,0,12,0"/>
+                            <TextBlock Text="专辑" Grid.Column="3" Margin="8,0,12,0"/>
+                            <TextBlock Text="时间" Grid.Column="4" Margin="0,0,5,0"/>
+                        </Grid>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </ListView.Header>
+    </ListView>
+</Page>

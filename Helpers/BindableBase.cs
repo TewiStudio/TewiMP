@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using TewiMP.Core.Models;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core;
+using TewiMP.Core.Music;
 
 namespace TewiMP.Helpers
 {

@@ -4,10 +4,10 @@ using System;
 using System.IO;
 using Microsoft.UI.Xaml;
 using Newtonsoft.Json.Linq;
-using TewiMP.Plugin;
-using TewiMP.Windowed;
-using TewiMP.Media.Audio.AudioEffects;
-using TewiMP.Core.Models.Music;
+using TewiMP.UI.Windows;
+using TewiMP.Services.Media.Audio.AudioEffects;
+using TewiMP.Core.Music;
+using TewiMP.Services.Plugin;
 
 public static class DataFolderBase
 {
@@ -360,7 +360,7 @@ public static class DataFolderBase
     /// </summary>
     public static void InitFiles()
     {
-        LogService.Log("DataFolderBase", "初始化文件目录中...");
+        LogService.Log(nameof(DataFolderBase), "初始化文件目录中...");
         Directory.CreateDirectory(PluginFolder);
         Directory.CreateDirectory(BaseFolder);
         Directory.CreateDirectory(BaseLocalFolder);
@@ -402,7 +402,7 @@ public static class DataFolderBase
         if (!File.Exists(PluginSettings))
         {
             File.Create(PluginSettings).Close();
-            File.WriteAllText(PluginSettings, JObject.FromObject(PluginManager.PluginInfoSettings).ToString());
+            File.WriteAllText(PluginSettings, JObject.FromObject(PluginService.PluginInfoSettings).ToString());
         }
         
         if (!File.Exists(HistoryDataPath))
@@ -428,7 +428,7 @@ public static class DataFolderBase
                     }
                     catch (Exception ex)
                     {
-                        LogService.Error("DataFolderBase", $"删除旧日志文件时出错：{ex.Message}");
+                        LogService.Error(nameof(DataFolderBase), $"删除旧日志文件时出错：{ex.Message}");
                     }
                 }
             }
@@ -446,14 +446,14 @@ public static class DataFolderBase
                     }
                     catch (Exception ex)
                     {
-                        LogService.Error("DataFolderBase", $"删除旧更新程序时出错：{ex.Message}");
+                        LogService.Error(nameof(DataFolderBase), $"删除旧更新程序时出错：{ex.Message}");
                     }
                 }
             }
         }
 
         Directory.CreateDirectory(StartupFolder);
-        LogService.Log("DataFolderBase", "初始化文件目录完成。");
+        LogService.Log(nameof(DataFolderBase), "初始化文件目录完成。");
     }
 
     public static void InitCacheFolder()

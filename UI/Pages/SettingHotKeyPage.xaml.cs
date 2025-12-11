@@ -1,0 +1,113 @@
+﻿using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Composition;
+using TewiMP.Services;
+
+namespace TewiMP.UI.Pages
+{
+    public partial class SettingHotKeyPage : Page
+    {
+        public SettingHotKeyPage()
+        {
+            InitializeComponent();
+        }
+
+
+        bool isInLoading = false;
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            isInLoading = true;
+            HotkeyEnableToggleSwitch.IsOn = App.Instance.HotKeyService.EnableHotKey;
+            isInLoading = false;
+        }
+
+        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            UpdateShyHeader();
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
+        {
+            var list = App.Instance.HotKeyService.RegisteredHotKeys.ToList();
+            App.Instance.HotKeyService.UnregisterHotKeys(list);
+            await Task.Delay(200);
+            App.Instance.HotKeyService.RegisterHotKeys(list);
+        }
+
+        private async void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var list = App.Instance.HotKeyService.RegisteredHotKeys.ToList();
+            App.Instance.HotKeyService.UnregisterHotKeys(list);
+            await Task.Delay(200);
+            App.Instance.HotKeyService.RegisterHotKeys(HotKeyService.DefaultRegisterHotKeysList);
+        }
+
+        private void ToggleSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            if (isInLoading) return;
+            if (sender is ToggleSwitch toggleSwitch)
+            {
+                App.Instance.HotKeyService.EnableHotKey = toggleSwitch.IsOn;
+            }
+        }
+
+        public void UpdateShyHeader()
+        {
+            // 设置 header 为顶层
+            var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ListViewBase.Header);
+            var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
+            Canvas.SetZIndex(headerContainer, 1);
+
+            var scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;
+            scrollViewer.CanContentRenderOutsideBounds = true;
+
+            CompositionPropertySet scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
+            Compositor compositor = scrollerPropertySet.Compositor;
+
+            var padingSize = 40;
+            // Get the visual that represents our HeaderTextBlock 
+            // And define the progress animation string
+            var headerVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseGrid);
+            String progress = $"Clamp(-scroller.Translation.Y / {padingSize}, 0, 1.0)";
+
+            // Shift the header by 50 pixels when scrolling down
+            var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {padingSize}");
+            offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
+            headerVisual.StartAnimation("Offset.Y", offsetExpression);
+
+            /*
+            Visual textVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
+            Vector3 finalOffset = new Vector3(0, 10, 0);
+            var headerOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(0,0,0), finalOffset, {progress})");
+            headerOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            headerOffsetAnimation.SetVector3Parameter("finalOffset", finalOffset);
+            textVisual.StartAnimation(nameof(Visual.Offset), headerOffsetAnimation);
+            */
+
+            // Logo scale and transform                                          from               to
+            var logoHeaderScaleAnimation = compositor.CreateExpressionAnimation("Lerp(Vector2(1,1), Vector2(0.7, 0.7), " + progress + ")");
+            logoHeaderScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+
+            var logoVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
+            logoVisual.StartAnimation("Scale.xy", logoHeaderScaleAnimation);
+
+            var logoVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 24, {progress})");
+            logoVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            logoVisual.StartAnimation("Offset.Y", logoVisualOffsetYAnimation);
+
+            var logoVisualOffsetXAnimation = compositor.CreateExpressionAnimation($"Lerp(0, -12, {progress})");
+            logoVisualOffsetXAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            logoVisual.StartAnimation("Offset.X", logoVisualOffsetXAnimation);
+
+            var backgroundVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseRectangle);
+            var backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
+            backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
+            backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
+        }
+    }
+}

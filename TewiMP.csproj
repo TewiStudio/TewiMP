@@ -59,53 +59,53 @@
 
 	<ItemGroup>
 		<None Remove="Background.zip" />
-		<None Remove="Controls\DownloadCard.xaml" />
-		<None Remove="Controls\ImageEx.xaml" />
-		<None Remove="Controls\ItemListViewArtist.xaml" />
-		<None Remove="Controls\ItemListViewPlayList.xaml" />
-		<None Remove="Controls\ItemListViewSearch.xaml" />
-		<None Remove="Controls\KeyControl.xaml" />
-		<None Remove="Controls\LoadingTip.xaml" />
-		<None Remove="Controls\LyricItem.xaml" />
-		<None Remove="Controls\MainMusicDataItem.xaml" />
-		<None Remove="Controls\ManageLocalMusicFolderControl.xaml" />
-		<None Remove="Controls\MediaPlayStateViewer.xaml" />
-		<None Remove="Controls\MusicDataFlyout.xaml" />
-		<None Remove="Controls\MusicDataItem.xaml" />
-		<None Remove="Controls\NotifyItem.xaml" />
-		<None Remove="Controls\PlayListCard.xaml" />
-		<None Remove="Controls\ScrollFootButton.xaml" />
-		<None Remove="Controls\ScrollViewerSearchControl.xaml" />
-		<None Remove="Controls\SongHistoryCard.xaml" />
-		<None Remove="Controls\SongHistoryInfo.xaml" />
-		<None Remove="Controls\ImageEx.xaml" />
+		<None Remove="UI\Controls\DownloadCard.xaml" />
+		<None Remove="UI\Controls\ImageEx.xaml" />
+		<None Remove="UI\Controls\ItemListViewArtist.xaml" />
+		<None Remove="UI\Controls\ItemListViewPlayList.xaml" />
+		<None Remove="UI\Controls\ItemListViewSearch.xaml" />
+		<None Remove="UI\Controls\KeyControl.xaml" />
+		<None Remove="UI\Controls\LoadingTip.xaml" />
+		<None Remove="UI\Controls\LyricItem.xaml" />
+		<None Remove="UI\Controls\MainMusicDataItem.xaml" />
+		<None Remove="UI\Controls\ManageLocalMusicFolderControl.xaml" />
+		<None Remove="UI\Controls\MediaPlayStateViewer.xaml" />
+		<None Remove="UI\Controls\MusicDataFlyout.xaml" />
+		<None Remove="UI\Controls\MusicDataItem.xaml" />
+		<None Remove="UI\Controls\NotifyItem.xaml" />
+		<None Remove="UI\Controls\PlayListCard.xaml" />
+		<None Remove="UI\Controls\ScrollFootButton.xaml" />
+		<None Remove="UI\Controls\ScrollViewerSearchControl.xaml" />
+		<None Remove="UI\Controls\SongHistoryCard.xaml" />
+		<None Remove="UI\Controls\SongHistoryInfo.xaml" />
+		<None Remove="UI\Controls\ImageEx.xaml" />
 		<None Remove="DesktopLyricWindow.xaml" />
-		<None Remove="Pages\BrowsePage.xaml" />
-		<None Remove="Pages\DialogPages\AddFilesToMusicListDataPage.xaml" />
-		<None Remove="Pages\DialogPages\AddPlayListPage.xaml" />
-		<None Remove="Pages\DialogPages\AudioInfoPage.xaml" />
-		<None Remove="Pages\DialogPages\EditPlayListPage.xaml" />
-		<None Remove="Pages\DialogPages\EqualizerPage.xaml" />
-		<None Remove="Pages\DialogPages\HotKeyEditor.xaml" />
-		<None Remove="Pages\DialogPages\HotKeyPage.xaml" />
-		<None Remove="Pages\DialogPages\InsertPlayListPage.xaml" />
-		<None Remove="Pages\DialogPages\TimeEventPage.xaml" />
-		<None Remove="Pages\DownloadPage.xaml" />
-		<None Remove="Pages\EmptyPage.xaml" />
-		<None Remove="Pages\HistoryPage.xaml" />
-		<None Remove="Pages\ListViewPages\ItemListViewAlbum.xaml" />
-		<None Remove="Pages\ListViewPages\PlayListPage.xaml" />
-		<None Remove="Pages\LocalAudioPage.xaml" />
-		<None Remove="Pages\MusicPage.xaml" />
-		<None Remove="Pages\PlayListPage.xaml" />
-		<None Remove="Pages\SearchPage.xaml" />
-		<None Remove="Pages\SettingEqPage.xaml" />
-		<None Remove="Pages\SettingHotKeyPage.xaml" />
-		<None Remove="Pages\SettingPage.xaml" />
-		<None Remove="Windows\ImageViewerWindow.xaml" />
-		<None Remove="Windows\MediaPlayerWindow.xaml" />
-		<None Remove="Windows\NotifyIconWindow.xaml" />
-		<None Remove="Windows\TaskBarInfoWindow.xaml" />
+		<None Remove="UI\Pages\BrowsePage.xaml" />
+		<None Remove="UI\Pages\DialogPages\AddFilesToMusicListDataPage.xaml" />
+		<None Remove="UI\Pages\DialogPages\AddPlayListPage.xaml" />
+		<None Remove="UI\Pages\DialogPages\AudioInfoPage.xaml" />
+		<None Remove="UI\Pages\DialogPages\EditPlayListPage.xaml" />
+		<None Remove="UI\Pages\DialogPages\EqualizerPage.xaml" />
+		<None Remove="UI\Pages\DialogPages\HotKeyEditor.xaml" />
+		<None Remove="UI\Pages\DialogPages\HotKeyPage.xaml" />
+		<None Remove="UI\Pages\DialogPages\InsertPlayListPage.xaml" />
+		<None Remove="UI\Pages\DialogPages\TimeEventPage.xaml" />
+		<None Remove="UI\Pages\DownloadPage.xaml" />
+		<None Remove="UI\Pages\EmptyPage.xaml" />
+		<None Remove="UI\Pages\HistoryPage.xaml" />
+		<None Remove="UI\Pages\ListViewPages\ItemListViewAlbum.xaml" />
+		<None Remove="UI\Pages\ListViewPages\PlayListPage.xaml" />
+		<None Remove="UI\Pages\LocalAudioPage.xaml" />
+		<None Remove="UI\Pages\MusicPage.xaml" />
+		<None Remove="UI\Pages\PlayListPage.xaml" />
+		<None Remove="UI\Pages\SearchPage.xaml" />
+		<None Remove="UI\Pages\SettingEqPage.xaml" />
+		<None Remove="UI\Pages\SettingHotKeyPage.xaml" />
+		<None Remove="UI\Pages\SettingPage.xaml" />
+		<None Remove="UI\Windows\ImageViewerWindow.xaml" />
+		<None Remove="UI\Windows\MediaPlayerWindow.xaml" />
+		<None Remove="UI\Windows\NotifyIconWindow.xaml" />
+		<None Remove="UI\Windows\TaskBarInfoWindow.xaml" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -147,34 +147,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Update="Controls\AudioFilter\PassFilterCard.xaml">
-		  <SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\LogItem.xaml">
-		  <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Controls\MusicDataItem.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Controls\MusicDataFlyout.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Controls\ImageEx.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Controls\ScrollFootButton.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Controls\ScrollViewerSearchControl.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Controls\ManageLocalMusicFolderControl.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Controls\MainMusicDataItem.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
 		<None Update="ffmpeg.exe">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
@@ -184,179 +156,18 @@
 		<None Update="LICENSE">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<Page Update="Pages\DialogPages\AddFilesToMusicListDataPage.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
 		<None Update="Plugins\FFmpegPathSelector.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="Plugins\NeteaseMusicSource.dll">
 		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
-		<Page Update="Pages\TestPage.xaml">
-		  <SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\ListViewPages\PlayListPage.xaml">
-		  <Generator>MSBuild:Compile</Generator>
-		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
-		<Page Update="Controls\KeyControl.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\NotifyItem.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\LoadingTip.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\SongHistoryInfo.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Pages\DialogPages\InsertPlayListPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\DialogPages\EditPlayListPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\LyricItem.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\ItemListViewPlayList.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\ItemListViewArtist.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\MediaPlayStateViewer.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\DownloadCard.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\SearchCard.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
 		<Page Update="DesktopLyricWindow.xaml">
 			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
 			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\PlayListCard.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\SongItem.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Controls\ItemListViewSearch.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\BrowsePage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\DialogPages\HotKeyPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\DialogPages\AudioInfoPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\DialogPages\AddPlayListPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\DialogPages\EqualizerPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\SettingEqPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\SettingPlugin.xaml">
-		  <SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\SettingHotKeyPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\EmptyPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\ListViewPages\ItemListViewAlbum.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Pages\LocalAudioPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\MusicPages\MusicPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\SettingPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\HistoryPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\PlayListPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\DownloadPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Pages\SearchPage.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Windows\ImageViewerWindow.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Windows\BackgroundTransparentTestWindow.xaml">
-		  <SubType>Designer</SubType>
-		</Page>
-		<Page Update="Windows\LogWindow.xaml">
-		  <SubType>Designer</SubType>
-		</Page>
-		<Page Update="Windows\TaskBarInfoWindow.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-			<SubType>Designer</SubType>
-		</Page>
-		<Page Update="Windows\NotifyIconWindow.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-		<Page Update="Windows\MediaPlayerWindow.xaml">
-			<XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-		</Page>
-
-		<Page Update="Pages\DialogPages\HotKeyEditor.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</Page>
-		<Page Update="Controls\SongHistoryCard.xaml">
-			<Generator>MSBuild:Compile</Generator>
 		</Page>
 	</ItemGroup>
 
@@ -377,6 +188,10 @@
 	    <Generator>ResXFileCodeGenerator</Generator>
 	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	  </EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="UI\" />
 	</ItemGroup>
 
 	<Target Name="RemovingLanuageFolders" AfterTargets="Build">

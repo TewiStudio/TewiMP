@@ -1,14 +1,6 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Imaging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -18,13 +10,20 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using TewiMP.Services;
-using TewiMP.Core.Models;
-using Windows.Graphics.Imaging;
-using Windows.Storage.Streams;
+using Microsoft.UI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.System;
+using Windows.Storage.Streams;
+using Windows.Graphics.Imaging;
 using WinRT.Interop;
-using TewiMP.Core.Models.Music;
+using TewiMP.Core;
+using TewiMP.Core.Music;
+using TewiMP.Services;
 using TewiMP.Services.Storage;
 
 namespace TewiMP.Helpers
@@ -838,7 +837,7 @@ namespace TewiMP.Helpers
                     case 1: timeMillsStr += "00"; break;
                     case 2: timeMillsStr += "0"; break;
                     case 3: break;
-                    default: LogService.Log("LyricManager", "歌词源文件时间精度较低。", LogLevel.Warning); break;
+                    default: LogService.Log(nameof(LyricService), "歌词源文件时间精度较低。", LogLevel.Warning); break;
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
                 return timesb + timeMills;
@@ -861,7 +860,7 @@ namespace TewiMP.Helpers
                         case 1: timeMillsStr += "00"; break;
                         case 2: timeMillsStr += "0"; break;
                         case 3: break;
-                        default: LogService.Log("LyricManager", "歌词源文件时间精度较低。", LogLevel.Warning); break;
+                        default: LogService.Log(nameof(LyricService), "歌词源文件时间精度较低。", LogLevel.Warning); break;
                     }
                 }
                 var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
