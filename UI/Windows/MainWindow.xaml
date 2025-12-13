@@ -757,12 +757,13 @@
         <!--  Debug  -->
         <Popup
             x:Name="DebugViewPopup"
+            x:FieldModifier="public"
             ShouldConstrainToRootBounds="False"
             HorizontalOffset="0"
             VerticalOffset="-42"
-            Loaded="DebugViewPopup_Loaded"
-            Unloaded="DebugViewPopup_Unloaded"
-            SizeChanged="DebugViewPopup_SizeChanged">
+            SizeChanged="DebugViewPopup_SizeChanged"
+            Opened="DebugViewPopup_Opened"
+            Closed="DebugViewPopup_Closed">
             <Popup.SystemBackdrop>
                 <DesktopAcrylicBackdrop/>
             </Popup.SystemBackdrop>

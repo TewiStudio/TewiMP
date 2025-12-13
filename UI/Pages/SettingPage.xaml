@@ -540,6 +540,9 @@
                 <cc:SettingsCard Header="显示帧数、GPU使用率指示器">
                     <ToggleSwitch Toggled="ToggleSwitch_Toggled_1" Tag="1"/>
                 </cc:SettingsCard>
+                <cc:SettingsCard Header="Debug Flyout Visible">
+                    <ToggleSwitch Toggled="ToggleSwitch_Toggled_1" Tag="2"/>
+                </cc:SettingsCard>
             </cc:SettingsExpander.Items>
         </cc:SettingsExpander>
     </ListView>

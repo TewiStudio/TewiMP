@@ -139,6 +139,8 @@
                                     ui:TransitionHelper.Id="image"
                                     Background="Transparent"
                                     StrokeWidth="0"
+                                    SmoothingUpFactor=".1"
+                                    SmoothingDownFactor=".1"
                                     DrawEqLines="True"
                                     DrawEqLinesStrokeWidth="1"
                                     DrawEqPoints="True"
@@ -487,7 +489,7 @@
                 </Grid.RowDefinitions>
                 <controls:AudioSpectrum
                     x:Name="AudioSpectrum"
-                    SmoothWindow="2" SmoothingFactor=".15" MaxFreq="22000"
+                    SmoothWindow="2" MaxFreq="22000"
                     SampleCount="1024" StrokeWidth="1"
                     DrawDbLines="True" DrawEqLines="True" DrawEqPoints="True" DrawLatencyText="True"
                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
@@ -520,7 +522,8 @@
                                     <Slider Header="透明度" Minimum="0" Maximum="1" Value="{x:Bind AudioSpectrum.Opacity, Mode=TwoWay}" StepFrequency="0.01"/>
                                     <Slider Header="线段宽度" Minimum="0" Maximum="10.0" Value="{x:Bind AudioSpectrum.StrokeWidth, Mode=TwoWay}" StepFrequency="0.1"/>
                                     <Slider Header="斜率(dB/oct)" Minimum="-6" Maximum="6" Value="{x:Bind AudioSpectrum.TiltDbPerOct, Mode=TwoWay}" StepFrequency="0.1"/>
-                                    <Slider Header="频谱平滑值" Minimum=".05" Maximum="1.0" Value="{x:Bind AudioSpectrum.SmoothingFactor, Mode=TwoWay}" StepFrequency="0.01"/>
+                                    <Slider Header="下降平滑系数" Minimum=".05" Maximum="1.0" Value="{x:Bind AudioSpectrum.SmoothingDownFactor, Mode=TwoWay}" StepFrequency="0.01"/>
+                                    <Slider Header="上升平滑系数" Minimum=".05" Maximum="1.0" Value="{x:Bind AudioSpectrum.SmoothingUpFactor, Mode=TwoWay}" StepFrequency="0.01"/>
                                     <Slider Header="滑动窗口平滑" Minimum="1" Maximum="100" Value="{x:Bind AudioSpectrum.SmoothWindow, Mode=TwoWay}" StepFrequency="1"/>
                                     <Slider Header="采样数" Minimum="3" Maximum="4096" Value="{x:Bind AudioSpectrum.SampleCount, Mode=TwoWay}" StepFrequency="1"/>
                                     <Slider Header="均衡器影响曲线宽度" Minimum="0" Maximum="10.0" Value="{x:Bind AudioSpectrum.DrawEqLinesStrokeWidth, Mode=TwoWay}" StepFrequency="0.1"/>

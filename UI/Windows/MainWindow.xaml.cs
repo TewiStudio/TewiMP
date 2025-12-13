@@ -379,8 +379,8 @@ public sealed partial class MainWindow : WindowEx
 
         PlayingListBaseView.ItemsSource = App.Instance.PlayingListService.NowPlayingList;
         //SystemNavigationManager.GetForCurrentView().BackRequested += (_, __) => { TryGoBack(); };
-#if DEBUG
         DebugViewPopup.XamlRoot = WindowGridBase.XamlRoot;
+#if DEBUG
         DebugViewPopup.IsOpen = true;
 #endif
     }
@@ -534,10 +534,11 @@ public sealed partial class MainWindow : WindowEx
     private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
     {
         SetDragRegionForCustomTitleBar();
-#if DEBUG
-        DebugView_Detail_WindowSizeRun.Text = $"{WindowGridBase.ActualWidth}x{WindowGridBase.ActualHeight}";
-        DebugViewPopup.VerticalOffset = AppWindow.Size.Height / NowDPI - 24;
-#endif
+        if (DebugViewPopup.IsOpen)
+        {
+            DebugView_Detail_WindowSizeRun.Text = $"{WindowGridBase.ActualWidth}x{WindowGridBase.ActualHeight}";
+            DebugViewPopup.VerticalOffset = AppWindow.Size.Height / NowDPI - 24;
+        }
         //NotifyListView.Padding = new(0, GridBase.ActualHeight, 0, 12);
         /*
         if (NotifyList.Any())
@@ -1991,31 +1992,25 @@ public sealed partial class MainWindow : WindowEx
     #region Other
     private void DebugViewPopup_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-#if DEBUG
-        DebugViewPopup.VerticalOffset = AppWindow.Size.Height;
-#endif
+        if (DebugViewPopup.IsOpen)
+            DebugViewPopup.VerticalOffset = AppWindow.Size.Height;
     }
 
     DispatcherTimer ramTimer;
-    private void DebugViewPopup_Loaded(object sender, RoutedEventArgs e)
+    private void DebugViewPopup_Opened(object sender, object e)
     {
-#if DEBUG
         DebugViewPopup.VerticalOffset = AppWindow.Size.Height;
         ramTimer = new();
         ramTimer.Tick += RamTimer_Tick;
         ramTimer.Interval = TimeSpan.FromSeconds(0.5);
         ramTimer.Start();
-#endif
     }
 
-    private void DebugViewPopup_Unloaded(object sender, RoutedEventArgs e)
+    private void DebugViewPopup_Closed(object sender, object e)
     {
-
-#if DEBUG
         ramTimer.Stop();
         ramTimer.Tick -= RamTimer_Tick;
         ramTimer = null;
-#endif
     }
 
     private void RamTimer_Tick(object sender, object e)

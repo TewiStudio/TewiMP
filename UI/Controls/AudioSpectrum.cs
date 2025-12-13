@@ -25,9 +25,22 @@ namespace TewiMP.UI.Controls
     /// </summary>
     public sealed partial class AudioSpectrum : Control
     {
+        private struct SpectrumBarCache
+        {
+            public int BinStart;      // 起始 FFT Bin 索引
+            public int BinEnd;        // 结束 FFT Bin 索引
+            public int Count;         // Bin 总数 (End - Start + 1)
+            public float X;           // 屏幕上的 X 坐标
+            public float TiltFactor;  // 预计算的 Tilt 修正系数
+        }
+
         private CanvasControl _spectrumCanvas;
 
-        // ===== 缓存 =====
+        private SpectrumBarCache[] _barCache;
+        private double _cacheMinFreq, _cacheMaxFreq;
+        private int _cacheSampleRate, _cacheBarCount;
+        private float _cacheWidth;
+
         private float[] _smoothedSpectrum;
         private float[] _pointsX;
         private float[] _pointsY;
@@ -50,7 +63,9 @@ namespace TewiMP.UI.Controls
         private const float QStep = 0.1f;
 
         private readonly Queue<double> _frameTimes = new();   // 记录最近一段时间的帧间隔（秒）
+        private double _deltaTime = 0;
         private double _lastDrawTime = 0;
+        private double _targetFps = 60;
         private double _avgFps = 0;
         private double _avgFrameMs = 0;
 
@@ -69,7 +84,7 @@ namespace TewiMP.UI.Controls
         private bool _isZoomAnimating;
         private bool _firstDraw = true;
 
-        // ===== 鼠标 =====
+        // 鼠标
         private float _hoverX = -1, _hoverY = -1;
         private float _hoverFreq = 0, _hoverDb = 0;
         private bool _isDragging = false;
@@ -85,9 +100,13 @@ namespace TewiMP.UI.Controls
             "SampleCount", typeof(int), typeof(AudioSpectrum),
             new PropertyMetadata(128, OnPropertyChanged<int>));
 
-        public static readonly DependencyProperty SmoothingFactorProperty = DependencyProperty.Register(
-            "SmoothingFactor", typeof(double), typeof(AudioSpectrum),
-            new PropertyMetadata(.13d, OnPropertyChanged<double>));
+        public static readonly DependencyProperty SmoothingDownFactorProperty = DependencyProperty.Register(
+            "SmoothingDownFactor", typeof(double), typeof(AudioSpectrum),
+            new PropertyMetadata(.15d, OnPropertyChanged<double>));
+
+        public static readonly DependencyProperty SmoothingUpFactorProperty = DependencyProperty.Register(
+            "SmoothingUpFactor", typeof(double), typeof(AudioSpectrum),
+            new PropertyMetadata(.4d, OnPropertyChanged<double>));
 
         public static readonly DependencyProperty SmoothWindowProperty = DependencyProperty.Register(
             "SmoothWindow", typeof(int), typeof(AudioSpectrum),
@@ -135,7 +154,8 @@ namespace TewiMP.UI.Controls
 
         public bool IsStop { get => (bool)GetValue(IsStopProperty); set => SetValue(IsStopProperty, value); }
         public int SampleCount { get => (int)GetValue(SampleCountProperty); set => SetValue(SampleCountProperty, value); }
-        public double SmoothingFactor { get => (double)GetValue(SmoothingFactorProperty); set => SetValue(SmoothingFactorProperty, value); }
+        public double SmoothingDownFactor { get => (double)GetValue(SmoothingDownFactorProperty); set => SetValue(SmoothingDownFactorProperty, value); }
+        public double SmoothingUpFactor { get => (double)GetValue(SmoothingUpFactorProperty); set => SetValue(SmoothingUpFactorProperty, value); }
         public int SmoothWindow { get => (int)GetValue(SmoothWindowProperty); set => SetValue(SmoothWindowProperty, value); }
         public double TiltDbPerOct { get => (double)GetValue(TiltDbPerOctProperty); set => SetValue(TiltDbPerOctProperty, value); }
         public double StrokeWidth { get => (double)GetValue(StrokeWidthProperty); set => SetValue(StrokeWidthProperty, value); }
@@ -428,13 +448,13 @@ namespace TewiMP.UI.Controls
         {
             if (_spectrumCanvas == null || _spectrumCanvas.ActualWidth <= 0) return;
 
-            // --- 缩放强度 ---
+            // 缩放强度
             double baseFactor = 1.35;
             double step = Math.Abs(delta) / 120.0;
             double scaleFactor = Math.Pow(baseFactor, step);
             if (delta < 0) scaleFactor = 1.0 / scaleFactor;
 
-            // --- 当前频率范围 ---
+            // 当前频率范围
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
             double logRange = logMax - logMin;
@@ -444,7 +464,7 @@ namespace TewiMP.UI.Controls
             double logMouse = logMin + mouseRatio * logRange;
             double mouseFreq = Math.Pow(10, logMouse);
 
-            // --- 新范围 ---
+            // 新范围
             double newLogRange = logRange / scaleFactor;
 
             // 缩放限制
@@ -456,7 +476,7 @@ namespace TewiMP.UI.Controls
             double newLogMin = logMouse - mouseRatio * newLogRange;
             double newLogMax = newLogMin + newLogRange;
 
-            // --- 限制边界 ---
+            // 限制边界
             double minLimit = Math.Log10(MinVisibleFreq);
             double maxLimit = Math.Log10(MaxVisibleFreq);
 
@@ -474,7 +494,7 @@ namespace TewiMP.UI.Controls
                 newLogMax -= diff;
             }
 
-            // --- 应用动画目标 ---
+            // 应用动画目标
             _targetMinFreq = Math.Pow(10, newLogMin);
             _targetMaxFreq = Math.Pow(10, newLogMax);
             _animMinFreq = MinFreq;
@@ -512,15 +532,15 @@ namespace TewiMP.UI.Controls
             var ds = args.DrawingSession;
             ds.Clear(Colors.Transparent);
 
-            if (DrawLatencyText)
+            // 计算帧时间
+            double now = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+            if (_lastDrawTime > 0)
             {
-                // === 计算帧时间 ===
-                double now = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
-                if (_lastDrawTime > 0)
-                {
-                    double delta = now - _lastDrawTime;
-                    _frameTimes.Enqueue(delta);
+                _deltaTime = now - _lastDrawTime;
 
+                if (DrawLatencyText)
+                {
+                    _frameTimes.Enqueue(_deltaTime);
                     // 移除超出统计窗口的旧数据
                     while (_frameTimes.Sum() > SampleDuration)
                         _frameTimes.Dequeue();
@@ -533,9 +553,8 @@ namespace TewiMP.UI.Controls
                         _avgFrameMs = avgDelta * 1000.0;
                     }
                 }
-                _lastDrawTime = now;
-
             }
+            _lastDrawTime = now;
 
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
@@ -557,7 +576,7 @@ namespace TewiMP.UI.Controls
 
             if (DrawLatencyText)
             {
-                // === 绘制平均 FPS 信息 ===
+                // 绘制平均 FPS 信息
                 string info = $"FPS: {_avgFps:0.0} ({_avgFrameMs:0.0} ms)";
                 ds.DrawText(info, 10, 10, App.Instance.PlayingListService.TextColor, canvasTextFormat ??= new CanvasTextFormat { FontSize = 14 });
             }
@@ -571,18 +590,37 @@ namespace TewiMP.UI.Controls
             var analyzer = App.Instance.AudioService.AudioAnalyzer;
             if (analyzer?.Spectrum == null) return;
 
-            int sampleRate = analyzer.WaveFormat.SampleRate;
-            double minFreq = MinFreq;
-            double maxFreq = MaxFreq;
-            int barCount = SampleCount;
-            var spectrum = analyzer.Spectrum;
+            if (_isZoomAnimating)
+            {
+                double t = (Environment.TickCount64 / 1000.0 - _zoomAnimStartTime) / ZoomAnimDuration;
 
+                if (t >= 1.0)
+                {
+                    _isZoomAnimating = false;
+                    MinFreq = _targetMinFreq;
+                    MaxFreq = _targetMaxFreq;
+                }
+                else
+                {
+                    // ease-out 平滑算法
+                    double easedT = 1 - Math.Pow(1 - t, 3);
+                    MinFreq = Lerp(_animMinFreq, _targetMinFreq, easedT);
+                    MaxFreq = Lerp(_animMaxFreq, _targetMaxFreq, easedT);
+                }
+            }
+
+            // 获取基础参数
+            int sampleRate = analyzer.WaveFormat.SampleRate;
+            int barCount = SampleCount;
             float w = (float)sender.ActualWidth;
             float h = (float)sender.ActualHeight;
 
-            // ===== 初始化缓存 =====
-            if (_smoothedSpectrum == null || _smoothedSpectrum.Length != spectrum.Length)
-                _smoothedSpectrum = new float[spectrum.Length];
+            // 更新缓存。如果正在缩放，这里会每帧执行计算；如果不缩放，这里耗时为0
+            UpdateSpectrumCache(sampleRate, barCount, MinFreq, MaxFreq, w, h, analyzer);
+
+            // 初始化数组
+            if (_smoothedSpectrum == null || _smoothedSpectrum.Length != analyzer.Spectrum.Length)
+                _smoothedSpectrum = new float[analyzer.Spectrum.Length];
 
             if (_pointsY == null || _pointsY.Length != barCount)
             {
@@ -591,7 +629,7 @@ namespace TewiMP.UI.Controls
                 _pointsX = new float[barCount];
             }
 
-            // ===== 渐变刷 =====
+            // 渐变刷
             var accent = App.Instance.PlayingListService.AlbumAccentColor;
             if (_gradientBrush == null || w != _lastWidth || h != _lastHeight || accent != _lastAccentColor)
             {
@@ -606,64 +644,50 @@ namespace TewiMP.UI.Controls
                 _lastAccentColor = accent;
             }
 
-            // ===== 平滑频谱值 =====
-            float smoothingFactor = (float)SmoothingFactor;
+            // 时间平滑
+            float adjustedDownFactor = (float)(1.0 - Math.Pow(1.0 - SmoothingDownFactor, _deltaTime * _targetFps));
+            float adjustedUpFactor = (float)(1.0 - Math.Pow(1.0 - SmoothingUpFactor, _deltaTime * _targetFps));
+            var spectrum = analyzer.Spectrum;
             for (int i = 0; i < spectrum.Length; i++)
-                _smoothedSpectrum[i] = _smoothedSpectrum[i] * (1 - smoothingFactor) + spectrum[i] * smoothingFactor;
-
-            // ===== 对数频率映射参数 =====
-            double logMin = Math.Log10(minFreq);
-            double logMax = Math.Log10(maxFreq);
-            double binScale = (_smoothedSpectrum.Length - 1) / (sampleRate / 2.0);
-
-            // ===== Tilt 参数 =====
-            double tiltDbPerOct = TiltDbPerOct;
-            double slopeDbPerDec = -tiltDbPerOct * 3.32; // 每十倍频变化斜率
-            const double refFreq = 1000.0; // 参考频率
-
-            // ===== 低频加密映射函数 =====
-            double a = minFreq == 20 ? 0.6 : 1; // <1 表示低频更密
-            Func<double, double> curve = t => Math.Pow(t, a);
-
-            // ===== 生成边界频率 =====
-            double[] freqEdges = new double[barCount + 1];
-            for (int i = 0; i <= barCount; i++)
             {
-                double t = (double)i / barCount;
-                double curvedT = curve(t);
-                freqEdges[i] = Math.Pow(10, logMin + (logMax - logMin) * curvedT);
+                float target = spectrum[i];
+                float current = _smoothedSpectrum[i];
+                if (target >= current)
+                    _smoothedSpectrum[i] = current + (target - current) * adjustedUpFactor;
+                else
+                    _smoothedSpectrum[i] = current + (target - current) * adjustedDownFactor;
             }
 
-            // ===== 计算每个条目 =====
+            // 6. 计算 Bar 高度
+            float range = analyzer.MaxDb - analyzer.MinDb;
+            float minDb = analyzer.MinDb;
+            float strokeW = (float)StrokeWidth / 2f;
+
             for (int i = 0; i < barCount; i++)
             {
-                double fStart = freqEdges[i];
-                double fEnd = freqEdges[i + 1];
-                double freqCenter = Math.Sqrt(fStart * fEnd);
-
-                int binStart = Math.Clamp((int)(fStart * binScale), 0, _smoothedSpectrum.Length - 1);
-                int binEnd = Math.Clamp((int)(fEnd * binScale), 0, _smoothedSpectrum.Length - 1);
+                var cache = _barCache[i];
 
                 float sum = 0;
-                for (int b = binStart; b <= binEnd; b++)
+                // 边界保护，防止 SampleRate 突变导致的越界
+                int end = Math.Min(cache.BinEnd, _smoothedSpectrum.Length - 1);
+                for (int b = cache.BinStart; b <= end; b++)
                     sum += _smoothedSpectrum[b];
-                float avgDb = sum / (binEnd - binStart + 1);
 
-                // 归一化 + tilt 修正
-                float normalized = Math.Clamp((avgDb - analyzer.MinDb) / (analyzer.MaxDb - analyzer.MinDb), 0f, 1f);
-                double decadesFromRef = Math.Log10(freqCenter / refFreq);
-                float tiltOffset = (float)((slopeDbPerDec / (analyzer.MaxDb - analyzer.MinDb)) * decadesFromRef);
-                normalized = Math.Clamp(normalized + tiltOffset * normalized, 0f, 1f);
+                float avgDb = sum / cache.Count;
 
-                _pointsY[i] = h - normalized * h - (float)StrokeWidth / 2f;
-                _pointsX[i] = (float)((Math.Log10(freqCenter) - logMin) / (logMax - logMin) * w);
+                // 归一化
+                float normalized = (avgDb - minDb) / range;
+
+                // 应用预计算的 Tilt
+                normalized = normalized + cache.TiltFactor * normalized;
+
+                normalized = Math.Clamp(normalized, 0f, 1f);
+
+                _pointsY[i] = h - normalized * h - strokeW;
+                _pointsX[i] = cache.X;
             }
 
-            // ===== 固定边界坐标 =====
-            _pointsX[0] = 0;
-            _pointsX[^1] = w;
-
-            // ===== 滑动窗口平滑 =====
+            // 滑动窗口平滑
             if (SmoothWindow < 2)
             {
                 _smoothedPoints = _pointsY;
@@ -685,7 +709,7 @@ namespace TewiMP.UI.Controls
                 }
             }
 
-            // ===== 绘制填充 =====
+            // 绘制填充
             using (var fillPath = new CanvasPathBuilder(sender))
             {
                 fillPath.BeginFigure(-1, h);
@@ -699,7 +723,7 @@ namespace TewiMP.UI.Controls
                 ds.FillGeometry(CanvasGeometry.CreatePath(fillPath), _gradientBrush);
             }
 
-            // ===== 绘制曲线 =====
+            // 绘制曲线
             using (var linePath = new CanvasPathBuilder(sender))
             {
                 linePath.BeginFigure(0, _smoothedPoints[0]);
@@ -711,53 +735,39 @@ namespace TewiMP.UI.Controls
                 ds.DrawGeometry(CanvasGeometry.CreatePath(linePath), accent, (float)StrokeWidth);
             }
 
-            // ===== Hover 提示 =====
-            if (_hoverX >= 0)
+            // Hover 提示
+            DrawHoverInfo(ds, w, h);
+        }
+
+        private CanvasTextLayout _hoverTextLayout;
+        private string _lastHoverText;
+        private void DrawHoverInfo(CanvasDrawingSession ds, float w, float h)
+        {
+            if (_hoverX < 0) return;
+
+            UpdateHoverData();
+            string hoverText = $"{_hoverFreq:0.#} Hz / {_hoverDb:0.0} dB";
+
+            // 只有文字变了才重新创建 Layout
+            if (_hoverTextLayout == null || hoverText != _lastHoverText)
             {
-                UpdateHoverData();
-                string hoverText = $"{_hoverFreq:0.#} Hz / {_hoverDb:0.0} dB";
-                var textFormat = new CanvasTextFormat { FontSize = 14 };
-                var brush = App.Instance.PlayingListService.TextColor;
-
-                float textWidth = (float)new CanvasTextLayout(ds, hoverText, textFormat, w, h).DrawBounds.Width;
-                float textX = _hoverX + 10;
-                if (textX + textWidth > w)
-                    textX = w - textWidth - 2;
-
-                float textY = _hoverY - 20;
-                if (textY < 0) textY = 0;
-
-                ds.DrawText(hoverText, textX, textY, brush, textFormat);
-                ds.DrawLine(_hoverX, 0, _hoverX, h, brush, .5f);
-            }
-            if (_firstDraw)
-            {
-                _animMinFreq = MinFreq;
-                _animMaxFreq = MaxFreq;
-                _targetMinFreq = MinFreq;
-                _targetMaxFreq = MaxFreq;
-                _firstDraw = false;
+                _hoverTextLayout?.Dispose();
+                var textFormat = new CanvasTextFormat { FontSize = 14 }; // 可以提为成员变量
+                _hoverTextLayout = new CanvasTextLayout(ds, hoverText, textFormat, w, h);
+                _lastHoverText = hoverText;
             }
 
-            if (_isZoomAnimating)
-            {
-                double t = (Environment.TickCount64 / 1000.0 - _zoomAnimStartTime) / ZoomAnimDuration;
+            var brush = App.Instance.PlayingListService.TextColor;
+            float textWidth = (float)_hoverTextLayout.DrawBounds.Width;
 
-                if (t >= 1.0)
-                {
-                    _isZoomAnimating = false;
-                    MinFreq = _targetMinFreq;
-                    MaxFreq = _targetMaxFreq;
-                }
-                else
-                {
-                    // ease-out 平滑
-                    double easedT = 1 - Math.Pow(1 - t, 3);
+            float textX = _hoverX + 10;
+            if (textX + textWidth > w) textX = w - textWidth - 2;
 
-                    MinFreq = Lerp(_animMinFreq, _targetMinFreq, easedT);
-                    MaxFreq = Lerp(_animMaxFreq, _targetMaxFreq, easedT);
-                }
-            }
+            float textY = _hoverY - 20;
+            if (textY < 0) textY = 0;
+
+            ds.DrawTextLayout(_hoverTextLayout, textX, textY, brush);
+            ds.DrawLine(_hoverX, 0, _hoverX, h, brush, .5f);
         }
 
         CanvasStrokeStyle gridDash;
@@ -778,7 +788,7 @@ namespace TewiMP.UI.Controls
             using var gds = _gridCache.CreateDrawingSession();
             gds.Clear(Colors.Transparent);
 
-            // ===== 水平 dB 网格 =====
+            // dB 网格
             float minDb = -90, maxDb = 0, stepDb = 10;
             float width = (float)_gridCache.Size.Width;
             float height = (float)_gridCache.Size.Height;
@@ -793,7 +803,7 @@ namespace TewiMP.UI.Controls
                 gds.DrawText($"{db} dB", 4, y - 18, textColor.A(150), textFormat);
             }
 
-            // ===== 对数频率网格 =====
+            // 对数频率网格
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
             double visibleRange = logMax - logMin;
@@ -1040,6 +1050,71 @@ namespace TewiMP.UI.Controls
                     ds.DrawGeometry(geometry, App.Instance.PlayingListService.TextColor.A(180), (float)DrawEqLinesStrokeWidth);
                 }
             }
+        }
+
+        private void UpdateSpectrumCache(int sampleRate, int barCount, double minFreq, double maxFreq, float w, float h, SpectrumAnalyzer analyzer)
+        {
+            // 检查缓存是否有效 (如果正在缩放动画，每帧都会由于 min/max 变化而重新进入这里，这是正常的)
+            if (_barCache != null && _barCache.Length == barCount &&
+                _cacheSampleRate == sampleRate && Math.Abs(_cacheWidth - w) < 0.1f &&
+                Math.Abs(_cacheMinFreq - minFreq) < 0.001 && Math.Abs(_cacheMaxFreq - maxFreq) < 0.001)
+            {
+                return; // 缓存命中，直接返回
+            }
+
+            if (_barCache == null || _barCache.Length != barCount)
+                _barCache = new SpectrumBarCache[barCount];
+
+            // 开始数学计算
+            double logMin = Math.Log10(minFreq);
+            double logMax = Math.Log10(maxFreq);
+            double binScale = (analyzer.Spectrum.Length - 1) / (sampleRate / 2.0);
+            double tiltDbPerOct = TiltDbPerOct;
+            double slopeDbPerDec = -tiltDbPerOct * 3.32;
+            const double refFreq = 1000.0;
+
+            double a = minFreq == 20 ? 0.6 : 1;
+
+            double prevEdgeFreq = Math.Pow(10, logMin); // Start with i=0
+            for (int i = 0; i < barCount; i++)
+            {
+                // 计算频率边界
+                double tNext = (double)(i + 1) / barCount;
+                double curvedTNext = Math.Pow(tNext, a);
+                double nextEdgeFreq = Math.Pow(10, logMin + (logMax - logMin) * curvedTNext);
+
+                double fStart = prevEdgeFreq;
+                double fEnd = nextEdgeFreq;
+                prevEdgeFreq = nextEdgeFreq; // 为下一次循环做准备
+
+                // 计算 Bin 索引
+                _barCache[i].BinStart = Math.Clamp((int)(fStart * binScale), 0, analyzer.Spectrum.Length - 1);
+                _barCache[i].BinEnd = Math.Clamp((int)(fEnd * binScale), 0, analyzer.Spectrum.Length - 1);
+                _barCache[i].Count = _barCache[i].BinEnd - _barCache[i].BinStart + 1;
+
+                // 计算中心频率用于 X 坐标和 Tilt
+                double freqCenter = Math.Sqrt(fStart * fEnd);
+
+                // 计算 X 坐标
+                _barCache[i].X = (float)((Math.Log10(freqCenter) - logMin) / (logMax - logMin) * w);
+
+                // 计算 Tilt 修正值 (预先算好系数)
+                // 原始公式：normalized + tiltOffset * normalized
+                // tiltOffset = (slope / range) * decades
+                double decadesFromRef = Math.Log10(freqCenter / refFreq);
+                double dbRange = analyzer.MaxDb - analyzer.MinDb;
+                _barCache[i].TiltFactor = (float)((slopeDbPerDec / dbRange) * decadesFromRef);
+            }
+
+            // 修正首尾 X 坐标
+            _barCache[0].X = 0;
+            _barCache[^1].X = w;
+
+            // 更新缓存标记
+            _cacheSampleRate = sampleRate;
+            _cacheWidth = w;
+            _cacheMinFreq = minFreq;
+            _cacheMaxFreq = maxFreq;
         }
         #endregion
     }

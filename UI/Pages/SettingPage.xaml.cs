@@ -816,31 +816,40 @@ namespace TewiMP.UI.Pages
         private void ToggleSwitch_Toggled_1(object sender, RoutedEventArgs e)
         {
             var ts = sender as ToggleSwitch;
-            if (ts.Tag as string == "0")
+            switch (ts.Tag)
             {
-                ScrollViewer b = (ScrollViewer)VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(App.MainWindowInstance.WindowGridBase)))));
-                if (ts.IsOn)
-                {
-                    b.ZoomMode = ZoomMode.Enabled;
-                    b.HorizontalScrollMode = ScrollMode.Enabled;
-                    b.HorizontalScrollBarVisibility = ScrollBarVisibility.Visible;
-                    b.VerticalScrollMode = ScrollMode.Enabled;
-                    b.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
-                    b.ZoomToFactor(1);
-                }
-                else
-                {
-                    b.ZoomMode = ZoomMode.Disabled;
-                    b.HorizontalScrollMode = ScrollMode.Disabled;
-                    b.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                    b.VerticalScrollMode = ScrollMode.Disabled;
-                    b.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
-                    b.ZoomToFactor(1);
-                }
-            }
-            else
-            {
-                App.Instance.SetFramePerSecondViewer(ts.IsOn);
+                case "0":
+                    {
+                        ScrollViewer b = (ScrollViewer)VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(VisualTreeHelper.GetParent(App.MainWindowInstance.WindowGridBase)))));
+                        if (ts.IsOn)
+                        {
+                            b.ZoomMode = ZoomMode.Enabled;
+                            b.HorizontalScrollMode = ScrollMode.Enabled;
+                            b.HorizontalScrollBarVisibility = ScrollBarVisibility.Visible;
+                            b.VerticalScrollMode = ScrollMode.Enabled;
+                            b.VerticalScrollBarVisibility = ScrollBarVisibility.Visible;
+                            b.ZoomToFactor(1);
+                        }
+                        else
+                        {
+                            b.ZoomMode = ZoomMode.Disabled;
+                            b.HorizontalScrollMode = ScrollMode.Disabled;
+                            b.HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                            b.VerticalScrollMode = ScrollMode.Disabled;
+                            b.VerticalScrollBarVisibility = ScrollBarVisibility.Disabled;
+                            b.ZoomToFactor(1);
+                        }
+
+                        break;
+                    }
+
+                case "1":
+                    App.Instance.SetFramePerSecondViewer(ts.IsOn);
+                    break;
+
+                case "2":
+                    App.MainWindowInstance.DebugViewPopup.IsOpen = ts.IsOn;
+                    break;
             }
         }
 
