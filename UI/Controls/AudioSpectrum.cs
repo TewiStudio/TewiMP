@@ -179,6 +179,53 @@ namespace TewiMP.UI.Controls
             DefaultStyleKey = typeof(AudioSpectrum);
         }
 
+        private double GetEqBandGainDb(double freq, EQData eq)
+        {
+            if (!eq.IsEnable) return 0;
+            double f0 = eq.CentreFrequency;
+            double Q = eq.Q;
+            double gainDb = eq.Gain;
+
+            // 带宽影响（简化高斯形状）
+            double ratio = freq / f0;
+            double response = Math.Exp(-0.5 * Math.Pow(Math.Log(ratio) * Q, 2.0));
+
+            return gainDb * response;
+        }
+
+        protected override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+            _spectrumCanvas = GetTemplateChild("PART_SpectrumCanvas") as CanvasControl;
+
+            if (_spectrumCanvas != null)
+            {
+                _spectrumCanvas.Draw += SpectrumCanvas_Draw;
+                _spectrumCanvas.PointerPressed += SpectrumCanvas_PointerPressed;
+                _spectrumCanvas.PointerReleased += SpectrumCanvas_PointerReleased;
+                _spectrumCanvas.PointerMoved += SpectrumCanvas_PointerMoved;
+                _spectrumCanvas.PointerExited += SpectrumCanvas_PointerExited;
+                _spectrumCanvas.PointerWheelChanged += SpectrumCanvas_PointerWheelChanged;
+                SizeChanged += AudioSpectrum_SizeChanged;
+
+                App.Instance.AudioService.VolumeMeter -= AudioService_VolumeMeter;
+                App.Instance.AudioService.VolumeMeter += AudioService_VolumeMeter;
+            }
+        }
+
+        private void AudioService_VolumeMeter(AudioService AudioService, float[] sample)
+        {
+            if (Visibility == Visibility.Visible && !IsStop)
+                _spectrumCanvas.Invalidate();
+        }
+
+        private void AudioSpectrum_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            _spectrumCanvas.Width = (float)ActualWidth;
+            _spectrumCanvas.Height = (float)ActualHeight;
+        }
+
+        #region 鼠标命中测试
         private EQData? HitTestEQ(float x, float y)
         {
             if (!AudioFilterStatic.ParametricEqEnable || AudioFilterStatic.ParametricEqDatas.Count == 0)
@@ -226,52 +273,7 @@ namespace TewiMP.UI.Controls
 
             return null;
         }
-
-        private double GetEqBandGainDb(double freq, EQData eq)
-        {
-            if (!eq.IsEnable) return 0;
-            double f0 = eq.CentreFrequency;
-            double Q = eq.Q;
-            double gainDb = eq.Gain;
-
-            // 带宽影响（简化高斯形状）
-            double ratio = freq / f0;
-            double response = Math.Exp(-0.5 * Math.Pow(Math.Log(ratio) * Q, 2.0));
-
-            return gainDb * response;
-        }
-
-        protected override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-            _spectrumCanvas = GetTemplateChild("PART_SpectrumCanvas") as CanvasControl;
-
-            if (_spectrumCanvas != null)
-            {
-                _spectrumCanvas.Draw += SpectrumCanvas_Draw;
-                _spectrumCanvas.PointerPressed += SpectrumCanvas_PointerPressed;
-                _spectrumCanvas.PointerReleased += SpectrumCanvas_PointerReleased;
-                _spectrumCanvas.PointerMoved += SpectrumCanvas_PointerMoved;
-                _spectrumCanvas.PointerExited += SpectrumCanvas_PointerExited;
-                _spectrumCanvas.PointerWheelChanged += SpectrumCanvas_PointerWheelChanged;
-                SizeChanged += AudioSpectrum_SizeChanged;
-
-                App.Instance.AudioService.VolumeMeter -= AudioService_VolumeMeter;
-                App.Instance.AudioService.VolumeMeter += AudioService_VolumeMeter;
-            }
-        }
-
-        private void AudioService_VolumeMeter(AudioService AudioService, float[] sample)
-        {
-            if (Visibility == Visibility.Visible && !IsStop)
-                _spectrumCanvas.Invalidate();
-        }
-
-        private void AudioSpectrum_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            _spectrumCanvas.Width = (float)ActualWidth;
-            _spectrumCanvas.Height = (float)ActualHeight;
-        }
+        #endregion
 
         #region 鼠标交互
         private void SpectrumCanvas_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
@@ -658,7 +660,7 @@ namespace TewiMP.UI.Controls
                     _smoothedSpectrum[i] = current + (target - current) * adjustedDownFactor;
             }
 
-            // 6. 计算 Bar 高度
+            // 计算 Bar 高度
             float range = analyzer.MaxDb - analyzer.MinDb;
             float minDb = analyzer.MinDb;
             float strokeW = (float)StrokeWidth / 2f;
