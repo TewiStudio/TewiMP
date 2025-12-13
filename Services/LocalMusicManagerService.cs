@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using TewiMP.Helpers;
+using TewiMP.Core.Models;
 
 namespace TewiMP.Services;
 
@@ -15,7 +15,7 @@ public class LocalMusicManagerService
     public event LocalMusicDelegate DataAnalyzing;
     public event LocalMusicDelegate DataAnalyzed;
 
-    public ObservableCollection<SongItemBindBase> LocalMusicItems { get; set; } = [];
+    public ObservableCollection<MusicDataViewModel> LocalMusicItems { get; set; } = [];
 
     public LocalMusicManagerService()
     {

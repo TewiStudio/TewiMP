@@ -183,13 +183,13 @@ public class PlayingListService
             NowPlayingImageLoading?.Invoke(null, null);
 
             // 异步获取图片
-            var (uri, path) = await ImageService.GetImageUri(AudioService.MusicData);
+            var uri = await ImageService.GetImageUri(AudioService.MusicData);
 
             // 如果 await 期间又切歌了，直接退出，不要覆盖新歌的数据
             if (currentToken.IsCancellationRequested) return;
 
             NowPlayingImage = uri;
-            NowPlayingImagePath = path;
+            NowPlayingImagePath = uri.LocalPath;
 
             // 处理空图片情况 TODO: FIX THIS
             if (uri is null) lastMusicData = null;

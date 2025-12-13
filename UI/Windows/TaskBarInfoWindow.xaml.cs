@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Windowing;
 using TewiMP.Services;
 using TewiMP.Services.Storage;
+using Vanara.PInvoke;
 
 namespace TewiMP.UI.Windows;
 
@@ -35,6 +36,7 @@ public partial class TaskBarInfoWindow : Window
         App.Instance.PlayingListService.NowPlayingImageLoaded += (_, __) => IconPath = __;
         App.Instance.AudioService.SourceChanged += (_) =>
         {
+            if (!User32.IsWindow(Handle)) return;
             if (_.MusicData is null)
             {
                 Title = App.Instance.AppName;
@@ -88,6 +90,7 @@ public partial class TaskBarInfoWindow : Window
     bool lastIsBackground = false;
     private void MainWindow_WindowViewStateChanged(bool isView)
     {
+        if (!User32.IsWindow(Handle)) return;
         ShowTaskBarButtons();
         SetTaskbarButtonIcon(App.Instance.AudioService.PlaybackState);
         //TryTransparentWindow();
@@ -128,6 +131,7 @@ public partial class TaskBarInfoWindow : Window
     {
         //Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetProgressState(Handle, Helpers.SDKs.TaskbarProgress.TBPFLAG.TBPF_NORMAL);
         //Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetProgressValue(Handle, 1, 100);
+        if (!User32.IsWindow(Handle)) return;
         Helpers.SDKs.TaskbarProgress.THUMBBUTTON[] changer;
         if (playbackState == NAudio.Wave.PlaybackState.Playing)
         {
@@ -154,12 +158,12 @@ public partial class TaskBarInfoWindow : Window
             // 似乎在某些情况下不会起作用？
             Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.ThumbBarUpdateButtons(Handle, 3, changer);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             LogService.Error("SetTaskbarButtonIcon", ex.ToString());
         }
     }
-    
+
     nint pauseIconHandle = (Bitmap.FromFile(DataFolderBase.TaskbarAssetPausePath) as Bitmap).GetHicon();
     nint playIconHandle = (Bitmap.FromFile(DataFolderBase.TaskbarAssetPlayPath) as Bitmap).GetHicon();
     nint nextPlayIconHandle = (Bitmap.FromFile(DataFolderBase.TaskbarAssetNextPath) as Bitmap).GetHicon();

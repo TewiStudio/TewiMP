@@ -60,8 +60,7 @@
                 Background="Transparent"
                 Tapped="Grid_Tapped">
                 <StackPanel
-                    Padding="16,8,8,8"
-                    Tag="{Binding MD5}">
+                    Padding="16,8,8,8">
                     <TextBlock TextTrimming="CharacterEllipsis">
                         <Run Text="{Binding Title}"/>
                     </TextBlock>

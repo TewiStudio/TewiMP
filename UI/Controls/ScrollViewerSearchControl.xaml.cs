@@ -2,13 +2,13 @@ using System.Linq;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.Helpers;
+using TewiMP.Core.Models;
 
 namespace TewiMP.UI.Controls
 {
     public sealed partial class ScrollViewerSearchControl : Grid
     {
-        public delegate void SearchItemDelegate(SongItemBindBase songItemBind);
+        public delegate void SearchItemDelegate(MusicDataViewModel songItemBind);
         public event SearchItemDelegate SearchingAItem;
         public event DependencyPropertyChangedEventHandler IsOpenChanged;
 
@@ -47,8 +47,8 @@ namespace TewiMP.UI.Controls
             }
         }
 
-        public ObservableCollection<SongItemBindBase> SongItemBinds { get; set; }
-        ObservableCollection<SongItemBindBase> searchResult { get; set; } = [];
+        public ObservableCollection<MusicDataViewModel> SongItemBinds { get; set; }
+        ObservableCollection<MusicDataViewModel> searchResult { get; set; } = [];
 
         public ScrollViewerSearchControl()
         {
@@ -182,15 +182,15 @@ namespace TewiMP.UI.Controls
         private void SearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             if (SearchModeComboBox.SelectedIndex == 0)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Title;
+                SearchBox.Text = (args.SelectedItem as MusicDataViewModel).MusicData.Title;
             else if (SearchModeComboBox.SelectedIndex == 1)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Title;
+                SearchBox.Text = (args.SelectedItem as MusicDataViewModel).MusicData.Title;
             else if (SearchModeComboBox.SelectedIndex == 2)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.ArtistName;
+                SearchBox.Text = (args.SelectedItem as MusicDataViewModel).MusicData.ArtistName;
             else if (SearchModeComboBox.SelectedIndex == 3)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Album.Title;
+                SearchBox.Text = (args.SelectedItem as MusicDataViewModel).MusicData.Album.Title;
 
-            searchNum = SongItemBinds.IndexOf(args.SelectedItem as SongItemBindBase);
+            searchNum = SongItemBinds.IndexOf(args.SelectedItem as MusicDataViewModel);
             SearchResultTextBlock.Text = $"{searchNum + 1} of {SongItemBinds.Count}";
         }
 

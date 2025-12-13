@@ -1,10 +1,13 @@
 ﻿using System;
-using System.IO;
-using System.Threading.Tasks;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
+using System.Security.Policy;
+using System.Threading;
+using System.Threading.Tasks;
+using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services.Storage;
-using TewiMP.Core.Music;
 
 namespace TewiMP.Services.Media;
 
@@ -14,138 +17,178 @@ public static class ImageService
     static int loadNum = 0;
     static int maxLoadNum = 0;
 
-    public static async Task<bool> DownloadPic(string a, string b)
+    public static async Task<bool> DownloadPicAsync(string url, string filePath)
     {
         try
         {
-            await WebHelper.DownloadFileAsync(a, b);
-        }
-        catch { }
+            if (string.IsNullOrEmpty(url)) return false;
 
-        bool error = await Task.Run(() =>
-        {
-            if (File.Exists(b))
+            await WebHelper.DownloadFileAsync(url, filePath);
+
+            var fileInfo = new FileInfo(filePath);
+
+            // 检查下载是否有效
+            if (fileInfo.Exists && fileInfo.Length > 0)
             {
-                try
-                {
-                    if (File.ReadAllBytes(b).Length == 0)
-                    {
-                        File.Delete(b);
-                        return true;
-                    }
-                }
-                catch { }
+                return true; // 下载成功
             }
-            return false;
-        });
 
-        return error;
+            // 下载无效（文件不存在或为空），清理垃圾文件
+            if (fileInfo.Exists)
+            {
+                fileInfo.Delete();
+            }
+
+            return false; // 下载失败（文件无效）
+        }
+        catch
+        {
+            // 发生异常（网络错误或文件占用等）
+            return false; // 下载失败
+        }
+    }
+
+    // 用于任务去重：Key是文件唯一标识，Value是正在进行的任务
+    private static readonly ConcurrentDictionary<string, Lazy<Task<Uri>>> _pendingTasks = new();
+    private static readonly SemaphoreSlim _downloadSemaphore = new(5);
+
+    public static async Task<Uri> GetImageUri(MusicData musicData)
+    {
+        if (musicData is null) return default;
+
+        // 优先从缓存获取
+        string imageFullName = CacheFileHelpers.GetImageCache(musicData);
+        if (File.Exists(imageFullName))
+        {
+            return imageFullName.ToImageUri();
+        }
+
+        var lazyTask = _pendingTasks.GetOrAdd(imageFullName, _ =>
+            new Lazy<Task<Uri>>(() => DownloadAndProcessImageAsync(musicData, imageFullName),
+            LazyThreadSafetyMode.ExecutionAndPublication));
+
+        try
+        {
+            var result = await lazyTask.Value;
+            if (result is null)
+            {
+                LogService.Error(nameof(GetImageUri), $"Get image uri failed: {musicData} / {imageFullName}");
+            }
+            return result;
+        }
+        catch (Exception)
+        {
+            _pendingTasks.TryRemove(new KeyValuePair<string, Lazy<Task<Uri>>>(imageFullName, lazyTask));
+            return null;
+        }
     }
 
     /// <summary>
-    /// 返回musicData对应的图像对象和图像所在的本地路径
+    /// 返回musicData对应的图像Uri
     /// </summary>
     /// <param name="musicData"></param>
-    /// <param name="decodePixelWidth"></param>
-    /// <param name="decodePixelHeight"></param>
-    /// <param name="useBitmapImage"></param>
     /// <returns>
-    /// <list type="table">
-    /// <item>T1: <see cref="Uri"/>，图像对象</item>
-    /// <item>T2: <see cref="string">，图像在本地的路径</item>
-    /// </list>
     /// </returns>
-    public static async Task<Tuple<Uri, string>> GetImageUri(MusicData musicData)
+    private static async Task<Uri> DownloadAndProcessImageAsync(MusicData musicData, string imageFullName)
     {
-        Uri source = null;
-        string resultPath = null;
-        resultPath = await FileHelper.GetImageCachePath(musicData);
-
-        if (musicData.From == MusicFrom.localMusic)
+        try
         {
-            if (string.IsNullOrEmpty(resultPath))
+            // 二次检查：并发情况下，可能前一个任务刚完成，这里再查一次文件是否存在
+            if (File.Exists(imageFullName))
             {
-                var imageByte = await CodeHelper.GetLocalImageByte(musicData);
-                if (imageByte != null)
-                {
-                    string b = $@"{DataFolderBase.ImageCacheFolder}\{musicData.From}{musicData.MD5.Replace(@"/", "#")}";
-                    await Task.Run(() =>
-                    {
-                        var f = File.Create(b);
-                        f.Write(imageByte);
-                        f.Close();
-                        f.Dispose();
-                    });
-                    source = b.ToImageUri();
-                    resultPath = b;
-                }
-                else
-                {
-                    string coverPath = await Task.Run(() =>
-                    {
-                        FileInfo fileInfo = new FileInfo(musicData.InLocal);
-                        string coverPath = $"{fileInfo.DirectoryName}\\Cover.jpg";
-                        if (File.Exists(coverPath)) return coverPath;
-                        else return null;
-                    });
-                    if (coverPath != null)
-                    {
-                        source = coverPath.ToImageUri();
-                        resultPath = coverPath;
-                    }
-                }
+                return imageFullName.ToImageUri();
+            }
+
+            if (musicData.From == MusicFrom.localMusic)
+            {
+                return await SaveAndGetLocalMusicImage(musicData, imageFullName);
             }
             else
             {
-                source = new(resultPath);
+                return await SaveAndGetPluginMusicImage(musicData, imageFullName);
             }
+        }
+        catch (Exception err)
+        {
+            LogService.Error(nameof(GetImageUri), $"获取歌曲封面失败。\n{err}");
+            return null;
+        }
+        finally
+        {
+            // 任务完成后，从字典中移除
+            _pendingTasks.TryRemove(imageFullName, out _);
+        }
+    }
+
+    public static async Task<Uri> SaveAndGetLocalMusicImage(MusicData musicData, string destPath)
+    {
+        var imageByte = await CodeHelper.GetLocalImageByte(musicData);
+        if (imageByte != null)
+        {
+            await File.WriteAllBytesAsync(destPath, imageByte);
+            return destPath.ToImageUri();
         }
         else
         {
-            string filePath = $@"{DataFolderBase.ImageCacheFolder}\{musicData.PluginInfo}{(string.IsNullOrEmpty(musicData.Album?.ID) ? musicData.MD5.Replace(@"/", "#") : musicData.Album.ID)}";
-            while (LoadingImages.Contains(filePath))
+            FileInfo fileInfo = new(musicData.InLocal);
+            string coverPath = Path.Combine(fileInfo.DirectoryName, "Cover.jpg");
+            if (File.Exists(coverPath))
             {
-                await Task.Delay(300);
-            }
-            if (resultPath is null)
-            {
-                while (loadNum > maxLoadNum)
-                {
-                    await Task.Delay(400);
-                }
-                loadNum++;
-                LoadingImages.Add(filePath);
-
-                if (WebHelper.IsNetworkConnected)
-                {
-                    string a;
-                    if (musicData.Album?.PicturePath != null)
-                    {
-                        a = musicData.Album.PicturePath;
-                    }
-                    else
-                    {
-                        a = await WebHelper.GetPicturePathAsync(musicData);
-                    }
-                    bool error = await DownloadPic(a, filePath);
-                    if (!error) resultPath = filePath;
-                }
-            }
-
-            try
-            {
-                source = new(resultPath);
-            }
-            finally
-            {
-                LoadingImages.Remove(filePath);
-                loadNum--;
+                await Task.Run(() => File.Copy(coverPath, destPath));
+                return coverPath.ToImageUri();
             }
         }
+        return null;
+    }
 
-        Tuple<Uri, string> resultTuple = new(source, resultPath);
-        //localImageCache.Add(musicData, resultTuple);
-        return resultTuple;
+    public static async Task<Uri> SaveAndGetPluginMusicImage(MusicData musicData, string destPath)
+    {
+        if (!WebHelper.IsNetworkConnected) return null;
+
+        await _downloadSemaphore.WaitAsync();
+        try
+        {
+            string url = musicData.Album?.PicturePath != null
+                ? musicData.Album.PicturePath
+                : await WebHelper.GetPicturePathAsync(musicData);
+
+            if (await DownloadPicAsync(url, destPath))
+            {
+                // 确保文件句柄已释放且文件可读
+                //await EnsureFileReadableAsync(destPath);
+                return destPath.ToImageUri();
+            }
+            return null;
+        }
+        finally
+        {
+            _downloadSemaphore.Release();
+        }
+    }
+
+    private static async Task EnsureFileReadableAsync(string path)
+    {
+        int maxRetries = 5;
+        int delay = 50; // ms
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            try
+            {
+                // 尝试以只读方式打开文件，不共享写入权限
+                // 如果能成功打开，说明下载流已经彻底关闭了
+                using var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                if (stream.Length > 0)
+                {
+                    return; // 文件就绪
+                }
+            }
+            catch (IOException)
+            {
+                // 文件被占用，等待一会重试
+                await Task.Delay(delay);
+            }
+        }
     }
 
     /// <summary>
@@ -156,40 +199,19 @@ public static class ImageService
     /// <param name="decodePixelHeight"></param>
     /// <param name="useBitmapImage"></param>
     /// <returns>Item1 为 ImageSource，Item2 为获取到 ImageSource 的文件路径</returns>
-    public static async Task<Tuple<Uri, string>> GetImageUri(MusicListData musicListData, int decodePixelWidth = 0, int decodePixelHeight = 0, bool useBitmapImage = false)
+    public static async Task<Uri> GetImageUri(MusicListData musicListData)
     {
         if (musicListData is null) return null;
 
-        string cachePath = await FileHelper.GetImageCache(musicListData);
-        string resultPath = null;
+        string cachePath = CacheFileHelpers.GetImageCache(musicListData);
+        if (musicListData.ListDataType == DataType.本地歌单) return cachePath.ToImageUri();
+        if (File.Exists(cachePath)) return cachePath.ToImageUri();
 
-        if (cachePath != null)
+        if (await DownloadPicAsync(musicListData.PicturePath, cachePath))
         {
-            resultPath = cachePath;
+            return cachePath.ToImageUri();
         }
-        else
-        {
-            if (WebHelper.IsNetworkConnected)
-            {
-                string b = $@"{DataFolderBase.ImageCacheFolder}\{musicListData.PluginInfo}{musicListData.ListDataType}{musicListData.ID}";
-                await Task.Run(() =>
-                {
-                    if (!File.Exists(b))
-                        File.Create(b).Close();
-                });
-                await WebHelper.DownloadFileAsync(musicListData.PicturePath, b);
-                resultPath = b;
-            }
-            else
-            {
-                resultPath = DataFolderBase.IconPNGPath;
-            }
-        }
-
-        var source = resultPath.ToImageUri();
-
-        Tuple<Uri, string> resultTuple = new(source, resultPath);
-        //localImageCache.Add(musicListData, resultTuple);
-        return resultTuple;
+        
+        return null;
     }
 }

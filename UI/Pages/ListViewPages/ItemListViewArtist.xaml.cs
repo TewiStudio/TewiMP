@@ -11,14 +11,14 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Composition;
 using CommunityToolkit.WinUI;
-using TewiMP.Services.Media;
 using TewiMP.Helpers;
 using TewiMP.UI.Controls;
 using TewiMP.UI.Windows;
-using TewiMP.Services.Storage;
+using TewiMP.UI.Pages.ListViewPages;
 using TewiMP.Core.Music;
-using TewiMP.UI.Pages.ListViewPages;
-using TewiMP.UI.Pages.ListViewPages;
+using TewiMP.Core.Models;
+using TewiMP.Services.Media;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Pages
 {
@@ -45,26 +45,26 @@ namespace TewiMP.UI.Pages
         {
             base.OnNavigatedFrom(e);
         }
-/*
-        private void CrateShadow()
-        {
-            var visual = ElementCompositionPreview.GetElementVisual(Artist_Image);
-            compositor = visual.Compositor;
+        /*
+                private void CrateShadow()
+                {
+                    var visual = ElementCompositionPreview.GetElementVisual(Artist_Image);
+                    compositor = visual.Compositor;
 
-            var basicRectVisual = compositor.CreateSpriteVisual();
-            basicRectVisual.Size = Artist_Image.RenderSize.ToVector2();
+                    var basicRectVisual = compositor.CreateSpriteVisual();
+                    basicRectVisual.Size = Artist_Image.RenderSize.ToVector2();
 
-            dropShadow = compositor.CreateDropShadow();
-            dropShadow.BlurRadius = 45f;
-            dropShadow.Color = Colors.Black;
-            dropShadow.Opacity = 0.3f;
-            dropShadow.Offset = new Vector3(0, 4, 0);
+                    dropShadow = compositor.CreateDropShadow();
+                    dropShadow.BlurRadius = 45f;
+                    dropShadow.Color = Colors.Black;
+                    dropShadow.Opacity = 0.3f;
+                    dropShadow.Offset = new Vector3(0, 4, 0);
 
-            basicRectVisual.Shadow = dropShadow;
-            ElementCompositionPreview.SetElementChildVisual(Artist_Image_DropShadowBase, basicRectVisual);
-        }
-*/
-        public ObservableCollection<SongItemBindBase> MusicDataList = new();
+                    basicRectVisual.Shadow = dropShadow;
+                    ElementCompositionPreview.SetElementChildVisual(Artist_Image_DropShadowBase, basicRectVisual);
+                }
+        */
+        public ObservableCollection<MusicDataViewModel> MusicDataList = new();
         MusicListData musicListData = null;
         static bool firstInit = false;
         int pageNumber = 1;
@@ -95,12 +95,11 @@ namespace TewiMP.UI.Pages
             {
                 LoadImage();
 
-                SongItemBindBase.RecycleBindItems(MusicDataList);
                 MusicDataList.Clear();
                 int count = 1;
                 foreach (var i in musicListData.Songs)
                 {
-                    MusicDataList.Add(SongItemBindBase.GetBindItem(i, musicListData, count++));
+                    MusicDataList.Add(new(i, musicListData, count++));
                 }
             }
             LoadingTipControl.UnShowLoading();
@@ -110,19 +109,10 @@ namespace TewiMP.UI.Pages
         {
             Artist_Image.Source = null;
             Artist_Image1.Source = null;
-            if (musicListData.ListDataType == DataType.本地歌单)
-            {
-                Artist_Image.Source = musicListData.PicturePath.ToImageUri();
-            }
-            else if (musicListData.ListDataType == DataType.歌单)
-            {
-                Artist_Image.Source = (await ImageService.GetImageUri(musicListData)).Item1;
-            }
-            else if (musicListData.ListDataType == DataType.艺术家)
-            {
-                var art = NavToObj;
-                Artist_Image.Source = new Uri(art.PicturePath);
-            }
+
+            var art = NavToObj;
+            Artist_Image.Source = new Uri(art.PicturePath);
+
             Artist_Image1.Source = Artist_Image.Source;
             Artist_Image1.SaveName = NavToObj.Name;
         }
@@ -385,7 +375,7 @@ namespace TewiMP.UI.Pages
         {
             if (Children.SelectedItems.Any())
             {
-                foreach (SongItemBindBase item in Children.SelectedItems)
+                foreach (MusicDataViewModel item in Children.SelectedItems)
                 {
                     App.Instance.PlayingListService.Add(item.MusicData);
                 }
@@ -396,7 +386,7 @@ namespace TewiMP.UI.Pages
         {
             if (Children.SelectedItems.Any())
             {
-                foreach (SongItemBindBase item in Children.SelectedItems) 
+                foreach (MusicDataViewModel item in Children.SelectedItems)
                 {
                     MusicDataList.Remove(item);
                 }
@@ -411,7 +401,7 @@ namespace TewiMP.UI.Pages
 
         private void SelectReverseButton_Click(object sender, RoutedEventArgs e)
         {
-            foreach (SongItemBindBase item in Children.Items)
+            foreach (MusicDataViewModel item in Children.Items)
             {
                 if (Children.SelectedItems.Contains(item))
                 {
@@ -433,7 +423,7 @@ namespace TewiMP.UI.Pages
         {
             if (Children.SelectedItems.Any())
             {
-                foreach (SongItemBindBase songItem in Children.SelectedItems)
+                foreach (MusicDataViewModel songItem in Children.SelectedItems)
                 {
                     App.Instance.DownloadService.Add(songItem.MusicData);
                 }
@@ -460,10 +450,10 @@ namespace TewiMP.UI.Pages
         {
             App.MainWindowInstance.ShowLoadingDialog();
             var text = await PlayListHelper.ReadData();
-            foreach (SongItemBindBase item in Children.SelectedItems)
+            foreach (MusicDataViewModel item in Children.SelectedItems)
             {
                 App.MainWindowInstance.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
-                
+
                 text = PlayListHelper.AddMusicDataToPlayList(
                     ((sender as MenuFlyoutItem).Tag as MusicListData).ListName,
                     item.MusicData, text);
@@ -528,7 +518,6 @@ namespace TewiMP.UI.Pages
         {
             scrollViewer?.ScrollToVerticalOffset(0);
 
-            SongItemBindBase.RecycleBindItems(MusicDataList);
             MusicDataList.Clear();
             Children.ItemsSource = null;
             Children.Items.Clear();

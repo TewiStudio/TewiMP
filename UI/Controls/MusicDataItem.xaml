@@ -93,10 +93,11 @@
                         Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"
                         FontSize="13"
                         TextTrimming="CharacterEllipsis">
-<Run x:Name="Info_Texts_CountRun"/><Run x:Name="Info_Texts_TitleRun" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="14"/><Run x:Name="Info_Texts_Title2Run"/></TextBlock>
+<Run x:Name="Info_Texts_CountRun" Text="{x:Bind ViewModel.CountText,Mode=OneWay}"/><Run x:Name="Info_Texts_TitleRun" Text="{x:Bind ViewModel.Title,Mode=OneWay}" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="14"/><Run x:Name="Info_Texts_Title2Run" Text="{x:Bind ViewModel.Title2,Mode=OneWay}"/></TextBlock>
                     <Grid>
                         <TextBlock
                             x:Name="Info_Texts_ButtonNameTextBlock"
+                            Text="{x:Bind ViewModel.ButtonName,Mode=OneWay}"
                             SizeChanged="Info_Texts_ButtonNameTextBlock_SizeChanged"
                             Foreground="{ThemeResource SystemChromeDisabledLowColor}"
                             FontSize="12"

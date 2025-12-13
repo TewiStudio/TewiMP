@@ -31,7 +31,8 @@ namespace TewiMP.UI.Pages
         protected override void OnNavigatedFrom(NavigationEventArgs e)
         {
             base.OnNavigatedFrom(e);
-            verticalOffset = scrollViewer.VerticalOffset;
+            if (scrollViewer is not null)
+                verticalOffset = scrollViewer.VerticalOffset;
         }
 
         ObservableCollection<MusicListData> playListCards = new();

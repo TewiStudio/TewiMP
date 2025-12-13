@@ -4,8 +4,8 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:helper="using:TewiMP.Helpers"
-    xmlns:data="using:TewiMP.Storage"
+    xmlns:models="using:TewiMP.Core.Models"
+    xmlns:data="using:TewiMP.Services.Storage"
     xmlns:c="using:CommunityToolkit.WinUI"
     xmlns:controls="using:TewiMP.UI.Controls"
     xmlns:local="using:TewiMP.UI.Pages.ListViewPages"
@@ -88,8 +88,8 @@
                 </Style>
             </ListView.Resources>
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="helper:SongItemBindBase">
-                    <controls:MusicDataItem Margin="16,1"/>
+                <DataTemplate x:DataType="models:MusicDataViewModel">
+                    <controls:MusicDataItem Margin="16,1" ViewModel="{x:Bind}"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
             <ListView.Header>

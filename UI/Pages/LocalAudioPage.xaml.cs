@@ -15,10 +15,12 @@ using Windows.System;
 using Newtonsoft.Json.Linq;
 using CommunityToolkit.WinUI;
 using TewiMP.UI.Controls;
-using TewiMP.Helpers;
 using TewiMP.UI.Windows;
-using TewiMP.Services.Storage;
 using TewiMP.Core.Music;
+using TewiMP.Core.Models;
+using TewiMP.Helpers;
+using TewiMP.Services.Storage;
+using Kawazu;
 
 namespace TewiMP.UI.Pages
 {
@@ -56,7 +58,7 @@ namespace TewiMP.UI.Pages
         }
         void SelectedReverseDo()
         {
-            foreach (SongItemBindBase item in ItemsList.Items.Cast<SongItemBindBase>())
+            foreach (MusicDataViewModel item in ItemsList.Items.Cast<MusicDataViewModel>())
             {
                 if (ItemsList.SelectedItems.Contains(item))
                 {
@@ -78,7 +80,7 @@ namespace TewiMP.UI.Pages
                     ItemsList_Header_CommandBar.IsEnabled = false;
                     var item = App.MainWindowInstance.AddNotify("删除歌曲", "正在准备删除歌曲...", NotifySeverity.Loading, TimeSpan.MaxValue);
                     int num = 0;
-                    foreach (SongItemBindBase data in ItemsList.SelectedItems.Cast<SongItemBindBase>())
+                    foreach (MusicDataViewModel data in ItemsList.SelectedItems.Cast<MusicDataViewModel>())
                     {
                         num++;
                         item.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -110,7 +112,7 @@ namespace TewiMP.UI.Pages
         {
             if (ItemsList.SelectedItems.Any())
             {
-                foreach (SongItemBindBase item in ItemsList.SelectedItems.Cast<SongItemBindBase>())
+                foreach (MusicDataViewModel item in ItemsList.SelectedItems.Cast<MusicDataViewModel>())
                 {
                     App.Instance.PlayingListService.Add(item.MusicData);
                 }
@@ -293,9 +295,10 @@ namespace TewiMP.UI.Pages
         }
 
         double vOffset = 0;
+        KawazuConverter kawazuConverter = LyricHelper.kawazuConverter;
         private async void LocalMusicManager_DataChanged()
         {
-            IEnumerable<IGrouping<string, SongItemBindBase>> groupsResult = null;
+            IEnumerable<IGrouping<string, MusicDataViewModel>> groupsResult = null;
             //dynamic groupsResult = null;
 
             switch (CommandBar_SortComboBox.SelectedIndex)
@@ -305,14 +308,13 @@ namespace TewiMP.UI.Pages
                     Resources["GroupHeaderPanelMaxWidth"] = 500;
                     groupsResult = await Task.Run(async () =>
                     {
-                        using Kawazu.KawazuConverter converter = new();
                         Dictionary<MusicData, string> array = [];
                         foreach (var i in App.Instance.LocalMusicManagerService.LocalMusicItems)
                         {
                             if (array.ContainsKey(i.MusicData)) continue;
                             string a = i.MusicData.Title;
                             a = PinyinHelper.GetPinyin(a).ToUpper().First().ToString();
-                            a = (await converter.Convert(a, Kawazu.To.Romaji, Kawazu.Mode.Spaced, Kawazu.RomajiSystem.Nippon)).ToUpper().First().ToString();
+                            a = (await kawazuConverter.Convert(a, To.Romaji, Mode.Spaced, RomajiSystem.Nippon)).ToUpper().First().ToString();
                             array.Add(i.MusicData, a);
                         }
 
@@ -359,10 +361,10 @@ namespace TewiMP.UI.Pages
             ItemsList_Header_Label_Count.Text = $"{App.Instance.LocalMusicManagerService.LocalMusicItems.Count} 首歌曲";
             scrollViewer.ChangeView(null, vOffset, null, true);
             int count = 0;
-            foreach (SongItemBindBase songItem in ItemsList_SongGroup.View)
+            foreach (MusicDataViewModel songItem in ItemsList_SongGroup.View)
             {
                 count++;
-                songItem.MusicData.Count = count;
+                songItem.Count = count;
             }
             isRefresh = false;
         }
@@ -384,11 +386,11 @@ namespace TewiMP.UI.Pages
                     {
                         App.Instance.PlayingListService.ClearAll();
                     }
-                    foreach (SongItemBindBase songItem in ItemsList_SongGroup.View)
+                    foreach (MusicDataViewModel songItem in ItemsList_SongGroup.View)
                     {
                         App.Instance.PlayingListService.Add(songItem.MusicData, false);
                     }
-                    await App.Instance.PlayingListService.Play((ItemsList_SongGroup.View.First() as SongItemBindBase).MusicData, true);
+                    await App.Instance.PlayingListService.Play((ItemsList_SongGroup.View.First() as MusicDataViewModel).MusicData, true);
                     App.Instance.PlayingListService.SetRandomPlay(App.Instance.PlayingListService.PlayBehavior);
                     break;
                 case "refresh":
@@ -491,7 +493,7 @@ namespace TewiMP.UI.Pages
             var text = await PlayListHelper.ReadData();
             var list = flyoutItem.Tag as MusicListData;
             var listName = list.ListName;
-            foreach (SongItemBindBase item in ItemsList.SelectedItems.Cast<SongItemBindBase>())
+            foreach (MusicDataViewModel item in ItemsList.SelectedItems.Cast<MusicDataViewModel>())
             {
                 App.MainWindowInstance.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
                 App.MainWindowInstance.SetLoadingProgressRingValue(ItemsList.SelectedItems.Count, ItemsList.SelectedItems.IndexOf(item));
@@ -531,8 +533,8 @@ namespace TewiMP.UI.Pages
             {
                 ItemsList_BottomButtons.Margin = new(0, 0, 16, ItemsList_SearchControl.ActualHeight + 16);
                 AtListBottomTb.Margin = new(4, 4, 4, ItemsList_BottomButtons.ActualHeight + ItemsList_SearchControl.ActualHeight + 20);
-                ObservableCollection<SongItemBindBase> songs = [];
-                foreach (SongItemBindBase i in ItemsList_SongGroup.View) { songs.Add(i); }
+                ObservableCollection<MusicDataViewModel> songs = [];
+                foreach (MusicDataViewModel i in ItemsList_SongGroup.View) { songs.Add(i); }
                 ItemsList_SearchControl.SongItemBinds = songs;
             }
             else
@@ -543,10 +545,10 @@ namespace TewiMP.UI.Pages
             }
         }
 
-        SongItemBindBase searchPointSongItemBindBase = null;
-        private async void ItemsList_SearchControl_SearchingAItem(SongItemBindBase songItemBind)
+        MusicDataViewModel searchPointMusicDataViewModel = null;
+        private async void ItemsList_SearchControl_SearchingAItem(MusicDataViewModel songItemBind)
         {
-            searchPointSongItemBindBase = songItemBind;
+            searchPointMusicDataViewModel = songItemBind;
             var scrollPlacement = ScrollItemPlacement.Top;
             int additionalVerticalOffset = -44;
             bool tryHighlight = MusicDataItem.TryHighlight(songItemBind);
@@ -554,13 +556,13 @@ namespace TewiMP.UI.Pages
             while (!tryHighlight)
             {
                 if (!IsLoaded) break;
-                if (searchPointSongItemBindBase != songItemBind) break;
+                if (searchPointMusicDataViewModel != songItemBind) break;
                 await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
                 await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
                 tryHighlight = MusicDataItem.TryHighlight(songItemBind);
                 await Task.Delay(80);
             }
-            searchPointSongItemBindBase = null;
+            searchPointMusicDataViewModel = null;
         }
 
         private void MainWindow_InKeyDownEvent(VirtualKey key)

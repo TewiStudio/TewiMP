@@ -3,29 +3,58 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using CommunityToolkit.Mvvm.ComponentModel;
 using Newtonsoft.Json;
 using TewiMP.Helpers;
-using TewiMP;
-using TewiMP.Core;
 using TewiMP.Services.Plugin;
 
 namespace TewiMP.Core.Music;
 
-public class MusicData : OnlyClass
+public class MusicData : IEquatable<MusicData>
 {
     public string Title { get; set; }
     public string Title2 { get; set; }
     public string ID { get; set; }
-    public List<Artist> Artists { get; set; }
-    public Album Album { get; set; }
+
+    private List<Artist> _artists;
+    public List<Artist> Artists
+    {
+        get => _artists;
+        set
+        {
+            if (_artists != value)
+            {
+                _artists = value;
+                // 当列表变动时，立即使缓存失效
+                _artistName = null;
+                _buttonName = null;
+            }
+        }
+    }
+
+    private Album _album;
+    public Album Album
+    {
+        get => _album;
+        set
+        {
+            if (_album != value)
+            {
+                _album = value;
+                // 当专辑变动时，ButtonName 需要重新计算
+                _buttonName = null;
+            }
+        }
+    }
+
     public DateTime? ReleaseTime { get; set; }
     public DateTime? FileTime { get; set; }
     public string InLocal { get; set; }
-    public CUETrackData CUETrackData { get; set; } = null;
+    public CUETrackData CUETrackData { get; set; }
     public int Index { get; set; } = 0;
-    public int Count { get; set; }
+    public PluginInfo PluginInfo { get; set; }
 
-    MusicFrom _from = MusicFrom.localMusic;
+    private MusicFrom _from = MusicFrom.localMusic;
     public MusicFrom From
     {
         get => _from;
@@ -33,13 +62,13 @@ public class MusicData : OnlyClass
         {
             if (_from == value) return;
             _from = value;
-            if (Album != null)
+
+            // 级联更新子对象的状态
+            if (_album != null) _album.From = value;
+
+            if (_artists != null && _artists.Count > 0)
             {
-                Album.From = value;
-            }
-            if (Artists.Count > 0)
-            {
-                foreach (var artist in Artists)
+                foreach (var artist in _artists)
                 {
                     artist.From = value;
                 }
@@ -47,72 +76,116 @@ public class MusicData : OnlyClass
         }
     }
 
-    public PluginInfo PluginInfo { get; set; }
+    // 缓存字段
+    private string _artistName;
+    private string _buttonName;
 
-    string _artistName = null;
     [JsonIgnore]
     public string ArtistName
     {
         get
         {
-            if (Artists.Any())
+            // 只有为 null 时才计算
+            if (_artistName == null)
             {
-                if (_artistName is null)
-                    SetABName();
+                if (_artists == null || _artists.Count == 0)
+                {
+                    _artistName = "未知";
+                }
+                else if (_artists.Count == 1)
+                {
+                    // 单歌手直接 ToString，无需 Join
+                    _artistName = _artists[0].ToString();
+                }
+                else
+                {
+                    _artistName = string.Join(", ", _artists.Select(a => a.ToString()));
+                }
             }
-            return string.IsNullOrEmpty(_artistName) ? "未知" : _artistName;
+            return _artistName;
         }
     }
 
-    string _buttonName = null;
     [JsonIgnore]
     public string ButtonName
     {
         get
         {
-            if (_buttonName is null)
+            if (_buttonName == null)
             {
-                SetABName();
+                // 确保依赖的属性已计算
+                var albStr = _album?.ToString() ?? string.Empty;
+                _buttonName = $"{ArtistName} · {albStr}";
             }
             return _buttonName;
         }
     }
 
     public MusicData(string title = "",
-                     string ID = "",
+                     string id = "",
                      List<Artist> artists = null,
                      Album album = null,
                      DateTime? releaseTime = null,
                      MusicFrom from = MusicFrom.localMusic,
                      string inLocal = null)
     {
-        this.Title = title;
-        this.ID = ID;
-        this.Artists = artists;
-        this.Album = album;
-        this.ReleaseTime = releaseTime;
-        this.From = from;
-        this.InLocal = inLocal;
-
+        Title = title;
+        ID = id;
+        _artists = artists;
+        _album = album;
+        ReleaseTime = releaseTime;
+        _from = from;
+        InLocal = inLocal;
     }
 
     /// <summary>
-    /// 设置 <see cref="ArtistName"/> 和 <see cref="ButtonName"/>
+    /// 判断是否是同一首歌。
     /// </summary>
-    private void SetABName()
+    public bool Equals(MusicData other)
     {
-        for (int i = 0; i < Artists.Count; i++)
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+
+        // 如果源不一样，直接返回
+        if (From != other.From) return false;
+
+        if (PluginInfo is not null && other.PluginInfo is not null)
         {
-            _artistName += $"{Artists[i].ToString()}{(i < (Artists.Count - 1) ? (i < Artists.Count - 2 ? ", " : " & ") : "")}";
+            if (PluginInfo != other.PluginInfo) return false;
         }
 
-        _buttonName = $"{(ArtistName is null ? "未知" : ArtistName)} · {Album}";
+        // 如果有 ID，优先比对 ID
+        if (!string.IsNullOrEmpty(ID) && !string.IsNullOrEmpty(other.ID))
+        {
+            return ID == other.ID;
+        }
+
+        // 如果 ID 为空，则回退到比较文件路径或标题
+        if (!string.IsNullOrEmpty(InLocal) && !string.IsNullOrEmpty(other.InLocal))
+        {
+            return InLocal == other.InLocal;
+        }
+
+        return Title == other.Title && ArtistName == other.ArtistName;
     }
 
-    public override string GetMD5()
+    public override bool Equals(object obj) => Equals(obj as MusicData);
+
+    public override int GetHashCode()
     {
-        return CodeHelper.ToMD5($"{Title}{(Artists.Any() ? $"{Artists[0]?.Name}{Artists[0]?.ID}" : "")}{Artists.Count}{Album?.Title}{ID}{Album?.ID}{From}{InLocal}{(CUETrackData != null ? $"{CUETrackData.StartDuration}{CUETrackData.EndDuration}" : "")}");
+        if (!string.IsNullOrEmpty(ID)) return ID.GetHashCode();
+
+        // 只有当 ID 为空时组合其他字段
+        return HashCode.Combine(Title, InLocal);
     }
+
+    public static bool operator ==(MusicData left, MusicData right)
+    {
+        if (left is null) return right is null;
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(MusicData left, MusicData right) => !(left == right);
 
     public override string ToString()
     {

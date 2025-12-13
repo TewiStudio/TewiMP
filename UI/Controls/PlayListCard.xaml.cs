@@ -10,13 +10,12 @@ using Windows.UI;
 using Windows.UI.ViewManagement;
 using Newtonsoft.Json.Linq;
 using TewiMP.Services.Media;
+using TewiMP.UI.Windows;
+using TewiMP.UI.Pages.ListViewPages;
+using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services;
 using TewiMP.Services.Storage;
-using TewiMP.UI.Pages.ListViewPages;
-using TewiMP.UI.Windows;
-using TewiMP.Core.Music;
-using TewiMP.UI.Pages.ListViewPages;
 
 namespace TewiMP.UI.Controls
 {
@@ -83,9 +82,11 @@ namespace TewiMP.UI.Controls
             //ExitMass();
             if (MusicListData != null)
             {
-                int size = 0;//(int)(200 * ImageScaleDPI);
-                var imageSources = await ImageService.GetImageUri(MusicListData, size, size, true);
-                PlayListImage.Source = imageSources.Item1;
+                PlayListImage.Source = null;
+                var imageSources = await ImageService.GetImageUri(MusicListData);
+                await Task.Delay(50);
+                PlayListImage.Source = null;
+                PlayListImage.Source = imageSources;
                 PlayListImage.SaveName = $"{MusicListData.ListShowName}";
             }
             //CrateShadow();
@@ -257,7 +258,7 @@ namespace TewiMP.UI.Controls
 
             try
             {
-                var deletePath = (await ImageService.GetImageUri(musicListData)).Item2;
+                var deletePath = (await ImageService.GetImageUri(musicListData)).LocalPath;
                 await Task.Run(() =>
                 {
                     try
@@ -266,7 +267,6 @@ namespace TewiMP.UI.Controls
                     }
                     catch { }
                 });
-
 
                 var playlist = await musicListData.PluginInfo.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
                 musicListData = playlist;

@@ -1,3 +1,4 @@
+using CommunityToolkit.WinUI.Animations;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -9,7 +10,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
+using TewiMP.Core.Models;
 using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services.Media;
@@ -42,9 +45,9 @@ namespace TewiMP.UI.Controls
             MusicDataItem equaled = null;
             foreach (var i in staticMusicDataItem)
             {
-                if (i?.songItemBind?.MusicData is not null)
+                if (i?.ViewModel?.MusicData is not null)
                 {
-                    if (i.songItemBind.MusicData == targetData)
+                    if (i.ViewModel.MusicData == targetData)
                     {
                         equaled = i;
                     }
@@ -102,13 +105,13 @@ namespace TewiMP.UI.Controls
             return result;
         }
 
-        public static bool TryHighlight(SongItemBindBase songItemBind)
+        public static bool TryHighlight(MusicDataViewModel songItemBind)
         {
             bool result = false;
             foreach (MusicDataItem item in staticMusicDataItem)
             {
-                item.SetHighlight(item.songItemBind == songItemBind);
-                if (item.songItemBind == songItemBind) result = true;
+                item.SetHighlight(item.ViewModel == songItemBind);
+                if (item.ViewModel == songItemBind) result = true;
             }
             return result;
         }
@@ -118,8 +121,8 @@ namespace TewiMP.UI.Controls
             bool result = false;
             foreach (MusicDataItem item in staticMusicDataItem)
             {
-                item.SetHighlight(item.songItemBind.MusicData == musicData);
-                if (item.songItemBind.MusicData == musicData) result = true;
+                item.SetHighlight(item.ViewModel.MusicData == musicData);
+                if (item.ViewModel.MusicData == musicData) result = true;
             }
             return result;
         }
@@ -136,122 +139,119 @@ namespace TewiMP.UI.Controls
         }
         #endregion
 
-        bool _isImageShow = true;
-        public bool IsImageShow
+        public static readonly DependencyProperty ViewModelProperty =
+            DependencyProperty.Register(nameof(ViewModel), typeof(MusicDataViewModel), typeof(MusicDataItem), new PropertyMetadata(null));
+
+        public MusicDataViewModel ViewModel
         {
-            get => _isImageShow;
-            set => _isImageShow = value;
+            get => (MusicDataViewModel)GetValue(ViewModelProperty);
+            set => SetValue(ViewModelProperty, value);
         }
 
         public bool IsMusicDataPlaying
         {
-            get => songItemBind?.MusicData == App.Instance.AudioService.MusicData;
+            get => ViewModel?.MusicData == App.Instance.AudioService.MusicData;
         }
 
-        SongItemBindBase songItemBind;
         public MusicDataItem()
         {
             initListen(); // 静态初始化，只在程序第一次运行时执行一次
             InitializeComponent();
-            InitVisuals();
             //arrayList = new ArrayList(10000000);
         }
 
         void InitInfo()
         {
-            if (!IsLoaded) return;
-            if (songItemBind is null) return;
-            Info_Texts_CountRun.Text = songItemBind.MusicData.Count == 0 ? null : $"{songItemBind.MusicData.Count}. ";
-            Info_Texts_TitleRun.Text = songItemBind.MusicData.Title;
-            Info_Texts_Title2Run.Text = $" {songItemBind.MusicData.Title2}";
-            Info_Texts_ButtonNameTextBlock.Text = 
-                songItemBind.MusicListData?.ListDataType == DataType.专辑 ? songItemBind.MusicData.ArtistName : songItemBind.MusicData.ButtonName;
+
         }
 
-        int initImageCallCount = 0;
-        async void InitImage()
+        private CancellationTokenSource _imageLoadCts;
+        async Task InitImage()
         {
-            if (Info_Image is null) return;
-            Info_Image.Source = null;
-            Info_Image_Root.Visibility = IsImageShow ? Visibility.Visible : Visibility.Collapsed;
-            FileNotExists_Root.Visibility = Visibility.Collapsed;
-            SetImageBorder(false);
-            if (!IsLoaded) return;
-            if (!IsImageShow) return;
-            if (songItemBind is null) return;
-            initImageCallCount++;
-            await Task.Delay(200);
-            initImageCallCount--;
-            if (initImageCallCount != 0) return;
-            if (!IsLoaded) return;
-            if (songItemBind is null) return;
-            if (songItemBind.MusicListData?.ListDataType == DataType.专辑) return;
-            if (songItemBind.MusicData.From == MusicFrom.localMusic)
+            if (ViewModel is null || Info_Image is null) return;
+
+            // 在专辑列表下时不加载图片
+            if (ViewModel.MusicListData?.ListDataType == DataType.专辑)
             {
-                if (Path.GetExtension(songItemBind.MusicData.InLocal) == ".mid")
+                Info_Image_Root.Visibility = Visibility.Collapsed;
+                return;
+            }
+
+            if (ViewModel.MusicData.From == MusicFrom.localMusic)
+            {
+                // 为 midi 文件时不加载图片
+                if (Path.GetExtension(ViewModel.MusicData.InLocal) == ".mid")
                 {
                     Info_Image.Source = null;
                     Info_Image_Root.Visibility = Visibility.Collapsed;
-                    SetImageBorder(false);
+                    return;
+                }
+                // 文件不存在时不加载图片
+                if (!File.Exists(ViewModel.MusicData.InLocal))
+                {
+                    Info_Image_Root.Visibility = Visibility.Collapsed;
+                    FileNotExists_Root.Visibility = Visibility.Visible;
                     return;
                 }
             }
 
-
-            bool isExists = true;
-            if (songItemBind.MusicData.From == MusicFrom.localMusic)
+            _imageLoadCts?.Cancel();
+            _imageLoadCts?.Dispose();
+            _imageLoadCts = new CancellationTokenSource();
+            var token = _imageLoadCts.Token;
+            try
             {
-                isExists = await Task.Run(() => File.Exists(songItemBind.MusicData.InLocal));
-            }
+                SetImageBorder(false);
+                Info_Image_Root.Visibility = Visibility.Visible;
+                FileNotExists_Root.Visibility = Visibility.Collapsed;
+                Info_Image.Source = null;
 
-            MusicData musicData = songItemBind.MusicData;
-            Uri result = null;
+                await Task.Delay(200);
+                if (token.IsCancellationRequested) return;
 
-            if (isExists)
-            {
-                if (songItemBind.MusicData.From == MusicFrom.localMusic || true)
+                MusicData targetMusicData = ViewModel.MusicData;
+                Uri result = await ImageService.GetImageUri(targetMusicData);
+                if (IsLoaded && ViewModel is not null &&
+                    result != null && targetMusicData == ViewModel.MusicData &&
+                    !token.IsCancellationRequested)
                 {
-                    var bitmapTuple = await ImageService.GetImageUri(musicData);
-                    result = bitmapTuple.Item1;
-                    FileNotExists_Root.Visibility = Visibility.Collapsed;
+                    Info_Image.Source = result;
+                    SetImageBorder(true);
                 }
                 else
                 {
-                    result = new(await WebHelper.GetPicturePathAsync(musicData));
+                    Info_Image_Root.Visibility = Visibility.Collapsed;
                 }
             }
-            else
+            catch (TaskCanceledException)
             {
-                FileNotExists_Root.Visibility = Visibility.Visible;
+                return;
             }
-
-            if (!IsLoaded) result = null;
-            if (songItemBind is null) result = null;
-
-            if (result != null)
+            catch (Exception ex)
             {
-                if (musicData == songItemBind.MusicData)
-                {
-                    Info_Image.Source = result;
-                }
-            }
-            else
-            {
-                Info_Image.Source = null;
-                Info_Image_Root.Visibility = Visibility.Collapsed;
-                SetImageBorder(false);
+                throw;
             }
         }
 
         Visual backgroundFillVisual;
         Visual rightButtonVisual;
         Visual strokeVisual;
-        ScalarKeyFrameAnimation rightButtonVisualShowAnimation;
-        ScalarKeyFrameAnimation rightButtonVisualHideAnimation;
-        ScalarKeyFrameAnimation backgroundFillVisualShowAnimation;
-        ScalarKeyFrameAnimation backgroundFillVisualHideAnimation;
-        ScalarKeyFrameAnimation strokeVisualShowAnimation;
-        ScalarKeyFrameAnimation strokeVisualHideAnimation;
+        private static readonly AnimationBuilder MouseInOpacityFadeInAnimation = 
+            AnimationBuilder.Create().Opacity(1, duration: TimeSpan.FromSeconds(.2));
+        private static readonly AnimationBuilder MouseInOpacityFadeOutAnimation = 
+            AnimationBuilder.Create().Opacity(0, duration: TimeSpan.FromSeconds(.2));
+        private static readonly AnimationBuilder HighlightStrokeOpacityFadeOutAnimation = 
+            AnimationBuilder.Create().Opacity().TimedKeyFrames(k => k
+                .KeyFrame(TimeSpan.FromSeconds(1), 1)
+                .KeyFrame(TimeSpan.FromSeconds(2), .45)
+                .KeyFrame(TimeSpan.FromSeconds(3), 1)
+                .KeyFrame(TimeSpan.FromSeconds(4), .45)
+                .KeyFrame(TimeSpan.FromSeconds(5), 1)
+                .KeyFrame(TimeSpan.FromSeconds(6), .45)
+                .KeyFrame(TimeSpan.FromSeconds(7), 1)
+                .KeyFrame(TimeSpan.FromSeconds(10), 0));
+        private static readonly AnimationBuilder HighlightStrokeOpacityFadeOutFastAnimation = 
+            AnimationBuilder.Create().Opacity(0, duration: TimeSpan.FromSeconds(.2));
         void InitVisuals()
         {
             backgroundFillVisual = ElementCompositionPreview.GetElementVisual(Background_FillRectangle);
@@ -261,39 +261,11 @@ namespace TewiMP.UI.Controls
             backgroundFillVisual.Opacity = 0;
             rightButtonVisual.Opacity = 0;
             strokeVisual.Opacity = 0;
-
-            AnimateHelper.AnimateScalar(
-                rightButtonVisual, 1, 0.1,
-                0, 0, 0, 0,
-                out rightButtonVisualShowAnimation);
-            AnimateHelper.AnimateScalar(
-                rightButtonVisual, 0, 0.1,
-                0, 0, 0, 0,
-                out rightButtonVisualHideAnimation);
-            AnimateHelper.AnimateScalar(
-                backgroundFillVisual,
-                1, 0.1,
-                0, 0, 0, 0,
-                out backgroundFillVisualShowAnimation);
-            AnimateHelper.AnimateScalar(
-                backgroundFillVisual,
-                0, 0.1,
-                0, 0, 0, 0,
-                out backgroundFillVisualHideAnimation);
-            AnimateHelper.AnimateScalar(
-                strokeVisual, 0, 3, 0, 0, 0, 0,
-                out strokeVisualShowAnimation);
-            AnimateHelper.AnimateScalar(
-                strokeVisual, 0, 0.2, 0, 0, 0, 0,
-                out strokeVisualHideAnimation);
         }
 
         bool last_IsMusicDataPlaying = false;
         void InitPlayingState()
         {
-            if (!IsLoaded) return;
-            if (songItemBind is null) return;
-
             if (IsMusicDataPlaying)
             {
                 App.Instance.AudioService.PlayStateChanged -= AudioService_PlayStateChanged;
@@ -320,12 +292,11 @@ namespace TewiMP.UI.Controls
         {
             if (value)
             {
-                strokeVisual.Opacity = 1;
-                strokeVisual.StartAnimation("Opacity", strokeVisualShowAnimation);
+                HighlightStrokeOpacityFadeOutAnimation.Start(Background_HighlightRectangle);
             }
             else
             {
-                strokeVisual.StartAnimation("Opacity", strokeVisualHideAnimation);
+                HighlightStrokeOpacityFadeOutFastAnimation.Start(Background_HighlightRectangle);
             }
         }
 
@@ -353,34 +324,29 @@ namespace TewiMP.UI.Controls
 
         void OnMouseIn()
         {
-            if (songItemBind is null) return;
+            if (!IsLoaded && ViewModel is null) return;
             Info_Buttons_Root.Visibility = Visibility.Visible;
-            backgroundFillVisual.StartAnimation("Opacity", backgroundFillVisualShowAnimation);
-            rightButtonVisual.StartAnimation("Opacity", rightButtonVisualShowAnimation);
+            MouseInOpacityFadeInAnimation.Start(Background_FillRectangle);
+            MouseInOpacityFadeInAnimation.Start(Info_Buttons_Root);
         }
-        void OnMouseLeave()
+
+        async Task OnMouseLeave()
         {
-            if (songItemBind is null)
-            {
-                rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
-                return;
-            }
-            backgroundFillVisual.StartAnimation("Opacity", backgroundFillVisualHideAnimation);
-            rightButtonVisual.StartAnimation("Opacity", rightButtonVisualHideAnimation);
-            rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
-            rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += MusicDataItem_Completed;
+            if (!IsLoaded || ViewModel is null) return;
+            var ani1 = MouseInOpacityFadeOutAnimation.StartAsync(Background_FillRectangle);
+            var ani2 = MouseInOpacityFadeOutAnimation.StartAsync(Info_Buttons_Root);
+            await Task.WhenAll(ani1, ani2);
+            if (!isPointEnter) Info_Buttons_Root.Visibility = Visibility.Collapsed;
         }
 
         async Task Play()
         {
-            await App.Instance.PlayingListService.Play(songItemBind.MusicData, true);
-
+            await App.Instance.PlayingListService.Play(ViewModel.MusicData, true);
         }
 
         private void MusicDataItem_Completed(object sender, CompositionBatchCompletedEventArgs args)
         {
             if (!isPointEnter) Info_Buttons_Root.Visibility = Visibility.Collapsed;
-            rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
         }
 
         private void AudioService_PlayStateChanged(AudioService AudioService)
@@ -388,21 +354,24 @@ namespace TewiMP.UI.Controls
             SetPlayingIcon(AudioService.PlaybackState);
         }
 
-        private void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+        private async void UserControl_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (sender is null) return;
             if (sender.DataContext is null) return;
-            if (sender.DataContext is not SongItemBindBase) return;
+            if (sender.DataContext is not MusicDataViewModel) return;
+            ViewModel = sender.DataContext as MusicDataViewModel;
+            musicDataFlyout.SongItemBind = ViewModel;
+            if (!IsLoaded) return;
             strokeVisual.Opacity = 0;
-            songItemBind = sender.DataContext as SongItemBindBase;
-            musicDataFlyout.SongItemBind = songItemBind;
+            if (ViewModel is null) return;
             InitInfo();
             InitPlayingState();
-            InitImage();
+            await InitImage();
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
+            InitVisuals();
             staticMusicDataItem.Add(this);
             UserControl_DataContextChanged(sender as FrameworkElement, null);
         }
@@ -414,22 +383,13 @@ namespace TewiMP.UI.Controls
                 rightButtonVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed -= MusicDataItem_Completed;
             }
             App.Instance.AudioService.PlayStateChanged -= AudioService_PlayStateChanged;
-            staticMusicDataItem.Remove(this);
-            songItemBind = null;
-            Info_Image.Source = null;
-            rightButtonVisualShowAnimation.Dispose();
-            rightButtonVisualHideAnimation.Dispose();
-            backgroundFillVisualShowAnimation.Dispose();
-            backgroundFillVisualHideAnimation.Dispose();
-            strokeVisualShowAnimation.Dispose();
-            strokeVisualHideAnimation.Dispose();
+            
+            _imageLoadCts?.Cancel();
+            _imageLoadCts?.Dispose();
 
-            rightButtonVisualShowAnimation = null;
-            rightButtonVisualHideAnimation = null;
-            backgroundFillVisualShowAnimation = null;
-            backgroundFillVisualHideAnimation = null;
-            strokeVisualShowAnimation = null;
-            strokeVisualHideAnimation = null;
+            staticMusicDataItem.Remove(this);
+            ViewModel = null;
+            Info_Image.Source = null;
         }
 
         bool isPointEnter = false;
@@ -504,14 +464,14 @@ namespace TewiMP.UI.Controls
 
         private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            Pages.ListViewPages.ListViewPage.SetPageToListViewPage(new() { PageType = Pages.ListViewPages.PageType.Album, Param = songItemBind.MusicData.Album });
+            Pages.ListViewPages.ListViewPage.SetPageToListViewPage(new() { PageType = Pages.ListViewPages.PageType.Album, Param = ViewModel.MusicData.Album });
         }
 
         private void Info_Texts_FlyoutMenu_Artist_Item_Loaded(object sender, RoutedEventArgs e)
         {
-            Info_Texts_FlyoutMenu_Album_Item.Text = $"专辑：{songItemBind.MusicData.Album.Title}";
+            Info_Texts_FlyoutMenu_Album_Item.Text = $"专辑：{ViewModel.MusicData.Album.Title}";
             Info_Texts_FlyoutMenu_Artist_Item.Items.Clear();
-            foreach (var artist in songItemBind.MusicData.Artists)
+            foreach (var artist in ViewModel.MusicData.Artists)
             {
                 var mfi = new MenuFlyoutItem()
                 {

@@ -209,7 +209,7 @@ public partial class App : Application
         AudioService.SourceChanged += async (AudioService) =>
         {
             //await SongHistoryHelper.AddHistory(new() { MusicData = AudioService.MusicData, Time = DateTime.Now });
-            if (saveSettingsWhenSourceChangedCount > 2)
+            if (saveSettingsWhenSourceChangedCount > 4)
             {
                 saveSettingsWhenSourceChangedCount = 0;
                 await SaveNowPlaying();
@@ -219,40 +219,56 @@ public partial class App : Application
         };
         AudioService.CacheLoadingChanged += (_, __) =>
         {
-            SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData?.Title;
-            SMTC.DisplayUpdater.MusicProperties.Artist = "加载中...";
-            SMTC.DisplayUpdater.Update();
+            try
+            {
+                SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData?.Title;
+                SMTC.DisplayUpdater.MusicProperties.Artist = "加载中...";
+                SMTC.DisplayUpdater.Update();
+            }
+            catch { }
         };
         AudioService.CacheLoadedChanged += (_) =>
         {
-            if (_.MusicData is null)
+            try
             {
-                SMTC.DisplayUpdater.MusicProperties.Title = _.FileReader?.FileName;
-                MainWindowInstance.AppWindow.Title = AppName;
+                if (_.MusicData is null)
+                {
+                    SMTC.DisplayUpdater.MusicProperties.Title = _.FileReader?.FileName;
+                    MainWindowInstance.AppWindow.Title = AppName;
+                }
+                else
+                {
+                    SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData.Title;
+                    SMTC.DisplayUpdater.MusicProperties.Artist = _.MusicData.ButtonName;
+                    MainWindowInstance.AppWindow.Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {AppName}";
+                }
+                SMTC.DisplayUpdater.Update();
             }
-            else
-            {
-                SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData.Title;
-                SMTC.DisplayUpdater.MusicProperties.Artist = _.MusicData.ButtonName;
-                MainWindowInstance.AppWindow.Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {AppName}";
-            }
-            SMTC.DisplayUpdater.Update();
+            catch { }
         };
         AudioService.PlayStateChanged += (_) =>
         {
-            if (_.PlaybackState == PlaybackState.Playing)
+            try
             {
-                SMTC.PlaybackStatus = MediaPlaybackStatus.Playing;
+                if (_.PlaybackState == PlaybackState.Playing)
+                {
+                    SMTC.PlaybackStatus = MediaPlaybackStatus.Playing;
+                }
+                else
+                {
+                    SMTC.PlaybackStatus = MediaPlaybackStatus.Paused;
+                }
             }
-            else
-            {
-                SMTC.PlaybackStatus = MediaPlaybackStatus.Paused;
-            }
+            catch { }
         };
         PlayingListService.NowPlayingImageLoading += (_, __) =>
         {
-            SMTC.DisplayUpdater.Thumbnail = null;
-            SMTC.DisplayUpdater.Update();
+            try
+            {
+                SMTC.DisplayUpdater.Thumbnail = null;
+                SMTC.DisplayUpdater.Update();
+            }
+            catch { }
         };
         SMTC.ButtonPressed += (_, __) =>
         {
@@ -280,20 +296,24 @@ public partial class App : Application
         };
         PlayingListService.NowPlayingImageLoaded += async (_, __) =>
         {
-            if (string.IsNullOrEmpty(__))
+            try
             {
-                SMTC.DisplayUpdater.Thumbnail = null;
-            }
-            else
-            {
-                try
+                if (string.IsNullOrEmpty(__))
                 {
-                    SMTC.DisplayUpdater.Thumbnail = RandomAccessStreamReference.CreateFromFile(await StorageFile.GetFileFromPathAsync(__));
+                    SMTC.DisplayUpdater.Thumbnail = null;
                 }
-                catch { }
-            }
+                else
+                {
+                    try
+                    {
+                        SMTC.DisplayUpdater.Thumbnail = RandomAccessStreamReference.CreateFromFile(await StorageFile.GetFileFromPathAsync(__));
+                    }
+                    catch { }
+                }
 
-            SMTC.DisplayUpdater.Update();
+                SMTC.DisplayUpdater.Update();
+            }
+            catch { }
         };
 
         StartingSettings = DataFolderBase.JSettingData;

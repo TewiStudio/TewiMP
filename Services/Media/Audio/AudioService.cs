@@ -545,8 +545,8 @@ public class AudioService
                         throw new Exception($"无法初始化音频输出，可能是其它应用程序独占了此音频输出设备，请尝试重新播放。\n错误信息：{err.Message}", err);
                     }
                     NowOutObj.PlaybackStopped += AudioService_PlaybackStopped;
-                    MusicData = musicData;
                 }
+                MusicData = musicData;
             });
         }
         finally

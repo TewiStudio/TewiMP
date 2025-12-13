@@ -14,14 +14,15 @@ using Microsoft.UI.Composition;
 using Windows.System;
 using Newtonsoft.Json.Linq;
 using CommunityToolkit.WinUI;
-using TewiMP.Services.Media;
-using TewiMP.Helpers;
 using TewiMP.UI.Controls;
 using TewiMP.UI.Windows;
-using TewiMP.Services;
-using TewiMP.Services.Storage;
 using TewiMP.Core;
 using TewiMP.Core.Music;
+using TewiMP.Core.Models;
+using TewiMP.Helpers;
+using TewiMP.Services;
+using TewiMP.Services.Media;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Pages.ListViewPages
 {
@@ -31,7 +32,7 @@ namespace TewiMP.UI.Pages.ListViewPages
     public sealed partial class PlayListPage : Page
     {
         MusicListData musicListData { get; set; } = null;
-        ObservableCollection<SongItemBindBase> musicListBind { get; set; } = [];
+        ObservableCollection<MusicDataViewModel> musicListBind { get; set; } = [];
         ScrollViewer scrollViewer;
         PageData PageData { get; set; }
         public string md5;
@@ -52,7 +53,8 @@ namespace TewiMP.UI.Pages.ListViewPages
         {
             base.OnNavigatedFrom(e);
 
-            PageData.VerticalOffset = scrollViewer.VerticalOffset;
+            if (scrollViewer is not null)
+                PageData.VerticalOffset = scrollViewer.VerticalOffset;
             PageData = null;
 
             musicListData = null;
@@ -151,7 +153,7 @@ namespace TewiMP.UI.Pages.ListViewPages
 
         void SelectedReverseDo()
         {
-            foreach (SongItemBindBase item in ItemsList.Items.Cast<SongItemBindBase>())
+            foreach (MusicDataViewModel item in ItemsList.Items.Cast<MusicDataViewModel>())
             {
                 if (ItemsList.SelectedItems.Contains(item))
                 {
@@ -175,7 +177,7 @@ namespace TewiMP.UI.Pages.ListViewPages
                     var jdata = await PlayListHelper.ReadData();
                     int num = 0;
                     string listName = musicListData.ListName;
-                    foreach (SongItemBindBase data in ItemsList.SelectedItems.Cast<SongItemBindBase>())
+                    foreach (MusicDataViewModel data in ItemsList.SelectedItems.Cast<MusicDataViewModel>())
                     {
                         num++;
                         item.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -203,7 +205,7 @@ namespace TewiMP.UI.Pages.ListViewPages
         {
             if (ItemsList.SelectedItems.Any())
             {
-                foreach (SongItemBindBase songItem in ItemsList.SelectedItems)
+                foreach (MusicDataViewModel songItem in ItemsList.SelectedItems)
                 {
                     App.Instance.DownloadService.Add(songItem.MusicData);
                 }
@@ -213,7 +215,7 @@ namespace TewiMP.UI.Pages.ListViewPages
         {
             if (ItemsList.SelectedItems.Any())
             {
-                foreach (SongItemBindBase item in ItemsList.SelectedItems.Cast<SongItemBindBase>())
+                foreach (MusicDataViewModel item in ItemsList.SelectedItems.Cast<MusicDataViewModel>())
                 {
                     App.Instance.PlayingListService.Add(item.MusicData);
                 }
@@ -283,51 +285,35 @@ namespace TewiMP.UI.Pages.ListViewPages
         private ExpressionAnimation _cmdBarOffsetAnim;
         private ExpressionAnimation _footerOffsetAnim;
         private ExpressionAnimation _searchOffsetAnim;
-
-        // 建议将常量表达式定义为 const 字符串，避免重复和拼写错误
+        
         private const string ProgressExp = "Clamp(-scroller.Translation.Y / HeightParam, 0, 1.0)";
-
-        // ==============================================================================
-        // 2. 优化后的方法
-        // ==============================================================================
         async Task InitShyHeader(bool imageSizeOnly = false, bool delay = false)
         {
-            // 基础检查
             if (scrollViewer is null || compositor is null || !IsLoaded) return;
 
-            // 如果需要延迟等待布局更新 (虽然建议尽量用 SizeChanged 事件代替 delay)
             if (delay) await Task.Delay(10);
 
-            // ---------------------------------------------------------
-            // 准备参数数值
-            // ---------------------------------------------------------
             float anotherHeight = 154f;
             float imageSizeEnd = 0.45f;
 
-            // 获取当前控件的尺寸 (注意：确保此时布局已完成，否则 ActualWidth 可能为 0)
+            // 获取当前控件的尺寸
             float imgRootWidth = (float)ItemsList_Header_Image_Root.ActualWidth;
             float headerRootWidth = (float)ItemsList_Header_Root.ActualWidth;
             float headerRootHeight = (float)ItemsList_Header_Root.ActualHeight;
             float visualH = headerFootRootVisual.Size.Y;
             float actualH = (float)ActualHeight;
 
-            // 计算 Width 逻辑 (保持你的原有逻辑)
-            // 注意：imageVisual.Scale.X 这里读取的是 C# 属性值，不是动画实时值。
-            // 如果 Scale 是由动画驱动的，这里读取的可能是初始值 1。
+            // 计算 Width 逻辑
             if (headerRootWidth != 0)
             {
-                // 假设当前 Scale.X 近似为 1 或你需要基于当前状态计算
                 float currentScaleX = imageVisual.Scale.X;
                 var calculatedWidth = headerRootWidth - imgRootWidth * currentScaleX - 32 - 16;
                 ItemsList_Header_Info_Root_SizeChanger.Width = calculatedWidth <= 0 ? 0 : calculatedWidth;
             }
 
-            // ---------------------------------------------------------
-            // 1. Logo Scale 动画
-            // ---------------------------------------------------------
+            // Logo Scale 动画
             if (_logoScaleAnim is null)
             {
-                // 表达式：Lerp(Start, End, Progress)
                 string exp = $"Lerp(Vector2(1, 1), Vector2(TargetScale, TargetScale), {ProgressExp})";
                 _logoScaleAnim = compositor.CreateExpressionAnimation(exp);
                 _logoScaleAnim.SetReferenceParameter("scroller", scrollerPropertySet);
@@ -336,17 +322,15 @@ namespace TewiMP.UI.Pages.ListViewPages
             _logoScaleAnim.SetScalarParameter("HeightParam", anotherHeight);
             _logoScaleAnim.SetScalarParameter("TargetScale", imageSizeEnd);
 
-            // 启动动画 (Composition 允许重复调用 StartAnimation，开销很小)
+            // 启动动画
             imageVisual.StartAnimation("Scale.xy", _logoScaleAnim);
 
             if (imageSizeOnly) return;
 
-            // ---------------------------------------------------------
-            // 2. Header Offset 动画
-            // ---------------------------------------------------------
+            // Header Offset 动画
             if (_headerOffsetAnim is null)
             {
-                // 表达式：-scroller.Y - (Progress * Height)
+                // -scroller.Y - (Progress * Height)
                 string exp = $"-scroller.Translation.Y - ({ProgressExp} * HeightParam)";
                 _headerOffsetAnim = compositor.CreateExpressionAnimation(exp);
                 _headerOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
@@ -354,9 +338,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _headerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
             headerVisual.StartAnimation("Offset.Y", _headerOffsetAnim);
 
-            // ---------------------------------------------------------
-            // 3. Background Opacity 动画
-            // ---------------------------------------------------------
+            // Background Opacity 动画
             if (_bgOpacityAnim is null)
             {
                 string exp = $"Lerp(0, 1, {ProgressExp})";
@@ -366,9 +348,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _bgOpacityAnim.SetScalarParameter("HeightParam", anotherHeight);
             backgroundVisual.StartAnimation("Opacity", _bgOpacityAnim);
 
-            // ---------------------------------------------------------
-            // 4. Image Visual Offset 动画
-            // ---------------------------------------------------------
+            // Image Visual Offset 动画
             if (_imgOffsetAnim is null)
             {
                 string exp = $"Lerp(Vector3(0,0,0), Vector3(0, HeightParam, 0), {ProgressExp})";
@@ -376,14 +356,11 @@ namespace TewiMP.UI.Pages.ListViewPages
                 _imgOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
             }
             _imgOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
-            imageVisual.StartAnimation("Offset", _imgOffsetAnim); // 建议用 Offset 而不是 Offset.xy，减少转换
+            imageVisual.StartAnimation("Offset", _imgOffsetAnim);
 
-            // ---------------------------------------------------------
-            // 5. Info Visual Offset 动画
-            // ---------------------------------------------------------
+            // Info Visual Offset 动画
             if (_infoOffsetAnim is null)
             {
-                // 这里的 X 和 Y 都是动态的，所以全部参数化
                 // Start: (StartX, 0, 0) -> End: (EndX, HeightParam, 0)
                 string exp = $"Lerp(Vector3(StartX, 0, 0), Vector3(EndX, HeightParam, 0), {ProgressExp})";
                 _infoOffsetAnim = compositor.CreateExpressionAnimation(exp);
@@ -394,9 +371,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _infoOffsetAnim.SetScalarParameter("EndX", (int)(imgRootWidth * imageSizeEnd) + 16);
             infoVisual.StartAnimation(nameof(infoVisual.Offset), _infoOffsetAnim);
 
-            // ---------------------------------------------------------
-            // 6. Command Bar Offset 动画
-            // ---------------------------------------------------------
+            // Command Bar Offset 动画
             if (_cmdBarOffsetAnim is null)
             {
                 // Start: (-6, StartY, 0) -> End: (-6, EndY, 0)
@@ -412,9 +387,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _cmdBarOffsetAnim.SetScalarParameter("EndY", imgVisualH * imageSizeEnd - cmdBarH + 6);
             commandBarVisual.StartAnimation(nameof(commandBarVisual.Offset), _cmdBarOffsetAnim);
 
-            // ---------------------------------------------------------
-            // 7. Header Foot Root Offset 动画
-            // ---------------------------------------------------------
+            // Header Foot Root Offset 动画
             if (_footerOffsetAnim is null)
             {
                 string exp = $"Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), {ProgressExp})";
@@ -426,17 +399,11 @@ namespace TewiMP.UI.Pages.ListViewPages
             _footerOffsetAnim.SetScalarParameter("EndY", anotherHeight + actualH - visualH - 8);
             headerFootRootVisual.StartAnimation("Offset", _footerOffsetAnim);
 
-            // ---------------------------------------------------------
-            // 8. Search Root Offset 动画 (原代码 Lerp 是一样的值)
-            // ---------------------------------------------------------
-            // 原代码逻辑：Start.Y = ActualHeight+4, End.Y = ActualHeight+4
-            // 除非你有计划让它动，否则这不需要 Lerp。但为了保持一致性：
             if (_searchOffsetAnim is null)
             {
-                string exp = $"Vector3(0, TargetY, 0)"; // 简化了，既然不动，直接定位即可
-                                                        // 或者如果未来要动： $"Lerp(Vector3(0, StartY, 0), Vector3(0, EndY, 0), {ProgressExp})"
+                string exp = $"Vector3(0, TargetY, 0)";
                 _searchOffsetAnim = compositor.CreateExpressionAnimation(exp);
-                // _searchOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet); // 如果不动就不需要监听 scroller
+                // _searchOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
             }
             _searchOffsetAnim.SetScalarParameter("TargetY", headerRootHeight + 4);
             searchRootVisual.StartAnimation(nameof(searchRootVisual.Offset), _searchOffsetAnim);
@@ -487,20 +454,18 @@ namespace TewiMP.UI.Pages.ListViewPages
             }
 
             var sortedSongs = await GetSortedSongsAsync(musicListData);
-            SongItemBindBase.RecycleBindItems(musicListBind);
-            musicListBind.Clear();
             if (!IsLoaded || musicListData is null || sortedSongs is null)
             {
                 sortedSongs = null; isInInitBindings = false;
                 LoadingTipControl.UnShowLoading();
                 return;
             }
+            musicListBind.Clear();
 
             int count = 1;
             foreach (var musicData in sortedSongs)
             {
-                var bindItem = SongItemBindBase.GetBindItem(musicData, musicListData, count++);
-                musicListBind.Add(bindItem);
+                musicListBind.Add(new(musicData, musicListData, count++));
             }
 
             SortComboBox.SelectedIndex = (int)musicListData.PlaySort;
@@ -538,40 +503,26 @@ namespace TewiMP.UI.Pages.ListViewPages
             ItemsList_Header_Info_OtherTextBlock.Text = $"{musicListData.Songs?.Count} 首歌曲";
         }
 
-        string resultPath;
         static Thickness thickness0 = new(0);
         static Thickness thickness1 = new(1);
+        Uri imageSource = null;
         async void InitImage()
         {
             if (!IsLoaded) return;
             if (musicListData is null) return;
+            ItemsList_Header_Image.Source = null;
             ItemsList_Header_Image.BorderThickness = thickness0;
-            Uri imageSource = null;
-            if (musicListData.ListDataType == DataType.本地歌单)
+            if (musicListData.ListDataType is DataType.本地歌单 or DataType.歌单)
             {
-                bool isExists = true;
-                await Task.Run(() => { isExists = File.Exists(musicListData.PicturePath); });
-                if (isExists) imageSource = musicListData.PicturePath.ToImageUri();
-                resultPath = musicListData.PicturePath;
-            }
-            else if (musicListData.ListDataType == DataType.歌单)
-            {
-                var result = await ImageService.GetImageUri(musicListData);
-                imageSource = result.Item1;
-                resultPath = result.Item2;
-            }
-            if (imageSource is null)
-            {
-                imageSource ="".ToImageUri();
-                resultPath = DataFolderBase.IconPNGPath;
+                imageSource = await ImageService.GetImageUri(musicListData);
             }
 
             if (!IsLoaded || musicListData is null) return;
             ItemsList_Header_Image.BorderThickness = thickness1;
             ItemsList_Header_Image.Source = imageSource;
-            InitShyHeader();
+            await InitShyHeader();
             commandBarVisual.StartAnimation("Opacity", commandBarVisualOpacityAnimation);
-            InitAccentColor();
+            await InitAccentColor();
             //PlayAllButton.RequestedTheme = CodeHelper.IsAccentColorDark(color.Item1) ? ElementTheme.Dark : ElementTheme.Light;
         }
 
@@ -604,13 +555,13 @@ namespace TewiMP.UI.Pages.ListViewPages
             ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToNowPlaying_Button_Click;
         }
 
-        async void InitAccentColor()
+        async Task InitAccentColor()
         {
-            if (string.IsNullOrEmpty(resultPath))
+            if (string.IsNullOrEmpty(imageSource.LocalPath))
             {
                 return;
             }
-            var color = await CodeHelper.GetThemeColorAsync(resultPath);
+            var color = await CodeHelper.GetThemeColorAsync(imageSource.LocalPath);
             (Resources["AccentColorBrush"] as SolidColorBrush).Color = color.Item1;
             (Resources["AccentColorBrushDark1"] as SolidColorBrush).Color = color.Item1.Darken(.1f);
             (Resources["AccentColorBrushDark2"] as SolidColorBrush).Color = color.Item1.Darken(.2f);
@@ -623,8 +574,8 @@ namespace TewiMP.UI.Pages.ListViewPages
         {
             InitEvents();
             InitInfo();
-            InitImage();
             InitVisuals();
+            InitImage();
             InitShyHeader();
             InitBindings();
         }
@@ -679,7 +630,6 @@ namespace TewiMP.UI.Pages.ListViewPages
             if (ItemsList_Header_Image != null) ItemsList_Header_Image.Source = null;
             if (ItemsList != null) ItemsList.ItemsSource = null;
             if (SortComboBox != null) SortComboBox.ItemsSource = null;
-            SongItemBindBase.RecycleBindItems(musicListBind);
             musicListBind?.Clear();
             musicListBind = null;
             listSortEnum?.Clear();
@@ -782,6 +732,7 @@ namespace TewiMP.UI.Pages.ListViewPages
                     break;
                 case "refresh":
                     InitInfo();
+                    InitImage();
                     InitBindings();
                     UpdateCommandBarWidth();
                     break;
@@ -894,7 +845,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             var text = await PlayListHelper.ReadData();
             var list = flyoutItem.Tag as MusicListData;
             var listName = list.ListName;
-            foreach (SongItemBindBase item in ItemsList.SelectedItems.Cast<SongItemBindBase>())
+            foreach (MusicDataViewModel item in ItemsList.SelectedItems.Cast<MusicDataViewModel>())
             {
                 App.MainWindowInstance.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
                 App.MainWindowInstance.SetLoadingProgressRingValue(ItemsList.SelectedItems.Count, ItemsList.SelectedItems.IndexOf(item));
@@ -919,10 +870,10 @@ namespace TewiMP.UI.Pages.ListViewPages
             (sender as MenuFlyout).Items.Clear();
         }
 
-        SongItemBindBase searchPointSongItemBindBase = null;
-        private async void ItemList_Header_Search_Control_SearchingAItem(SongItemBindBase songItemBind)
+        MusicDataViewModel searchPointMusicDataViewModel = null;
+        private async void ItemList_Header_Search_Control_SearchingAItem(MusicDataViewModel songItemBind)
         {
-            searchPointSongItemBindBase = songItemBind;
+            searchPointMusicDataViewModel = songItemBind;
             var scrollPlacement = ScrollItemPlacement.Top;
             int additionalVerticalOffset = -214;
             bool tryHighlight = MusicDataItem.TryHighlight(songItemBind);
@@ -930,13 +881,13 @@ namespace TewiMP.UI.Pages.ListViewPages
             while (!tryHighlight)
             {
                 if (!IsLoaded) break;
-                if (searchPointSongItemBindBase != songItemBind) break;
+                if (searchPointMusicDataViewModel != songItemBind) break;
                 await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
                 await ItemsList.SmoothScrollIntoViewWithItemAsync(songItemBind, scrollPlacement, true, additionalVerticalOffset: additionalVerticalOffset);
                 tryHighlight = MusicDataItem.TryHighlight(songItemBind);
                 await Task.Delay(80);
             }
-            searchPointSongItemBindBase = null;
+            searchPointMusicDataViewModel = null;
         }
 
         private void MainWindow_InKeyDownEvent(VirtualKey key)
@@ -952,9 +903,9 @@ namespace TewiMP.UI.Pages.ListViewPages
             }
         }
 
-        private void Page_ActualThemeChanged(FrameworkElement sender, object args)
+        private async void Page_ActualThemeChanged(FrameworkElement sender, object args)
         {
-            InitAccentColor();
+            await InitAccentColor();
         }
     }
 }

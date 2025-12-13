@@ -72,7 +72,7 @@ public partial class AboutPage : Page
         try
         {
             if (App.Instance.PlayingListService.NowPlayingList.Any())
-                abcd.Source = (await ImageService.GetImageUri(App.Instance.PlayingListService.NowPlayingList[new Random().Next(0, App.Instance.PlayingListService.NowPlayingList.Count - 1)])).Item1;
+                abcd.Source = (await ImageService.GetImageUri(App.Instance.PlayingListService.NowPlayingList[new Random().Next(0, App.Instance.PlayingListService.NowPlayingList.Count - 1)]));
         }
         catch { }
         GC.Collect();/*

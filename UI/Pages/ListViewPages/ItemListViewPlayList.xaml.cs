@@ -2,11 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Data;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Numerics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Hosting;
@@ -18,17 +18,18 @@ using CommunityToolkit.WinUI;
 using Windows.System;
 using Windows.Storage;
 using Windows.Storage.Pickers;
-using Newtonsoft.Json.Linq;
 using Vanara.Extensions;
-using TewiMP.Services.Media;
-using TewiMP.Helpers;
+using Newtonsoft.Json.Linq;
 using TewiMP.UI.Controls;
-using TewiMP.Services;
-using TewiMP.Services.Storage;
 using TewiMP.UI.Windows;
-using TewiMP.Services.Media.Audio;
 using TewiMP.Core;
 using TewiMP.Core.Music;
+using TewiMP.Core.Models;
+using TewiMP.Helpers;
+using TewiMP.Services;
+using TewiMP.Services.Media;
+using TewiMP.Services.Media.Audio;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Pages
 {
@@ -38,7 +39,7 @@ namespace TewiMP.UI.Pages
         private ScrollViewer scrollViewer { get; set; }
         public MusicListData NavToObj { get; set; }
 
-        ObservableCollection<SongItemBindBase> searchMusicDatas = [];
+        ObservableCollection<MusicDataViewModel> searchMusicDatas = [];
         public ItemListViewPlayList()
         {
             InitializeComponent();
@@ -186,7 +187,7 @@ namespace TewiMP.UI.Pages
         }
 
         bool isLoading = false;
-        public ObservableCollection<SongItemBindBase> MusicDataList = new();
+        public ObservableCollection<MusicDataViewModel> MusicDataList = new();
         public async void InitData()
         {
             if (NavToObj is null)
@@ -290,8 +291,7 @@ namespace TewiMP.UI.Pages
                 {
                     if (i is null) continue;
                     count++;
-                    i.Count = count;
-                    MusicDataList.Add(new() { MusicData = i, MusicListData = NavToObj, ImageScaleDPI = dpi });
+                    MusicDataList.Add(new(i, NavToObj, count));
                 }
                 array = null;
                 LogService.Log("ItemListViewPlayList", $"列表加载完成。");
@@ -337,12 +337,12 @@ namespace TewiMP.UI.Pages
             }
             else if (NavToObj.ListDataType == DataType.歌单)
             {
-                PlayList_Image.Source = (await ImageService.GetImageUri(NavToObj)).Item1;
+                PlayList_Image.Source = await ImageService.GetImageUri(NavToObj);
             }
             if (NavToObj is null) return;
             if (PlayList_Image.Source is null)
             {
-                PlayList_Image.Source ="".ToImageUri();
+                PlayList_Image.Source = "".ToImageUri();
             }
             PlayList_Image.SaveName = NavToObj?.ListShowName;
             PlayList_Image.BorderThickness = new(1);
@@ -669,7 +669,7 @@ namespace TewiMP.UI.Pages
         {
             if (Children.SelectedItems.Any())
             {
-                foreach (SongItemBindBase item in Children.SelectedItems.Cast<SongItemBindBase>())
+                foreach (MusicDataViewModel item in Children.SelectedItems.Cast<MusicDataViewModel>())
                 {
                     App.Instance.PlayingListService.Add(item.MusicData);
                 }
@@ -688,7 +688,7 @@ namespace TewiMP.UI.Pages
                     var jdata = await PlayListHelper.ReadData();
                     int num = 0;
                     string listName = NavToObj.ListName;
-                    foreach (SongItemBindBase data in Children.SelectedItems.Cast<SongItemBindBase>())
+                    foreach (MusicDataViewModel data in Children.SelectedItems.Cast<MusicDataViewModel>())
                     {
                         num++;
                         item.HorizontalAlignment = HorizontalAlignment.Stretch;
@@ -733,7 +733,7 @@ namespace TewiMP.UI.Pages
 
         private void SelectReverseButton_Click(object sender, RoutedEventArgs e)
         {
-            foreach (SongItemBindBase item in Children.Items.Cast<SongItemBindBase>())
+            foreach (MusicDataViewModel item in Children.Items.Cast<MusicDataViewModel>())
             {
                 if (Children.SelectedItems.Contains(item))
                 {
@@ -842,7 +842,7 @@ namespace TewiMP.UI.Pages
         {
             if (Children.SelectedItems.Any())
             {
-                foreach (SongItemBindBase songItem in Children.SelectedItems)
+                foreach (MusicDataViewModel songItem in Children.SelectedItems)
                 {
                     App.Instance.DownloadService.Add(songItem.MusicData);
                 }
@@ -871,7 +871,7 @@ namespace TewiMP.UI.Pages
             var text = await PlayListHelper.ReadData();
             var list = (sender as MenuFlyoutItem).Tag as MusicListData;
             var listName = list.ListName;
-            foreach (SongItemBindBase item in Children.SelectedItems.Cast<SongItemBindBase>())
+            foreach (MusicDataViewModel item in Children.SelectedItems.Cast<MusicDataViewModel>())
             {
                 App.MainWindowInstance.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
                 App.MainWindowInstance.SetLoadingProgressRingValue(Children.SelectedItems.Count, Children.SelectedItems.IndexOf(item));
@@ -1041,7 +1041,7 @@ namespace TewiMP.UI.Pages
             UpdateCommandToolBarWidth();
         }
 
-        private async void ChangeViewToSearchItem(SongItemBindBase item)
+        private async void ChangeViewToSearchItem(MusicDataViewModel item)
         {
             if (searchMusicDatas.Any())
             {
@@ -1095,17 +1095,17 @@ namespace TewiMP.UI.Pages
         private void SearchBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
         {
             if (SearchModeComboBox.SelectedIndex == 0)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Title;
+                SearchBox.Text = (args.SelectedItem as MusicDataViewModel).MusicData.Title;
             else if(SearchModeComboBox.SelectedIndex == 1)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Title;
+                SearchBox.Text = (args.SelectedItem as MusicDataViewModel).MusicData.Title;
             else if(SearchModeComboBox.SelectedIndex == 2)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.ArtistName;
+                SearchBox.Text = (args.SelectedItem as MusicDataViewModel).MusicData.ArtistName;
             else if(SearchModeComboBox.SelectedIndex == 3)
-                SearchBox.Text = (args.SelectedItem as SongItemBindBase).MusicData.Album.Title;
+                SearchBox.Text = (args.SelectedItem as MusicDataViewModel).MusicData.Album.Title;
 
-            searchNum = searchMusicDatas.IndexOf(args.SelectedItem as SongItemBindBase) - 1;
+            searchNum = searchMusicDatas.IndexOf(args.SelectedItem as MusicDataViewModel) - 1;
             SearchResultTextBlock.Text = $"{searchNum + 2} of {searchMusicDatas.Count}";
-            //ChangeViewToSearchItem(args.SelectedItem as SongItemBindBase);
+            //ChangeViewToSearchItem(args.SelectedItem as MusicDataViewModel);
         }
 
         private void AutoSuggestBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)

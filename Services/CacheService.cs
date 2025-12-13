@@ -30,7 +30,7 @@ public class CacheService
     /// <returns>null = not exists</returns>
     public async Task<string> GetCachePath(MusicData data)
     {
-        return await FileHelper.GetAudioCache(data);
+        return await CacheFileHelpers.GetAudioCache(data);
     }
 
     /// <summary>

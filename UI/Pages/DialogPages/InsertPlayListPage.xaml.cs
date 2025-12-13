@@ -75,8 +75,8 @@ namespace TewiMP.UI.Pages.DialogPages
             }
             else if (ml.ListDataType == DataType.歌单)
             {
-                var imageSources = await ImageService.GetImageUri(ml, size, size, true);
-                image.Source = imageSources.Item1;
+                var imageSources = await ImageService.GetImageUri(ml);
+                image.Source = imageSources;
             }
         }
     }

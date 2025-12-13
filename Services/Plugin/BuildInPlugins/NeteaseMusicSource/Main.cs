@@ -596,7 +596,7 @@ namespace TewiMP.Services.Plugin.BuildInPlugins.NeteaseMusicSource
                 {
                     var data = JObject.Parse(Services.FormatMethod(false).Song(id.ID));
 
-                    //System.Diagnostics.LogManager.Log(data);
+                    //LogService.LogDebug(data.ToString());
                     string result = null;
                     try
                     {

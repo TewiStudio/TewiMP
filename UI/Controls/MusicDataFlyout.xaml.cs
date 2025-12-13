@@ -7,19 +7,20 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Windows.Foundation;
 using Windows.ApplicationModel.DataTransfer;
-using TewiMP.UI.Pages;
 using TewiMP.Helpers;
+using TewiMP.UI.Pages;
 using TewiMP.UI.Windows;
-using TewiMP.Services.Storage;
 using TewiMP.Core.Music;
+using TewiMP.Core.Models;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Controls
 {
     public sealed partial class MusicDataFlyout : UserControl
     {
         public ArrayList arrayList { get; set; }
-        SongItemBindBase songItemBind = null;
-        public SongItemBindBase SongItemBind
+        MusicDataViewModel songItemBind = null;
+        public MusicDataViewModel SongItemBind
         {
             get => songItemBind;
             set

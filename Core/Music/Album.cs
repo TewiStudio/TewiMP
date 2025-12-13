@@ -6,7 +6,7 @@ using TewiMP.Services.Plugin;
 
 namespace TewiMP.Core.Music;
 
-public class Album : OnlyClass, IIsListPage
+public record class Album : IIsListPage
 {
     public string Title { get; set; }
     public string Title2 { get; set; }
@@ -53,13 +53,8 @@ public class Album : OnlyClass, IIsListPage
     {
         for (int i = 0; i < Artists.Count; i++)
         {
-            _artistName += $"{Artists[i].ToString()}{(i < (Artists.Count - 1) ? (i < Artists.Count - 2 ? ", " : " & ") : "")}";
+            _artistName += $"{Artists[i]}{(i < (Artists.Count - 1) ? (i < Artists.Count - 2 ? ", " : " & ") : "")}";
         }
-    }
-
-    public override string GetMD5()
-    {
-        return $"{Title}{Title2}{ID}{Artists?.Count}{Describe}{ReleaseTime}";
     }
 
     public override string ToString()

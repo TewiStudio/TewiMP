@@ -84,7 +84,7 @@ namespace TewiMP.Helpers
                     }
                 }
             }
-            catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
+            catch (Exception ex) when (ex is OperationCanceledException or TaskCanceledException)
             {
                 LogService.Info("DownloadFileAsync", "下载已取消。");
                 // 取消时删除未完成文件

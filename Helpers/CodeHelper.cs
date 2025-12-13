@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -24,7 +22,6 @@ using WinRT.Interop;
 using TewiMP.Core;
 using TewiMP.Core.Music;
 using TewiMP.Services;
-using TewiMP.Services.Storage;
 
 namespace TewiMP.Helpers
 {
@@ -513,13 +510,31 @@ namespace TewiMP.Helpers
 
             return imageSource;
         }
-       
+
         public static string ToMD5(string strs)
         {
-            using MD5 md5 = MD5.Create();
-            byte[] bytes = Encoding.Default.GetBytes(strs);//将要加密的字符串转换为字节数组
-            byte[] encryptData = md5.ComputeHash(bytes);//将字符串加密后也转换为字符数组
-            return Convert.ToBase64String(encryptData);//将加密后的字节数组转换为加密字符串
+            if (string.IsNullOrEmpty(strs)) return string.Empty;
+
+            // 将字符串转换为 UTF8 字节，使用 Span 避免分配数组
+            // 假设输入字符串不会超级长，计算最大字节数
+            int maxByteCount = Encoding.UTF8.GetMaxByteCount(strs.Length);
+
+            // 使用 stackalloc 在栈上分配内存
+            Span<byte> inputBuffer = maxByteCount <= 1024
+                ? stackalloc byte[maxByteCount]
+                : new byte[maxByteCount];
+
+            int bytesWritten = Encoding.UTF8.GetBytes(strs, inputBuffer);
+
+            // 切片，只取实际写入的长度
+            ReadOnlySpan<byte> inputSpan = inputBuffer.Slice(0, bytesWritten);
+
+            // 计算 MD5 (MD5 固定 16 字节)
+            Span<byte> hashBytes = stackalloc byte[16];
+            MD5.HashData(inputSpan, hashBytes);
+
+            // 转换为 Base64 字符串
+            return Convert.ToHexString(hashBytes);
         }
 
         public static bool IsAccentColorDark(Windows.UI.Color c)
@@ -635,6 +650,7 @@ namespace TewiMP.Helpers
 
         public static async Task<(Windows.UI.Color, Windows.UI.Color, Windows.UI.Color)> GetThemeColorAsync(string file)
         {
+            if (!File.Exists(file)) return (Colors.Red, Colors.Red, Colors.Red);
             DateTime time = DateTime.Now;
             using var image = Image.FromFile(file);
             using var bitmap = new Bitmap(image.GetThumbnailImage(100, 100, () => false, nint.Zero));
@@ -713,160 +729,6 @@ namespace TewiMP.Helpers
                 }
             }
             return dp[n, m];
-        }
-    }
-
-    public static class LyricHelper
-    {
-        public static string NoneLyricString = "·········";
-        public async static Task<LyricData[]> LyricToLrcData(string lyricText, bool useRomaji = true)
-        {
-            Dictionary<TimeSpan, LyricData> lyricDictionary = new();
-            IOrderedEnumerable<KeyValuePair<TimeSpan, LyricData>> sorter = null;
-            await Task.Run(() =>
-            {
-                foreach (var lyric in lyricText.Split('\n'))
-                {
-                    if (string.IsNullOrEmpty(lyric)) continue;
-                    var timesAndLyric = lyric.Split(']');
-                    //当一句歌词在不同时间段时
-                    if (timesAndLyric.Length > 2)
-                    {
-                        for (int i = timesAndLyric.Length; i > 0; i--)
-                        {
-                            var timef = timesAndLyric[i - 1].Replace("[", "");
-                            TimeSpan? timesResultBackup = GetLrcTimeStringTimeSpan(timef);
-                            if (timesResultBackup is null) continue;
-                            TimeSpan timesResult = (TimeSpan)timesResultBackup;
-
-                            if (!lyricDictionary.ContainsKey(timesResult))
-                            {
-                                string text = timesAndLyric.Last();
-                                if (text == "") text = NoneLyricString;
-                                lyricDictionary.Add(timesResult, new(new() { text }, null, timesResult));
-                            }
-                        }
-                    }
-                    //当一句歌词在只在同一时间段时
-                    else
-                    {
-                        if (timesAndLyric.Length < 2) continue;
-                        var timef = timesAndLyric[0].Replace("[", "");
-                        TimeSpan? timesResultBackup = GetLrcTimeStringTimeSpan(timef);
-                        if (timesResultBackup is null) continue;
-                        TimeSpan timesResult = (TimeSpan)timesResultBackup;
-                        
-                        var text = timesAndLyric[1];
-                        if (text == "" || text == "...") text = NoneLyricString;
-
-                        //当有相同时间的歌词时
-                        if (lyricDictionary.ContainsKey(timesResult))
-                        {
-                            var l = lyricDictionary[timesResult];
-                            if (text != NoneLyricString)
-                            {
-                                l.Lyric.Add(text);
-                            }
-                        }
-                        //当没有相同时间的歌词时
-                        else
-                        {
-                            lyricDictionary.Add(timesResult, new(new() { text }, null, timesResult));
-                        }
-                    }
-                }
-
-                if (lyricDictionary.Count <= 2)
-                {
-                    lyricDictionary.Clear();
-                }
-                if (lyricDictionary.Any())
-                {
-                    //lastLyric
-                    lyricDictionary.Add(TimeSpan.MaxValue,
-                        new(null, null, TimeSpan.MaxValue));
-                }
-                sorter = from pair in lyricDictionary orderby pair.Key ascending select pair;
-            });
-
-            List<LyricData> lyricList = new();
-            Kawazu.KawazuConverter converter = new(DataFolderBase.KawazuDicFolder);
-            foreach (var l in sorter)
-            {
-                if (useRomaji && l.Value.Lyric?.First() != null)
-                {
-                    var percent = await Task.Run(() =>
-                    {
-                        int count = 0;
-                        foreach (var c in l.Value.Lyric.First())
-                        {
-                            //if (((byte)c) % 2 == 0) count++;
-                            if (Regex.IsMatch(c.ToString(), @"^[\u0800-\u4e00]+$")) count++;
-                        }
-                        return (double)count / l.Value.Lyric.First().Length;
-                    });
-                    if (percent >= 0.15)
-                    {
-                        var romaji = await converter.Convert(l.Value.Lyric.First(), Kawazu.To.Romaji, Kawazu.Mode.Spaced, Kawazu.RomajiSystem.Nippon);
-                        l.Value.Romaji = romaji;
-                    }
-
-                }
-                lyricList.Add(l.Value);
-            }
-            converter.Dispose();
-            return [.. lyricList];
-        }
-
-        static TimeSpan? GetLrcTimeStringTimeSpan(string timeString)
-        {
-            if (timeString.Contains('.'))
-            {
-                var times = timeString.Split('.');
-                var timesa = TimeSpan.TryParse($"00:{times[0]}", null, out TimeSpan timesb);
-
-                if (times.Length == 1) return null;
-                if (!timesa) return null;
-
-                var timeMillsStr = times[1];
-                var parse = int.TryParse(timeMillsStr, out int iparse);
-                if (!parse) return null;
-
-                switch (timeMillsStr.Length)
-                {
-                    case 1: timeMillsStr += "00"; break;
-                    case 2: timeMillsStr += "0"; break;
-                    case 3: break;
-                    default: LogService.Log(nameof(LyricService), "歌词源文件时间精度较低。", LogLevel.Warning); break;
-                }
-                var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
-                return timesb + timeMills;
-            }
-            else
-            {
-                var times = timeString.Split(':');
-                if (times.Length == 0 || times.Length == 1) return null;
-                var timesa = TimeSpan.TryParse($"00:{times[0]}:{times[1]}", null, out TimeSpan timesb);
-
-                var timeMillsStr = "0";
-                if (times.Length == 3)
-                {
-                    timeMillsStr = times[2];
-                    var parse = int.TryParse(timeMillsStr, out int iparse);
-                    if (!parse) return null;
-
-                    switch (timeMillsStr.Length)
-                    {
-                        case 1: timeMillsStr += "00"; break;
-                        case 2: timeMillsStr += "0"; break;
-                        case 3: break;
-                        default: LogService.Log(nameof(LyricService), "歌词源文件时间精度较低。", LogLevel.Warning); break;
-                    }
-                }
-                var timeMills = TimeSpan.FromMilliseconds(int.Parse(timeMillsStr));
-                return timesb + timeMills;
-            }
-
         }
     }
 }

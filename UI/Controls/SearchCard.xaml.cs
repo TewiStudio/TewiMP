@@ -4,11 +4,12 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
-using TewiMP.Helpers;
 using TewiMP.Services.Storage;
 using TewiMP.UI.Pages;
 using TewiMP.UI.Pages.ListViewPages;
 using TewiMP.UI.Pages.ListViewPages;
+using TewiMP.Core.Models;
+using TewiMP.Core;
 
 namespace TewiMP.UI.Controls
 {

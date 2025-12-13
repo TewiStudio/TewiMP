@@ -124,6 +124,7 @@ namespace TewiMP.UI.Controls
         {
             if (controlVisual is null) return;
             if (isInitedVisuals || SwitchImageImmediateSetOpacity) controlVisual.Opacity = 0;
+            Image_ControlSources.UriSource = null;
             Image_ControlSources.UriSource = imageSource;
         }
 

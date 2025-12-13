@@ -9,13 +9,14 @@ using Microsoft.UI.Composition;
 using Windows.System;
 using Windows.Storage;
 using Windows.ApplicationModel.DataTransfer;
-using TewiMP.Services.Media;
-using TewiMP.UI.Pages;
 using TewiMP.Helpers;
+using TewiMP.UI.Pages;
 using TewiMP.UI.Windows;
+using TewiMP.Core.Music;
+using TewiMP.Core.Models;
+using TewiMP.Services.Media;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
-using TewiMP.Core.Music;
 
 namespace TewiMP.UI.Controls
 {
@@ -51,7 +52,7 @@ namespace TewiMP.UI.Controls
             }
         }
 
-        SongItemBindBase musicItemBindBase;
+        MusicDataViewModel musicItemBindBase;
 
         public double ImageScaleDPI { get; set; } = 1.0;
         public bool ShowImage
@@ -191,7 +192,7 @@ namespace TewiMP.UI.Controls
         private void SongItem_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
         {
             if (DataContext is null) return;
-            var d = DataContext as SongItemBindBase;
+            var d = DataContext as MusicDataViewModel;
             if (d is null) return;
             if (d.MusicData is null) return;
             if (musicItemBindBase?.MusicData == d.MusicData) return;
@@ -199,7 +200,7 @@ namespace TewiMP.UI.Controls
             Init(musicItemBindBase);
         }
 
-        public void Init(SongItemBindBase bindBase)
+        public void Init(MusicDataViewModel bindBase)
         {
             MusicData = bindBase.MusicData;
             musicListData = bindBase.MusicListData;
@@ -304,8 +305,8 @@ namespace TewiMP.UI.Controls
                 }
                 if (!err)
                 {
-                    var b = await ImageService.GetImageUri(musicData);
-                    a = b.Item1;
+                    var uri = await ImageService.GetImageUri(musicData);
+                    a = uri;
                 }
             }
             catch { }

@@ -3,8 +3,9 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using TewiMP.Services.Storage;
 using TewiMP.Core.Music;
+using TewiMP.Core.Models;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Controls
 {
@@ -73,9 +74,9 @@ namespace TewiMP.UI.Controls
             {
                 count++;
                 if (count > 10) break;
-                d.Key.Count = count;
+                d.Key.Index = count;
                 d.Key.Title2 = $"ÌýÁË {d.Value} ´Î";
-                ListenedMusicMost.Items.Add(new Helpers.SongItemBindBase() { MusicData = d.Key });
+                ListenedMusicMost.Items.Add(new MusicDataViewModel() { MusicData = d.Key });
             }
 
             int countartist = 0;

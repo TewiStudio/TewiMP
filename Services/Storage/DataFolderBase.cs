@@ -190,7 +190,7 @@ public static class DataFolderBase
     /// <summary>
     /// 默认播放列表数据
     /// </summary>
-    public static MusicListData PlayListDefault = new("default", "默认播放列表", Path.Combine(Environment.CurrentDirectory, "Images", "icon.png"), MusicFrom.localMusic, listDataType: DataType.本地歌单);
+    public static MusicListData PlayListDefault = new("default", "默认播放列表", null, MusicFrom.localMusic, listDataType: DataType.本地歌单);
 
     /// <summary>
     /// 默认设置数据
@@ -214,7 +214,7 @@ public static class DataFolderBase
         { SettingParams.EqualizerString.ToString(), nameof(AudioEqualizerBands.CustomBands) },
         { SettingParams.EqualizerCustomData.ToString(), "0,0,0,0,0,0,0,0,0,0" },
         { SettingParams.WasapiOnly.ToString(), false },
-        { SettingParams.AudioLatency.ToString(), 120 },
+        { SettingParams.AudioLatency.ToString(), 150 },
         { SettingParams.MusicPageShowLyricPage.ToString(), true },
         { SettingParams.ThemeColorMode.ToString(), (int)ElementTheme.Default },
         { SettingParams.ThemeMusicPageColorMode.ToString(), (int)ElementTheme.Default },
@@ -271,7 +271,7 @@ public static class DataFolderBase
         { AudioEffectFlag.PassFilterEqEnable.ToString(), false },
         { AudioEffectFlag.EffectEnable.ToString(), false },
         { AudioEffectFlag.WasapiOnlyEnable.ToString(), false },
-        { AudioEffectFlag.Latency.ToString(), 100 },
+        { AudioEffectFlag.Latency.ToString(), 150 },
         { AudioEffectFlag.AudioEffectDatas.ToString(), new JArray() { 1.0, 1.0, 1.0 } },
         { AudioEffectFlag.GraphicEqString.ToString(), nameof(AudioEqualizerBands.CustomBands) },
         { AudioEffectFlag.GraphicEqDatas.ToString(), "0,0,0,0,0,0,0,0,0,0" },

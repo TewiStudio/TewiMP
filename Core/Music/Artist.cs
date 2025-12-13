@@ -2,7 +2,7 @@
 
 namespace TewiMP.Core.Music;
 
-public class Artist : OnlyClass, IIsListPage
+public record class Artist : IIsListPage
 {
     public string Name { get; set; }
     public string Name2 { get; set; }
@@ -21,12 +21,7 @@ public class Artist : OnlyClass, IIsListPage
         PicturePath = picturePath;
     }
 
-    public override string GetMD5()
-    {
-        return $"{Name}{Name2}{ID}{PicturePath}";
-    }
-
-    public new string ToString()
+    public override string ToString()
     {
         return Name;
     }

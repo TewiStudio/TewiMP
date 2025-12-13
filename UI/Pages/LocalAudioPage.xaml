@@ -5,7 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:TewiMP.UI.Pages"
-    xmlns:helper="using:TewiMP.Helpers"
+    xmlns:models="using:TewiMP.Core.Models"
     xmlns:controls="using:TewiMP.UI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
@@ -266,7 +266,7 @@
                     Orientation="Horizontal"
                     MaxWidth="{ThemeResource GroupHeaderPanelMaxWidth}"/>
             </ItemsPanelTemplate>
-            <DataTemplate x:Key="GridViewItemsTemplate" x:DataType="helper:SongItemBindBase">
+            <DataTemplate x:Key="GridViewItemsTemplate" x:DataType="models:MusicDataViewModel">
                 <Grid VerticalAlignment="Center" Width="{ThemeResource GroupItemWidth}" Height="60">
                     <TextBlock
                         Text="{Binding Group.Key}"
@@ -500,7 +500,7 @@
                             </GroupStyle>
                         </ListView.GroupStyle>
                         <ListView.ItemTemplate>
-                            <DataTemplate x:DataType="helper:SongItemBindBase">
+                            <DataTemplate x:DataType="models:MusicDataViewModel">
                                 <controls:MusicDataItem Margin="16,1"/>
                             </DataTemplate>
                         </ListView.ItemTemplate>

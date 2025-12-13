@@ -5,12 +5,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:TewiMP.UI.Controls"
-    xmlns:helper="using:TewiMP.Helpers"
     xmlns:data="using:TewiMP.Core.Music"
+    xmlns:models="using:TewiMP.Core.Models"
     mc:Ignorable="d">
 
     <UserControl.Resources>
-        <DataTemplate x:Key="MusicDataCard" x:DataType="helper:SongItemBindBase">
+        <DataTemplate x:Key="MusicDataCard" x:DataType="models:MusicDataViewModel">
             <local:MusicDataItem/>
         </DataTemplate>
         <DataTemplate x:Key="ArtistDataCard" x:DataType="data:Artist">

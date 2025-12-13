@@ -11,16 +11,15 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Composition;
 using CommunityToolkit.WinUI;
-using TewiMP.Helpers;
 using TewiMP.UI.Controls;
 using TewiMP.UI.Windows;
-using TewiMP.Services;
-using TewiMP.Services.Storage;
+using TewiMP.UI.Pages.ListViewPages;
 using TewiMP.Core;
 using TewiMP.Core.Music;
-using TewiMP.UI.Pages.ListViewPages;
-using TewiMP.UI.Pages.ListViewPages;
+using TewiMP.Core.Models;
+using TewiMP.Services;
 using TewiMP.Services.Plugin;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Pages
 {
@@ -56,7 +55,7 @@ namespace TewiMP.UI.Pages
             base.OnNavigatedFrom(e);
         }
 
-        public ObservableCollection<SongItemBindBase> MusicDataList = new();
+        public ObservableCollection<MusicDataViewModel> MusicDataList = new();
         public ObservableCollection<SearchItemBindBase> SearchList = new();
         object searchDatas = null;
         static bool firstInit = false;
@@ -113,7 +112,6 @@ namespace TewiMP.UI.Pages
 
             if (searchDatas != null)
             {
-                SongItemBindBase.RecycleBindItems(MusicDataList);
                 MusicDataList.Clear();
                 SearchList.Clear();
 
@@ -127,7 +125,7 @@ namespace TewiMP.UI.Pages
                         var musicListData = searchDatas as MusicListData;
                         foreach (var i in musicListData.Songs)
                         {
-                            MusicDataList.Add(SongItemBindBase.GetBindItem(i, musicListData, count++));
+                            MusicDataList.Add(new(i, musicListData, count++));
                         }
                         break;
                     default:
@@ -415,7 +413,7 @@ namespace TewiMP.UI.Pages
         {
             if (Children.SelectedItems.Any())
             {
-                foreach (SongItemBindBase item in Children.SelectedItems)
+                foreach (MusicDataViewModel item in Children.SelectedItems)
                 {
                     App.Instance.PlayingListService.Add(item.MusicData);
                 }
@@ -426,7 +424,7 @@ namespace TewiMP.UI.Pages
         {
             if (Children.SelectedItems.Any())
             {
-                foreach (SongItemBindBase item in Children.SelectedItems)
+                foreach (MusicDataViewModel item in Children.SelectedItems)
                 {
                     MusicDataList.Remove(item);
                 }
@@ -445,7 +443,7 @@ namespace TewiMP.UI.Pages
 
         private void SelectReverseButton_Click(object sender, RoutedEventArgs e)
         {
-            foreach (SongItemBindBase item in Children.Items)
+            foreach (MusicDataViewModel item in Children.Items)
             {
                 if (Children.SelectedItems.Contains(item))
                 {
@@ -467,7 +465,7 @@ namespace TewiMP.UI.Pages
         {
             if (Children.SelectedItems.Any())
             {
-                foreach (SongItemBindBase songItem in Children.Items)
+                foreach (MusicDataViewModel songItem in Children.Items)
                 {
                     App.Instance.DownloadService.Add(songItem.MusicData);
                 }
@@ -494,7 +492,7 @@ namespace TewiMP.UI.Pages
         {
             App.MainWindowInstance.ShowLoadingDialog();
             var text = await PlayListHelper.ReadData();
-            foreach (SongItemBindBase item in Children.SelectedItems)
+            foreach (MusicDataViewModel item in Children.SelectedItems)
             {
                 App.MainWindowInstance.SetLoadingText($"正在添加：{item.MusicData.Title} - {item.MusicData.ButtonName}");
                 
@@ -553,7 +551,6 @@ namespace TewiMP.UI.Pages
             searchData = null;
 
             scrollViewer?.ScrollToVerticalOffset(0);
-            SongItemBindBase.RecycleBindItems(MusicDataList);
             MusicDataList.Clear();
             Children.ItemsSource = null;
             Children.Items.Clear();

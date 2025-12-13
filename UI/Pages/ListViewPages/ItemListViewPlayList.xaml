@@ -2,16 +2,15 @@
     x:Class="TewiMP.UI.Pages.ItemListViewPlayList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:local="using:TewiMP.UI.Pages"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:controlszn="using:TewiMP.UI.Controls"
-    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-    xmlns:helper="using:TewiMP.Helpers"
-    xmlns:data="using:TewiMP.Storage"
+    xmlns:models="using:TewiMP.Core.Models"
     Unloaded="Page_Unloaded"
     mc:Ignorable="d">
 
@@ -29,7 +28,7 @@
                   ItemsSource="{x:Bind MusicDataList}"
                   DropCompleted="Children_DropCompleted">
             <ListView.ItemTemplate>
-                <DataTemplate x:DataType="helper:SongItemBindBase">
+                <DataTemplate x:DataType="models:MusicDataViewModel">
                     <controlszn:SongItem Margin="0,0,4,2"/>
                 </DataTemplate>
             </ListView.ItemTemplate>
@@ -332,7 +331,7 @@
                                                 SuggestionChosen="SearchBox_SuggestionChosen"
                                                 Style="{ThemeResource DefaultAutoSuggestBoxStyle1}">
                                     <AutoSuggestBox.ItemTemplate>
-                                        <DataTemplate x:DataType="helper:SongItemBindBase">
+                                        <DataTemplate x:DataType="models:MusicDataViewModel">
                                             <StackPanel Padding="0,8">
                                                 <TextBlock Text="{Binding MusicData.Title}" FontWeight="Bold"/>
                                                 <TextBlock Text="{Binding MusicData.ArtistName}" Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"/>

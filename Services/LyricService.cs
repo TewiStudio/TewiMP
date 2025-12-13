@@ -105,7 +105,7 @@ public class LyricService
         var startTime = DateTime.Now;
         NowPlayingLyrics.Clear();
 
-        string cachePath = await FileHelper.GetLyricCache(musicData);
+        string cachePath = await CacheFileHelpers.GetLyricCache(musicData);
         string resultPath = null;
 
         if (cachePath != null)
@@ -183,7 +183,7 @@ public class LyricService
             await InitLyricList("");
             return;
         }
-        InitLyricList(await LyricHelper.LyricToLrcData(file.Tag.Lyrics));
+        InitLyricList(await Task.Run(async () =>  await LyricHelper.LyricToLrcData(file.Tag.Lyrics)));
     }
 
     public async Task InitLyricList(string lyricPath)
@@ -218,7 +218,7 @@ public class LyricService
             return;
         }
 
-        InitLyricList(await LyricHelper.LyricToLrcData(f, UseRomajiLyric));
+        InitLyricList(await Task.Run(async () => await LyricHelper.LyricToLrcData(f, UseRomajiLyric)));
     }
 
     public void InitLyricList(LyricData[] lyricDatas)
