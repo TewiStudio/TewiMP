@@ -435,9 +435,9 @@ public class PlayingListService
         NowPlayingList.Clear();
     }
 
-    public async Task UpdateImageColor()
+    public async Task UpdateImageColor(bool forceChange = false)
     {
-        await GetImageColor();
+        await GetImageColor(forceChange);
         NowPlayingImageLoaded?.Invoke(NowPlayingImage, NowPlayingImagePath);
     }
 
@@ -449,15 +449,15 @@ public class PlayingListService
     // 记录上一次处理成功的图片路径，避免重复计算
     private string _lastProcessedImagePath;
 
-    public async Task GetImageColor()
+    public async Task GetImageColor(bool forceChange = false)
     {
         // 获取当前路径
         var nowImagePath = NowPlayingImagePath;
 
-        if (string.Equals(nowImagePath, _lastProcessedImagePath, StringComparison.OrdinalIgnoreCase) && _lastProcessedImagePath is not null)
-        {
+        if (string.Equals(nowImagePath, _lastProcessedImagePath, StringComparison.OrdinalIgnoreCase)
+            && _lastProcessedImagePath is not null
+            && !forceChange)
             return;
-        }
 
         LogService.Info(nameof(PlayingListService), $"Album accent color source：From \"{_lastProcessedImagePath}\" To \"{nowImagePath}\"");
         _lastProcessedImagePath = nowImagePath;

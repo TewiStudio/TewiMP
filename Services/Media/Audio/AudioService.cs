@@ -426,10 +426,21 @@ public class AudioService
         LogService.Log("DeviceManager", "Device Removed.");
     }
 
+    private CancellationTokenSource _loadCts;
     public async Task SetSourceAsync(MusicData musicData)
     {
+        _loadCts?.Cancel();
+        _loadCts?.Dispose();
+        _loadCts = new CancellationTokenSource();
+        var token = _loadCts.Token;
+        bool lockTaken = false;
+
         pointMusicData = musicData;
-        await _loadingLock.WaitAsync();
+
+        await Task.Delay(200);
+        if (token.IsCancellationRequested)
+            return;
+
         //LogManager.Log(nameof(AudioService), $"Loading：\"{musicData}\"");
         try
         {
@@ -463,6 +474,12 @@ public class AudioService
                 throw new FileNotFoundException($"找不到位于 \"{resultPath}\" 的音频文件。");
             }
 
+            // 如果在缓存期间切换了歌曲，取消执行
+            if (token.IsCancellationRequested)
+                return;
+
+            await _loadingLock.WaitAsync(token);
+            lockTaken = true;
             CacheLoadingChanged?.Invoke(this, null);
 
             // 获取输出设备
@@ -550,13 +567,23 @@ public class AudioService
                 MusicData = musicData;
             });
         }
+        catch (OperationCanceledException)
+        {
+            LogService.Log(nameof(AudioService), $"Canceled：\"{musicData}\"");
+        }
         finally
         {
-            _loadingLock.Release();
-            CacheLoadedChanged?.Invoke(this);
-            SourceChanged?.Invoke(this);
+            if (lockTaken)
+            {
+                _loadingLock.Release();
+            }
+            if (!token.IsCancellationRequested && lockTaken)
+            {
+                CacheLoadedChanged?.Invoke(this);
+                SourceChanged?.Invoke(this);
+                LogService.Log(nameof(AudioService), $"Loaded：\"{musicData}\"");
+            }
         }
-        LogService.Log(nameof(AudioService), $"Loaded：\"{musicData}\"");
     }
 
     private void CreateOutputDevice(OutDevice device, int latency)

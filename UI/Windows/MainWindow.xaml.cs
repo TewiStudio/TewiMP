@@ -172,7 +172,7 @@ public sealed partial class MainWindow : WindowEx
         App.Instance.SaveSettings();
         _ = App.Instance.SaveNowPlaying();
 
-        if (RunInBackground && App.MainWindowCount < 1)
+        if (RunInBackground)
         {
             args.Cancel = true;
             if (InOpenMusicPage) SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
@@ -392,7 +392,7 @@ public sealed partial class MainWindow : WindowEx
             SetBackdrop(CurrentBackdrop);
         }
         InitializeTitleBar(WindowGridBase.RequestedTheme);
-        await App.Instance.PlayingListService.UpdateImageColor();
+        await App.Instance.PlayingListService.UpdateImageColor(true);
     }
 
     private void UpdateWhenDataLated()
