@@ -100,7 +100,7 @@ public sealed partial class MainWindow : WindowEx
         //SubClassing();
 
         AppWindow.Title = App.Instance.AppName;
-        AppWindow.SetIcon(DataFolderBase.IconPath);
+        this.SetIcon(DataFolderBase.IconICOPath);
 
         InitializeTitleBar(WindowGridBase.RequestedTheme);
         SetDragRegionForCustomTitleBar();
@@ -170,9 +170,9 @@ public sealed partial class MainWindow : WindowEx
     {
         LogService.Log(nameof(MainWindow), "Closing...");
         App.Instance.SaveSettings();
-        App.Instance.SaveNowPlaying();
+        _ = App.Instance.SaveNowPlaying();
 
-        if (RunInBackground)
+        if (RunInBackground && App.MainWindowCount < 1)
         {
             args.Cancel = true;
             if (InOpenMusicPage) SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
@@ -190,7 +190,7 @@ public sealed partial class MainWindow : WindowEx
         if (App.MainWindowCount == 0)
         {
             args.Cancel = true;
-            App.Instance.ExitApp();
+            _ = App.Instance.ExitApp();
         }
         isShowClosingDialog = false;
     }

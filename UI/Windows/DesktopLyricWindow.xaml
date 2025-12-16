@@ -83,16 +83,17 @@
         </Border>
         <Grid CornerRadius="8" BorderThickness="1"
               HorizontalAlignment="Center" VerticalAlignment="Center"
+              Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
               BorderBrush="{ThemeResource ControlElevationBorderBrush}"
               x:Name="InfoBorder" Opacity="0">
             <Grid.OpacityTransition>
                 <ScalarTransition/>
             </Grid.OpacityTransition>
-            <SystemBackdropHost CornerRadius="8">
+            <!--<SystemBackdropHost CornerRadius="8">
                 <SystemBackdropHost.SystemBackdrop>
                     <DesktopAcrylicBackdrop/>
                 </SystemBackdropHost.SystemBackdrop>
-            </SystemBackdropHost>
+            </SystemBackdropHost>-->
             <Grid Padding="20">
                 <controls:MediaPlayStateViewer x:Name="PlayStateElement" PlaybackState="Playing" Width="20" Height="20" />
             </Grid>
@@ -111,11 +112,11 @@
               HorizontalAlignment="Left"
               PointerEntered="ToolButtonsBase_PointerEntered"
               PointerExited="ToolButtonsBase_PointerExited">
-            <SystemBackdropHost CornerRadius="0,8,8,8">
+            <!--<SystemBackdropHost CornerRadius="0,8,8,8">
                 <SystemBackdropHost.SystemBackdrop>
                     <DesktopAcrylicBackdrop/>
                 </SystemBackdropHost.SystemBackdrop>
-            </SystemBackdropHost>
+            </SystemBackdropHost>-->
             <StackPanel Margin="0,0,0,0"
                         x:Name="ToolButtonsStackPanel"
                         VerticalAlignment="Top"

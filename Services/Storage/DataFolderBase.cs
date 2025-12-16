@@ -99,7 +99,7 @@ public static class DataFolderBase
     /// <summary>
     /// 图标路径
     /// </summary>
-    public static string IconPath { get; set; } = Path.Combine(IconFolder, "icon.ico");
+    public static string IconICOPath { get; set; } = Path.Combine(IconFolder, "icon.ico");
 
     /// <summary>
     /// 图标图片路径

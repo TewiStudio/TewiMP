@@ -64,7 +64,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
             AppWindow.IsShownInSwitchers = false;
             AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
             AppWindow.Title = "DesktopLyric Window";
-            AppWindow.SetIcon(DataFolderBase.IconPath);
+            AppWindow.SetIcon(DataFolderBase.IconICOPath);
             AppWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
             AppWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
             AppWindow.TitleBar.ForegroundColor = Colors.Transparent;

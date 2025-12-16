@@ -125,7 +125,7 @@ namespace TewiMP.UI.Pages
                         var musicListData = searchDatas as MusicListData;
                         foreach (var i in musicListData.Songs)
                         {
-                            MusicDataList.Add(new(i, musicListData, count++));
+                            MusicDataList.Add(new(i, musicListData, ++count));
                         }
                         break;
                     default:

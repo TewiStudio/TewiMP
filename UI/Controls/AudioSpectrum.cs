@@ -324,7 +324,7 @@ namespace TewiMP.UI.Controls
             _hoverY = (float)pos.Y;
             UpdateHoverData();
 
-            // --- 更新悬停 EQ 或 PassFilter ---
+            // 更新悬停 EQ 或 PassFilter
             _hoveringEQ = HitTestEQ(_hoverX, _hoverY);
             _hoveringPass = HitTestPassFilter(_hoverX, _hoverY);
 
@@ -336,7 +336,7 @@ namespace TewiMP.UI.Controls
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
 
-            // === 拖动 EQ 点 ===
+            // 拖动 EQ 点
             if (_draggingEQ != null)
             {
                 double logFreq = logMin + (_hoverX / width) * (logMax - logMin);
@@ -348,7 +348,7 @@ namespace TewiMP.UI.Controls
                 return;
             }
 
-            // === 拖动 PassFilter 点 ===
+            // 拖动 PassFilter 点
             if (_draggingPass != null)
             {
                 double logFreq = logMin + (_hoverX / width) * (logMax - logMin);
@@ -368,7 +368,7 @@ namespace TewiMP.UI.Controls
                 return;
             }
 
-            // === 拖动频谱 ===
+            // 拖动频谱
             if (!_isDragging) return;
 
             float dx = (float)pos.X - _dragStartX;
@@ -439,7 +439,7 @@ namespace TewiMP.UI.Controls
             }
 
             if (!DrawDbLines) return;
-            // === 默认行为：频谱缩放 ===
+            // 默认行为：频谱缩放
             var pointerPos = e.GetCurrentPoint(_spectrumCanvas).Position;
             ZoomSpectrum((float)pointerPos.X, delta);
         }
@@ -592,25 +592,6 @@ namespace TewiMP.UI.Controls
             var analyzer = App.Instance.AudioService.AudioAnalyzer;
             if (analyzer?.Spectrum == null) return;
 
-            if (_isZoomAnimating)
-            {
-                double t = (Environment.TickCount64 / 1000.0 - _zoomAnimStartTime) / ZoomAnimDuration;
-
-                if (t >= 1.0)
-                {
-                    _isZoomAnimating = false;
-                    MinFreq = _targetMinFreq;
-                    MaxFreq = _targetMaxFreq;
-                }
-                else
-                {
-                    // ease-out 平滑算法
-                    double easedT = 1 - Math.Pow(1 - t, 3);
-                    MinFreq = Lerp(_animMinFreq, _targetMinFreq, easedT);
-                    MaxFreq = Lerp(_animMaxFreq, _targetMaxFreq, easedT);
-                }
-            }
-
             // 获取基础参数
             int sampleRate = analyzer.WaveFormat.SampleRate;
             int barCount = SampleCount;
@@ -739,6 +720,24 @@ namespace TewiMP.UI.Controls
 
             // Hover 提示
             DrawHoverInfo(ds, w, h);
+            if (_isZoomAnimating)
+            {
+                double t = (Environment.TickCount64 / 1000.0 - _zoomAnimStartTime) / ZoomAnimDuration;
+
+                if (t >= 1.0)
+                {
+                    _isZoomAnimating = false;
+                    MinFreq = _targetMinFreq;
+                    MaxFreq = _targetMaxFreq;
+                }
+                else
+                {
+                    // ease-out 平滑算法
+                    double easedT = 1 - Math.Pow(1 - t, 3);
+                    MinFreq = Lerp(_animMinFreq, _targetMinFreq, easedT);
+                    MaxFreq = Lerp(_animMaxFreq, _targetMaxFreq, easedT);
+                }
+            }
         }
 
         private CanvasTextLayout _hoverTextLayout;
@@ -776,15 +775,17 @@ namespace TewiMP.UI.Controls
         CanvasTextFormat gridTextFormat;
         private void DrawGrid(CanvasControl sender, CanvasDrawingSession ds)
         {
+            bool isFreqChanged = Math.Abs(_lastMinFreq - MinFreq) > 0.0001 ||
+                                 Math.Abs(_lastMaxFreq - MaxFreq) > 0.0001;
             if (_gridCache != null && _gridCache.Size.Width == sender.ActualWidth && _gridCache.Size.Height == sender.ActualHeight
-                && _lastMinFreq == MinFreq && _lastMaxFreq == MaxFreq)
+                && !isFreqChanged)
             {
                 ds.DrawImage(_gridCache);
                 return;
             }
 
             _gridCache?.Dispose();
-            _gridCache = new CanvasRenderTarget(sender, (float)sender.ActualWidth, (float)sender.ActualHeight, 96);
+            _gridCache = new CanvasRenderTarget(sender, (float)sender.ActualWidth, (float)sender.ActualHeight, sender.Dpi);
             _lastMinFreq = MinFreq; _lastMaxFreq = MaxFreq;
 
             using var gds = _gridCache.CreateDrawingSession();

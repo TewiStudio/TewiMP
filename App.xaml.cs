@@ -163,7 +163,6 @@ public partial class App : Application
 
     #region 启动和退出
     public List<string> LaunchArgs = null;
-    public JObject StartingSettings = null;
     /// <summary>
     /// Invoked when the application is launched normally by the end user.  Other entry points
     /// will be used such as when the application is launched to open settingData specific file.
@@ -315,17 +314,17 @@ public partial class App : Application
             }
             catch { }
         };
-
+/*
         StartingSettings = DataFolderBase.JSettingData;
         var accentColor = StartingSettings[DataFolderBase.SettingParams.ThemeAccentColor.ToString()];
         if (accentColor != null)
         {
-            /*Current.Resources["SystemAccentColor"] = Windows.UI.Color.FromArgb(255, 2,255,2);
+            Current.Resources["SystemAccentColor"] = Windows.UI.Color.FromArgb(255, 2,255,2);
             Current.Resources["SystemAccentColorLight2"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
-            Current.Resources["SystemAccentColorDark1"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);*/
+            Current.Resources["SystemAccentColorDark1"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
 
             //LogManager.Log(Current.Resources["SystemAccentColorLight2"].GetType());
-        }
+        }*/
         LoadSettings();
 
         // WinUI Bug: 获取不到启动参数

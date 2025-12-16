@@ -13,6 +13,8 @@ namespace TewiMP.UI.Windows;
 
 public partial class TaskBarInfoWindow : Window
 {
+    private int _maxThumbWidth = 200;
+    private int _maxThumbHeight = 109;
     public nint Handle { get; private set; }
     public string IconPath { get; private set; }
     public string IconPathUsing { get; private set; }
@@ -82,7 +84,7 @@ public partial class TaskBarInfoWindow : Window
         AppWindow.TitleBar.BackgroundColor = global::Windows.UI.Color.FromArgb(0, 0, 0, 0);
         AppWindow.TitleBar.ButtonBackgroundColor = global::Windows.UI.Color.FromArgb(0, 0, 0, 0);
         AppWindow.TitleBar.ButtonInactiveBackgroundColor = global::Windows.UI.Color.FromArgb(0, 0, 0, 0);
-        AppWindow.SetIcon(DataFolderBase.IconPath);
+        AppWindow.SetIcon(DataFolderBase.IconICOPath);
         AppWindow.MoveAndResize(new(0, 0, 0, 0));
         AppWindow.SetPresenter(overlappedPresenter);
     }
@@ -112,6 +114,7 @@ public partial class TaskBarInfoWindow : Window
         Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.HrInit();
         Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.RegisterTab(Handle, App.MainWindowInstance.Handle);
         Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.SetTabOrder(Handle, App.MainWindowInstance.Handle);
+        UpdateTaskbarCover(DataFolderBase.IconPNGPath);
     }
 
     private void InitCallBack()
@@ -180,42 +183,67 @@ public partial class TaskBarInfoWindow : Window
         Helpers.SDKs.TaskbarProgress.MyTaskbarInstance.ThumbBarUpdateButtons(Handle, 3, taskbarInfoButtonPauseStyle);
     }
 
-    public async void SetTaskbarImage(string filePath)
+    public void UpdateTaskbarCover(string newPath)
     {
-        LogService.Log(nameof(TaskBarInfoWindow), $"TaskBar thumbnail updated to \"{filePath}\".");
-        if (string.IsNullOrEmpty(filePath))
+        if (IconPathUsing == newPath) return;
+        IconPath = newPath;
+
+        SetTaskbarImage(IconPath, _maxThumbWidth, _maxThumbHeight);
+    }
+
+    public void SetTaskbarImage(string filePath, int maxWidth, int maxHeight)
+    {
+        if (string.IsNullOrEmpty(filePath)) filePath = DataFolderBase.IconPNGPath;
+        if (!File.Exists(filePath)) return;
+        try
         {
-            filePath = DataFolderBase.IconRoundedPNGPath;
-        }
-        if (IconPathUsing == filePath) return;
-        if (!await Task.Run(() => File.Exists(filePath))) return;
-        bool canBreak = false;
-        using var bmp = await Task.Run(() => Bitmap.FromFile(filePath));
-        int size = 160;
-        for (int i = 0; i < 50; i++)
-        {
-            if (canBreak) break;
-            using var hBitmap = bmp.GetThumbnailImage(size, size, null, 0) as Bitmap;
-            var hBitmapNint = hBitmap.GetHbitmap();
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            using var originalBmp = new Bitmap(fileStream);
+
+            // 计算保持纵横比的目标尺寸
+            float ratioX = (float)maxWidth / originalBmp.Width;
+            float ratioY = (float)maxHeight / originalBmp.Height;
+            float ratio = Math.Min(ratioX, ratioY); // 取较小的比例，确保塞得进缩略图框
+
+            int newWidth = (int)(originalBmp.Width * ratio);
+            int newHeight = (int)(originalBmp.Height * ratio);
+
+            LogService.Info(nameof(TaskBarInfoWindow), $"Taskbar thumbnail size：{newWidth}x{newHeight}");
+
+            // 创建一个新的 32位 ARGB 位图
+            using var targetBmp = new Bitmap(newWidth, newHeight, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+
+            using (var g = Graphics.FromImage(targetBmp))
+            {
+                g.Clear(Color.Transparent);
+                g.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
+                g.DrawImage(originalBmp, 0, 0, newWidth, newHeight);
+            }
+
+            // 获取 HBITMAP
+            IntPtr hBitmap = targetBmp.GetHbitmap();
+
             try
             {
-                var a = await Task.Run(() => NativeMethods.DwmSetIconicThumbnail(Handle, hBitmapNint, NativeMethods.DWM_SIT.None));
-                if (a != 0)
+                int result = NativeMethods.DwmSetIconicThumbnail(Handle, hBitmap, NativeMethods.DWM_SIT.None);
+                if (result != 0)
                 {
-                    //LogManager.Log($"{size}x{size} failed.");
-                    size -= 2;
-                    canBreak = false;
+                    LogService.Log(nameof(SetTaskbarImage), $"DwmSetIconicThumbnail failed: {result:X}, size: {newWidth}x{newHeight}");
+                    NativeMethods.DwmInvalidateIconicBitmaps(Handle);
                 }
                 else
                 {
-                    LogService.Log(nameof(TaskBarInfoWindow), $"TaskBar thumbnail {size}x{size} completed.");
                     IconPathUsing = filePath;
-                    canBreak = true;
                 }
             }
-            catch
+            finally
             {
+                NativeMethods.DeleteObject(hBitmap); // 释放 GDI 对象
             }
+        }
+        catch (Exception ex)
+        {
+            LogService.Error(nameof(TaskBarInfoWindow), ex.ToString());
         }
     }
 
@@ -251,7 +279,20 @@ public partial class TaskBarInfoWindow : Window
         else if (uMsg == 127)
         {
             if (wParam.Value == 2)
-                SetTaskbarImage(IconPath);
+            {
+                UpdateTaskbarCover(IconPath);
+                return new global::Windows.Win32.Foundation.LRESULT(0);
+            }
+        }
+        else if (uMsg is 0x0323)
+        {
+            // 高16位是宽，低16位是高
+            _maxThumbWidth = (short)((lParam >> 16) & 0xFFFF);
+            _maxThumbHeight = (short)(lParam & 0xFFFF);
+
+            LogService.Log(nameof(TaskBarInfoWindow), $"System accept taskbar thumbnail size: {_maxThumbWidth}x{_maxThumbHeight}");
+            SetTaskbarImage(IconPath, _maxThumbWidth, _maxThumbHeight);
+            return new global::Windows.Win32.Foundation.LRESULT(0);
         }
         else if (uMsg == 124 || uMsg == 125)
         {/* doesn't work
@@ -292,7 +333,7 @@ public partial class TaskBarInfoWindow : Window
     private void PlayingList_NowPlayingImageLoaded(Uri imageSource, string path)
     {
         App.Instance.PlayingListService.NowPlayingImageLoaded -= PlayingList_NowPlayingImageLoaded;
-        SetTaskbarImage(path);
+        UpdateTaskbarCover(path);
     }
 
     #region Transparent Window Method
@@ -344,6 +385,11 @@ public partial class TaskBarInfoWindow : Window
 
 internal static class NativeMethods
 {
+    [DllImport("gdi32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    public static extern bool DeleteObject(IntPtr hObject);
+    [DllImport("dwmapi.dll")]
+    public static extern int DwmInvalidateIconicBitmaps(IntPtr hwnd);
     [DllImport("dwmapi.dll")]
     public static extern int DwmSetIconicThumbnail(IntPtr hwnd, IntPtr hbmp, DWM_SIT dwSITFlags);
 

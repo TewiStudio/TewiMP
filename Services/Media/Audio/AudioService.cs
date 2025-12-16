@@ -13,11 +13,10 @@ using Melanchall.DryWetMidi.Multimedia;
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
 using SoundTouch;
+using TewiMP.UI.Windows;
 using TewiMP.Core;
 using TewiMP.Core.Music;
-using TewiMP.Services;
 using TewiMP.Services.Media.Audio.AudioEffects;
-using TewiMP.UI.Windows;
 
 namespace TewiMP.Services.Media.Audio;
 
@@ -480,15 +479,17 @@ public class AudioService
             // 初始化音频读取
             await AudioThread.InvokeAsync(() =>
             {
-                // 释放非托管对象
-                DisposeAll();
-
                 // 获取音频信息
                 UpdateInfo(resultPath);
                 FileSize = (int)tfile.AudioDataSize;
 
                 // ffmpeg
-                FileReader = new AudioFileReader(resultPath, musicData.CUETrackData != null);
+                var fileReader = new AudioFileReader(resultPath, musicData.CUETrackData != null);
+
+                // 释放非托管对象
+                DisposeAll();
+
+                FileReader = fileReader;
                 if (FileReader.isMidi)
                 {
                     WaveInfo = "midi";

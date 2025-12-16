@@ -657,9 +657,9 @@ namespace TewiMP.UI.Pages.ListViewPages
             if (scrollViewer.VerticalOffset < 300)
             {
                 isDelayInitShyHeaderWhenScroll = true;
-                InitShyHeader(true);
+                _ = InitShyHeader(true);
                 await Task.Delay(200);
-                InitShyHeader(true);
+                _ = InitShyHeader(true);
             }
             else
             {

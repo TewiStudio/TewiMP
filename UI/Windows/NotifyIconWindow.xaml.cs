@@ -55,7 +55,7 @@ public sealed partial class NotifyIconWindow : Window
 
         notifyIcon = new System.Windows.Forms.NotifyIcon();
         notifyIcon.Text = App.Instance.AppName;
-        notifyIcon.Icon = new(DataFolderBase.IconPath);
+        notifyIcon.Icon = new(DataFolderBase.IconICOPath);
         notifyIcon.Visible = isVisible;
 
         #region others
@@ -70,7 +70,7 @@ public sealed partial class NotifyIconWindow : Window
         
         presenter = OverlappedPresenter.CreateForContextMenu(); // FIX: https://github.com/microsoft/microsoft-ui-xaml/issues/9978#issuecomment-2456461855
         AppWindow.SetPresenter(presenter);
-        AppWindow.SetIcon(DataFolderBase.IconPath);
+        AppWindow.SetIcon(DataFolderBase.IconICOPath);
         UpdateWindowDisplay();
 
         AppWindow.Closing += AppWindow_Closing;

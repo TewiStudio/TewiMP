@@ -25,6 +25,7 @@
         <ListView
             SelectionMode="None"
             x:Name="ItemsList"
+            UseLayoutRounding="True"
             Padding="0,0,0,58">
             <ListView.Resources>
                 <Style TargetType="ListViewItem">

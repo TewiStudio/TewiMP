@@ -34,7 +34,7 @@ public partial class LogWindow : Window
         AppWindow.TitleBar.BackgroundColor = global::Windows.UI.Color.FromArgb(0, 0, 0, 0);
         AppWindow.TitleBar.ButtonBackgroundColor = global::Windows.UI.Color.FromArgb(0, 0, 0, 0);
         AppWindow.TitleBar.ButtonInactiveBackgroundColor = global::Windows.UI.Color.FromArgb(0, 0, 0, 0);
-        AppWindow.SetIcon(DataFolderBase.IconPath);
+        AppWindow.SetIcon(DataFolderBase.IconICOPath);
         AppWindow.Resize(new(800, 600));
         AppWindow.SetPresenter(overlappedPresenter);
         SystemBackdrop = new DesktopAcrylicBackdrop();
