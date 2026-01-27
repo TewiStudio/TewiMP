@@ -8,6 +8,7 @@
     xmlns:winex="using:WinUIEx"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
+    xmlns:cmedia="using:CommunityToolkit.WinUI.Media"
     xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:media="using:Microsoft.UI.Xaml.Media"
@@ -513,23 +514,56 @@
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch">
                         <Grid>
+                            <!--<cc:OpacityMaskView>
+                            <cc:OpacityMaskView.OpacityMask>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="auto"/>
+                                    </Grid.RowDefinitions>
+                                    <Rectangle Fill="White"/>
+                                    <Rectangle Grid.Row="1" Height="42" VerticalAlignment="Bottom">
+                                        <Rectangle.Fill>
+                                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                                <GradientStop Offset=".5" Color="White" />
+                                                <GradientStop Offset="1" Color="Transparent" />
+                                            </LinearGradientBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
+                                </Grid>
+                            </cc:OpacityMaskView.OpacityMask>-->
                             <ListView
                                 x:Name="PlayingListBaseView"
                                 Padding="0,0,0,56"
                                 SelectionChanged="PlayingListBaseView_SelectionChanged"
                                 SelectionMode="None"
-                                Background="Transparent"
                                 AllowDrop="True"
                                 CanReorderItems="True">
+                                <ListView.Resources>
+                                    <Style TargetType="ListViewItem">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListViewItem">
+                                                    <ListViewItemPresenter/>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                    <cmedia:AttachedCardShadow x:Key="CommonShadow"
+                                        Offset="0,0" CornerRadius="0" BlurRadius="32" Color="#3000000"/>
+                                </ListView.Resources>
                                 <ListView.Header>
                                     <Grid x:Name="PlayingListHeader">
                                         <interactivity:Interaction.Behaviors>
                                             <behaviors:StickyHeaderBehavior/>
                                         </interactivity:Interaction.Behaviors>
-                                        <Grid 
+                                        <Grid
+                                            x:Name="PlayingListHeaderBaseGrid"
                                             Background="{ThemeResource AcrylicNormal}"
                                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                            BorderThickness="0,0,0,1" Margin="0,0,0,6">
+                                            BorderThickness="0,0,0,1" Margin="0,0,0,6"
+                                            ui:Effects.Shadow="{StaticResource CommonShadow}"
+>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition/>
                                                 <ColumnDefinition Width="auto"/>
@@ -611,18 +645,9 @@
                                         <controls:MainMusicDataItem Margin="4,1,16,1"/>
                                     </DataTemplate>
                                 </ListView.ItemTemplate>
-                                <ListView.Resources>
-                                    <Style TargetType="ListViewItem">
-                                        <Setter Property="Template">
-                                            <Setter.Value>
-                                                <ControlTemplate TargetType="ListViewItem">
-                                                    <ListViewItemPresenter/>
-                                                </ControlTemplate>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ListView.Resources>
                             </ListView>
+                            <!--</cc:OpacityMaskView>-->
+                            <Grid/>
                         </Grid>
                     </Grid>
                 </Flyout>

@@ -11,6 +11,7 @@ using TewiMP.Helpers;
 using TewiMP.UI.Windows;
 using TewiMP.Services.Storage;
 using TewiMP.Services;
+using CommunityToolkit.WinUI.Controls;
 
 namespace TewiMP.UI.Pages
 {
@@ -259,8 +260,7 @@ namespace TewiMP.UI.Pages
         #region cacheExp
         private async void Button_Click(object sender, RoutedEventArgs e)
         {
-            Button button = sender as Button;
-            if (button is null) return;
+            if (sender is not SettingsCard button) return;
 
             string tagObj = button.Tag as string;
             string folderPath = null;
@@ -614,7 +614,7 @@ namespace TewiMP.UI.Pages
             }
         }
 
-        private void ColorPicker_ColorChanged(ColorPicker sender, ColorChangedEventArgs args)
+        private void ColorPicker_ColorChanged(Microsoft.UI.Xaml.Controls.ColorPicker sender, ColorChangedEventArgs args)
         {
             accentcolor_accentcolor_presenter_root.Background = new SolidColorBrush(sender.Color);
         }

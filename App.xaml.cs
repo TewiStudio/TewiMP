@@ -207,7 +207,7 @@ public partial class App : Application
         int saveSettingsWhenSourceChangedCount = 0;
         AudioService.SourceChanged += async (AudioService) =>
         {
-            //await SongHistoryHelper.AddHistory(new() { MusicData = AudioService.MusicData, Time = DateTime.Now });
+            await SongHistoryHelper.AddHistory(new() { MusicData = AudioService.MusicData, Time = DateTime.Now });
             if (saveSettingsWhenSourceChangedCount > 4)
             {
                 saveSettingsWhenSourceChangedCount = 0;

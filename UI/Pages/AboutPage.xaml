@@ -53,7 +53,7 @@
                                 Powered by <Hyperlink Click="Hyperlink_Click">.NET 9</Hyperlink> &#x0026; <Hyperlink Click="Hyperlink_Click_1">Windows App SDK 2.0</Hyperlink>
                             </TextBlock>
                             <TextBlock TextWrapping="Wrap" Margin="0,4,0,0">
-                                © 2025 TewiStudio.
+                                © 2026 TewiStudio.
                             </TextBlock>
                         </StackPanel>
                     </Grid>

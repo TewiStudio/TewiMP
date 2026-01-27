@@ -128,6 +128,10 @@ namespace TewiMP.UI.Controls
             "MaxFreq", typeof(double), typeof(AudioSpectrum),
             new PropertyMetadata(20000d, OnPropertyChanged<double>));
 
+        public static readonly DependencyProperty DrawScaleProperty = DependencyProperty.Register(
+            "DrawScale", typeof(double), typeof(AudioSpectrum),
+            new PropertyMetadata(1.0d, OnPropertyChanged<double>));
+
         public static readonly DependencyProperty DrawDbLinesProperty = DependencyProperty.Register(
             "DrawDbLines", typeof(bool), typeof(AudioSpectrum),
             new PropertyMetadata(false, OnPropertyChanged<bool>));
@@ -161,6 +165,7 @@ namespace TewiMP.UI.Controls
         public double StrokeWidth { get => (double)GetValue(StrokeWidthProperty); set => SetValue(StrokeWidthProperty, value); }
         public double MinFreq { get => (double)GetValue(MinFreqProperty); set => SetValue(MinFreqProperty, value); }
         public double MaxFreq { get => (double)GetValue(MaxFreqProperty); set => SetValue(MaxFreqProperty, value); }
+        public double DrawScale { get => (double)GetValue(DrawScaleProperty); set => SetValue(DrawScaleProperty, value); }
         public bool DrawDbLines { get => (bool)GetValue(DrawDbLinesProperty); set => SetValue(DrawDbLinesProperty, value); }
         public bool DrawEqLines { get => (bool)GetValue(DrawEqLinesProperty); set => SetValue(DrawEqLinesProperty, value); }
         public bool DrawLatencyText { get => (bool)GetValue(DrawLatencyTextProperty); set => SetValue(DrawLatencyTextProperty, value); }
@@ -533,6 +538,7 @@ namespace TewiMP.UI.Controls
         {
             var ds = args.DrawingSession;
             ds.Clear(Colors.Transparent);
+            sender.DpiScale = (float)DrawScale;
 
             // 计算帧时间
             double now = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
@@ -560,8 +566,10 @@ namespace TewiMP.UI.Controls
 
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
+            float width = (float)sender.ActualWidth;
+            float height = (float)sender.ActualHeight;
 
-            DrawSpectrum(sender, ds);
+            DrawSpectrum(sender, ds, width, height);
 
             if (DrawEqLines)
             {
@@ -573,7 +581,7 @@ namespace TewiMP.UI.Controls
             }
             if (DrawDbLines)
             {
-                DrawGrid(sender, ds);
+                DrawGrid(sender, ds, width, height);
             }
 
             if (DrawLatencyText)
@@ -587,7 +595,7 @@ namespace TewiMP.UI.Controls
         // 内部插值函数
         static double Lerp(double a, double b, double t) => a + (b - a) * t;
 
-        private void DrawSpectrum(CanvasControl sender, CanvasDrawingSession ds)
+        private void DrawSpectrum(CanvasControl sender, CanvasDrawingSession ds, float w, float h)
         {
             var analyzer = App.Instance.AudioService.AudioAnalyzer;
             if (analyzer?.Spectrum == null) return;
@@ -595,8 +603,6 @@ namespace TewiMP.UI.Controls
             // 获取基础参数
             int sampleRate = analyzer.WaveFormat.SampleRate;
             int barCount = SampleCount;
-            float w = (float)sender.ActualWidth;
-            float h = (float)sender.ActualHeight;
 
             // 更新缓存。如果正在缩放，这里会每帧执行计算；如果不缩放，这里耗时为0
             UpdateSpectrumCache(sampleRate, barCount, MinFreq, MaxFreq, w, h, analyzer);
@@ -773,11 +779,11 @@ namespace TewiMP.UI.Controls
 
         CanvasStrokeStyle gridDash;
         CanvasTextFormat gridTextFormat;
-        private void DrawGrid(CanvasControl sender, CanvasDrawingSession ds)
+        private void DrawGrid(CanvasControl sender, CanvasDrawingSession ds, float w, float h)
         {
             bool isFreqChanged = Math.Abs(_lastMinFreq - MinFreq) > 0.0001 ||
                                  Math.Abs(_lastMaxFreq - MaxFreq) > 0.0001;
-            if (_gridCache != null && _gridCache.Size.Width == sender.ActualWidth && _gridCache.Size.Height == sender.ActualHeight
+            if (_gridCache != null && _gridCache.Size.Width == w && _gridCache.Size.Height == h
                 && !isFreqChanged)
             {
                 ds.DrawImage(_gridCache);
