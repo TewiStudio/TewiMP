@@ -65,6 +65,15 @@ public class HotKeyService
         LogService.Log(nameof(HotKeyService), $"Window: {RegisteredWindowHandle}, EnableHotKey: {EnableHotKey}, Registered HotKey Count: {RegisteredHotKeys.Count}");
     }
 
+    public HotKey GetHotKey(HotKeyID hotKeyID)
+    {
+        foreach (var item in RegisteredHotKeys)
+        {
+            if (item.HotKeyID == hotKeyID) return item;
+        }
+        return null;
+    }
+
     public bool RegisterHotKey(HotKey hotKey, int? insertIndex = null)
     {
         if (insertIndex == -1) insertIndex = null;

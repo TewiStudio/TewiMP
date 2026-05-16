@@ -1,23 +1,25 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using System.Runtime.InteropServices;
-using Microsoft.UI;
+﻿using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
-using Windows.UI;
-using Windows.Graphics;
-using Vanara.PInvoke;
-using WinUIEx;
 using NAudio.Wave;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using TewiMP.Core;
 using TewiMP.Helpers;
 using TewiMP.Services;
 using TewiMP.Services.Media.Audio;
-using TewiMP.Core;
 using TewiMP.Services.Storage;
+using TewiMP.UI.Pages;
+using Vanara.PInvoke;
+using Windows.Graphics;
+using Windows.UI;
+using WinUIEx;
 
 namespace TewiMP.UI.Windows;
 
@@ -704,9 +706,8 @@ public sealed partial class DesktopLyricWindow : WindowEx
     }
 
     private void LyricManager_PlayingLyricSourceChange(ObservableCollection<LyricData> nowPlayingLyrics)
-    {/*
-        if (nowPlayingLyrics.Any())
-            LyricManager_PlayingLyricSelectedChange(nowPlayingLyrics[0]);*/
+    {
+        SetLyric(null);
     }
 
     bool IsT1Focus = true;
@@ -751,7 +752,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
             this.SetWindowStyle(this.GetWindowStyle() & ~(WindowStyle.Caption | WindowStyle.ThickFrame | WindowStyle.MinimizeBox | WindowStyle.MaximizeBox));
             root.Padding = new(8, 0, 8, 8); // 透明窗口后会导致窗口左右下往外增大 8 像素
             ToolButtonsBase.Visibility = Visibility.Collapsed;
-            ShowInfo("使用 锁定桌面歌词 热键可以切换锁定状态");
+            ShowInfo($"按下 {App.Instance.HotKeyService.GetHotKey(HotKeyID.LockLyricWindow)} 切换窗口锁定状态");
         }
         RestartTimer();
     }
@@ -933,5 +934,109 @@ public sealed partial class DesktopLyricWindow : WindowEx
     {
         var dpi = CodeHelper.GetScaleAdjustment(this);
         AppWindow.Resize(new SizeInt32() { Width = (int)(850 * dpi), Height = (int)(120 * dpi) });
+    }
+
+    private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+    {
+        var item = sender as MenuFlyoutItem;
+        var tag = item.Tag as string;
+        var displayArea = CodeHelper.GetDisplayArea(App.MainWindowInstance);
+        switch (tag)
+        {
+            case "0":
+                this.Move(0, 0);
+                break;
+            case "1":
+                this.Move(0, displayArea.WorkArea.Height / 2 - (int)(Height / 2));
+                break;
+            case "2":
+                this.Move(0, displayArea.WorkArea.Height - (int)Height);
+                break;
+        }
+    }
+
+    private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
+    {
+        var item = sender as MenuFlyoutItem;
+        var tag = item.Tag as string;
+        var displayArea = CodeHelper.GetDisplayArea(App.MainWindowInstance);
+        switch (tag)
+        {
+            case "0":
+                this.Move(displayArea.WorkArea.Width / 2 - (int)(Width / 2), 0);
+                break;
+            case "1":
+                this.Move(displayArea.WorkArea.Width / 2 - (int)(Width / 2), displayArea.WorkArea.Height / 2 - (int)(Height / 2));
+                break;
+            case "2":
+                this.Move(displayArea.WorkArea.Width / 2 - (int)(Width / 2), displayArea.WorkArea.Height - (int)Height);
+                break;
+        }
+    }
+
+    private void MenuFlyoutItem_Click_2(object sender, RoutedEventArgs e)
+    {
+        var item = sender as MenuFlyoutItem;
+        var tag = item.Tag as string;
+        var displayArea = CodeHelper.GetDisplayArea(App.MainWindowInstance);
+        switch (tag)
+        {
+            case "0":
+                this.Move(displayArea.WorkArea.Width - (int)Width, 0);
+                break;
+            case "1":
+                this.Move(displayArea.WorkArea.Width - (int)Width, displayArea.WorkArea.Height / 2 - (int)(Height / 2));
+                break;
+            case "2":
+                this.Move(displayArea.WorkArea.Width - (int)Width, displayArea.WorkArea.Height - (int)Height);
+                break;
+        }
+    }
+
+    private void MenuFlyoutItem_Click_3(object sender, RoutedEventArgs e)
+    {
+        var item = sender as MenuFlyoutItem;
+        var tag = item.Tag as string;
+        var displayArea = CodeHelper.GetDisplayArea(App.MainWindowInstance);
+        switch (tag)
+        {
+            case "0":
+                this.Move(0, AppWindow.Position.Y);
+                break;
+            case "1":
+                this.Move(displayArea.WorkArea.Width / 2 - (int)Width / 2, AppWindow.Position.Y);
+                break;
+            case "2":
+                this.Move(displayArea.WorkArea.Width - (int)Width, AppWindow.Position.Y);
+                break;
+        }
+    }
+
+    private void MenuFlyoutItem_Click_4(object sender, RoutedEventArgs e)
+    {
+        var item = sender as MenuFlyoutItem;
+        var tag = item.Tag as string;
+        var displayArea = CodeHelper.GetDisplayArea(App.MainWindowInstance);
+        switch (tag)
+        {
+            case "0":
+                this.Move(AppWindow.Position.X, 0);
+                break;
+            case "1":
+                this.Move(AppWindow.Position.X, displayArea.WorkArea.Height / 2 - (int)Height / 2);
+                break;
+            case "2":
+                this.Move(AppWindow.Position.X, displayArea.WorkArea.Height - (int)Height);
+                break;
+        }
+    }
+
+    private void SettingsButton_Click(object sender, RoutedEventArgs e)
+    {
+        App.MainWindowInstance.AppWindow.Show();
+        App.MainWindowInstance.SetForegroundWindow();
+        App.MainWindowInstance.SetNavViewContent(
+            typeof(SettingPage),
+            "open desktopLyric");
     }
 }

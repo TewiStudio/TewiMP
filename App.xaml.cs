@@ -207,7 +207,8 @@ public partial class App : Application
         int saveSettingsWhenSourceChangedCount = 0;
         AudioService.SourceChanged += async (AudioService) =>
         {
-            await SongHistoryHelper.AddHistory(new() { MusicData = AudioService.MusicData, Time = DateTime.Now });
+            AudioService.AudioThread.Invoke(async () => await SongHistoryHelper.AddHistory(new() { MusicData = AudioService.MusicData, Time = DateTime.Now })
+                );
             if (saveSettingsWhenSourceChangedCount > 4)
             {
                 saveSettingsWhenSourceChangedCount = 0;
@@ -404,7 +405,7 @@ public partial class App : Application
         if (!LoadLastExitPlayingSongAndSongList) return;
         //if (isOpeningMusicLoaded) return;
 
-        var path = Path.Combine(DataFolderBase.UserDataFolder, "LastPlaying");
+        var path = DataFolderBase.LastPlayedDataPath;
         if (!File.Exists(path)) return;
 
         MusicData musicData = null;
@@ -433,7 +434,7 @@ public partial class App : Application
     {
         if (AudioService.MusicData is null) return;
 
-        var path = Path.Combine(DataFolderBase.UserDataFolder, "LastPlaying");
+        var path = DataFolderBase.LastPlayedDataPath;
         if (!LoadLastExitPlayingSongAndSongList)
         {
             await Task.Run(() => File.Delete(path));
@@ -766,9 +767,6 @@ public class VersionData
 
 public static class DateConverter
 {
-    /// <summary>
-    /// 将毫秒级 Unix 时间戳转换为 DateTime (本地时间)
-    /// </summary>
     public static DateTime ToDateTimeFromMillisecondsUnix(this long timestamp)
     {
         // Unix 时间戳起点：1970-01-01 00:00:00 UTC
@@ -776,9 +774,6 @@ public static class DateConverter
         return dto.ToLocalTime().DateTime;
     }
 
-    /// <summary>
-    /// 将 DateTime 转换为毫秒级 Unix 时间戳
-    /// </summary>
     public static long ToUnixTimeMilliseconds(this DateTime dateTime)
     {
         return new DateTimeOffset(dateTime.ToUniversalTime()).ToUnixTimeMilliseconds();

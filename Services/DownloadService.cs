@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using TewiMP.UI.Pages;
-using TewiMP.Helpers;
 using TewiMP.Core;
 using TewiMP.Core.Music;
+using TewiMP.Helpers;
 using TewiMP.Services.Storage;
+using TewiMP.UI.Pages;
 
 namespace TewiMP.Services;
 
@@ -173,7 +173,7 @@ public class DownloadService
         var saveLyric = SaveLyricToLrcFile;
         try
         {
-            addressPath = await dm.MusicData.PluginInfo.GetMusicSourcePlugin().GetUrl(dm.MusicData.ID, (int)downloadQuality);
+            addressPath = await dm.MusicData.GetMusicSourcePlugin().GetUrl(dm.MusicData.ID, (int)downloadQuality);
         }
         catch
         {
@@ -217,7 +217,7 @@ public class DownloadService
         dm.DownloadState = DownloadStates.DownloadedPreview;
         OnDownloadedPreview?.Invoke(dm);
 
-        var lyric = await dm.MusicData.PluginInfo.GetMusicSourcePlugin().GetLyric(dm.MusicData.ID); // 下载歌词
+        var lyric = await dm.MusicData.GetMusicSourcePlugin().GetLyric(dm.MusicData.ID); // 下载歌词
         byte[] picDatas = null; // 图片数据
         try
         {
@@ -252,7 +252,7 @@ public class DownloadService
                         if (a.PicturePath is null)
                         {
                             result =
-                                (await dm.MusicData.PluginInfo.GetMusicSourcePlugin().GetArtist(a.ID)).PicturePath;
+                                (await dm.MusicData.GetMusicSourcePlugin().GetArtist(a.ID)).PicturePath;
                         }
                         var data = await WebHelper.Client.GetByteArrayAsync(result);
                         artistsPictureData.Add(new(a.Name, data));

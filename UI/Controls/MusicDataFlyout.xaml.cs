@@ -1,17 +1,17 @@
-using System;
-using System.IO;
+ï»¿using System;
 using System.Collections;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
-using Windows.Foundation;
 using Windows.ApplicationModel.DataTransfer;
-using TewiMP.Helpers;
+using Windows.Foundation;
 using TewiMP.UI.Pages;
 using TewiMP.UI.Windows;
 using TewiMP.Core.Music;
 using TewiMP.Core.Models;
+using TewiMP.Helpers;
 using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Controls
@@ -38,12 +38,12 @@ namespace TewiMP.UI.Controls
         void Init()
         {
             TitleTextblock.Text = songItemBind.MusicData.Title;
-            AlbumItem.Text = $"×¨¼­£º{songItemBind.MusicData.Album.Title}";
+            AlbumItem.Text = $"ä¸“è¾‘ï¼š{songItemBind.MusicData.Album.Title}";
         }
 
         void InitFlyout()
         {
-            if (songItemBind.MusicListData?.ListDataType == DataType.¸èµ¥ || songItemBind.MusicListData?.ListDataType == DataType.±¾µØ¸èµ¥)
+            if (songItemBind.MusicListData?.ListDataType == DataType.Playlist || songItemBind.MusicListData?.ListDataType == DataType.LocalPlaylist)
             {
                 DeleteFromPlaylistItem.Visibility = Visibility.Visible;
                 if (songItemBind.MusicData.From == MusicFrom.localMusic)
@@ -123,17 +123,17 @@ namespace TewiMP.UI.Controls
                     App.Instance.PlayingListService.SetNextPlay(App.Instance.AudioService.MusicData, songItemBind.MusicData);
                     break;
                 case "deleteFromPlaylist":
-                    if (songItemBind.MusicListData.ListDataType == DataType.±¾µØ¸èµ¥ || songItemBind.MusicListData.ListDataType == DataType.¸èµ¥)
+                    if (songItemBind.MusicListData.ListDataType == DataType.LocalPlaylist || songItemBind.MusicListData.ListDataType == DataType.Playlist)
                     {
                         await PlayListHelper.DeleteMusicDataFromPlayList(songItemBind.MusicListData.ListName, songItemBind.MusicData);
                         await App.Instance.PlayListReader.Refresh();
                     }
                     break;
                 case "deleteFile":
-                    var result = await App.MainWindowInstance.ShowDialog("É¾³ıÒôÆµÎÄ¼ş", $"È·¶¨ÒªÉ¾³ı \"{songItemBind.MusicData.Title}\" Âğ£¿´Ë²Ù×÷²»¿É»Ö¸´¡£", "È¡Ïû", "È·¶¨", null, ContentDialogButton.Close);
+                    var result = await App.MainWindowInstance.ShowDialog("åˆ é™¤éŸ³é¢‘æ–‡ä»¶", $"ç¡®å®šè¦åˆ é™¤ \"{songItemBind.MusicData.Title}\" å—ï¼Ÿæ­¤æ“ä½œä¸å¯æ¢å¤ã€‚", "å–æ¶ˆ", "ç¡®å®š", null, ContentDialogButton.Close);
                     if (result == ContentDialogResult.Primary)
                     {
-                        if (songItemBind.MusicListData.ListDataType == DataType.±¾µØ¸èµ¥ || songItemBind.MusicListData.ListDataType == DataType.¸èµ¥)
+                        if (songItemBind.MusicListData.ListDataType == DataType.LocalPlaylist || songItemBind.MusicListData.ListDataType == DataType.Playlist)
                         {
                             string deletePath = songItemBind.MusicData.InLocal;
                             await Task.Run(() => File.Delete(deletePath));
@@ -175,9 +175,9 @@ namespace TewiMP.UI.Controls
                     Clipboard.SetContent(dp);
                     break;
                 case "link":
-                    var link = await songItemBind.MusicData.PluginInfo.GetMusicSourcePlugin().GetUrl(songItemBind.MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
+                    var link = await songItemBind.MusicData.GetMusicSourcePlugin().GetUrl(songItemBind.MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
                     App.MainWindowInstance.HideDialog();
-                    await App.MainWindowInstance.ShowDialog("»ñÈ¡µ½µÄÁ´½ÓÊÇ£º", link);
+                    await App.MainWindowInstance.ShowDialog("è·å–åˆ°çš„é“¾æ¥æ˜¯ï¼š", link);
                     break;
                 case "exploreLocalFile":
                     await FileHelper.ExploreFile(songItemBind.MusicData.InLocal);
@@ -188,10 +188,10 @@ namespace TewiMP.UI.Controls
                 case "cache":
                     if (await App.Instance.CacheService.GetCachePath(songItemBind.MusicData) is not null)
                     {
-                        App.MainWindowInstance.AddNotify($"´Ë¸èÇúÒÑ»º´æ£¡", null, NotifySeverity.Warning);
+                        App.MainWindowInstance.AddNotify($"æ­¤æ­Œæ›²å·²ç¼“å­˜ï¼", null, NotifySeverity.Warning);
                         return;
                     }
-                    item = App.MainWindowInstance.AddNotify($"ÕıÔÚ»º´æ£º{songItemBind.MusicData.Title}", "¼ÓÔØÖĞ...", NotifySeverity.Loading, TimeSpan.MaxValue);
+                    item = App.MainWindowInstance.AddNotify($"æ­£åœ¨ç¼“å­˜ï¼š{songItemBind.MusicData.Title}", "åŠ è½½ä¸­...", NotifySeverity.Loading, TimeSpan.MaxValue);
                     App.Instance.CacheService.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
                     App.Instance.CacheService.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
                     App.Instance.CacheService.CachedMusicData -= CacheManager_CachedMusicData;
@@ -202,11 +202,11 @@ namespace TewiMP.UI.Controls
                     var path = await App.Instance.CacheService.GetCachePath(songItemBind.MusicData);
                     if (string.IsNullOrEmpty(path))
                     {
-                        App.MainWindowInstance.AddNotify("´Ë¸èÇúµÄ»º´æÎÄ¼ş²»´æÔÚ¡£", null, NotifySeverity.Error);
+                        App.MainWindowInstance.AddNotify("æ­¤æ­Œæ›²çš„ç¼“å­˜æ–‡ä»¶ä¸å­˜åœ¨ã€‚", null, NotifySeverity.Error);
                         return;
                     }
 
-                    var itema = App.MainWindowInstance.AddNotify($"ÕıÔÚÉ¾³ı£º{songItemBind.MusicData.Title}", null, NotifySeverity.Loading, TimeSpan.MaxValue);
+                    var itema = App.MainWindowInstance.AddNotify($"æ­£åœ¨åˆ é™¤ï¼š{songItemBind.MusicData.Title}", null, NotifySeverity.Loading, TimeSpan.MaxValue);
                     Exception err = null;
                     try
                     {
@@ -215,23 +215,23 @@ namespace TewiMP.UI.Controls
                     catch (Exception ex)
                     {
                         err = ex;
-                        itema.SetNotifyItemData("É¾³ıÊ§°Ü¡£", null, NotifySeverity.Error);
+                        itema.SetNotifyItemData("åˆ é™¤å¤±è´¥ã€‚", null, NotifySeverity.Error);
                     }
                     if (err is null)
                     {
-                        itema.SetNotifyItemData("É¾³ı³É¹¦¡£", null, NotifySeverity.Complete);
+                        itema.SetNotifyItemData("åˆ é™¤æˆåŠŸã€‚", null, NotifySeverity.Complete);
                     }
                     App.MainWindowInstance.NotifyCountDown(itema);
                     break;
                 case "info":
                     await App.MainWindowInstance.ShowDialog(
-                        $"{songItemBind.MusicData.Title} µÄÏêÏ¸ĞÅÏ¢£º",
-                        $"±êÌâ£º{songItemBind.MusicData.Title}\n" +
-                            $"ÒÕÊõ¼Ò&×¨¼­£º{songItemBind.MusicData.ButtonName}\n" +
-                            $"ID£º{songItemBind.MusicData.ID}\n" +
-                            $"À´Ô´£º{songItemBind.MusicData.From}" +
-                                $"{(songItemBind.MusicData.PluginInfo is not null ? $" {songItemBind.MusicData.PluginInfo.Name}" : "")}" +
-                            $"\nÍ¼Æ¬µØÖ·£º{songItemBind.MusicData.Album.PicturePath}");
+                        $"{songItemBind.MusicData.Title} çš„è¯¦ç»†ä¿¡æ¯ï¼š",
+                        $"æ ‡é¢˜ï¼š{songItemBind.MusicData.Title}\n" +
+                            $"è‰ºæœ¯å®¶&ä¸“è¾‘ï¼š{songItemBind.MusicData.ButtonName}\n" +
+                            $"IDï¼š{songItemBind.MusicData.ID}\n" +
+                            $"æ¥æºï¼š{songItemBind.MusicData.From}" +
+                                $"{(songItemBind.MusicData.GetMusicSourcePlugin() is not null ? $" {songItemBind.MusicData.GetMusicSourcePlugin().PluginInfo.Name}" : "")}" +
+                            $"\nå›¾ç‰‡åœ°å€ï¼š{songItemBind.MusicData.Album.PicturePath}");
                     break;
             }
         }
@@ -249,7 +249,7 @@ namespace TewiMP.UI.Controls
             if (musicData != songItemBind?.MusicData) return;
             App.Instance.CacheService.CachingStateChangeMusicData -= CacheManager_CachingStateChangeMusicData;
             App.Instance.CacheService.CachedMusicData -= CacheManager_CachedMusicData;
-            item.SetNotifyItemData(item.GetNotifyItemData().Title, "»º´æÍê³É¡£", NotifySeverity.Complete);
+            item.SetNotifyItemData(item.GetNotifyItemData().Title, "ç¼“å­˜å®Œæˆã€‚", NotifySeverity.Complete);
             App.MainWindowInstance.NotifyCountDown(item);
             item = null;
         }

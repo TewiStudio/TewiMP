@@ -48,7 +48,6 @@ public static class ImageService
         }
     }
 
-    // 用于任务去重：Key是文件唯一标识，Value是正在进行的任务
     private static readonly ConcurrentDictionary<string, Lazy<Task<Uri>>> _pendingTasks = new();
     private static readonly SemaphoreSlim _downloadSemaphore = new(5);
 
@@ -204,7 +203,7 @@ public static class ImageService
         if (musicListData is null) return null;
 
         string cachePath = CacheFileHelpers.GetImageCache(musicListData);
-        if (musicListData.ListDataType == DataType.本地歌单) return cachePath.ToImageUri();
+        if (musicListData.ListDataType == DataType.LocalPlaylist) return cachePath.ToImageUri();
         if (File.Exists(cachePath)) return cachePath.ToImageUri();
 
         if (await DownloadPicAsync(musicListData.PicturePath, cachePath))

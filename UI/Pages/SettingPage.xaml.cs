@@ -12,6 +12,7 @@ using TewiMP.UI.Windows;
 using TewiMP.Services.Storage;
 using TewiMP.Services;
 using CommunityToolkit.WinUI.Controls;
+using CommunityToolkit.WinUI;
 
 namespace TewiMP.UI.Pages
 {
@@ -34,15 +35,19 @@ namespace TewiMP.UI.Pages
 
         private async Task DelaySetParameter(string value)
         {
-            CommunityToolkit.WinUI.Controls.SettingsExpander expander = null;
+            SettingsExpander expander = null;
             switch (value)
             {
                 case "open download":
                     expander = DownloadEpd;
                     break;
+                case "open desktopLyric":
+                    expander = DesktopLyricEpd;
+                    break;
             }
             expander.IsExpanded = true;
-            ListViewBase.ScrollIntoView(expander);
+            await Task.Delay(500);
+            await ListViewBase.SmoothScrollIntoViewWithItemAsync(expander);
         }
 
         public async void ToAudioCachePlaceSize()

@@ -62,15 +62,16 @@ public class CacheService
             throw new WebException("网络未连接，请连接网络后重试。");
         }
 
-        if (data.PluginInfo.GetMusicSourcePlugin(false) is null)
+        var plugin = data.GetMusicSourcePlugin(false);
+        if (plugin is null)
         {
             InCachingMusicData.Remove(data);
-            CachedMusicData?.Invoke(data, $"未找到此音乐源插件：{data.PluginInfo.NameAndAuthor} ({data.PluginInfo.Version})。");
-            throw new PluginNotFoundException($"未找到此音乐源插件：{data.PluginInfo.NameAndAuthor} ({data.PluginInfo.Version})。");
+            CachedMusicData?.Invoke(data, $"未找到此音乐源插件：{plugin.PluginInfo.NameAndAuthor} ({plugin.PluginInfo.Version})。");
+            throw new PluginNotFoundException($"未找到此音乐源插件：{plugin.PluginInfo.NameAndAuthor} ({plugin.PluginInfo.Version})。");
         }
 
         InCachingMusicData.Add(data);
-        string musicWebAddress = await data.PluginInfo.GetMusicSourcePlugin().GetUrl(data.ID, 960);
+        string musicWebAddress = await plugin.GetUrl(data.ID, 960);
         if (musicWebAddress is null)
         {
             InCachingMusicData.Remove(data);
@@ -79,7 +80,7 @@ public class CacheService
         }
 
         LogService.Log(nameof(CacheService), "正在下载缓存文件...");
-        musicPathResult = @$"{DataFolderBase.AudioCacheFolder}\{data.PluginInfo}{data.ID}";
+        musicPathResult = @$"{DataFolderBase.AudioCacheFolder}\{data.PluginInfoGUID}{data.ID}";
         await Task.Run(() => File.Create(musicPathResult).Close()); // 创建缓存文件
 
         try

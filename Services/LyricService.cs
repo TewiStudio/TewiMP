@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml;
+using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using Microsoft.UI.Xaml;
+using TewiMP.Core;
+using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
-using TewiMP.Core;
-using TewiMP.Core.Music;
 
 namespace TewiMP.Services;
 
@@ -138,7 +138,7 @@ public class LyricService
             Tuple<string, string> lyricTuple;
             if (musicData.From == MusicFrom.pluginMusicSource)
             {
-                lyricTuple = await musicData.PluginInfo.GetMusicSourcePlugin().GetLyric(musicData.ID);
+                lyricTuple = await musicData.GetMusicSourcePlugin().GetLyric(musicData.ID);
             }
             else
             {
@@ -151,7 +151,7 @@ public class LyricService
             }
             else
             {
-                string path = Path.Combine(DataFolderBase.LyricCacheFolder, $"{musicData.PluginInfo}{musicData.ID}");
+                string path = Path.Combine(DataFolderBase.LyricCacheFolder, $"{musicData.PluginInfoGUID}{musicData.ID}");
                 await Task.Run(() =>
                 {
                     if (!File.Exists(path))

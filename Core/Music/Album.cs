@@ -16,7 +16,7 @@ public record class Album : IIsListPage
     public DateTime ReleaseTime { get; set; }
     public int Count { get; set; }
     public MusicFrom From { get; set; }
-    public PluginInfo PluginInfo { get; set; }
+    public string PluginInfoGUID { get; set; }
     public List<Artist> Artists { get; set; }
     public MusicListData Songs { get; set; }
 
@@ -42,6 +42,16 @@ public record class Album : IIsListPage
         PicturePath = picturePath;
         Describe = describee;
         Songs = songs;
+    }
+
+    private MusicSourcePlugin _plugin = null;
+    public MusicSourcePlugin GetMusicSourcePlugin()
+    {
+        if (_plugin != null) return _plugin;
+        if (string.IsNullOrEmpty(PluginInfoGUID)) return null;
+
+        _plugin = PluginInfoGUID.GetMusicSourcePlugin();
+        return _plugin;
     }
 
     public bool IsNull()

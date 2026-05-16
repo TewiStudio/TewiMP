@@ -10,7 +10,7 @@ public class MusicListData : OnlyClass, IIsListPage
     public string ListShowName { get; set; }
     public string PicturePath { get; set; }
     public MusicFrom ListFrom { get; set; }
-    public PluginInfo PluginInfo { get; set; }
+    public string PluginInfoGUID { get; set; }
     public DataType ListDataType { get; set; }
     public string ID { get; set; }
     public PlaySort PlaySort { get; set; }
@@ -28,6 +28,16 @@ public class MusicListData : OnlyClass, IIsListPage
         this.ID = ID;
         this.Songs = songs is null ? new() : songs;
         ListDataType = listDataType;
+    }
+
+    private MusicSourcePlugin _plugin = null;
+    public MusicSourcePlugin GetMusicSourcePlugin()
+    {
+        if (_plugin != null) return _plugin;
+        if (string.IsNullOrEmpty(PluginInfoGUID)) return null;
+
+        _plugin = PluginInfoGUID.GetMusicSourcePlugin();
+        return _plugin;
     }
 
     public override string GetMD5()

@@ -11,13 +11,11 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Composition;
 using CommunityToolkit.WinUI;
-using TewiMP.Helpers;
 using TewiMP.UI.Controls;
 using TewiMP.UI.Windows;
 using TewiMP.UI.Pages.ListViewPages;
 using TewiMP.Core.Music;
 using TewiMP.Core.Models;
-using TewiMP.Services.Media;
 using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Pages
@@ -79,7 +77,7 @@ namespace TewiMP.UI.Pages
             SelectReverseButton.Visibility = Visibility.Collapsed;
             SelectAllButton.Visibility = Visibility.Collapsed;
             LoadingTipControl.ShowLoading();
-            var obj = await NavToObj.PluginInfo.GetMusicSourcePlugin().GetArtist(NavToObj.ID);
+            var obj = await NavToObj.GetMusicSourcePlugin().GetArtist(NavToObj.ID);
             if (obj is null)
             {
                 App.MainWindowInstance.AddNotify("加载艺术家信息时出现错误", "无法加载艺术家信息，请重试。", NotifySeverity.Error);

@@ -12,7 +12,8 @@ public class Main : Plugin
     {
         Name = "BuildIn Plugin Sample",
         Author = "TewiStudio",
-        Version = "justTest",
+        Version = "Test",
+        GUID = "tewi.buildin.sample"
     };
 
     // 自定义插件设置，键值对形式存储，会自动保存和加载，会显示在插件设置界面

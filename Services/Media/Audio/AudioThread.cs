@@ -28,10 +28,8 @@ public class AudioThread : IDisposable
         _thread.Start();
     }
 
-    // 线程的主循环
     private void ThreadLoop()
     {
-        // 设置线程为音频优先级
         uint taskIndex;
         IntPtr handle = AvSetMmThreadCharacteristics("Audio", out taskIndex);
 
@@ -42,7 +40,6 @@ public class AudioThread : IDisposable
 
         try
         {
-            // GetConsumingEnumerable 会阻塞等待，直到有新任务进来
             foreach (var action in _actionQueue.GetConsumingEnumerable(_cts.Token))
             {
                 try
@@ -51,22 +48,17 @@ public class AudioThread : IDisposable
                 }
                 catch (Exception ex)
                 {
-                    // 这里记录日志，不要让音频线程崩溃
                     LogService.Error("AudioThread", $"Audio Thread Error: {ex}");
                 }
             }
         }
         catch (OperationCanceledException)
         {
-            // 线程被取消，正常退出
             LogService.Info("AudioThread", "Audio thread canceled.");
             AvRevertMmThreadCharacteristics(handle);
         }
     }
 
-    /// <summary>
-    /// 将操作发送到音频线程执行
-    /// </summary>
     public void Invoke(Action action)
     {
         if (!_cts.IsCancellationRequested)
@@ -75,9 +67,6 @@ public class AudioThread : IDisposable
         }
     }
 
-    /// <summary>
-    /// 异步等待操作在音频线程完成 (可选)
-    /// </summary>
     public Task InvokeAsync(Action action)
     {
         var tcs = new TaskCompletionSource();

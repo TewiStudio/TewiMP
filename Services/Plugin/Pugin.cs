@@ -10,13 +10,10 @@ namespace TewiMP.Services.Plugin;
 /// <summary>
 /// 插件基类。继承此类可被插件系统识别为插件。
 /// </summary>
-public abstract class Plugin
+public abstract class Plugin : IPlugin
 {
     [JsonIgnore] public bool IsEnable { get; private set; } = false;
 
-    /// <summary>
-    /// 设置插件信息。
-    /// </summary>
     public abstract PluginInfo PluginInfo { get; }
 
     /// <summary>

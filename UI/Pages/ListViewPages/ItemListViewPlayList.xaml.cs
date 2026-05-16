@@ -329,13 +329,13 @@ namespace TewiMP.UI.Pages
         {
             if (NavToObj is null || IsNavigatedOutFromPage) return;
             PlayList_Image.BorderThickness = new(0);
-            if (NavToObj.ListDataType == DataType.本地歌单)
+            if (NavToObj.ListDataType == DataType.LocalPlaylist)
             {
                 bool isExists = true;
                 await Task.Run(() => { isExists = File.Exists(NavToObj.PicturePath); });
                 if (isExists) PlayList_Image.Source = NavToObj.PicturePath.ToImageUri();
             }
-            else if (NavToObj.ListDataType == DataType.歌单)
+            else if (NavToObj.ListDataType == DataType.Playlist)
             {
                 PlayList_Image.Source = await ImageService.GetImageUri(NavToObj);
             }

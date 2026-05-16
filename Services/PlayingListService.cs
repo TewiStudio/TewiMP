@@ -477,11 +477,8 @@ public class PlayingListService
         {
             try
             {
-                // 异步提取颜色
                 var themeColor = await CodeHelper.GetThemeColorAsync(nowImagePath);
 
-                // 并发保护：await 回来后，检查当前播放图片是否已经又变了
-                // 如果变了，说明这次计算已经过时，直接丢弃
                 if (nowImagePath != NowPlayingImagePath)
                 {
                     LogService.Info(nameof(PlayingListService), "图片路径已变更，放弃应用旧的颜色计算结果。");
@@ -497,7 +494,7 @@ public class PlayingListService
             catch (Exception ex)
             {
                 LogService.Error(nameof(PlayingListService), $"提取颜色失败，回退到默认颜色: {ex.Message}");
-                // 发生异常时的回退逻辑
+
                 var systemAccent = (Windows.UI.Color)App.Current.Resources["SystemAccentColor"];
                 albumColor = systemAccent;
                 albumColorReverse = systemAccent;

@@ -9,7 +9,9 @@
     xmlns:controls="using:TewiMP.UI.Controls"
     mc:Ignorable="d" SizeChanged="Window_SizeChanged" Closed="DesktopLyricWindow_Closed"
     xmlns:ui="using:CommunityToolkit.WinUI"
-    xmlns:media="using:CommunityToolkit.WinUI.Media">
+    xmlns:media="using:CommunityToolkit.WinUI.Media"
+    xmlns:cc="using:CommunityToolkit.WinUI.Controls"
+    xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals">
     <Grid x:Name="root" SizeChanged="root_SizeChanged" Loaded="root_Loaded"
           Padding="0" Background="Transparent">
         <Grid.Resources>
@@ -70,87 +72,7 @@
                 </Viewbox>
             </Grid>
         </Grid>
-        <Border x:Name="InfoTBBorder"
-                HorizontalAlignment="Center" VerticalAlignment="Bottom" Opacity="0"
-                CornerRadius="4" BorderThickness="1" Background="{ThemeResource ControlOnImageFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}">
-            <Border.OpacityTransition>
-                <ScalarTransition/>
-            </Border.OpacityTransition>
-            <TextBlock Text="正在播放：" x:Name="InfoTB"
-                   TextAlignment="Center" TextTrimming="CharacterEllipsis"
-                   FontWeight="Light" Margin="4,1">
-            </TextBlock>
-        </Border>
-        <Grid CornerRadius="8" BorderThickness="1"
-              HorizontalAlignment="Center" VerticalAlignment="Center"
-              Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
-              BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-              x:Name="InfoBorder" Opacity="0">
-            <Grid.OpacityTransition>
-                <ScalarTransition/>
-            </Grid.OpacityTransition>
-            <!--<SystemBackdropHost CornerRadius="8">
-                <SystemBackdropHost.SystemBackdrop>
-                    <DesktopAcrylicBackdrop/>
-                </SystemBackdropHost.SystemBackdrop>
-            </SystemBackdropHost>-->
-            <Grid Padding="20">
-                <controls:MediaPlayStateViewer x:Name="PlayStateElement" PlaybackState="Playing" Width="20" Height="20" />
-            </Grid>
-        </Grid>
-        <Grid x:Name="progressRoot" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinWidth="200" Margin="0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock x:Name="progressPresent" Width="32" FontSize="13" Text="0%" HorizontalAlignment="Center" Margin="0,0,4,0" Foreground="Silver" Opacity="0.8"/>
-            <ProgressBar x:Name="progressBase" Grid.Column="1" Background="{ThemeResource SystemAccentColorDark2}"/>
-            <Rectangle Fill="{ThemeResource SystemAccentColorLight2}" Grid.Column="1" Width="4" Height="3" RadiusX="3" RadiusY="3" VerticalAlignment="Center" HorizontalAlignment="Right"/>
-        </Grid>
-        <Grid x:Name="ToolButtonsBase"
-              VerticalAlignment="Top"
-              HorizontalAlignment="Left"
-              PointerEntered="ToolButtonsBase_PointerEntered"
-              PointerExited="ToolButtonsBase_PointerExited">
-            <!--<SystemBackdropHost CornerRadius="0,8,8,8">
-                <SystemBackdropHost.SystemBackdrop>
-                    <DesktopAcrylicBackdrop/>
-                </SystemBackdropHost.SystemBackdrop>
-            </SystemBackdropHost>-->
-            <StackPanel Margin="0,0,0,0"
-                        x:Name="ToolButtonsStackPanel"
-                        VerticalAlignment="Top"
-                        HorizontalAlignment="Left"
-                        Orientation="Horizontal"
-                        Opacity="0.7">
-                <StackPanel.Resources>
-                    <Style TargetType="FontIcon">
-                        <Setter Property="FontSize" Value="16"/>
-                    </Style>
-                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                    </Style>
-                </StackPanel.Resources>
-                <Button CornerRadius="0,0,4,0"
-                        x:Name="LockButton" Click="LockButton_Click" Width="50" Height="34" ToolTipService.ToolTip="锁定">
-                    <FontIcon Glyph="&#xE72E;"/>
-                </Button>
-                <Button CornerRadius="0,0,4,4"
-                        x:Name="ResizeButton" Click="ResizeButton_Click" Width="50" Height="34" ToolTipService.ToolTip="恢复窗口大小到默认">
-                    <FontIcon Glyph="&#xE61F;"/>
-                </Button>
-                <Button CornerRadius="0,0,4,0" Visibility="Collapsed"
-                        x:Name="MusicControlButton" Click="MusicControlButton_Click" Width="50" Height="34" ToolTipService.ToolTip="">
-                    <FontIcon Glyph="&#xEA69;"/>
-                </Button>
-            </StackPanel>
-            <FontIcon HorizontalAlignment="Left" VerticalAlignment="Top"
-                      Glyph="&#xE788;" FontSize="16"
-                      ui:VisualExtensions.RotationAngleInDegrees="180"
-                      Margin="19,20,0,0" Opacity="0.8"
-                      IsHitTestVisible="False"/>
-        </Grid>
+
         <Grid x:Name="TRBaseParent"
               HorizontalAlignment="Center">
             <Grid.Transitions>
@@ -176,8 +98,8 @@
                 RequestedTheme="Dark"
                 Visibility="Collapsed"
                 Orientation="Horizontal"
-                Spacing="2" Margin="0,0,0,4"
-                VerticalAlignment="Bottom"
+                Spacing="2" Margin="0,8,0,4"
+                VerticalAlignment="Top"
                 HorizontalAlignment="Center">
                 <StackPanel.Resources>
                     <Style TargetType="Rectangle">
@@ -197,6 +119,183 @@
                 <Rectangle x:Name="LyricIntervalCircle5"/>
             </StackPanel>
         </Grid>
+
+        <Grid x:Name="InfoTBBorder"
+                HorizontalAlignment="Center" VerticalAlignment="Bottom" Opacity="0"
+                CornerRadius="4" BorderThickness="1" Background="{ThemeResource ControlOnImageFillColorDefaultBrush}" BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+            <Grid.OpacityTransition>
+                <ScalarTransition/>
+            </Grid.OpacityTransition>
+            <!--<SystemBackdropElement CornerRadius="4">
+                <SystemBackdropElement.SystemBackdrop>
+                    <DesktopAcrylicBackdrop/>
+                </SystemBackdropElement.SystemBackdrop>
+            </SystemBackdropElement>-->
+            <TextBlock Text="正在播放：" x:Name="InfoTB"
+                   TextAlignment="Center" TextTrimming="CharacterEllipsis"
+                   FontWeight="Light" Margin="4,1">
+            </TextBlock>
+        </Grid>
+
+        <Grid CornerRadius="8" BorderThickness="1"
+              HorizontalAlignment="Center" VerticalAlignment="Center"
+              Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource ControlElevationBorderBrush}"
+              x:Name="InfoBorder" Opacity="0">
+            <Grid.OpacityTransition>
+                <ScalarTransition/>
+            </Grid.OpacityTransition>
+            <!--<SystemBackdropElement CornerRadius="8">
+                <SystemBackdropElement.SystemBackdrop>
+                    <DesktopAcrylicBackdrop/>
+                </SystemBackdropElement.SystemBackdrop>
+            </SystemBackdropElement>-->
+            <Grid Padding="20">
+                <controls:MediaPlayStateViewer x:Name="PlayStateElement" PlaybackState="Playing" Width="20" Height="20" />
+            </Grid>
+        </Grid>
+        <Grid x:Name="progressRoot" VerticalAlignment="Bottom" HorizontalAlignment="Center" MinWidth="200" Margin="0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="progressPresent" Width="32" FontSize="13" Text="0%" HorizontalAlignment="Center" Margin="0,0,4,0" Foreground="Silver" Opacity="0.8"/>
+            <ProgressBar x:Name="progressBase" Grid.Column="1" Background="{ThemeResource SystemAccentColorDark2}"/>
+            <Rectangle Fill="{ThemeResource SystemAccentColorLight2}" Grid.Column="1" Width="4" Height="3" RadiusX="3" RadiusY="3" VerticalAlignment="Center" HorizontalAlignment="Right"/>
+        </Grid>
+        <Grid x:Name="ToolButtonsBase"
+              Opacity="{Binding ElementName=BackgroundFill, Path=Opacity}"
+              VerticalAlignment="Top"
+              HorizontalAlignment="Left"
+              PointerEntered="ToolButtonsBase_PointerEntered"
+              PointerExited="ToolButtonsBase_PointerExited"
+              CornerRadius="0,0,4,0"
+              BorderThickness="0,0,1,1"
+              BorderBrush="{ThemeResource SurfaceStrokeColorDefaultBrush}">
+            <Grid.OpacityTransition>
+                <ScalarTransition/>
+            </Grid.OpacityTransition>
+            <SystemBackdropElement CornerRadius="0,0,4,0">
+                <SystemBackdropElement.SystemBackdrop>
+                    <DesktopAcrylicBackdrop/>
+                </SystemBackdropElement.SystemBackdrop>
+            </SystemBackdropElement>
+            <StackPanel Margin="0,0,0,0"
+                        x:Name="ToolButtonsStackPanel"
+                        VerticalAlignment="Top"
+                        HorizontalAlignment="Left"
+                        Orientation="Horizontal"
+                        Opacity="0.7">
+                <StackPanel.Resources>
+                    <Style TargetType="FontIcon">
+                        <Setter Property="FontSize" Value="16"/>
+                    </Style>
+                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                </StackPanel.Resources>
+                <Button CornerRadius="0"
+                        x:Name="LockButton" Click="LockButton_Click" Width="50" Height="34" ToolTipService.ToolTip="锁定">
+                    <FontIcon Glyph="&#xE72E;"/>
+                </Button>
+                <Button CornerRadius="0"
+                        x:Name="ResizeButton" Width="50" Height="34" ToolTipService.ToolTip="移动窗口">
+                    <Button.Flyout>
+                        <MenuFlyout>
+                            <MenuFlyoutSubItem Text="水平">
+                                <MenuFlyoutItem Text="靠左" Tag="0" Click="MenuFlyoutItem_Click_3"/>
+                                <MenuFlyoutItem Text="居中" Tag="1" Click="MenuFlyoutItem_Click_3"/>
+                                <MenuFlyoutItem Text="靠右" Tag="2" Click="MenuFlyoutItem_Click_3"/>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutSubItem Text="垂直">
+                                <MenuFlyoutItem Text="靠上" Tag="0" Click="MenuFlyoutItem_Click_4"/>
+                                <MenuFlyoutItem Text="居中" Tag="1" Click="MenuFlyoutItem_Click_4"/>
+                                <MenuFlyoutItem Text="靠下" Tag="2" Click="MenuFlyoutItem_Click_4"/>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutSubItem Text="移动到屏幕锚点">
+                                <MenuFlyoutSubItem Text="左侧">
+                                    <MenuFlyoutItem Text="上" Tag="0" Click="MenuFlyoutItem_Click"/>
+                                    <MenuFlyoutItem Text="中" Tag="1" Click="MenuFlyoutItem_Click"/>
+                                    <MenuFlyoutItem Text="下" Tag="2" Click="MenuFlyoutItem_Click"/>
+                                </MenuFlyoutSubItem>
+                                <MenuFlyoutSubItem Text="居中">
+                                    <MenuFlyoutItem Text="上" Tag="0" Click="MenuFlyoutItem_Click_1"/>
+                                    <MenuFlyoutItem Text="中" Tag="1" Click="MenuFlyoutItem_Click_1"/>
+                                    <MenuFlyoutItem Text="下" Tag="2" Click="MenuFlyoutItem_Click_1"/>
+                                </MenuFlyoutSubItem>
+                                <MenuFlyoutSubItem Text="右侧">
+                                    <MenuFlyoutItem Text="上" Tag="0" Click="MenuFlyoutItem_Click_2"/>
+                                    <MenuFlyoutItem Text="中" Tag="1" Click="MenuFlyoutItem_Click_2"/>
+                                    <MenuFlyoutItem Text="下" Tag="2" Click="MenuFlyoutItem_Click_2"/>
+                                </MenuFlyoutSubItem>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutItem Icon="{ui:FontIcon Glyph=&#xE72C;}" Click="ResizeButton_Click" Text="恢复默认大小"/>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                    <FontIcon Glyph="&#xE7C2;"/>
+                </Button>
+                <Button CornerRadius="0,0,4,0"
+                        x:Name="SettingsButton" Width="50" Height="34"
+                        ToolTipService.ToolTip="设置"
+                        Click="SettingsButton_Click">
+                    <!--
+                    <Button.Flyout>
+                        <Flyout ShouldConstrainToRootBounds="False">
+                            <Flyout.FlyoutPresenterStyle>
+                                <Style TargetType="FlyoutPresenter">
+                                    <Setter Property="ScrollViewer.VerticalScrollMode" Value="Disabled" />
+                                    <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
+                                    <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
+                                    <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+                                    <Setter Property="CornerRadius" Value="8"/>
+                                    <Setter Property="Background" Value="{ThemeResource SurfaceStrokeColorFlyoutBrush}"/>
+                                    <Setter Property="BorderBrush" Value="{ThemeResource SurfaceStrokeColorFlyoutBrush}"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Setter Property="MaxHeight" Value="800"/>
+                                    <Setter Property="Padding" Value="0"/>
+                                </Style>
+                            </Flyout.FlyoutPresenterStyle>
+                            <Grid>
+                                <SystemBackdropElement CornerRadius="8">
+                                    <SystemBackdropElement.SystemBackdrop>
+                                        <DesktopAcrylicBackdrop/>
+                                    </SystemBackdropElement.SystemBackdrop>
+                                </SystemBackdropElement>
+                                <ScrollView Margin="16">
+                                    <ScrollView.Resources>
+                                        <Style TargetType="Slider" BasedOn="{StaticResource DefaultSliderStyle}">
+                                            <Setter Property="MinWidth" Value="200"/>
+                                            <Setter Property="Margin" Value="2"/>
+                                        </Style>
+                                    </ScrollView.Resources>
+                                    <StackPanel Spacing="4">
+                                        <Slider Header="不透明度"/>
+                                        <ComboBox Header="单句歌词位置"/>
+                                        <ComboBox Header="多段歌词位置"/>
+                                    </StackPanel>
+                                </ScrollView>
+                            </Grid>
+                        </Flyout>
+                    </Button.Flyout>
+                    -->
+                    <AnimatedIcon Margin="2">
+                        <m:AnimatedSettingsVisualSource/>
+                    </AnimatedIcon>
+                </Button>
+                <Button CornerRadius="0,0,4,0" Visibility="Collapsed"
+                        x:Name="MusicControlButton" Click="MusicControlButton_Click" Width="50" Height="34" ToolTipService.ToolTip="">
+                    <FontIcon Glyph="&#xEA69;"/>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <FontIcon HorizontalAlignment="Left" VerticalAlignment="Top"
+                      Glyph="&#xE788;" FontSize="16"
+                      ui:VisualExtensions.RotationAngleInDegrees="180"
+                      Margin="19,20,0,0" Opacity="0.8"
+                      IsHitTestVisible="False" Visibility="{Binding ElementName=ToolButtonsBase,Path=Visibility}"/>
+
         <Popup x:Name="MusicControlPopup" ShouldConstrainToRootBounds="False"
                VerticalOffset="-40" Opened="MusicControlPopup_Opened" Closed="MusicControlPopup_Closed">
             <Popup.Transitions>
@@ -204,9 +303,6 @@
                     <PopupThemeTransition/>
                 </TransitionCollection>
             </Popup.Transitions>
-            <Popup.SystemBackdrop>
-                <DesktopAcrylicBackdrop/>
-            </Popup.SystemBackdrop>
             <Grid Background="Transparent"
                   BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                   BorderThickness="1"

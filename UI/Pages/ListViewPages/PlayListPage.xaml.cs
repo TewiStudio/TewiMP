@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +22,7 @@ using TewiMP.Core.Models;
 using TewiMP.Helpers;
 using TewiMP.Services;
 using TewiMP.Services.Media;
+using TewiMP.Services.Plugin;
 using TewiMP.Services.Storage;
 
 namespace TewiMP.UI.Pages.ListViewPages
@@ -67,10 +68,10 @@ namespace TewiMP.UI.Pages.ListViewPages
             //arrayList = new ArrayList(100000000);
         }
 
-        // Items ¸üĞÂÊ± CommandBar ¿í¶È²»»á¸üĞÂ >:(
+        // Items æ›´æ–°æ—¶ CommandBar å®½åº¦ä¸ä¼šæ›´æ–° >:(
         async void UpdateCommandBarWidth()
         {
-            // ´´¿ÉÌùĞ´·¨ :(
+            // åˆ›å¯è´´å†™æ³• :(
             ItemsList_Header_Info_CommandBar.Width = 0;
             await Task.Delay(50);
             InitShyHeader();
@@ -121,7 +122,7 @@ namespace TewiMP.UI.Pages.ListViewPages
                     element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
                 }
             }
-            moveButton.Label = isChecked ? "Íê³ÉÅÅĞò" : "ÅÅĞò";
+            moveButton.Label = isChecked ? "å®Œæˆæ’åº" : "æ’åº";
             ItemsList.AllowDrop = isChecked;
             ItemsList.CanDragItems = isChecked;
             ItemsList.CanReorderItems = isChecked;
@@ -133,7 +134,7 @@ namespace TewiMP.UI.Pages.ListViewPages
         async void MoveItemSave()
         {
             ItemsList_Header_Info_CommandBar.IsEnabled = false;
-            var item = App.MainWindowInstance.AddNotify("ÕıÔÚ±£´æÅÅĞò...", null, NotifySeverity.Loading, TimeSpan.MaxValue);
+            var item = App.MainWindowInstance.AddNotify("æ­£åœ¨ä¿å­˜æ’åº...", null, NotifySeverity.Loading, TimeSpan.MaxValue);
             var data = await PlayListHelper.ReadData();
             musicListData.Songs.Clear();
             foreach (var i in musicListBind)
@@ -145,7 +146,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             await App.Instance.PlayListReader.Refresh();
             InitInfo();
             InitBindings();
-            item.SetNotifyItemData("±£´æÅÅĞòÍê³É¡£", null, NotifySeverity.Complete);
+            item.SetNotifyItemData("ä¿å­˜æ’åºå®Œæˆã€‚", null, NotifySeverity.Complete);
             App.MainWindowInstance.NotifyCountDown(item);
             ItemsList_Header_Info_CommandBar.IsEnabled = true;
             UpdateCommandBarWidth();
@@ -169,11 +170,11 @@ namespace TewiMP.UI.Pages.ListViewPages
         {
             if (ItemsList.SelectedItems.Any())
             {
-                var result = await App.MainWindowInstance.ShowDialog("ÒÆ³ı¸èÇú", $"ÕæµÄÒª´Ó²¥·ÅÁĞ±íÖĞÒÆ³ıÕâ{ItemsList.SelectedItems.Count}Ê×¸èÇúÂğ£¿", "È¡Ïû", "È·¶¨", defaultButton: ContentDialogButton.Close);
+                var result = await App.MainWindowInstance.ShowDialog("ç§»é™¤æ­Œæ›²", $"çœŸçš„è¦ä»æ’­æ”¾åˆ—è¡¨ä¸­ç§»é™¤è¿™{ItemsList.SelectedItems.Count}é¦–æ­Œæ›²å—ï¼Ÿ", "å–æ¶ˆ", "ç¡®å®š", defaultButton: ContentDialogButton.Close);
                 if (result == ContentDialogResult.Primary)
                 {
                     ItemsList_Header_Info_CommandBar.IsEnabled = false;
-                    var item = App.MainWindowInstance.AddNotify("É¾³ı¸èÇú", "ÕıÔÚ×¼±¸É¾³ı¸èÇú...", NotifySeverity.Loading, TimeSpan.MaxValue);
+                    var item = App.MainWindowInstance.AddNotify("åˆ é™¤æ­Œæ›²", "æ­£åœ¨å‡†å¤‡åˆ é™¤æ­Œæ›²...", NotifySeverity.Loading, TimeSpan.MaxValue);
                     var jdata = await PlayListHelper.ReadData();
                     int num = 0;
                     string listName = musicListData.ListName;
@@ -181,18 +182,18 @@ namespace TewiMP.UI.Pages.ListViewPages
                     {
                         num++;
                         item.HorizontalAlignment = HorizontalAlignment.Stretch;
-                        item.SetNotifyItemData("É¾³ı¸èÇú", $"½ø¶È£º{Math.Round(((decimal)num / ItemsList.SelectedItems.Count) * 100, 1)}%\nÕıÔÚÉ¾³ı£º{data.MusicData.Title} - {data.MusicData.ButtonName}", NotifySeverity.Loading);
+                        item.SetNotifyItemData("åˆ é™¤æ­Œæ›²", $"è¿›åº¦ï¼š{Math.Round(((decimal)num / ItemsList.SelectedItems.Count) * 100, 1)}%\næ­£åœ¨åˆ é™¤ï¼š{data.MusicData.Title} - {data.MusicData.ButtonName}", NotifySeverity.Loading);
                         item.SetProcess(ItemsList.SelectedItems.Count, num);
                         musicListData.Songs.Remove(data.MusicData);
                     }
                     jdata[musicListData.ListName] = JObject.FromObject(musicListData);
 
                     item.HorizontalAlignment = HorizontalAlignment.Center;
-                    item.SetNotifyItemData("É¾³ı¸èÇú", "ÕıÔÚ±£´æ...", NotifySeverity.Loading);
+                    item.SetNotifyItemData("åˆ é™¤æ­Œæ›²", "æ­£åœ¨ä¿å­˜...", NotifySeverity.Loading);
                     item.SetProcess(0, 0);
                     await PlayListHelper.SaveData(jdata);
                     await App.Instance.PlayListReader.Refresh();
-                    item.SetNotifyItemData("É¾³ı¸èÇú", "É¾³ı¸èÇú³É¹¦¡£", NotifySeverity.Complete);
+                    item.SetNotifyItemData("åˆ é™¤æ­Œæ›²", "åˆ é™¤æ­Œæ›²æˆåŠŸã€‚", NotifySeverity.Complete);
                     App.MainWindowInstance.NotifyCountDown(item);
                     ItemsList_Header_Info_CommandBar.IsEnabled = true;
                     InitInfo();
@@ -224,7 +225,7 @@ namespace TewiMP.UI.Pages.ListViewPages
 
         async void AddLocalFilesDo()
         {
-            await App.MainWindowInstance.ShowDialog("Ìí¼Ó±¾µØÎÄ¼ş", new DialogPages.AddFilesToMusicListDataPage() { musicListData = this.musicListData });
+            await App.MainWindowInstance.ShowDialog("æ·»åŠ æœ¬åœ°æ–‡ä»¶", new DialogPages.AddFilesToMusicListDataPage() { musicListData = this.musicListData });
         }
 
         CompositionPropertySet scrollerPropertySet;
@@ -244,7 +245,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             MultiSelectDo(false);
             MoveItemDo(false);
 
-            // ÉèÖÃ header Îª¶¥²ã
+            // è®¾ç½® header ä¸ºé¡¶å±‚
             var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ItemsList.Header);
             var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
             Canvas.SetZIndex(headerContainer, 1);
@@ -296,14 +297,14 @@ namespace TewiMP.UI.Pages.ListViewPages
             float anotherHeight = 154f;
             float imageSizeEnd = 0.45f;
 
-            // »ñÈ¡µ±Ç°¿Ø¼şµÄ³ß´ç
+            // è·å–å½“å‰æ§ä»¶çš„å°ºå¯¸
             float imgRootWidth = (float)ItemsList_Header_Image_Root.ActualWidth;
             float headerRootWidth = (float)ItemsList_Header_Root.ActualWidth;
             float headerRootHeight = (float)ItemsList_Header_Root.ActualHeight;
             float visualH = headerFootRootVisual.Size.Y;
             float actualH = (float)ActualHeight;
 
-            // ¼ÆËã Width Âß¼­
+            // è®¡ç®— Width é€»è¾‘
             if (headerRootWidth != 0)
             {
                 float currentScaleX = imageVisual.Scale.X;
@@ -311,23 +312,23 @@ namespace TewiMP.UI.Pages.ListViewPages
                 ItemsList_Header_Info_Root_SizeChanger.Width = calculatedWidth <= 0 ? 0 : calculatedWidth;
             }
 
-            // Logo Scale ¶¯»­
+            // Logo Scale åŠ¨ç”»
             if (_logoScaleAnim is null)
             {
                 string exp = $"Lerp(Vector2(1, 1), Vector2(TargetScale, TargetScale), {ProgressExp})";
                 _logoScaleAnim = compositor.CreateExpressionAnimation(exp);
                 _logoScaleAnim.SetReferenceParameter("scroller", scrollerPropertySet);
             }
-            // ¸üĞÂ²ÎÊı
+            // æ›´æ–°å‚æ•°
             _logoScaleAnim.SetScalarParameter("HeightParam", anotherHeight);
             _logoScaleAnim.SetScalarParameter("TargetScale", imageSizeEnd);
 
-            // Æô¶¯¶¯»­
+            // å¯åŠ¨åŠ¨ç”»
             imageVisual.StartAnimation("Scale.xy", _logoScaleAnim);
 
             if (imageSizeOnly) return;
 
-            // Header Offset ¶¯»­
+            // Header Offset åŠ¨ç”»
             if (_headerOffsetAnim is null)
             {
                 // -scroller.Y - (Progress * Height)
@@ -338,7 +339,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _headerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
             headerVisual.StartAnimation("Offset.Y", _headerOffsetAnim);
 
-            // Background Opacity ¶¯»­
+            // Background Opacity åŠ¨ç”»
             if (_bgOpacityAnim is null)
             {
                 string exp = $"Lerp(0, 1, {ProgressExp})";
@@ -348,7 +349,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _bgOpacityAnim.SetScalarParameter("HeightParam", anotherHeight);
             backgroundVisual.StartAnimation("Opacity", _bgOpacityAnim);
 
-            // Image Visual Offset ¶¯»­
+            // Image Visual Offset åŠ¨ç”»
             if (_imgOffsetAnim is null)
             {
                 string exp = $"Lerp(Vector3(0,0,0), Vector3(0, HeightParam, 0), {ProgressExp})";
@@ -358,7 +359,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _imgOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
             imageVisual.StartAnimation("Offset", _imgOffsetAnim);
 
-            // Info Visual Offset ¶¯»­
+            // Info Visual Offset åŠ¨ç”»
             if (_infoOffsetAnim is null)
             {
                 // Start: (StartX, 0, 0) -> End: (EndX, HeightParam, 0)
@@ -371,7 +372,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _infoOffsetAnim.SetScalarParameter("EndX", (int)(imgRootWidth * imageSizeEnd) + 16);
             infoVisual.StartAnimation(nameof(infoVisual.Offset), _infoOffsetAnim);
 
-            // Command Bar Offset ¶¯»­
+            // Command Bar Offset åŠ¨ç”»
             if (_cmdBarOffsetAnim is null)
             {
                 // Start: (-6, StartY, 0) -> End: (-6, EndY, 0)
@@ -387,7 +388,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             _cmdBarOffsetAnim.SetScalarParameter("EndY", imgVisualH * imageSizeEnd - cmdBarH + 6);
             commandBarVisual.StartAnimation(nameof(commandBarVisual.Offset), _cmdBarOffsetAnim);
 
-            // Header Foot Root Offset ¶¯»­
+            // Header Foot Root Offset åŠ¨ç”»
             if (_footerOffsetAnim is null)
             {
                 string exp = $"Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), {ProgressExp})";
@@ -449,7 +450,7 @@ namespace TewiMP.UI.Pages.ListViewPages
 
             if (musicListData.Songs is null && musicListData.ListFrom == MusicFrom.pluginMusicSource)
             {
-                musicListData = await musicListData.PluginInfo.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
+                musicListData = await musicListData.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
                 InitInfo();
             }
 
@@ -500,7 +501,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             App.MainWindowInstance.WindowDpiChanged -= MainWindow_WindowDpiChanged;
             App.MainWindowInstance.WindowDpiChanged += MainWindow_WindowDpiChanged;
             ItemsList_Header_Info_TitleTextBlock.Text = musicListData.ListShowName;
-            ItemsList_Header_Info_OtherTextBlock.Text = $"{musicListData.Songs?.Count} Ê×¸èÇú";
+            ItemsList_Header_Info_OtherTextBlock.Text = $"{musicListData.Songs?.Count} é¦–æ­Œæ›²";
         }
 
         static Thickness thickness0 = new(0);
@@ -512,7 +513,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             if (musicListData is null) return;
             ItemsList_Header_Image.Source = null;
             ItemsList_Header_Image.BorderThickness = thickness0;
-            if (musicListData.ListDataType is DataType.±¾µØ¸èµ¥ or DataType.¸èµ¥)
+            if (musicListData.ListDataType is DataType.LocalPlaylist or DataType.Playlist)
             {
                 imageSource = await ImageService.GetImageUri(musicListData);
             }
@@ -592,18 +593,18 @@ namespace TewiMP.UI.Pages.ListViewPages
             {
                 return scs switch
                 {
-                    PlaySort.Ä¬ÈÏÉıĞò => songs.AsEnumerable(),
-                    PlaySort.Ä¬ÈÏ½µĞò => songs.AsEnumerable().Reverse(),
-                    PlaySort.Ãû³ÆÉıĞò => songs.OrderBy(m => m.Title),
-                    PlaySort.Ãû³Æ½µĞò => songs.OrderByDescending(m => m.Title),
-                    PlaySort.ÒÕÊõ¼ÒÉıĞò => songs.OrderBy(m => m.Artists.Count > 0 ? m.Artists[0].Name : "Î´Öª"),
-                    PlaySort.ÒÕÊõ¼Ò½µĞò => songs.OrderByDescending(m => m.Artists.Count > 0 ? m.Artists[0].Name : "Î´Öª"),
-                    PlaySort.×¨¼­ÉıĞò => songs.OrderBy(m => m.Album.Title),
-                    PlaySort.×¨¼­½µĞò => songs.OrderByDescending(m => m.Album.Title),
-                    PlaySort.Ê±¼äÉıĞò => songs.OrderBy(m => m.ReleaseTime ?? DateTime.MinValue),
-                    PlaySort.Ê±¼ä½µĞò => songs.OrderByDescending(m => m.ReleaseTime ?? DateTime.MinValue),
-                    PlaySort.Ë÷ÒıÉıĞò => songs.OrderBy(m => m.Index),
-                    PlaySort.Ë÷Òı½µĞò => songs.OrderByDescending(m => m.Index),
+                    PlaySort.é»˜è®¤å‡åº => songs.AsEnumerable(),
+                    PlaySort.é»˜è®¤é™åº => songs.AsEnumerable().Reverse(),
+                    PlaySort.åç§°å‡åº => songs.OrderBy(m => m.Title),
+                    PlaySort.åç§°é™åº => songs.OrderByDescending(m => m.Title),
+                    PlaySort.è‰ºæœ¯å®¶å‡åº => songs.OrderBy(m => m.Artists.Count > 0 ? m.Artists[0].Name : "æœªçŸ¥"),
+                    PlaySort.è‰ºæœ¯å®¶é™åº => songs.OrderByDescending(m => m.Artists.Count > 0 ? m.Artists[0].Name : "æœªçŸ¥"),
+                    PlaySort.ä¸“è¾‘å‡åº => songs.OrderBy(m => m.Album.Title),
+                    PlaySort.ä¸“è¾‘é™åº => songs.OrderByDescending(m => m.Album.Title),
+                    PlaySort.æ—¶é—´å‡åº => songs.OrderBy(m => m.ReleaseTime ?? DateTime.MinValue),
+                    PlaySort.æ—¶é—´é™åº => songs.OrderByDescending(m => m.ReleaseTime ?? DateTime.MinValue),
+                    PlaySort.ç´¢å¼•å‡åº => songs.OrderBy(m => m.Index),
+                    PlaySort.ç´¢å¼•é™åº => songs.OrderByDescending(m => m.Index),
                     _ => songs.AsEnumerable()
                 };
             });
@@ -719,7 +720,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             {
                 case "playAll":
                     if (musicListBind.Count == 0) return;
-                    if (App.Instance.PlayingListService.PlayBehavior == TewiMP.Services.PlayBehavior.Ëæ»ú²¥·Å)
+                    if (App.Instance.PlayingListService.PlayBehavior == TewiMP.Services.PlayBehavior.éšæœºæ’­æ”¾)
                     {
                         App.Instance.PlayingListService.ClearAll();
                     }
@@ -847,7 +848,7 @@ namespace TewiMP.UI.Pages.ListViewPages
             var listName = list.ListName;
             foreach (MusicDataViewModel item in ItemsList.SelectedItems.Cast<MusicDataViewModel>())
             {
-                App.MainWindowInstance.SetLoadingText($"ÕıÔÚÌí¼Ó£º{item.MusicData.Title} - {item.MusicData.ButtonName}");
+                App.MainWindowInstance.SetLoadingText($"æ­£åœ¨æ·»åŠ ï¼š{item.MusicData.Title} - {item.MusicData.ButtonName}");
                 App.MainWindowInstance.SetLoadingProgressRingValue(ItemsList.SelectedItems.Count, ItemsList.SelectedItems.IndexOf(item));
 
                 await Task.Run(() =>

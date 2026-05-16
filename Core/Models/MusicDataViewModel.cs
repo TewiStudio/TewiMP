@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using TewiMP.Core.Music;
 
 namespace TewiMP.Core.Models;
@@ -29,7 +28,7 @@ public partial class MusicDataViewModel : ObservableObject
     public string Title => MusicData?.Title;
     public string Title2 => MusicData is null ? null : $" {MusicData.Title2}";
     public string ButtonName => MusicData is null ? null :
-        MusicListData?.ListDataType == DataType.专辑
+        MusicListData?.ListDataType == DataType.Album
         ? MusicData.ArtistName
         : MusicData.ButtonName; 
 

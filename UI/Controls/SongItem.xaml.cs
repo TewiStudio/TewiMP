@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
@@ -9,14 +9,14 @@ using Microsoft.UI.Composition;
 using Windows.System;
 using Windows.Storage;
 using Windows.ApplicationModel.DataTransfer;
-using TewiMP.Helpers;
-using TewiMP.UI.Pages;
-using TewiMP.UI.Windows;
-using TewiMP.Core.Music;
 using TewiMP.Core.Models;
+using TewiMP.Core.Music;
+using TewiMP.Helpers;
 using TewiMP.Services.Media;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
+using TewiMP.UI.Pages;
+using TewiMP.UI.Windows;
 
 namespace TewiMP.UI.Controls
 {
@@ -240,7 +240,7 @@ namespace TewiMP.UI.Controls
 
         public void UpdateFlyoutMenuContext(MusicData musicData)
         {
-            if (MusicListData?.ListDataType == DataType.歌单 || MusicListData?.ListDataType == DataType.本地歌单)
+            if (MusicListData?.ListDataType == DataType.Playlist || MusicListData?.ListDataType == DataType.LocalPlaylist)
             {
                 DeleteFlyoutBtn.Visibility = Visibility.Visible;
             }
@@ -283,7 +283,7 @@ namespace TewiMP.UI.Controls
             showCount--;
             if (showCount != 0) return;
 
-            if (MusicListData?.ListDataType == DataType.专辑)
+            if (MusicListData?.ListDataType == DataType.Album)
             {
                 ShowImage = false;
                 MainWindow_DriveInTypeEvent(App.MainWindowInstance.DriveInType);
@@ -596,7 +596,7 @@ namespace TewiMP.UI.Controls
 
         private async void DeleteFlyoutBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (MusicListData.ListDataType == DataType.本地歌单 || MusicListData.ListDataType == DataType.歌单)
+            if (MusicListData.ListDataType == DataType.LocalPlaylist || MusicListData.ListDataType == DataType.Playlist)
             {
                 if ((sender as FrameworkElement).Tag as string == "1")
                 {
@@ -735,7 +735,7 @@ namespace TewiMP.UI.Controls
 
         private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
         {
-            var uri = await MusicData.PluginInfo.GetMusicSourcePlugin().GetUrl(MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
+            var uri = await MusicData.GetMusicSourcePlugin().GetUrl(MusicData.ID, (int)DataFolderBase.DownloadQuality.lossless);
             App.MainWindowInstance.HideDialog();
             await App.MainWindowInstance.ShowDialog("获取到的链接是：", uri);
         }

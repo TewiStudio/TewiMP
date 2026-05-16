@@ -64,32 +64,37 @@ public static class DataFolderBase
     /// <summary>
     /// 歌单数据文件路径
     /// </summary>
-    public static string PlayListDataPath { get; } = Path.Combine(UserDataFolder, "PlayList");
+    public static string PlayListDataPath { get; } = Path.Combine(UserDataFolder, "playlists.json");
     
     /// <summary>
     /// 本地音乐数据文件路径
     /// </summary>
-    public static string LocalMusicDataPath { get; } = Path.Combine(UserDataFolder, "LocalMusic");
+    public static string LocalMusicDataPath { get; } = Path.Combine(UserDataFolder, "localMusics.json");
     
     /// <summary>
     /// 设置数据文件路径
     /// </summary>
-    public static string SettingDataPath { get; } = Path.Combine(UserDataFolder, "Setting");
+    public static string SettingDataPath { get; } = Path.Combine(UserDataFolder, "settings.json");
 
     /// <summary>
     /// 参数均衡器设置数据文件路径
     /// </summary>
-    public static string AudioEffectDataPath { get; } = Path.Combine(UserDataFolder, "AudioEffect");
+    public static string AudioEffectDataPath { get; } = Path.Combine(UserDataFolder, "audioEffects.json");
 
     /// <summary>
     /// 插件设置数据文件路径
     /// </summary>
-    public static string PluginSettings{ get; } = Path.Combine(UserDataFolder, "PluginSettings");
+    public static string PluginSettings{ get; } = Path.Combine(UserDataFolder, "pluginSettings.json");
 
     /// <summary>
     /// 历史记录数据文件路径
     /// </summary>
-    public static string HistoryDataPath { get; } = Path.Combine(UserDataFolder, "History");
+    public static string HistoryDataPath { get; } = Path.Combine(UserDataFolder, "histories.json");
+
+    /// <summary>
+    /// 上次播放数据文件路径。储存上次播放的歌曲和歌单数据，用于程序启动时恢复上次的播放状态。
+    /// </summary>
+    public static string LastPlayedDataPath { get; } = Path.Combine(UserDataFolder, "lastPlayed.json");
     
     /// <summary>
     /// 日志文件路径
@@ -190,7 +195,7 @@ public static class DataFolderBase
     /// <summary>
     /// 默认播放列表数据
     /// </summary>
-    public static MusicListData PlayListDefault = new("default", "默认播放列表", null, MusicFrom.localMusic, listDataType: DataType.本地歌单);
+    public static MusicListData PlayListDefault = new("default", "默认播放列表", null, MusicFrom.localMusic, listDataType: DataType.LocalPlaylist);
 
     /// <summary>
     /// 默认设置数据

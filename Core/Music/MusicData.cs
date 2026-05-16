@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using CommunityToolkit.Mvvm.ComponentModel;
 using Newtonsoft.Json;
 using TewiMP.Helpers;
 using TewiMP.Services.Plugin;
@@ -52,7 +51,7 @@ public class MusicData : IEquatable<MusicData>
     public string InLocal { get; set; }
     public CUETrackData CUETrackData { get; set; }
     public int Index { get; set; } = 0;
-    public PluginInfo PluginInfo { get; set; }
+    public string PluginInfoGUID { get; set; }
 
     private MusicFrom _from = MusicFrom.localMusic;
     public MusicFrom From
@@ -138,6 +137,16 @@ public class MusicData : IEquatable<MusicData>
         InLocal = inLocal;
     }
 
+    private MusicSourcePlugin _plugin = null;
+    public MusicSourcePlugin GetMusicSourcePlugin(bool throwError = true)
+    {
+        if (_plugin != null) return _plugin;
+        if (string.IsNullOrEmpty(PluginInfoGUID)) return null;
+
+        _plugin = PluginInfoGUID.GetMusicSourcePlugin(throwError);
+        return _plugin;
+    }
+
     /// <summary>
     /// 判断是否是同一首歌。
     /// </summary>
@@ -149,9 +158,9 @@ public class MusicData : IEquatable<MusicData>
         // 如果源不一样，直接返回
         if (From != other.From) return false;
 
-        if (PluginInfo is not null && other.PluginInfo is not null)
+        if (GetMusicSourcePlugin() is not null && other.GetMusicSourcePlugin() is not null)
         {
-            if (PluginInfo != other.PluginInfo) return false;
+            if (GetMusicSourcePlugin() != other.GetMusicSourcePlugin()) return false;
         }
 
         // 如果有 ID，优先比对 ID

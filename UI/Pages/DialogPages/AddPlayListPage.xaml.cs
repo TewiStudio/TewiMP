@@ -39,7 +39,7 @@ namespace TewiMP.UI.Pages.DialogPages
                     musicListData = new MusicListData(null, AddLocalPage_ListNameTB.Text, AddLocalPage_ListImageTB.Text, MusicFrom.localMusic);
                     musicListData.ListName = musicListData.MD5;
                     musicListData.ListFrom = MusicFrom.localMusic;
-                    musicListData.ListDataType = DataType.本地歌单;
+                    musicListData.ListDataType = DataType.LocalPlaylist;
                 }
                 else
                 {

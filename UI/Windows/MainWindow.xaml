@@ -550,7 +550,7 @@
                                         </Setter>
                                     </Style>
                                     <cmedia:AttachedCardShadow x:Key="CommonShadow"
-                                        Offset="0,0" CornerRadius="0" BlurRadius="32" Color="#3000000"/>
+                                        Offset="0,0" CornerRadius="0" BlurRadius="32" Color="#30000000"/>
                                 </ListView.Resources>
                                 <ListView.Header>
                                     <Grid x:Name="PlayingListHeader">
@@ -560,7 +560,7 @@
                                         <Grid
                                             x:Name="PlayingListHeaderBaseGrid"
                                             Background="{ThemeResource AcrylicNormal}"
-                                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                            BorderBrush="{ThemeResource SurfaceStrokeColorFlyoutBrush}"
                                             BorderThickness="0,0,0,1" Margin="0,0,0,6"
                                             ui:Effects.Shadow="{StaticResource CommonShadow}"
 >

@@ -662,8 +662,8 @@ namespace TewiMP.Helpers
 
             //LogManager.Info("Album HSV before", $"h:{h}, s:{s}, v:{v}");
             ElementTheme elementTheme = App.MainWindowInstance.WindowGridBase.ActualTheme;
-            var saturation = s + (elementTheme == ElementTheme.Dark ? .1 : .6);
-            var value = v + (elementTheme == ElementTheme.Dark ? 1 : .1);
+            var saturation = s + (elementTheme == ElementTheme.Dark ? .1 : 1);
+            var value = v + (elementTheme == ElementTheme.Dark ? 1 : .01);
             var color1 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
             //LogManager.Info("Album HSV after", $"h:{h}, s:{saturation}, v:{value}");
 

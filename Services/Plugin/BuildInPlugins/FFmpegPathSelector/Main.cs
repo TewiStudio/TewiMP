@@ -13,6 +13,7 @@ public class Main : Plugin
         Describe = "自定义 ffmpeg.exe 程序的路径",
         Author = "TewiStudio",
         Version = "1.0.0",
+        GUID = "tewi.ffmpeg.pathselector"
     };
     protected override Dictionary<string, object> PluginSettings { get; set; } = new()
         {

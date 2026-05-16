@@ -1,4 +1,4 @@
-#nullable enable
+ï»¿#nullable enable
 using System;
 using System.Linq;
 using System.Numerics;
@@ -17,27 +17,28 @@ using TewiMP.Core.Audio;
 using TewiMP.Helpers;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Media.Audio.AudioEffects;
+using Microsoft.UI.Xaml.Media;
 
 namespace TewiMP.UI.Controls
 {
     /// <summary>
-    /// ´ÓÕıÔÚ²¥·ÅµÄ¸èÇú»ñÈ¡¾­¹ı×ª»»µÄÊı¾İ£¬ÊµÊ±»æÖÆÆµÆ×¡¢¾ùºâÆ÷Ó°ÏìÇúÏß
+    /// ä»æ­£åœ¨æ’­æ”¾çš„æ­Œæ›²è·å–ç»è¿‡è½¬æ¢çš„æ•°æ®ï¼Œå®æ—¶ç»˜åˆ¶é¢‘è°±ã€å‡è¡¡å™¨å½±å“æ›²çº¿
     /// </summary>
     public sealed partial class AudioSpectrum : Control
     {
         private struct SpectrumBarCache
         {
-            public int BinStart;      // ÆğÊ¼ FFT Bin Ë÷Òı
-            public int BinEnd;        // ½áÊø FFT Bin Ë÷Òı
-            public int Count;         // Bin ×ÜÊı (End - Start + 1)
-            public float X;           // ÆÁÄ»ÉÏµÄ X ×ø±ê
-            public float TiltFactor;  // Ô¤¼ÆËãµÄ Tilt ĞŞÕıÏµÊı
+            public int BinStart;      // èµ·å§‹ FFT Bin ç´¢å¼•
+            public int BinEnd;        // ç»“æŸ FFT Bin ç´¢å¼•
+            public int Count;         // Bin æ€»æ•° (End - Start + 1)
+            public float X;           // å±å¹•ä¸Šçš„ X åæ ‡
+            public float TiltFactor;  // é¢„è®¡ç®—çš„ Tilt ä¿®æ­£ç³»æ•°
         }
 
         private CanvasControl _spectrumCanvas;
 
         private SpectrumBarCache[] _barCache;
-        private double _cacheMinFreq, _cacheMaxFreq;
+        private double _cacheMinFreq, _cacheMaxFreq, _cacheTiltDbPerOct;
         private int _cacheSampleRate, _cacheBarCount;
         private float _cacheWidth;
 
@@ -62,36 +63,36 @@ namespace TewiMP.UI.Controls
         private const float MaxQ = 33.3f;
         private const float QStep = 0.1f;
 
-        private readonly Queue<double> _frameTimes = new();   // ¼ÇÂ¼×î½üÒ»¶ÎÊ±¼äµÄÖ¡¼ä¸ô£¨Ãë£©
+        private readonly Queue<double> _frameTimes = new();   // è®°å½•æœ€è¿‘ä¸€æ®µæ—¶é—´çš„å¸§é—´éš”ï¼ˆç§’ï¼‰
         private double _deltaTime = 0;
         private double _lastDrawTime = 0;
         private double _targetFps = 60;
         private double _avgFps = 0;
         private double _avgFrameMs = 0;
 
-        // ¿ØÖÆÍ³¼Æ´°¿Ú´óĞ¡£¨Ãë£©
-        private const double SampleDuration = 1.0; // 1ÃëÄÚµÄÆ½¾ùÖµ
+        // æ§åˆ¶ç»Ÿè®¡çª—å£å¤§å°ï¼ˆç§’ï¼‰
+        private const double SampleDuration = 1.0; // 1ç§’å†…çš„å¹³å‡å€¼
 
-        // ¹öÂÖËõ·Å
+        // æ»šè½®ç¼©æ”¾
         private const double MinVisibleFreq = 20;
         private const double MaxVisibleFreq = 22000;
-        private const double MinZoomRangeHz = 200;  // ×îĞ¡¿ÉÏÔÊ¾´ø¿í
-        private const double MaxZoomRangeHz = 22000 - 20; // ×î´ó¿ÉÏÔÊ¾´ø¿í
+        private const double MinZoomRangeHz = 200;  // æœ€å°å¯æ˜¾ç¤ºå¸¦å®½
+        private const double MaxZoomRangeHz = 22000 - 20; // æœ€å¤§å¯æ˜¾ç¤ºå¸¦å®½
         private double _animMinFreq, _animMaxFreq;
         private double _targetMinFreq, _targetMaxFreq;
         private double _zoomAnimStartTime;
-        private const double ZoomAnimDuration = 0.25; // Ãë
+        private const double ZoomAnimDuration = 0.25; // ç§’
         private bool _isZoomAnimating;
         private bool _firstDraw = true;
 
-        // Êó±ê
+        // é¼ æ ‡
         private float _hoverX = -1, _hoverY = -1;
         private float _hoverFreq = 0, _hoverDb = 0;
         private bool _isDragging = false;
         private float _dragStartX;
         private double _logMinStart, _logMaxStart;
 
-        #region ÒÀÀµÊôĞÔ
+        #region ä¾èµ–å±æ€§
         public static readonly DependencyProperty IsStopProperty = DependencyProperty.Register(
             "IsStop", typeof(bool), typeof(AudioSpectrum),
             new PropertyMetadata(false, OnPropertyChanged<bool>));
@@ -191,7 +192,7 @@ namespace TewiMP.UI.Controls
             double Q = eq.Q;
             double gainDb = eq.Gain;
 
-            // ´ø¿íÓ°Ïì£¨¼ò»¯¸ßË¹ĞÎ×´£©
+            // å¸¦å®½å½±å“ï¼ˆç®€åŒ–é«˜æ–¯å½¢çŠ¶ï¼‰
             double ratio = freq / f0;
             double response = Math.Exp(-0.5 * Math.Pow(Math.Log(ratio) * Q, 2.0));
 
@@ -230,7 +231,7 @@ namespace TewiMP.UI.Controls
             _spectrumCanvas.Height = (float)ActualHeight;
         }
 
-        #region Êó±êÃüÖĞ²âÊÔ
+        #region é¼ æ ‡å‘½ä¸­æµ‹è¯•
         private EQData? HitTestEQ(float x, float y)
         {
             if (!AudioFilterStatic.ParametricEqEnable || AudioFilterStatic.ParametricEqDatas.Count == 0)
@@ -280,7 +281,7 @@ namespace TewiMP.UI.Controls
         }
         #endregion
 
-        #region Êó±ê½»»¥
+        #region é¼ æ ‡äº¤äº’
         private void SpectrumCanvas_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             if (!DrawDbLines) return;
@@ -290,7 +291,7 @@ namespace TewiMP.UI.Controls
 
             if (pt.Properties.IsLeftButtonPressed)
             {
-                // ÏÈ¼ì²âÊÇ·ñµãÔÚ EQ / PassFilter µãÉÏ
+                // å…ˆæ£€æµ‹æ˜¯å¦ç‚¹åœ¨ EQ / PassFilter ç‚¹ä¸Š
                 _draggingEQ = HitTestEQ((float)pos.X, (float)pos.Y);
                 _draggingPass = HitTestPassFilter((float)pos.X, (float)pos.Y);
 
@@ -300,7 +301,7 @@ namespace TewiMP.UI.Controls
                     return;
                 }
 
-                // ·ñÔòÆôÓÃÆµÆ×ÍÏ¶¯
+                // å¦åˆ™å¯ç”¨é¢‘è°±æ‹–åŠ¨
                 _isDragging = true;
                 _dragStartX = (float)pos.X;
                 _logMinStart = Math.Log10(MinFreq);
@@ -329,7 +330,7 @@ namespace TewiMP.UI.Controls
             _hoverY = (float)pos.Y;
             UpdateHoverData();
 
-            // ¸üĞÂĞüÍ£ EQ »ò PassFilter
+            // æ›´æ–°æ‚¬åœ EQ æˆ– PassFilter
             _hoveringEQ = HitTestEQ(_hoverX, _hoverY);
             _hoveringPass = HitTestPassFilter(_hoverX, _hoverY);
 
@@ -341,7 +342,7 @@ namespace TewiMP.UI.Controls
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
 
-            // ÍÏ¶¯ EQ µã
+            // æ‹–åŠ¨ EQ ç‚¹
             if (_draggingEQ != null)
             {
                 double logFreq = logMin + (_hoverX / width) * (logMax - logMin);
@@ -353,7 +354,7 @@ namespace TewiMP.UI.Controls
                 return;
             }
 
-            // ÍÏ¶¯ PassFilter µã
+            // æ‹–åŠ¨ PassFilter ç‚¹
             if (_draggingPass != null)
             {
                 double logFreq = logMin + (_hoverX / width) * (logMax - logMin);
@@ -367,13 +368,13 @@ namespace TewiMP.UI.Controls
                 }
                 else
                 {
-                    if (_draggingPass.Gain != 0 ) _draggingPass.Gain = 0;
+                    if (_draggingPass.Gain != 0) _draggingPass.Gain = 0;
                 }
 
                 return;
             }
 
-            // ÍÏ¶¯ÆµÆ×
+            // æ‹–åŠ¨é¢‘è°±
             if (!_isDragging) return;
 
             float dx = (float)pos.X - _dragStartX;
@@ -411,7 +412,7 @@ namespace TewiMP.UI.Controls
             int delta = e.GetCurrentPoint(_spectrumCanvas).Properties.MouseWheelDelta;
             bool ctrlDown = App.MainWindowInstance.isControlDown;
 
-            // Èç¹û Ctrl °´ÏÂ£¬ÔòÖ´ĞĞÆµÆ×Ëõ·Å
+            // å¦‚æœ Ctrl æŒ‰ä¸‹ï¼Œåˆ™æ‰§è¡Œé¢‘è°±ç¼©æ”¾
             if (ctrlDown && DrawDbLines)
             {
                 var pos = e.GetCurrentPoint(_spectrumCanvas).Position;
@@ -419,7 +420,7 @@ namespace TewiMP.UI.Controls
                 return;
             }
 
-            // === EQ µ÷ÕûÄ£Ê½ ===
+            // === EQ è°ƒæ•´æ¨¡å¼ ===
             if (_hoveringEQ != null)
             {
                 float newQ = _hoveringEQ.Q + (delta > 0 ? QStep : -QStep);
@@ -427,7 +428,7 @@ namespace TewiMP.UI.Controls
                 return;
             }
 
-            // === PassFilter µ÷ÕûÄ£Ê½ ===
+            // === PassFilter è°ƒæ•´æ¨¡å¼ ===
             if (_hoveringPass != null)
             {
                 if (_hoveringPass.PassFilterType is PassFilterType.LowPass or PassFilterType.HighPass)
@@ -444,50 +445,50 @@ namespace TewiMP.UI.Controls
             }
 
             if (!DrawDbLines) return;
-            // Ä¬ÈÏĞĞÎª£ºÆµÆ×Ëõ·Å
+            // é»˜è®¤è¡Œä¸ºï¼šé¢‘è°±ç¼©æ”¾
             var pointerPos = e.GetCurrentPoint(_spectrumCanvas).Position;
             ZoomSpectrum((float)pointerPos.X, delta);
         }
         #endregion
 
-        #region Ëõ·Å & hover
+        #region ç¼©æ”¾ & hover
         private void ZoomSpectrum(float mouseX, int delta)
         {
             if (_spectrumCanvas == null || _spectrumCanvas.ActualWidth <= 0) return;
 
-            // Ëõ·ÅÇ¿¶È
+            // ç¼©æ”¾å¼ºåº¦
             double baseFactor = 1.35;
             double step = Math.Abs(delta) / 120.0;
             double scaleFactor = Math.Pow(baseFactor, step);
             if (delta < 0) scaleFactor = 1.0 / scaleFactor;
 
-            // µ±Ç°ÆµÂÊ·¶Î§
+            // å½“å‰é¢‘ç‡èŒƒå›´
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
             double logRange = logMax - logMin;
 
-            // Êó±êËùÔÚÆµÂÊ
+            // é¼ æ ‡æ‰€åœ¨é¢‘ç‡
             double mouseRatio = mouseX / _spectrumCanvas.ActualWidth;
             double logMouse = logMin + mouseRatio * logRange;
             double mouseFreq = Math.Pow(10, logMouse);
 
-            // ĞÂ·¶Î§
+            // æ–°èŒƒå›´
             double newLogRange = logRange / scaleFactor;
 
-            // Ëõ·ÅÏŞÖÆ
+            // ç¼©æ”¾é™åˆ¶
             double curRangeHz = Math.Pow(10, logMax) - Math.Pow(10, logMin);
             if (curRangeHz < MinZoomRangeHz && delta > 0) return;
             if (curRangeHz > MaxZoomRangeHz && delta < 0) return;
 
-            // ±£Ö¤ÃªµãÆµÂÊ²»Æ«ÒÆ
+            // ä¿è¯é”šç‚¹é¢‘ç‡ä¸åç§»
             double newLogMin = logMouse - mouseRatio * newLogRange;
             double newLogMax = newLogMin + newLogRange;
 
-            // ÏŞÖÆ±ß½ç
+            // é™åˆ¶è¾¹ç•Œ
             double minLimit = Math.Log10(MinVisibleFreq);
             double maxLimit = Math.Log10(MaxVisibleFreq);
 
-            // Èç¹û³¬³ö±ß½çÔòÕûÌåÆ«ÒÆ»ØÀ´
+            // å¦‚æœè¶…å‡ºè¾¹ç•Œåˆ™æ•´ä½“åç§»å›æ¥
             if (newLogMin < minLimit)
             {
                 double diff = minLimit - newLogMin;
@@ -501,7 +502,7 @@ namespace TewiMP.UI.Controls
                 newLogMax -= diff;
             }
 
-            // Ó¦ÓÃ¶¯»­Ä¿±ê
+            // åº”ç”¨åŠ¨ç”»ç›®æ ‡
             _targetMinFreq = Math.Pow(10, newLogMin);
             _targetMaxFreq = Math.Pow(10, newLogMax);
             _animMinFreq = MinFreq;
@@ -533,14 +534,14 @@ namespace TewiMP.UI.Controls
         }
         #endregion
 
-        #region »æÖÆ
+        #region ç»˜åˆ¶
         private void SpectrumCanvas_Draw(CanvasControl sender, CanvasDrawEventArgs args)
         {
             var ds = args.DrawingSession;
             ds.Clear(Colors.Transparent);
             sender.DpiScale = (float)DrawScale;
 
-            // ¼ÆËãÖ¡Ê±¼ä
+            // è®¡ç®—å¸§æ—¶é—´
             double now = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
             if (_lastDrawTime > 0)
             {
@@ -549,11 +550,11 @@ namespace TewiMP.UI.Controls
                 if (DrawLatencyText)
                 {
                     _frameTimes.Enqueue(_deltaTime);
-                    // ÒÆ³ı³¬³öÍ³¼Æ´°¿ÚµÄ¾ÉÊı¾İ
+                    // ç§»é™¤è¶…å‡ºç»Ÿè®¡çª—å£çš„æ—§æ•°æ®
                     while (_frameTimes.Sum() > SampleDuration)
                         _frameTimes.Dequeue();
 
-                    // ¼ÆËãÆ½¾ùÖ¡Ê±¼äºÍFPS
+                    // è®¡ç®—å¹³å‡å¸§æ—¶é—´å’ŒFPS
                     if (_frameTimes.Count > 0)
                     {
                         double avgDelta = _frameTimes.Average();
@@ -586,13 +587,13 @@ namespace TewiMP.UI.Controls
 
             if (DrawLatencyText)
             {
-                // »æÖÆÆ½¾ù FPS ĞÅÏ¢
+                // ç»˜åˆ¶å¹³å‡ FPS ä¿¡æ¯
                 string info = $"FPS: {_avgFps:0.0} ({_avgFrameMs:0.0} ms)";
                 ds.DrawText(info, 10, 10, App.Instance.PlayingListService.TextColor, canvasTextFormat ??= new CanvasTextFormat { FontSize = 14 });
             }
         }
 
-        // ÄÚ²¿²åÖµº¯Êı
+        // å†…éƒ¨æ’å€¼å‡½æ•°
         static double Lerp(double a, double b, double t) => a + (b - a) * t;
 
         private void DrawSpectrum(CanvasControl sender, CanvasDrawingSession ds, float w, float h)
@@ -600,14 +601,14 @@ namespace TewiMP.UI.Controls
             var analyzer = App.Instance.AudioService.AudioAnalyzer;
             if (analyzer?.Spectrum == null) return;
 
-            // »ñÈ¡»ù´¡²ÎÊı
+            // è·å–åŸºç¡€å‚æ•°
             int sampleRate = analyzer.WaveFormat.SampleRate;
             int barCount = SampleCount;
 
-            // ¸üĞÂ»º´æ¡£Èç¹ûÕıÔÚËõ·Å£¬ÕâÀï»áÃ¿Ö¡Ö´ĞĞ¼ÆËã£»Èç¹û²»Ëõ·Å£¬ÕâÀïºÄÊ±Îª0
+            // æ›´æ–°ç¼“å­˜ã€‚å¦‚æœæ­£åœ¨ç¼©æ”¾ï¼Œè¿™é‡Œä¼šæ¯å¸§æ‰§è¡Œè®¡ç®—ï¼›å¦‚æœä¸ç¼©æ”¾ï¼Œè¿™é‡Œè€—æ—¶ä¸º0
             UpdateSpectrumCache(sampleRate, barCount, MinFreq, MaxFreq, w, h, analyzer);
 
-            // ³õÊ¼»¯Êı×é
+            // åˆå§‹åŒ–æ•°ç»„
             if (_smoothedSpectrum == null || _smoothedSpectrum.Length != analyzer.Spectrum.Length)
                 _smoothedSpectrum = new float[analyzer.Spectrum.Length];
 
@@ -618,12 +619,12 @@ namespace TewiMP.UI.Controls
                 _pointsX = new float[barCount];
             }
 
-            // ½¥±äË¢
-            var accent = App.Instance.PlayingListService.AlbumAccentColor;
+            // æ¸å˜åˆ·
+            var accent = ((SolidColorBrush)Foreground).Color;// ?? App.Instance.PlayingListService.AlbumAccentColor;
             if (_gradientBrush == null || w != _lastWidth || h != _lastHeight || accent != _lastAccentColor)
             {
                 _gradientBrush?.Dispose();
-                _gradientBrush = new CanvasLinearGradientBrush(sender, accent, Color.FromArgb(0, 255, 255, 255))
+                _gradientBrush = new CanvasLinearGradientBrush(sender, accent, Color.FromArgb(0, accent.R, accent.G, accent.B))
                 {
                     StartPoint = new(0, 0),
                     EndPoint = new(0, h),
@@ -633,7 +634,7 @@ namespace TewiMP.UI.Controls
                 _lastAccentColor = accent;
             }
 
-            // Ê±¼äÆ½»¬
+            // æ—¶é—´å¹³æ»‘
             float adjustedDownFactor = (float)(1.0 - Math.Pow(1.0 - SmoothingDownFactor, _deltaTime * _targetFps));
             float adjustedUpFactor = (float)(1.0 - Math.Pow(1.0 - SmoothingUpFactor, _deltaTime * _targetFps));
             var spectrum = analyzer.Spectrum;
@@ -647,7 +648,7 @@ namespace TewiMP.UI.Controls
                     _smoothedSpectrum[i] = current + (target - current) * adjustedDownFactor;
             }
 
-            // ¼ÆËã Bar ¸ß¶È
+            // è®¡ç®— Bar é«˜åº¦
             float range = analyzer.MaxDb - analyzer.MinDb;
             float minDb = analyzer.MinDb;
             float strokeW = (float)StrokeWidth / 2f;
@@ -657,17 +658,17 @@ namespace TewiMP.UI.Controls
                 var cache = _barCache[i];
 
                 float sum = 0;
-                // ±ß½ç±£»¤£¬·ÀÖ¹ SampleRate Í»±äµ¼ÖÂµÄÔ½½ç
+                // è¾¹ç•Œä¿æŠ¤ï¼Œé˜²æ­¢ SampleRate çªå˜å¯¼è‡´çš„è¶Šç•Œ
                 int end = Math.Min(cache.BinEnd, _smoothedSpectrum.Length - 1);
                 for (int b = cache.BinStart; b <= end; b++)
                     sum += _smoothedSpectrum[b];
 
                 float avgDb = sum / cache.Count;
 
-                // ¹éÒ»»¯
+                // å½’ä¸€åŒ–
                 float normalized = (avgDb - minDb) / range;
 
-                // Ó¦ÓÃÔ¤¼ÆËãµÄ Tilt
+                // åº”ç”¨é¢„è®¡ç®—çš„ Tilt
                 normalized = normalized + cache.TiltFactor * normalized;
 
                 normalized = Math.Clamp(normalized, 0f, 1f);
@@ -676,7 +677,7 @@ namespace TewiMP.UI.Controls
                 _pointsX[i] = cache.X;
             }
 
-            // »¬¶¯´°¿ÚÆ½»¬
+            // æ»‘åŠ¨çª—å£å¹³æ»‘
             if (SmoothWindow < 2)
             {
                 _smoothedPoints = _pointsY;
@@ -686,7 +687,7 @@ namespace TewiMP.UI.Controls
                 for (int i = 0; i < barCount; i++)
                 {
                     double freqRatio = (double)i / barCount;
-                    int win = (int)(SmoothWindow * (1 + (1 - freqRatio) * 8)); // µÍÆµÆ½»¬¸üÇ¿
+                    int win = (int)(SmoothWindow * (1 + (1 - freqRatio) * 8)); // ä½é¢‘å¹³æ»‘æ›´å¼º
                     float sum = 0;
                     int count = 0;
                     for (int j = Math.Max(0, i - win / 2); j < Math.Min(barCount, i + win / 2); j++)
@@ -698,7 +699,7 @@ namespace TewiMP.UI.Controls
                 }
             }
 
-            // »æÖÆÌî³ä
+            // ç»˜åˆ¶å¡«å……
             using (var fillPath = new CanvasPathBuilder(sender))
             {
                 fillPath.BeginFigure(-1, h);
@@ -712,7 +713,7 @@ namespace TewiMP.UI.Controls
                 ds.FillGeometry(CanvasGeometry.CreatePath(fillPath), _gradientBrush);
             }
 
-            // »æÖÆÇúÏß
+            // ç»˜åˆ¶æ›²çº¿
             using (var linePath = new CanvasPathBuilder(sender))
             {
                 linePath.BeginFigure(0, _smoothedPoints[0]);
@@ -724,7 +725,7 @@ namespace TewiMP.UI.Controls
                 ds.DrawGeometry(CanvasGeometry.CreatePath(linePath), accent, (float)StrokeWidth);
             }
 
-            // Hover ÌáÊ¾
+            // Hover æç¤º
             DrawHoverInfo(ds, w, h);
             if (_isZoomAnimating)
             {
@@ -738,7 +739,7 @@ namespace TewiMP.UI.Controls
                 }
                 else
                 {
-                    // ease-out Æ½»¬Ëã·¨
+                    // ease-out å¹³æ»‘ç®—æ³•
                     double easedT = 1 - Math.Pow(1 - t, 3);
                     MinFreq = Lerp(_animMinFreq, _targetMinFreq, easedT);
                     MaxFreq = Lerp(_animMaxFreq, _targetMaxFreq, easedT);
@@ -755,11 +756,11 @@ namespace TewiMP.UI.Controls
             UpdateHoverData();
             string hoverText = $"{_hoverFreq:0.#} Hz / {_hoverDb:0.0} dB";
 
-            // Ö»ÓĞÎÄ×Ö±äÁË²ÅÖØĞÂ´´½¨ Layout
+            // åªæœ‰æ–‡å­—å˜äº†æ‰é‡æ–°åˆ›å»º Layout
             if (_hoverTextLayout == null || hoverText != _lastHoverText)
             {
                 _hoverTextLayout?.Dispose();
-                var textFormat = new CanvasTextFormat { FontSize = 14 }; // ¿ÉÒÔÌáÎª³ÉÔ±±äÁ¿
+                var textFormat = new CanvasTextFormat { FontSize = 14 }; // å¯ä»¥æä¸ºæˆå‘˜å˜é‡
                 _hoverTextLayout = new CanvasTextLayout(ds, hoverText, textFormat, w, h);
                 _lastHoverText = hoverText;
             }
@@ -797,7 +798,7 @@ namespace TewiMP.UI.Controls
             using var gds = _gridCache.CreateDrawingSession();
             gds.Clear(Colors.Transparent);
 
-            // dB Íø¸ñ
+            // dB ç½‘æ ¼
             float minDb = -90, maxDb = 0, stepDb = 10;
             float width = (float)_gridCache.Size.Width;
             float height = (float)_gridCache.Size.Height;
@@ -812,7 +813,7 @@ namespace TewiMP.UI.Controls
                 gds.DrawText($"{db} dB", 4, y - 18, textColor.A(150), textFormat);
             }
 
-            // ¶ÔÊıÆµÂÊÍø¸ñ
+            // å¯¹æ•°é¢‘ç‡ç½‘æ ¼
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
             double visibleRange = logMax - logMin;
@@ -847,7 +848,7 @@ namespace TewiMP.UI.Controls
                     float alpha = isMain ? 60f : 40f;
                     float thickness = isMain ? 1.5f : 0.7f;
 
-                    // ¸ßÆµµ­»¯
+                    // é«˜é¢‘æ·¡åŒ–
                     if (f > 10000)
                     {
                         float reduce = (float)Math.Clamp(1.0 - (f - 10000) / 15000.0, 0.3, 1.0);
@@ -856,7 +857,7 @@ namespace TewiMP.UI.Controls
 
                     gds.DrawLine(x, 0, x, height, textColor.A((byte)alpha), thickness, dash);
 
-                    // »æÖÆÎÄ×Ö±êÇ©
+                    // ç»˜åˆ¶æ–‡å­—æ ‡ç­¾
                     string label = f >= 1000 ? $"{f / 1000:0.#}kHz" : $"{(int)f}Hz";
                     using var layout = new CanvasTextLayout(gds, label, textFormat, 100, 20);
                     float labelWidth = (float)layout.DrawBounds.Width;
@@ -864,12 +865,12 @@ namespace TewiMP.UI.Controls
                     float textX = x + 4;
                     float textY = height - (16 + baseFont * 0.4f);
 
-                    // ÈôÎÄ×Ö³¬³öÓÒ±ß½ç£¬Ôò×óÒÆ»Ø»­²¼ÄÚ
+                    // è‹¥æ–‡å­—è¶…å‡ºå³è¾¹ç•Œï¼Œåˆ™å·¦ç§»å›ç”»å¸ƒå†…
                     bool nearRightEdge = textX + labelWidth > width - 4;
                     if (nearRightEdge)
                         textX = width - labelWidth - 4;
 
-                    // Èç¹ûÓëÇ°Ò»¸ö±êÇ©ÖØµş£¬Ìø¹ı»æÖÆ
+                    // å¦‚æœä¸å‰ä¸€ä¸ªæ ‡ç­¾é‡å ï¼Œè·³è¿‡ç»˜åˆ¶
                     if (textX < lastLabelRight + labelWidth * 0.6f)
                         continue;
 
@@ -881,39 +882,39 @@ namespace TewiMP.UI.Controls
             ds.DrawImage(_gridCache);
         }
 
-        private void DrawEQPoints(CanvasDrawingSession ds, float width, float height, double logMin, double logMax)
+        private void DrawEQPoints(CanvasDrawingSession ds, float w, float h, double logMin, double logMax)
         {
-            // »æÖÆ Parametric EQ µã
+            // ç»˜åˆ¶ Parametric EQ ç‚¹
             if (AudioFilterStatic.ParametricEqEnable)
             {
                 foreach (var eq in AudioFilterStatic.ParametricEqDatas)
                 {
                     if (!eq.IsEnable) continue;
-                    float x = (float)((Math.Log10(eq.CentreFrequency) - logMin) / (logMax - logMin) * width);
-                    float y = height / 2 - eq.Gain / 24f * height / 2;
+                    float x = (float)((Math.Log10(eq.CentreFrequency) - logMin) / (logMax - logMin) * w);
+                    float y = h / 2 - eq.Gain / 24f * h / 2;
                     ds.FillCircle(x, y, (float)DrawEqPointsRadius, eq.Color.A(200));
                 }
             }
 
-            // »æÖÆ PassFilter µã
+            // ç»˜åˆ¶ PassFilter ç‚¹
             if (AudioFilterStatic.PassFilterEqEnable)
             {
                 foreach (var pf in AudioFilterStatic.PassFilterDatas)
                 {
                     if (!pf.IsEnable) continue;
-                    float x = (float)((Math.Log10(pf.CentreFrequency) - logMin) / (logMax - logMin) * width);
-                    float y = height / 2 - pf.Gain / 24f * height / 2;
+                    float x = (float)((Math.Log10(pf.CentreFrequency) - logMin) / (logMax - logMin) * w);
+                    float y = h / 2 - pf.Gain / 24f * h / 2;
                     ds.FillCircle(x, y, (float)DrawEqPointsRadius, pf.Color.A(200));
                 }
             }
         }
 
-        private void DrawEqResponseCurve(CanvasDrawingSession ds, float width, float height)
+        private void DrawEqResponseCurve(CanvasDrawingSession ds, float w, float h)
         {
             if (!AudioFilterStatic.ParametricEqEnable && !AudioFilterStatic.PassFilterEqEnable)
                 return;
 
-            int points = 512; // ÇúÏß¾«¶È
+            int points = 512; // æ›²çº¿ç²¾åº¦
             Vector2[] curve = new Vector2[points];
             double logMin = Math.Log10(MinFreq);
             double logMax = Math.Log10(MaxFreq);
@@ -925,7 +926,7 @@ namespace TewiMP.UI.Controls
 
                 double totalDb = 0.0;
 
-                // PassFilter£¨dBµş¼Ó£¬±ÜÃâÊıÖµÒç³ö£©
+                // PassFilterï¼ˆdBå åŠ ï¼Œé¿å…æ•°å€¼æº¢å‡ºï¼‰
                 if (AudioFilterStatic.PassFilterEqEnable)
                 {
                     double fs = App.Instance.AudioService?.FileReader?.WaveFormat.SampleRate ?? 44100;
@@ -942,7 +943,7 @@ namespace TewiMP.UI.Controls
 
                         for (int s = 0; s < stages; s++)
                         {
-                            double w = freq / f0;
+                            double width = freq / f0;
                             double db = 0.0;
 
                             switch (pass.PassFilterType)
@@ -950,7 +951,7 @@ namespace TewiMP.UI.Controls
                                 case PassFilterType.LowPass:
                                     {
                                         double num = 1.0;
-                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(w, 2), 2) + Math.Pow(w / Q, 2));
+                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(width, 2), 2) + Math.Pow(width / Q, 2));
                                         double mag = num / den;
                                         db = 20 * Math.Log10(mag);
                                     }
@@ -958,8 +959,8 @@ namespace TewiMP.UI.Controls
 
                                 case PassFilterType.HighPass:
                                     {
-                                        double num = Math.Pow(w, 2);
-                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(w, 2), 2) + Math.Pow(w / Q, 2));
+                                        double num = Math.Pow(width, 2);
+                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(width, 2), 2) + Math.Pow(width / Q, 2));
                                         double mag = num / den;
                                         db = 20 * Math.Log10(mag);
                                     }
@@ -983,8 +984,8 @@ namespace TewiMP.UI.Controls
 
                                 case PassFilterType.BandPassPeak:
                                     {
-                                        double num = w / Q;
-                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(w, 2), 2) + Math.Pow(w / Q, 2));
+                                        double num = width / Q;
+                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(width, 2), 2) + Math.Pow(width / Q, 2));
                                         double mag = num / den;
                                         db = 20 * Math.Log10(mag);
                                     }
@@ -992,8 +993,8 @@ namespace TewiMP.UI.Controls
 
                                 case PassFilterType.BandPassSkirt:
                                     {
-                                        double num = Q * w;
-                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(w, 2), 2) + Math.Pow(w * Q, 2));
+                                        double num = Q * width;
+                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(width, 2), 2) + Math.Pow(width * Q, 2));
                                         double mag = num / den;
                                         db = 20 * Math.Log10(mag);
                                     }
@@ -1001,8 +1002,8 @@ namespace TewiMP.UI.Controls
 
                                 case PassFilterType.Notch:
                                     {
-                                        double num = Math.Abs(1 - Math.Pow(w, 2));
-                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(w, 2), 2) + Math.Pow(w / Q, 2));
+                                        double num = Math.Abs(1 - Math.Pow(width, 2));
+                                        double den = Math.Sqrt(Math.Pow(1 - Math.Pow(width, 2), 2) + Math.Pow(width / Q, 2));
                                         double mag = num / den;
                                         db = 20 * Math.Log10(mag);
                                     }
@@ -1022,7 +1023,7 @@ namespace TewiMP.UI.Controls
                     }
                 }
 
-                // ParametricEq£¨dBÖ±½ÓÏà¼Ó£©
+                // ParametricEqï¼ˆdBç›´æ¥ç›¸åŠ ï¼‰
                 if (AudioFilterStatic.ParametricEqEnable)
                 {
                     double parametricDb = 0;
@@ -1034,16 +1035,16 @@ namespace TewiMP.UI.Controls
                     totalDb += parametricDb;
                 }
 
-                float x = (float)(i / (double)(points - 1) * width);
-                float y = height / 2 - (float)(totalDb / 24.0 * (height / 2));
+                float x = (float)(i / (double)(points - 1) * w);
+                float y = h / 2 - (float)(totalDb / 24.0 * (h / 2));
                 curve[i] = new Vector2(x, y);
             }
 
-            // curve ÊÇ List<Vector2> »ò Vector2[]£¬°üº¬Á¬Ğøµã
+            // curve æ˜¯ List<Vector2> æˆ– Vector2[]ï¼ŒåŒ…å«è¿ç»­ç‚¹
             if (curve == null || curve.Length < 2)
                 return;
 
-            // ´´½¨Â·¾¶
+            // åˆ›å»ºè·¯å¾„
             using (var pathBuilder = new CanvasPathBuilder(ds))
             {
                 pathBuilder.BeginFigure(curve[0]);
@@ -1053,7 +1054,7 @@ namespace TewiMP.UI.Controls
 
                 pathBuilder.EndFigure(CanvasFigureLoop.Open);
 
-                // »æÖÆÇúÏß
+                // ç»˜åˆ¶æ›²çº¿
                 using (var geometry = CanvasGeometry.CreatePath(pathBuilder))
                 {
                     ds.DrawGeometry(geometry, App.Instance.PlayingListService.TextColor.A(180), (float)DrawEqLinesStrokeWidth);
@@ -1063,18 +1064,22 @@ namespace TewiMP.UI.Controls
 
         private void UpdateSpectrumCache(int sampleRate, int barCount, double minFreq, double maxFreq, float w, float h, SpectrumAnalyzer analyzer)
         {
-            // ¼ì²é»º´æÊÇ·ñÓĞĞ§ (Èç¹ûÕıÔÚËõ·Å¶¯»­£¬Ã¿Ö¡¶¼»áÓÉÓÚ min/max ±ä»¯¶øÖØĞÂ½øÈëÕâÀï£¬ÕâÊÇÕı³£µÄ)
-            if (_barCache != null && _barCache.Length == barCount &&
-                _cacheSampleRate == sampleRate && Math.Abs(_cacheWidth - w) < 0.1f &&
-                Math.Abs(_cacheMinFreq - minFreq) < 0.001 && Math.Abs(_cacheMaxFreq - maxFreq) < 0.001)
+            // æ£€æŸ¥ç¼“å­˜æ˜¯å¦æœ‰æ•ˆ
+            if (_barCache != null &&
+                _barCache.Length == barCount &&
+                _cacheSampleRate == sampleRate &&
+                Math.Abs(_cacheWidth - w) < 0.1f &&
+                Math.Abs(_cacheMinFreq - minFreq) < 0.001 &&
+                Math.Abs(_cacheMaxFreq - maxFreq) < 0.001 &&
+                Math.Abs(_cacheTiltDbPerOct - TiltDbPerOct) < 0.001)
             {
-                return; // »º´æÃüÖĞ£¬Ö±½Ó·µ»Ø
+                return;
             }
 
             if (_barCache == null || _barCache.Length != barCount)
                 _barCache = new SpectrumBarCache[barCount];
 
-            // ¿ªÊ¼ÊıÑ§¼ÆËã
+            // å¼€å§‹æ•°å­¦è®¡ç®—
             double logMin = Math.Log10(minFreq);
             double logMax = Math.Log10(maxFreq);
             double binScale = (analyzer.Spectrum.Length - 1) / (sampleRate / 2.0);
@@ -1087,43 +1092,44 @@ namespace TewiMP.UI.Controls
             double prevEdgeFreq = Math.Pow(10, logMin); // Start with i=0
             for (int i = 0; i < barCount; i++)
             {
-                // ¼ÆËãÆµÂÊ±ß½ç
+                // è®¡ç®—é¢‘ç‡è¾¹ç•Œ
                 double tNext = (double)(i + 1) / barCount;
                 double curvedTNext = Math.Pow(tNext, a);
                 double nextEdgeFreq = Math.Pow(10, logMin + (logMax - logMin) * curvedTNext);
 
                 double fStart = prevEdgeFreq;
                 double fEnd = nextEdgeFreq;
-                prevEdgeFreq = nextEdgeFreq; // ÎªÏÂÒ»´ÎÑ­»·×ö×¼±¸
+                prevEdgeFreq = nextEdgeFreq; // ä¸ºä¸‹ä¸€æ¬¡å¾ªç¯åšå‡†å¤‡
 
-                // ¼ÆËã Bin Ë÷Òı
+                // è®¡ç®— Bin ç´¢å¼•
                 _barCache[i].BinStart = Math.Clamp((int)(fStart * binScale), 0, analyzer.Spectrum.Length - 1);
                 _barCache[i].BinEnd = Math.Clamp((int)(fEnd * binScale), 0, analyzer.Spectrum.Length - 1);
                 _barCache[i].Count = _barCache[i].BinEnd - _barCache[i].BinStart + 1;
 
-                // ¼ÆËãÖĞĞÄÆµÂÊÓÃÓÚ X ×ø±êºÍ Tilt
+                // è®¡ç®—ä¸­å¿ƒé¢‘ç‡ç”¨äº X åæ ‡å’Œ Tilt
                 double freqCenter = Math.Sqrt(fStart * fEnd);
 
-                // ¼ÆËã X ×ø±ê
+                // è®¡ç®— X åæ ‡
                 _barCache[i].X = (float)((Math.Log10(freqCenter) - logMin) / (logMax - logMin) * w);
 
-                // ¼ÆËã Tilt ĞŞÕıÖµ (Ô¤ÏÈËãºÃÏµÊı)
-                // Ô­Ê¼¹«Ê½£ºnormalized + tiltOffset * normalized
+                // è®¡ç®— Tilt ä¿®æ­£å€¼ (é¢„å…ˆç®—å¥½ç³»æ•°)
+                // åŸå§‹å…¬å¼ï¼šnormalized + tiltOffset * normalized
                 // tiltOffset = (slope / range) * decades
                 double decadesFromRef = Math.Log10(freqCenter / refFreq);
                 double dbRange = analyzer.MaxDb - analyzer.MinDb;
                 _barCache[i].TiltFactor = (float)((slopeDbPerDec / dbRange) * decadesFromRef);
             }
 
-            // ĞŞÕıÊ×Î² X ×ø±ê
+            // ä¿®æ­£é¦–å°¾ X åæ ‡
             _barCache[0].X = 0;
             _barCache[^1].X = w;
 
-            // ¸üĞÂ»º´æ±ê¼Ç
+            // æ›´æ–°ç¼“å­˜æ ‡è®°
             _cacheSampleRate = sampleRate;
             _cacheWidth = w;
             _cacheMinFreq = minFreq;
             _cacheMaxFreq = maxFreq;
+            _cacheTiltDbPerOct = TiltDbPerOct;
         }
         #endregion
     }

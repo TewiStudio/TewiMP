@@ -47,7 +47,7 @@ namespace TewiMP.UI.Pages
             NavToObj = searchData.Key;
             NowMusicFrom = searchData.SourcePlugin;
             NowSearchMode = searchData.SearchDataType;
-            musicListData = new() { ListDataType = DataType.歌曲 };
+            musicListData = new() { ListDataType = DataType.Song };
         }
 
         protected override async void OnNavigatedFrom(NavigationEventArgs e)

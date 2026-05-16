@@ -1,4 +1,4 @@
-using CommunityToolkit.WinUI.Animations;
+ï»¿using CommunityToolkit.WinUI.Animations;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -155,7 +155,7 @@ namespace TewiMP.UI.Controls
 
         public MusicDataItem()
         {
-            initListen(); // ¾²Ì¬³õÊ¼»¯£¬Ö»ÔÚ³ÌĞòµÚÒ»´ÎÔËĞĞÊ±Ö´ĞĞÒ»´Î
+            initListen(); // é™æ€åˆå§‹åŒ–ï¼Œåªåœ¨ç¨‹åºç¬¬ä¸€æ¬¡è¿è¡Œæ—¶æ‰§è¡Œä¸€æ¬¡
             InitializeComponent();
             //arrayList = new ArrayList(10000000);
         }
@@ -170,8 +170,8 @@ namespace TewiMP.UI.Controls
         {
             if (ViewModel is null || Info_Image is null) return;
 
-            // ÔÚ×¨¼­ÁĞ±íÏÂÊ±²»¼ÓÔØÍ¼Æ¬
-            if (ViewModel.MusicListData?.ListDataType == DataType.×¨¼­)
+            // åœ¨ä¸“è¾‘åˆ—è¡¨ä¸‹æ—¶ä¸åŠ è½½å›¾ç‰‡
+            if (ViewModel.MusicListData?.ListDataType == DataType.Album)
             {
                 Info_Image_Root.Visibility = Visibility.Collapsed;
                 return;
@@ -179,14 +179,14 @@ namespace TewiMP.UI.Controls
 
             if (ViewModel.MusicData.From == MusicFrom.localMusic)
             {
-                // Îª midi ÎÄ¼şÊ±²»¼ÓÔØÍ¼Æ¬
+                // ä¸º midi æ–‡ä»¶æ—¶ä¸åŠ è½½å›¾ç‰‡
                 if (Path.GetExtension(ViewModel.MusicData.InLocal) == ".mid")
                 {
                     Info_Image.Source = null;
                     Info_Image_Root.Visibility = Visibility.Collapsed;
                     return;
                 }
-                // ÎÄ¼ş²»´æÔÚÊ±²»¼ÓÔØÍ¼Æ¬
+                // æ–‡ä»¶ä¸å­˜åœ¨æ—¶ä¸åŠ è½½å›¾ç‰‡
                 if (!File.Exists(ViewModel.MusicData.InLocal))
                 {
                     Info_Image_Root.Visibility = Visibility.Collapsed;
@@ -278,7 +278,7 @@ namespace TewiMP.UI.Controls
             else
             {
                 App.Instance.AudioService.PlayStateChanged -= AudioService_PlayStateChanged;
-                if (last_IsMusicDataPlaying) // Ö»ÓĞµ±ÉÏ´Îµ÷ÓÃ´Ëº¯ÊıÊ± IsMusicDataPlaying ÅĞ¶ÏÎª true Ê±²ÅÖ´ĞĞÏÂÃæµÄ»Ö¸´ÑùÊ½´úÂë
+                if (last_IsMusicDataPlaying) // åªæœ‰å½“ä¸Šæ¬¡è°ƒç”¨æ­¤å‡½æ•°æ—¶ IsMusicDataPlaying åˆ¤æ–­ä¸º true æ—¶æ‰æ‰§è¡Œä¸‹é¢çš„æ¢å¤æ ·å¼ä»£ç 
                 {
                     SetPlayingIcon(NAudio.Wave.PlaybackState.Paused);
                     OnMouseLeave();
@@ -469,7 +469,7 @@ namespace TewiMP.UI.Controls
 
         private void Info_Texts_FlyoutMenu_Artist_Item_Loaded(object sender, RoutedEventArgs e)
         {
-            Info_Texts_FlyoutMenu_Album_Item.Text = $"×¨¼­£º{ViewModel.MusicData.Album.Title}";
+            Info_Texts_FlyoutMenu_Album_Item.Text = $"ä¸“è¾‘ï¼š{ViewModel.MusicData.Album.Title}";
             Info_Texts_FlyoutMenu_Artist_Item.Items.Clear();
             foreach (var artist in ViewModel.MusicData.Artists)
             {

@@ -11,6 +11,7 @@ public class Main : Plugin
         Describe = "获取版本信息的 Json 字符串",
         Author = "TewiStudio",
         Version = "1.0.0",
+        GUID = "tewi.buildin.egetversionjson"
     };
     protected override Dictionary<string, object> PluginSettings { get; set; } = new()
         {

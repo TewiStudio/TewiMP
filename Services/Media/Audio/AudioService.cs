@@ -329,11 +329,13 @@ public class AudioService
     }
 
     private readonly object _analyzerLock = new();
+    public float[] spectrum = null;
+    bool inThread = false;
     private void CompositionTarget_Rendering(object sender, object e)
     {
         if (VolumeMeter is null) return;
 
-        float[] spectrum = null;
+        spectrum = null;
         lock (_analyzerLock)
         {
             var analyzer = AudioAnalyzer;

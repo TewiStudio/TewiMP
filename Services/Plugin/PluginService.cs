@@ -1,14 +1,13 @@
-﻿using System;
+﻿namespace TewiMP.Services.Plugin;
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using Newtonsoft.Json.Linq;
-using TewiMP.Services;
 using TewiMP.Services.Storage;
-
-namespace TewiMP.Services.Plugin;
 
 public static class PluginService
 {
@@ -21,12 +20,7 @@ public static class PluginService
     {
         LogService.Log(nameof(PluginService), "初始化 PluginManager.");
         RemoveAllPlugin();
-        /*
-        assemblyLoadContext?.Unload();
-        GC.Collect();
-        assemblyLoadContext = new AssemblyLoadContext("Plugins", true);*/
 
-#if !DEBUG
         DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
         var dllFiles = directoryInfo.GetFiles();
         LogService.Log(nameof(PluginService), $"Scanned plugins count: {dllFiles.Length}.");
@@ -34,36 +28,10 @@ public static class PluginService
         for (int i = 0; i < dllFiles.Length; i++)
         {
             if (dllFiles[i].Extension.ToLower() is not ".dll") continue;
-            var fileData = File.ReadAllBytes(dllFiles[i].FullName);
-
-            //Assembly asm = assemblyLoadContext.LoadFromStream(new MemoryStream(fileData));
-            Assembly asm = Assembly.Load(fileData);
-            var manifestModuleName = asm.ManifestModule.ScopeName;
-            var classLibraryName = manifestModuleName.Remove(manifestModuleName.LastIndexOf("."), manifestModuleName.Length - manifestModuleName.LastIndexOf("."));
-            Type type = asm.GetType(classLibraryName + ".Main");
-
-            bool isMusicSourcePlugin = false;
-            if (typeof(MusicSourcePlugin).IsAssignableFrom(type))
-            {
-                isMusicSourcePlugin = true;
-            }
-            else if (typeof(Plugin).IsAssignableFrom(type))
-            {
-
-            }
-            else
-            {
-                App.MainWindowInstance.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 Plugin 类。");
-                LogService.Log(nameof(PluginService), $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
-                continue;
-            }
-
-            if (isMusicSourcePlugin)
-                AddPlugin(Activator.CreateInstance(type) as MusicSourcePlugin);
-            else
-                AddPlugin(Activator.CreateInstance(type) as Plugin);
+            var dllFile = dllFiles[i];
+            AddPlugin(dllFile.FullName);
         }
-#endif
+
 #if DEBUG
         Assembly assembly = Assembly.GetExecutingAssembly();
 
@@ -74,25 +42,7 @@ public static class PluginService
 
         foreach (var type in result)
         {
-            bool isMusicSourcePlugin = false;
-            if (typeof(MusicSourcePlugin).IsAssignableFrom(type))
-            {
-                isMusicSourcePlugin = true;
-            }
-            else if (typeof(Plugin).IsAssignableFrom(type))
-            {
-
-            }
-            else
-            {
-                App.MainWindowInstance.AddNotify("加载插件失败", $"\"{type}\" 加载失败：未继承 IPlugin 接口。");
-                LogService.Log(nameof(PluginService), $"Load plugin failed: {type} does not inherit the IPlugin interface.");
-                continue;
-            }
-            if (isMusicSourcePlugin)
-                AddPlugin(Activator.CreateInstance(type) as MusicSourcePlugin);
-            else
-                AddPlugin(Activator.CreateInstance(type) as Plugin);
+            AddPlugin(Activator.CreateInstance(type) as IPlugin);
         }
 #endif
 
@@ -115,42 +65,83 @@ public static class PluginService
         MusicSourcePlugins.Clear();
     }
 
+    public static bool AddPlugin(string path)
+    {
+        var fileData = File.ReadAllBytes(path);
+        Assembly asm = Assembly.Load(fileData);
+        var manifestModuleName = asm.ManifestModule.ScopeName;
+        var classLibraryName = manifestModuleName.Remove(manifestModuleName.LastIndexOf("."), manifestModuleName.Length - manifestModuleName.LastIndexOf("."));
+        Type type = asm.GetType(classLibraryName + ".Main");
+
+        if (typeof(IPlugin).IsAssignableFrom(type) && !type.IsInterface && !type.IsAbstract)
+        {
+            var plugin = Activator.CreateInstance(type) as IPlugin;
+            plugin.PluginInfo.path = path;
+            AddPlugin(plugin);
+        }
+        else
+        {
+            App.MainWindowInstance.AddNotify("加载插件失败", $"\"{manifestModuleName}\" 加载失败：未继承 IPlugin 接口。");
+            LogService.Log(nameof(PluginService), $"Load plugin failed: {manifestModuleName} does not inherit the IPlugin interface.");
+            return false;
+        }
+        return true;
+    }
+
+    public static void AddPlugin(IPlugin plugin)
+    {
+        if (plugin is MusicSourcePlugin musicSourcePlugin)
+        {
+            AddPlugin(musicSourcePlugin);
+        }
+        else if (plugin is Plugin normalPlugin)
+        {
+            AddPlugin(normalPlugin);
+        }
+    }
+
     public static void AddPlugin(Plugin plugin)
     {
+        if (string.IsNullOrEmpty(plugin.PluginInfo.GUID))
+        {
+            App.MainWindowInstance.AddNotify("加载插件失败", $"\"{plugin.PluginInfo.Name}\" 加载失败：插件 GUID 不能为空。");
+            LogService.Error(nameof(PluginService), $"Load plugin failed: {plugin.PluginInfo.Name} GUID is null or empty.");
+            return;
+        }
         Plugins.Add(plugin);
-        LogService.Log(nameof(PluginService), $"Loaded plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log(nameof(PluginService), $"Loaded plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
     }
 
     public static void AddPlugin(MusicSourcePlugin plugin)
     {
         MusicSourcePlugins.Add(plugin);
-        LogService.Log(nameof(PluginService), $"Loaded source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log(nameof(PluginService), $"Loaded source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
     }
 
     public static void RemovePlugin(Plugin plugin)
     {
         DisablePlugin(plugin);
         Plugins.Remove(plugin);
-        LogService.Log(nameof(PluginService), $"Removed plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log(nameof(PluginService), $"Removed plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
     }
 
     public static void RemovePlugin(MusicSourcePlugin plugin)
     {
         DisablePlugin(plugin);
         MusicSourcePlugins.Remove(plugin);
-        LogService.Log(nameof(PluginService), $"Removed source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log(nameof(PluginService), $"Removed source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
     }
 
     public static void EnablePlugin(Plugin plugin)
     {
         plugin.OnEnable();
-        LogService.Log(nameof(PluginService), $"Enabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log(nameof(PluginService), $"Enabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
     }
 
     public static void DisablePlugin(Plugin plugin)
     {
         plugin.OnDisable();
-        LogService.Log(nameof(PluginService), $"Disabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.ID}.");
+        LogService.Log(nameof(PluginService), $"Disabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
     }
 
     public static void UpdatePluginInfoSettings()
@@ -171,13 +162,13 @@ public static class PluginService
         JObject pluginSettingsData = DataFolderBase.PluginSettingsData;
         foreach (var item in pluginSettingsData)
         {
-            var plugins = Plugins.Where(plugin => plugin.PluginInfo.ToString() == item.Key);
+            var plugins = Plugins.Where(plugin => plugin.PluginInfo.GUID == item.Key);
             if (plugins.Any())
             {
                 plugins.First().SetPluginSettings(item.Value.ToObject<Dictionary<string, object>>());
             }
 
-            var musicSourcePlugins = MusicSourcePlugins.Where(plugin => plugin.PluginInfo.ToString() == item.Key);
+            var musicSourcePlugins = MusicSourcePlugins.Where(plugin => plugin.PluginInfo.GUID == item.Key);
             if (musicSourcePlugins.Any())
             {
                 musicSourcePlugins.First().SetPluginSettings(item.Value.ToObject<Dictionary<string, object>>());

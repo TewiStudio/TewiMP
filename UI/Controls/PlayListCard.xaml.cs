@@ -16,6 +16,7 @@ using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services;
 using TewiMP.Services.Storage;
+using TewiMP.Services.Plugin;
 
 namespace TewiMP.UI.Controls
 {
@@ -56,7 +57,7 @@ namespace TewiMP.UI.Controls
         {
             MusicListData = musicListData;
             UpdateImage();
-            if (MusicListData.ListDataType != DataType.歌单)
+            if (MusicListData.ListDataType != DataType.Playlist)
             {
                 RefreshPlayListButton.Visibility = Visibility.Collapsed;
                 MusicSourceRoot.Visibility = Visibility.Collapsed;
@@ -65,9 +66,9 @@ namespace TewiMP.UI.Controls
             {
                 RefreshPlayListButton.Visibility = Visibility.Visible;
                 MusicSourceRoot.Visibility = Visibility.Visible;
-                MusicSourceBtn.Content = MusicListData.PluginInfo.Name;
+                MusicSourceBtn.Content = MusicListData.PluginInfoGUID;
             }
-            if (musicListData.ListDataType == DataType.本地歌单)
+            if (musicListData.ListDataType == DataType.LocalPlaylist)
             {
                 EditPlayListButton.Visibility = Visibility.Visible;
             }
@@ -268,7 +269,7 @@ namespace TewiMP.UI.Controls
                     catch { }
                 });
 
-                var playlist = await musicListData.PluginInfo.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
+                var playlist = await musicListData.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
                 musicListData = playlist;
 
                 var data = await PlayListHelper.ReadData();
@@ -308,7 +309,7 @@ namespace TewiMP.UI.Controls
 
         private async void MusicSourceBtn_Click(object sender, RoutedEventArgs e)
         {
-            await MusicListData.PluginInfo.GetMusicSourcePlugin().ShowSettingsDialog();
+            await MusicListData.GetMusicSourcePlugin().ShowSettingsDialog();
         }
     }
 }

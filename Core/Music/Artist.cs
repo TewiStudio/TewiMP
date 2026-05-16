@@ -10,7 +10,7 @@ public record class Artist : IIsListPage
     public string PicturePath { get; set; }
     public string Describee { get; set; }
     public MusicFrom From { get; set; }
-    public PluginInfo PluginInfo { get; set; }
+    public string PluginInfoGUID { get; set; }
     public MusicListData HotSongs { get; set; }
     public int Count { get; set; }
 
@@ -19,6 +19,16 @@ public record class Artist : IIsListPage
         Name = name;
         this.ID = ID;
         PicturePath = picturePath;
+    }
+
+    private MusicSourcePlugin _plugin = null;
+    public MusicSourcePlugin GetMusicSourcePlugin()
+    {
+        if (_plugin != null) return _plugin;
+        if (string.IsNullOrEmpty(PluginInfoGUID)) return null;
+
+        _plugin = PluginInfoGUID.GetMusicSourcePlugin();
+        return _plugin;
     }
 
     public override string ToString()

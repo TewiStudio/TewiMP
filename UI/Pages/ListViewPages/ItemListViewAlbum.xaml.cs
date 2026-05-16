@@ -1,27 +1,27 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
-using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Composition;
-using Windows.System;
 using CommunityToolkit.WinUI;
-using TewiMP.UI.Windows;
-using TewiMP.UI.Controls;
-using TewiMP.UI.Pages.ListViewPages;
-using TewiMP.Core.Music;
+using Microsoft.UI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Navigation;
+using Windows.System;
 using TewiMP.Core.Models;
+using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services;
 using TewiMP.Services.Media;
 using TewiMP.Services.Storage;
+using TewiMP.UI.Controls;
+using TewiMP.UI.Pages.ListViewPages;
+using TewiMP.UI.Windows;
 
 namespace TewiMP.UI.Pages
 {
@@ -120,13 +120,13 @@ namespace TewiMP.UI.Pages
                 LoadingTipControl.UnShowLoading();
                 return;
             }
-            if (NavToObj.PluginInfo is null)
+            if (string.IsNullOrEmpty(NavToObj.PluginInfoGUID))
             {
                 LoadingTipControl.UnShowLoading();
                 App.MainWindowInstance.AddNotify("找不到此专辑的信息", "无插件源查询专辑信息。", NotifySeverity.Error);
                 return;
             }
-            var obj = await NavToObj.PluginInfo.GetMusicSourcePlugin().GetAlbum(NavToObj.ID);
+            var obj = await NavToObj.GetMusicSourcePlugin().GetAlbum(NavToObj.ID);
             if (!IsLoaded) return;
             if (obj is null)
             {
@@ -171,15 +171,15 @@ namespace TewiMP.UI.Pages
             AlbumLogo.Source = null;
             AlbumLogo.BorderThickness = new(0);
             if (NavToObj is null) return;
-            if (musicListData.ListDataType == DataType.本地歌单)
+            if (musicListData.ListDataType == DataType.LocalPlaylist)
             {
                 Album_Image.Source = musicListData.PicturePath.ToImageUri();
             }
-            else if (musicListData.ListDataType == DataType.歌单)
+            else if (musicListData.ListDataType == DataType.Playlist)
             {
                 Album_Image.Source = await ImageService.GetImageUri(musicListData);
             }
-            else if (musicListData.ListDataType == DataType.专辑)
+            else if (musicListData.ListDataType == DataType.Album)
             {
                 var art = NavToObj;
                 Album_Image.Source = new Uri(art.PicturePath);
@@ -726,7 +726,7 @@ namespace TewiMP.UI.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = this;
-            musicListData = new() { ListDataType = DataType.专辑 };
+            musicListData = new() { ListDataType = DataType.Album };
             App.MainWindowInstance.InKeyDownEvent += MainWindow_InKeyDownEvent;
             App.MainWindowInstance.MainViewStateChanged += MainWindow_MainViewStateChanged;
             InitData();

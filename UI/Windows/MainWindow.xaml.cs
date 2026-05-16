@@ -1809,7 +1809,7 @@ public sealed partial class MainWindow : WindowEx
     {
         var name = $"{DateTime.Now} 时的播放列表";
         var musicPlayList = new MusicListData(
-            name, name, "", MusicFrom.localMusic, null, [.. App.Instance.PlayingListService.NowPlayingList], DataType.本地歌单);
+            name, name, "", MusicFrom.localMusic, null, [.. App.Instance.PlayingListService.NowPlayingList], DataType.LocalPlaylist);
         await PlayListHelper.AddPlayList(musicPlayList);
         await App.Instance.PlayListReader.Refresh();
         AddNotify("播放列表已添加！", $"播放列表 \"{name}\" 已添加。", buttonMessage: "打开播放列表", buttonAction: () =>

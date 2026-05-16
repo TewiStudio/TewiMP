@@ -69,11 +69,11 @@ namespace TewiMP.UI.Pages.DialogPages
             if (image is null) return;
 
             int size = 0;
-            if (ml.ListDataType == DataType.本地歌单)
+            if (ml.ListDataType == DataType.LocalPlaylist)
             {
                 image.Source = ml.PicturePath.ToImageUri();
             }
-            else if (ml.ListDataType == DataType.歌单)
+            else if (ml.ListDataType == DataType.Playlist)
             {
                 var imageSources = await ImageService.GetImageUri(ml);
                 image.Source = imageSources;

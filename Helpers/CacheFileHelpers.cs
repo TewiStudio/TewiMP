@@ -24,8 +24,8 @@ namespace TewiMP.Helpers
                 FileInfo[] fileInfo = directory.GetFiles();
                 foreach (FileInfo file in fileInfo)
                 {
-                    string name = file.Name.Split('.')[0];
-                    if (name == $"{musicData.PluginInfo}{musicData.ID}")
+                    string name = file.Name;
+                    if (name == $"{musicData.PluginInfoGUID}{musicData.ID}")
                     {
                         return file.FullName;
                     }
@@ -58,7 +58,7 @@ namespace TewiMP.Helpers
         /// </returns>
         public static string GetImageCache(MusicListData musicListData)
         {
-            var filename = musicListData.ListDataType == DataType.本地歌单
+            var filename = musicListData.ListDataType == DataType.LocalPlaylist
                 ? musicListData.PicturePath
                 : GetImageCache(GetImageCacheFileName(musicListData));
             return filename;
@@ -85,7 +85,7 @@ namespace TewiMP.Helpers
         {
             return musicData.From == MusicFrom.localMusic
                 ? $"{musicData.From}{CodeHelper.ToMD5(musicData.Album.Title)}"
-                : $"{musicData.PluginInfo}" +
+                : $"{musicData.PluginInfoGUID}" +
                   $"{(string.IsNullOrEmpty(musicData.Album?.ID)
                         ? musicData.ID.Replace(@"/", "#")
                         : musicData.Album.ID)}";
@@ -98,7 +98,7 @@ namespace TewiMP.Helpers
         /// <returns></returns>
         public static string GetImageCacheFileName(MusicListData musicListData)
         {
-            return $"{musicListData.PluginInfo}{musicListData.ListDataType}{musicListData.ID}";
+            return $"{musicListData.PluginInfoGUID}{musicListData.ListDataType}{musicListData.ID}";
         }
 
         /// <summary>
@@ -125,7 +125,7 @@ namespace TewiMP.Helpers
                     FileInfo[] fileInfo = directory.GetFiles();
                     foreach (FileInfo file in fileInfo)
                     {
-                        if (file.Name == $"{musicData.PluginInfo}{musicData.ID}")
+                        if (file.Name == $"{musicData.PluginInfoGUID}{musicData.ID}")
                         {
                             return file.FullName;
                         }
@@ -138,7 +138,7 @@ namespace TewiMP.Helpers
         public static Uri ToImageUri(this string filePath)
         {
             //System.Diagnostics.LogManager.Log(filePath);
-            if (string.IsNullOrEmpty(filePath))
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
             {
                 filePath = DataFolderBase.IconPNGPath;
             }

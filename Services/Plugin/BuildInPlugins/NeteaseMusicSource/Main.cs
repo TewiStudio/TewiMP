@@ -1,3 +1,5 @@
+Ôªønamespace TewiMP.Services.Plugin.BuildInPlugins.NeteaseMusicSource;
+
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,95 +10,94 @@ using TewiMP.Core.Music;
 using Meting4Net.Core;
 using Meting4Net.Core.Models.Standard;
 
-namespace TewiMP.Services.Plugin.BuildInPlugins.NeteaseMusicSource
+public class Main : MusicSourcePlugin
 {
-    public class Main : MusicSourcePlugin
+    public Meting Services { get; private set; }
+    public override PluginInfo PluginInfo => new()
     {
-        public Meting Services { get; private set; }
-        public override PluginInfo PluginInfo => new()
-        {
-            Name = "neteaseMusic",
-            Author = "TewiStudio",
-            Version = "1.0.0",
-        };
-        protected override Dictionary<string, object> PluginSettings { get; set; } = new()
+        Name = "neteaseMusic",
+        Author = "TewiStudio",
+        Version = "1.0.0",
+        GUID = "tewi.music.sources.neteasemusic"
+    };
+    protected override Dictionary<string, object> PluginSettings { get; set; } = new()
         {
             { "RetryCount", 15.0 },
             { "NeteaseCookie", "" },
         };
-        private int RetryCount => (int)GetSetting("RetryCount", 15.0);
-        private string NeteaseCookie
+    private int RetryCount => (int)GetSetting("RetryCount", 15.0);
+    private string NeteaseCookie
+    {
+        get
         {
-            get
-            {
-                var setting = GetSetting("NeteaseCookie", "");
-                return string.IsNullOrEmpty(setting) ? Cookie.defaultNeteaseCookie : setting;
-            }
+            var setting = GetSetting("NeteaseCookie", "");
+            return string.IsNullOrEmpty(setting) ? Cookie.defaultNeteaseCookie : setting;
         }
+    }
 
-        public override string GetUserViewPluginSettingName(string keyString)
+    public override string GetUserViewPluginSettingName(string keyString)
+    {
+        switch (keyString)
         {
-            switch (keyString)
-            {
-                case "NeteaseCookie":
-                    return "Cookie";
-                case "RetryCount":
-                    return "÷ÿ ‘¥Œ ˝";
-                default:
-                    return base.GetUserViewPluginSettingName(keyString);
-            }
+            case "NeteaseCookie":
+                return "Cookie";
+            case "RetryCount":
+                return "ÈáçËØïÊ¨°Êï∞";
+            default:
+                return base.GetUserViewPluginSettingName(keyString);
         }
+    }
 
-        public override string GetUserViewPluginSettingDescribe(string keyString)
+    public override string GetUserViewPluginSettingDescribe(string keyString)
+    {
+        switch (keyString)
         {
-            switch (keyString)
-            {
-                case "NeteaseCookie":
-                    return "”√ªß Cookie …Ë÷√°£";
-                case "RetryCount":
-                    return "¥”∑˛ŒÒ∆˜ªÒ»°–≈œ¢ ß∞‹ ±£¨≥Ã–Ú÷ÿ ‘µƒ¥Œ ˝°£";
-                default:
-                    return base.GetUserViewPluginSettingName(keyString);
-            }
+            case "NeteaseCookie":
+                return "Áî®Êà∑ Cookie ËÆæÁΩÆ„ÄÇ";
+            case "RetryCount":
+                return "‰ªéÊúçÂä°Âô®Ëé∑Âèñ‰ø°ÊÅØÂ§±Ë¥•Êó∂ÔºåÁ®ãÂ∫èÈáçËØïÁöÑÊ¨°Êï∞„ÄÇ";
+            default:
+                return base.GetUserViewPluginSettingName(keyString);
         }
+    }
 
-        protected override void OnSettingsChanged(string key, object value)
+    protected override void OnSettingsChanged(string key, object value)
+    {
+        base.OnSettingsChanged(key, value);
+        if (key == "NeteaseCookie")
         {
-            base.OnSettingsChanged(key, value);
-            if (key == "NeteaseCookie")
-            {
-                UpdateCookie();
-            }
-        }
-
-        public override void OnEnable()
-        {
-            Services = new Meting(ServerProvider.Netease);
             UpdateCookie();
-            base.OnEnable();
         }
+    }
 
-        private void UpdateCookie()
-        {
-            Services.Cookie("os=pc;" + NeteaseCookie);
-        }
+    public override void OnEnable()
+    {
+        Services = new Meting(ServerProvider.Netease);
+        UpdateCookie();
+        base.OnEnable();
+    }
 
-        public Album GetAlbumFromJson(JToken json)
+    private void UpdateCookie()
+    {
+        Services.Cookie("os=pc;" + NeteaseCookie);
+    }
+
+    public Album GetAlbumFromJson(JToken json)
+    {
+        Album album = null;
+        var artist = json["artist"];
+        album = new()
         {
-            Album album = null;
-            var artist = json["artist"];
-            album = new()
-            {
-                Title = (string)json["name"],
-                Title2 = json["alias"].Any() ? (string)json["alias"].First : null,
-                ID = (string)json["id"],
-                PicturePath = (string)json["picUrl"],
-                Describe = (string)json["description"],
-                ReleaseTime = ((long)json["publishTime"]).ToDateTimeFromMillisecondsUnix(),
-                From = MusicFrom.pluginMusicSource,
-                PluginInfo = PluginInfo
-            };
-            album.Artists = new()
+            Title = (string)json["name"],
+            Title2 = json["alias"].Any() ? (string)json["alias"].First : null,
+            ID = (string)json["id"],
+            PicturePath = (string)json["picUrl"],
+            Describe = (string)json["description"],
+            ReleaseTime = ((long)json["publishTime"]).ToDateTimeFromMillisecondsUnix(),
+            From = MusicFrom.pluginMusicSource,
+            PluginInfoGUID = PluginInfo.GUID
+        };
+        album.Artists = new()
             {
                 new()
                 {
@@ -105,531 +106,530 @@ namespace TewiMP.Services.Plugin.BuildInPlugins.NeteaseMusicSource
                     ID = (string)artist["id"],
                     PicturePath = (string)artist["picUrl"],
                     From = MusicFrom.pluginMusicSource,
-                    PluginInfo = PluginInfo
+                    PluginInfoGUID = PluginInfo.GUID
                 }
             };
-            album.Songs = new()
+        album.Songs = new()
+        {
+            ListFrom = MusicFrom.pluginMusicSource,
+            PluginInfoGUID = PluginInfo.GUID,
+            ListDataType = DataType.Album
+        };
+        return album;
+    }
+
+    public Artist GetArtistFromJson(JObject json)
+    {
+        Artist artist = new();
+        artist.Name = (string)json["name"];
+        artist.Name2 = json.ContainsKey("trans") ? (string)json["trans"] : null;
+        artist.ID = (string)json["id"];
+        artist.PicturePath = (string)json["img1v1Url"];
+        artist.Describee = (string)json["briefDesc"];
+        artist.From = MusicFrom.pluginMusicSource;
+        artist.PluginInfoGUID = PluginInfo.GUID;
+        return artist;
+    }
+
+    public MusicListData GetMusicListDataFromJson(JToken playlistJson)
+    {
+        MusicListData musicListData = new();
+
+        musicListData.ListShowName = (string)playlistJson["name"];
+        musicListData.ID = (string)playlistJson["id"];
+        musicListData.PicturePath = (string)playlistJson["coverImgUrl"];
+        musicListData.ListFrom = MusicFrom.pluginMusicSource;
+        musicListData.PluginInfoGUID = PluginInfo.GUID;
+        musicListData.ListDataType = DataType.Playlist;
+
+        var plt = playlistJson["tracks"];
+        musicListData.Songs = UnpackMusicData(plt);
+        musicListData.ListName = $"{musicListData.PluginInfoGUID}{musicListData.ListDataType}{musicListData.ID}";
+
+        return musicListData;
+    }
+
+    public List<MusicData> UnpackMusicData(JToken token)
+    {
+        if (token is null) return null;
+        var datas = new List<MusicData>();
+        foreach (JObject md in token)
+        {
+            // Ëé∑ÂèñËâ∫ÊúØÂÆ∂ÂàóË°®
+            List<Artist> artists = new();
+            foreach (var artist in md["ar"])
             {
-                ListFrom = MusicFrom.pluginMusicSource,
-                PluginInfo = PluginInfo,
-                ListDataType = DataType.◊®º≠
+                artists.Add(new(
+                    (string)artist["name"],
+                    (string)artist["id"], null
+                    )
+                {
+                    PluginInfoGUID = PluginInfo.GUID
+                });
+            }
+
+            // Ëé∑Âèñ‰∏ìËæëÂ∞ÅÈù¢
+            string pic = null;
+            if ((md["al"] as JObject).ContainsKey("picUrl"))
+            {
+                pic = (string)md["al"]["picUrl"];
+            }
+            else
+            {
+                pic = null;
+            }
+
+            // Ëé∑Âèñ‰∏ìËæë‰ø°ÊÅØ
+            Album album = new(
+                (string)md["al"]["name"], (string)md["al"]["id"], pic)
+            {
+                From = MusicFrom.pluginMusicSource,
+                PluginInfoGUID = PluginInfo.GUID
             };
-            return album;
-        }
 
-        public Artist GetArtistFromJson(JObject json)
-        {
-            Artist artist = new();
-            artist.Name = (string)json["name"];
-            artist.Name2 = json.ContainsKey("trans") ? (string)json["trans"] : null;
-            artist.ID = (string)json["id"];
-            artist.PicturePath = (string)json["img1v1Url"];
-            artist.Describee = (string)json["briefDesc"];
-            artist.From = MusicFrom.pluginMusicSource;
-            artist.PluginInfo = PluginInfo;
-            return artist;
-        }
-
-        public MusicListData GetMusicListDataFromJson(JToken playlistJson)
-        {
-            MusicListData musicListData = new();
-
-            musicListData.ListShowName = (string)playlistJson["name"];
-            musicListData.ID = (string)playlistJson["id"];
-            musicListData.PicturePath = (string)playlistJson["coverImgUrl"];
-            musicListData.ListFrom = MusicFrom.pluginMusicSource;
-            musicListData.PluginInfo = PluginInfo;
-            musicListData.ListDataType = DataType.∏Ëµ•;
-
-            var plt = playlistJson["tracks"];
-            musicListData.Songs = UnpackMusicData(plt);
-            musicListData.ListName = $"{musicListData.PluginInfo}{musicListData.ListDataType}{musicListData.ID}";
-
-            return musicListData;
-        }
-
-        public List<MusicData> UnpackMusicData(JToken token)
-        {
-            if (token is null) return null;
-            var datas = new List<MusicData>();
-            foreach (JObject md in token)
+            // Ëé∑ÂèñÂèëË°åÊó∂Èó¥
+            DateTime? dateTime = null;
+            bool dateTickComplete = long.TryParse((string)md["publishTime"], out var dateTick);
+            if (dateTickComplete && dateTick != 0L)
             {
-                // ªÒ»°“’ ıº“¡–±Ì
-                List<Artist> artists = new();
-                foreach (var artist in md["ar"])
-                {
-                    artists.Add(new(
-                        (string)artist["name"],
-                        (string)artist["id"], null
-                        )
-                    {
-                        PluginInfo = PluginInfo
-                    });
-                }
-
-                // ªÒ»°◊®º≠∑‚√Ê
-                string pic = null;
-                if ((md["al"] as JObject).ContainsKey("picUrl"))
-                {
-                    pic = (string)md["al"]["picUrl"];
-                }
-                else
-                {
-                    pic = null;
-                }
-
-                // ªÒ»°◊®º≠–≈œ¢
-                Album album = new(
-                    (string)md["al"]["name"], (string)md["al"]["id"], pic)
-                {
-                    From = MusicFrom.pluginMusicSource,
-                    PluginInfo = PluginInfo
-                };
-
-                // ªÒ»°∑¢–– ±º‰
-                DateTime? dateTime = null;
-                bool dateTickComplete = long.TryParse((string)md["publishTime"], out var dateTick);
-                if (dateTickComplete && dateTick != 0L)
-                {
-                    DateTime resultDateTime = dateTick.ToDateTimeFromMillisecondsUnix();
-                    dateTime = resultDateTime;
-                }
-
-                // ¥¥Ω® MusicData ∂‘œÛ
-                MusicData data = new(
-                    (string)md["name"],
-                    (string)md["id"],
-                    artists, album, dateTime,
-                    MusicFrom.pluginMusicSource)
-                {
-                    PluginInfo = PluginInfo
-                };
-
-                // ªÒ»°∑≠“Î–≈œ¢
-                if (md.ContainsKey("tns"))
-                    data.Title2 = (string)md["tns"].First();
-
-                datas.Add(data);
+                DateTime resultDateTime = dateTick.ToDateTimeFromMillisecondsUnix();
+                dateTime = resultDateTime;
             }
-            return datas;
-        }
 
-        public override async Task<string> GetUrl(string id, int br)
-        {
-            return await Task.Run(() =>
+            // ÂàõÂª∫ MusicData ÂØπË±°
+            MusicData data = new(
+                (string)md["name"],
+                (string)md["id"],
+                artists, album, dateTime,
+                MusicFrom.pluginMusicSource)
             {
-                var getAddressAction = string () =>
-                {
-                    string address = Services.FormatMethod().Url(id, br);
+                PluginInfoGUID = PluginInfo.GUID
+            };
 
-                    if (address != null)
+            // Ëé∑ÂèñÁøªËØë‰ø°ÊÅØ
+            if (md.ContainsKey("tns"))
+                data.Title2 = (string)md["tns"].First();
+
+            datas.Add(data);
+        }
+        return datas;
+    }
+
+    public override async Task<string> GetUrl(string id, int br)
+    {
+        return await Task.Run(() =>
+        {
+            var getAddressAction = string () =>
+            {
+                string address = Services.FormatMethod().Url(id, br);
+
+                if (address != null)
+                {
+                    var a = JObject.Parse(address);
+                    if (a.ContainsKey("url"))
                     {
-                        var a = JObject.Parse(address);
-                        if (a.ContainsKey("url"))
+                        if (a["url"].ToString() != "")
                         {
-                            if (a["url"].ToString() != "")
-                            {
-                                address = a["url"].ToString();
-                                return address;
-                            }
+                            address = a["url"].ToString();
+                            return address;
                         }
-                    }
-
-                    return null;
-                };
-
-                for (int i = 0; i <= RetryCount; i++)
-                {
-                    var a = getAddressAction();
-                    if (a != null)
-                    {
-                        return a;
                     }
                 }
 
                 return null;
-            });
-        }
+            };
 
-        public override async Task<Tuple<string, string>> GetLyric(string id)
-        {
-            return await Task.Run(() =>
+            for (int i = 0; i <= RetryCount; i++)
             {
-                var getLyricAction = Tuple<string, string> () =>
+                var a = getAddressAction();
+                if (a != null)
                 {
-                    string lyric = Services.FormatMethod().Lyric(id);
-
-                    if (lyric != null)
-                    {
-                        var a = JObject.Parse(lyric);
-                        if (a.ContainsKey("lyric"))
-                        {
-                            var l = (string)a["lyric"];
-                            var t = (string)a["tlyric"];
-                            return new Tuple<string, string>(l, t);
-                        }
-                    }
-
-                    return null;
-                };
-
-                for (int i = 0; i <= RetryCount; i++)
-                {
-                    var a = getLyricAction();
-                    if (a != null)
-                    {
-                        return a;
-                    }
+                    return a;
                 }
-
-                return null;
-            });
-        }
-
-        private List<string> PictureLoadingList = new();
-        public override async Task<string> GetPic(string id)
-        {
-            while (PictureLoadingList.Count > 3)
-            {
-                await Task.Delay(250);
             }
-            return await Task.Run(() =>
-            {
-                PictureLoadingList.Add(id);
-                var getPicAction = string () =>
-                {
-                    var pic = Services.FormatMethod().PicObj(id, 5000);
 
-                    if (pic != null)
-                    {
-                        return pic.url;
-                    }
+            return null;
+        });
+    }
 
-                    return null;
-                };
-
-                for (int i = 0; i <= RetryCount; i++)
-                {
-                    var a = getPicAction();
-                    if (a != null)
-                    {
-                        PictureLoadingList.Remove(id);
-                        return a;
-                    }
-                }
-
-                PictureLoadingList.Remove(id);
-                return null;
-            });
-        }
-
-        public override async Task<object> GetSearch(
-            string keyword,
-            int pageNumber = 1,
-            int pageSize = 30,
-            int type = 0)
+    public override async Task<Tuple<string, string>> GetLyric(string id)
+    {
+        return await Task.Run(() =>
         {
-            SearchDataType dataType = (SearchDataType)type;
-            return await Task.Run(() =>
+            var getLyricAction = Tuple<string, string> () =>
             {
-                var getSearchAction = object () =>
+                string lyric = Services.FormatMethod().Lyric(id);
+
+                if (lyric != null)
                 {
-                    string data = Services.FormatMethod(false).Search(keyword, new Options() { page = pageNumber, limit = pageSize, type = type });
-
-                    if (data != null)
+                    var a = JObject.Parse(lyric);
+                    if (a.ContainsKey("lyric"))
                     {
-                        var a = JObject.Parse(data);
-                        if (a.ContainsKey("result"))
-                        {
-                            if (dataType == SearchDataType.∏Ë«˙)
-                            {
-                                MusicListData ld = new(keyword, keyword, null, MusicFrom.pluginMusicSource, null, null)
-                                {
-                                    PluginInfo = PluginInfo
-                                };
-                                ld.Songs = UnpackMusicData(a["result"]["songs"]);
-                                if (ld.Songs != null)
-                                    return ld;
-                                else return null;
-                            }
-                            else if (dataType == SearchDataType.∏Ëµ•)
-                            {
-                                List<object[]> list = new();
-                                foreach (var musicList in a["result"]["playlists"])
-                                {
-                                    list.Add([GetMusicListDataFromJson(musicList), (int)musicList["trackCount"]]);
-                                }
-                                return list;
-                            }
-                            else if (dataType == SearchDataType.◊®º≠)
-                            {
-                                List<Album> list = new();
-                                foreach (var albumjson in a["result"]["albums"])
-                                {
-                                    list.Add(GetAlbumFromJson(albumjson));
-                                }
-                                return list;
-                            }
-                            else if (dataType == SearchDataType.“’ ıº“)
-                            {
-                                List<Artist> artists = new();
-                                foreach (var artist in a["result"]["artists"])
-                                {
-                                    artists.Add(GetArtistFromJson((JObject)artist));
-                                }
-                                return artists;
-                            }
-                            else if (dataType == SearchDataType.”√ªß)
-                            {
-
-                            }
-                        }
-                    }
-
-                    return null;
-                };
-
-                for (int i = 0; i <= RetryCount; i++)
-                {
-                    var a = getSearchAction();
-                    if (a != null)
-                    {
-                        return a;
+                        var l = (string)a["lyric"];
+                        var t = (string)a["tlyric"];
+                        return new Tuple<string, string>(l, t);
                     }
                 }
 
                 return null;
-            });
-        }
+            };
 
-        private List<string> PlayListLoadingList = new();
-        public override async Task<MusicListData> GetPlayList(string id)
-        {
-            while (PlayListLoadingList.Count > 3)
+            for (int i = 0; i <= RetryCount; i++)
             {
-                await Task.Delay(250);
+                var a = getLyricAction();
+                if (a != null)
+                {
+                    return a;
+                }
             }
-            return await Task.Run(() =>
+
+            return null;
+        });
+    }
+
+    private List<string> PictureLoadingList = new();
+    public override async Task<string> GetPic(string id)
+    {
+        while (PictureLoadingList.Count > 3)
+        {
+            await Task.Delay(250);
+        }
+        return await Task.Run(() =>
+        {
+            PictureLoadingList.Add(id);
+            var getPicAction = string () =>
             {
-                PlayListLoadingList.Add(id);
-                var getPlayListAction = MusicListData () =>
-                {
-                    try
-                    {
-                        JObject pls = JObject.Parse(Services.FormatMethod(false).Playlist(id));
-                        //LogManager.Log("Debug", pls.ToString());
+                var pic = Services.FormatMethod().PicObj(id, 5000);
 
-                        if (pls["code"].ToString() == "200")
-                        {
-                            MusicListData musicListData = GetMusicListDataFromJson(pls["playlist"]);
-                            if (musicListData.Songs.Count != 0) return musicListData;
-                        }
-                        else
-                        {
-                            //System.Diagnostics.LogManager.Log(pls["message"]);
-                        }
-                    }
-                    catch (Exception err) { LogService.Log("NeteaseMeting", $"GetPlayList Error: {err}", LogLevel.Error); }
-                    return null;
-                };
-
-                for (int i = 0; i <= RetryCount; i++)
+                if (pic != null)
                 {
-                    var a = getPlayListAction();
-                    if (a != null)
+                    return pic.url;
+                }
+
+                return null;
+            };
+
+            for (int i = 0; i <= RetryCount; i++)
+            {
+                var a = getPicAction();
+                if (a != null)
+                {
+                    PictureLoadingList.Remove(id);
+                    return a;
+                }
+            }
+
+            PictureLoadingList.Remove(id);
+            return null;
+        });
+    }
+
+    public override async Task<object> GetSearch(
+        string keyword,
+        int pageNumber = 1,
+        int pageSize = 30,
+        int type = 0)
+    {
+        SearchDataType dataType = (SearchDataType)type;
+        return await Task.Run(() =>
+        {
+            var getSearchAction = object () =>
+            {
+                string data = Services.FormatMethod(false).Search(keyword, new Options() { page = pageNumber, limit = pageSize, type = type });
+
+                if (data != null)
+                {
+                    var a = JObject.Parse(data);
+                    if (a.ContainsKey("result"))
                     {
-                        PlayListLoadingList.Remove(id);
-                        return a;
+                        if (dataType == SearchDataType.Ê≠åÊõ≤)
+                        {
+                            MusicListData ld = new(keyword, keyword, null, MusicFrom.pluginMusicSource, null, null)
+                            {
+                                PluginInfoGUID = PluginInfo.GUID
+                            };
+                            ld.Songs = UnpackMusicData(a["result"]["songs"]);
+                            if (ld.Songs != null)
+                                return ld;
+                            else return null;
+                        }
+                        else if (dataType == SearchDataType.Ê≠åÂçï)
+                        {
+                            List<object[]> list = new();
+                            foreach (var musicList in a["result"]["playlists"])
+                            {
+                                list.Add([GetMusicListDataFromJson(musicList), (int)musicList["trackCount"]]);
+                            }
+                            return list;
+                        }
+                        else if (dataType == SearchDataType.‰∏ìËæë)
+                        {
+                            List<Album> list = new();
+                            foreach (var albumjson in a["result"]["albums"])
+                            {
+                                list.Add(GetAlbumFromJson(albumjson));
+                            }
+                            return list;
+                        }
+                        else if (dataType == SearchDataType.Ëâ∫ÊúØÂÆ∂)
+                        {
+                            List<Artist> artists = new();
+                            foreach (var artist in a["result"]["artists"])
+                            {
+                                artists.Add(GetArtistFromJson((JObject)artist));
+                            }
+                            return artists;
+                        }
+                        else if (dataType == SearchDataType.Áî®Êà∑)
+                        {
+
+                        }
                     }
                 }
 
-                PlayListLoadingList.Remove(id);
                 return null;
-            });
-        }
+            };
 
-        public override async Task<Artist> GetArtist(string id)
-        {
-            return await Task.Run(() =>
+            for (int i = 0; i <= RetryCount; i++)
             {
-                var getArtistAction = Artist () =>
+                var a = getSearchAction();
+                if (a != null)
                 {
-                    var data = JObject.Parse(Services.FormatMethod(false).Artist(id));
-                    //System.Diagnostics.LogManager.Log(data);
-                    Artist artist = new();
-                    if (data["code"].ToString() == "200")
+                    return a;
+                }
+            }
+
+            return null;
+        });
+    }
+
+    private List<string> PlayListLoadingList = new();
+    public override async Task<MusicListData> GetPlayList(string id)
+    {
+        while (PlayListLoadingList.Count > 3)
+        {
+            await Task.Delay(250);
+        }
+        return await Task.Run(() =>
+        {
+            PlayListLoadingList.Add(id);
+            var getPlayListAction = MusicListData () =>
+            {
+                try
+                {
+                    JObject pls = JObject.Parse(Services.FormatMethod(false).Playlist(id));
+                    //LogManager.Log("Debug", pls.ToString());
+
+                    if (pls["code"].ToString() == "200")
                     {
-                        JObject art = (JObject)data["artist"];
-                        artist = GetArtistFromJson(art);
-                        artist.HotSongs = new()
-                        {
-                            ListFrom = MusicFrom.pluginMusicSource,
-                            PluginInfo = PluginInfo,
-                            ListDataType = DataType.“’ ıº“,
-                            Songs = UnpackMusicData(data["hotSongs"]),
-                            PicturePath = artist.PicturePath
-                        };
+                        MusicListData musicListData = GetMusicListDataFromJson(pls["playlist"]);
+                        if (musicListData.Songs.Count != 0) return musicListData;
                     }
                     else
-                        artist = null;
-
-                    return artist;
-                };
-
-                for (int i = 0; i <= RetryCount; i++)
-                {
-                    Artist a = null;
-                    try
                     {
-                        a = getArtistAction();
-                    }
-                    catch { a = null; }
-
-                    if (a != null)
-                    {
-                        if (!string.IsNullOrEmpty(a.ID))
-                            return a;
+                        //System.Diagnostics.LogManager.Log(pls["message"]);
                     }
                 }
-
+                catch (Exception err) { LogService.Log("NeteaseMeting", $"GetPlayList Error: {err}", LogLevel.Error); }
                 return null;
-            });
-        }
+            };
 
-        public override async Task<Album> GetAlbum(string id)
-        {
-            return await Task.Run(() =>
+            for (int i = 0; i <= RetryCount; i++)
             {
-                var getAlbumAction = Album () =>
+                var a = getPlayListAction();
+                if (a != null)
                 {
-                    string jsonStr = Services.FormatMethod(false).Album(id);
-                    var data = JObject.Parse(jsonStr);
-
-                    Album album = null;
-                    //System.Diagnostics.LogManager.Log(data);
-                    try
-                    {
-                        if (data["code"].ToString() == "200")
-                        {
-                            JObject json = (JObject)data["album"];
-                            album = GetAlbumFromJson(json);
-                            album.Songs.Songs = UnpackMusicData(data["songs"]);
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        LogService.Log("NeteaseMeting", $"GetAlbum Error: {err}", LogLevel.Error);
-                    }
-
-                    return album;
-                };
-
-                for (int i = 0; i <= RetryCount; i++)
-                {
-                    Album a = null;
-                    try
-                    {
-                        a = getAlbumAction();
-                    }
-                    catch (Exception err) { a = null; }
-
-                    if (a != null)
-                    {
-                        if (!a.IsNull())
-                            return a;
-                    }
+                    PlayListLoadingList.Remove(id);
+                    return a;
                 }
+            }
 
-                return null;
-            });
-        }
+            PlayListLoadingList.Remove(id);
+            return null;
+        });
+    }
 
-        public override async Task<MusicData> GetMusicData(string songid)
+    public override async Task<Artist> GetArtist(string id)
+    {
+        return await Task.Run(() =>
         {
-            return await Task.Run(() =>
+            var getArtistAction = Artist () =>
             {
-                var getSongAction = MusicData () =>
+                var data = JObject.Parse(Services.FormatMethod(false).Artist(id));
+                //System.Diagnostics.LogManager.Log(data);
+                Artist artist = new();
+                if (data["code"].ToString() == "200")
                 {
-                    var data = JObject.Parse(Services.FormatMethod(false).Song(songid));
-
-                    //System.Diagnostics.LogManager.Log(data);
-                    MusicData musicData = null;
-                    try
+                    JObject art = (JObject)data["artist"];
+                    artist = GetArtistFromJson(art);
+                    artist.HotSongs = new()
                     {
-                        if (data["code"].ToString() == "200")
-                        {
-                            //System.Diagnostics.LogManager.Log(data);
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        //System.Diagnostics.LogManager.Log(err);
-                    }
+                        ListFrom = MusicFrom.pluginMusicSource,
+                        PluginInfoGUID = PluginInfo.GUID,
+                        ListDataType = DataType.Artist,
+                        Songs = UnpackMusicData(data["hotSongs"]),
+                        PicturePath = artist.PicturePath
+                    };
+                }
+                else
+                    artist = null;
 
-                    return musicData;
-                };
+                return artist;
+            };
 
-                for (int i = 0; i <= RetryCount; i++)
+            for (int i = 0; i <= RetryCount; i++)
+            {
+                Artist a = null;
+                try
                 {
-                    MusicData a = null;
-                    try
-                    {
-                        a = getSongAction();
-                    }
-                    catch (Exception err) { a = null; }
+                    a = getArtistAction();
+                }
+                catch { a = null; }
 
-                    if (a != null)
-                    {
+                if (a != null)
+                {
+                    if (!string.IsNullOrEmpty(a.ID))
                         return a;
-                    }
                 }
+            }
 
-                return null;
-            });
-        }
+            return null;
+        });
+    }
 
-        public override async Task<string> GetPicFromMusicData(MusicData id)
+    public override async Task<Album> GetAlbum(string id)
+    {
+        return await Task.Run(() =>
         {
-            return await Task.Run(() =>
+            var getAlbumAction = Album () =>
             {
-                var getSongAction = string () =>
+                string jsonStr = Services.FormatMethod(false).Album(id);
+                var data = JObject.Parse(jsonStr);
+
+                Album album = null;
+                //System.Diagnostics.LogManager.Log(data);
+                try
                 {
-                    var data = JObject.Parse(Services.FormatMethod(false).Song(id.ID));
-
-                    //LogService.LogDebug(data.ToString());
-                    string result = null;
-                    try
+                    if (data["code"].ToString() == "200")
                     {
-                        if (data["code"].ToString() == "200")
-                        {
-                            result = (string)data["songs"][0]["al"]["picUrl"];
-                        }
-                    }
-                    catch (Exception err)
-                    {
-                        LogService.Log("NeteaseMeting", $"GetPicFromMusicData Error: {err}", LogLevel.Error);
-                    }
-
-                    return result;
-                };
-
-                for (int i = 0; i <= RetryCount; i++)
-                {
-                    string a = null;
-                    try
-                    {
-                        a = getSongAction();
-                    }
-                    catch (Exception err) { a = null; }
-
-                    if (a != null)
-                    {
-                        return a;
+                        JObject json = (JObject)data["album"];
+                        album = GetAlbumFromJson(json);
+                        album.Songs.Songs = UnpackMusicData(data["songs"]);
                     }
                 }
+                catch (Exception err)
+                {
+                    LogService.Log("NeteaseMeting", $"GetAlbum Error: {err}", LogLevel.Error);
+                }
 
-                return null;
-            });
-        }
+                return album;
+            };
+
+            for (int i = 0; i <= RetryCount; i++)
+            {
+                Album a = null;
+                try
+                {
+                    a = getAlbumAction();
+                }
+                catch (Exception err) { a = null; }
+
+                if (a != null)
+                {
+                    if (!a.IsNull())
+                        return a;
+                }
+            }
+
+            return null;
+        });
+    }
+
+    public override async Task<MusicData> GetMusicData(string songid)
+    {
+        return await Task.Run(() =>
+        {
+            var getSongAction = MusicData () =>
+            {
+                var data = JObject.Parse(Services.FormatMethod(false).Song(songid));
+
+                //System.Diagnostics.LogManager.Log(data);
+                MusicData musicData = null;
+                try
+                {
+                    if (data["code"].ToString() == "200")
+                    {
+                        //System.Diagnostics.LogManager.Log(data);
+                    }
+                }
+                catch (Exception err)
+                {
+                    //System.Diagnostics.LogManager.Log(err);
+                }
+
+                return musicData;
+            };
+
+            for (int i = 0; i <= RetryCount; i++)
+            {
+                MusicData a = null;
+                try
+                {
+                    a = getSongAction();
+                }
+                catch (Exception err) { a = null; }
+
+                if (a != null)
+                {
+                    return a;
+                }
+            }
+
+            return null;
+        });
+    }
+
+    public override async Task<string> GetPicFromMusicData(MusicData id)
+    {
+        return await Task.Run(() =>
+        {
+            var getSongAction = string () =>
+            {
+                var data = JObject.Parse(Services.FormatMethod(false).Song(id.ID));
+
+                //LogService.LogDebug(data.ToString());
+                string result = null;
+                try
+                {
+                    if (data["code"].ToString() == "200")
+                    {
+                        result = (string)data["songs"][0]["al"]["picUrl"];
+                    }
+                }
+                catch (Exception err)
+                {
+                    LogService.Log("NeteaseMeting", $"GetPicFromMusicData Error: {err}", LogLevel.Error);
+                }
+
+                return result;
+            };
+
+            for (int i = 0; i <= RetryCount; i++)
+            {
+                string a = null;
+                try
+                {
+                    a = getSongAction();
+                }
+                catch (Exception err) { a = null; }
+
+                if (a != null)
+                {
+                    return a;
+                }
+            }
+
+            return null;
+        });
     }
 }
