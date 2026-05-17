@@ -16,7 +16,7 @@ public class LogService
 
     public static void Log(string name, string content, LogLevel logLevel = LogLevel.Info, bool writeToLogStream = true)
     {
-        App.Instance?.LogService.LogInstance(name, content, logLevel, writeToLogStream);
+        App.Instance?.LogService?.LogInstance(name, content, logLevel, writeToLogStream);
     }
 
     public static void LogIf(bool b, string name, string content, LogLevel logLevel = LogLevel.Info, bool writeToLogStream = true)

@@ -230,6 +230,7 @@ namespace TewiMP.UI.Pages.ListViewPages
 
         CompositionPropertySet scrollerPropertySet;
         Compositor compositor;
+        Visual itemsStackPanelVisual;
         Visual scrollVisual;
         Visual headerVisual;
         Visual backgroundVisual;
@@ -238,14 +239,19 @@ namespace TewiMP.UI.Pages.ListViewPages
         Visual commandBarVisual;
         Visual headerFootRootVisual;
         Visual searchRootVisual;
+        InsetClip itemsStackPanelClip;
         ScalarKeyFrameAnimation commandBarVisualOpacityAnimation;
         void InitVisuals()
         {
-            if (!this.IsLoaded) return;
+            if (!IsLoaded) return;
             MultiSelectDo(false);
             MoveItemDo(false);
 
-            // 设置 header 为顶层
+            var itemsStackPanel = CodeHelper.FindDescendant<ItemsStackPanel>(ItemsList);
+            itemsStackPanelVisual = ElementCompositionPreview.GetElementVisual(itemsStackPanel);
+            itemsStackPanelClip = itemsStackPanelVisual.Compositor.CreateInsetClip();
+            itemsStackPanelVisual.Clip = itemsStackPanelClip;
+
             var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ItemsList.Header);
             var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
             Canvas.SetZIndex(headerContainer, 1);
@@ -280,6 +286,7 @@ namespace TewiMP.UI.Pages.ListViewPages
         ExpressionAnimation searchRootVisualOffsetAnimation;
         private ExpressionAnimation _logoScaleAnim;
         private ExpressionAnimation _headerOffsetAnim;
+        private ExpressionAnimation _itemsStackClipAnim;
         private ExpressionAnimation _bgOpacityAnim;
         private ExpressionAnimation _imgOffsetAnim;
         private ExpressionAnimation _infoOffsetAnim;
@@ -338,6 +345,26 @@ namespace TewiMP.UI.Pages.ListViewPages
             }
             _headerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
             headerVisual.StartAnimation("Offset.Y", _headerOffsetAnim);
+
+            // ItemStackClip 动画
+            if (_itemsStackClipAnim is null)
+            {
+                string exp = $"-scroller.Translation.Y - ({ProgressExp} * HeightParam)";
+                _itemsStackClipAnim = compositor.CreateExpressionAnimation(exp);
+                _itemsStackClipAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _itemsStackClipAnim.SetScalarParameter("HeightParam", anotherHeight);
+            itemsStackPanelClip.StartAnimation(nameof(itemsStackPanelClip.TopInset), _itemsStackClipAnim);
+
+            // Search Offset
+            if (_searchOffsetAnim is null)
+            {
+                string exp = $"Vector3(0, TargetY, 0)";
+                _searchOffsetAnim = compositor.CreateExpressionAnimation(exp);
+                // _searchOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+            }
+            _searchOffsetAnim.SetScalarParameter("TargetY", headerRootHeight + 4);
+            searchRootVisual.StartAnimation(nameof(searchRootVisual.Offset), _searchOffsetAnim);
 
             // Background Opacity 动画
             if (_bgOpacityAnim is null)
@@ -399,15 +426,6 @@ namespace TewiMP.UI.Pages.ListViewPages
             _footerOffsetAnim.SetScalarParameter("StartY", actualH - visualH - 8);
             _footerOffsetAnim.SetScalarParameter("EndY", anotherHeight + actualH - visualH - 8);
             headerFootRootVisual.StartAnimation("Offset", _footerOffsetAnim);
-
-            if (_searchOffsetAnim is null)
-            {
-                string exp = $"Vector3(0, TargetY, 0)";
-                _searchOffsetAnim = compositor.CreateExpressionAnimation(exp);
-                // _searchOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
-            }
-            _searchOffsetAnim.SetScalarParameter("TargetY", headerRootHeight + 4);
-            searchRootVisual.StartAnimation(nameof(searchRootVisual.Offset), _searchOffsetAnim);
         }
         void DisposeVisuals()
         {

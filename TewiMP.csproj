@@ -109,10 +109,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="UI\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="CoelWu.Music.SDK" Version="1.0.7" />
 		<PackageReference Include="CommunityToolkit.Labs.WinUI.OpacityMaskView" Version="0.1.250826-build.2212" />
 		<PackageReference Include="CommunityToolkit.Labs.WinUI.TokenView" Version="0.1.250828-build.2223" />
@@ -126,6 +122,8 @@
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.ColorPicker" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.Segmented" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+		<PackageReference Include="DevWinUI" Version="9.9.4" />
+		<PackageReference Include="DevWinUI.Controls" Version="9.9.4" />
 		<PackageReference Include="Downloader" Version="5.5.0" />
 		<PackageReference Include="ksemenenko.ColorThief" Version="1.1.1.4" />
 		<PackageReference Include="Melanchall.DryWetMidi" Version="8.0.3" />

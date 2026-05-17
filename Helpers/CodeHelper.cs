@@ -688,6 +688,23 @@ namespace TewiMP.Helpers
         {
             return await OpenInBrowser(new Uri(url));
         }
+
+        public static T FindDescendant<T>(DependencyObject root)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+            {
+                var child = VisualTreeHelper.GetChild(root, i);
+
+                if (child is T t)
+                    return t;
+
+                var result = FindDescendant<T>(child);
+                if (result != null)
+                    return result;
+            }
+
+            return default;
+        }
     }
 
     public static class StringSimilarity

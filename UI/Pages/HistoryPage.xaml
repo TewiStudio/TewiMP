@@ -53,8 +53,15 @@
                     </Grid>
                     <Grid x:Name="HeaderText" VerticalAlignment="Bottom" Opacity="1"
                           Grid.Row="1" CornerRadius="4" BorderThickness="1"
-                          Background="{ThemeResource CardBackgroundFillColorDefault}" Margin="16,0,16,8"
+                          Margin="16,8,16,8"
                           BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+
+                        <SystemBackdropElement CornerRadius="4">
+                            <SystemBackdropElement.SystemBackdrop>
+                                <DesktopAcrylicBackdrop/>
+                            </SystemBackdropElement.SystemBackdrop>
+                        </SystemBackdropElement>
+                        
                         <Grid Margin="12,4,140,4">
                             <Grid.Resources>
                                 <Style TargetType="TextBlock">

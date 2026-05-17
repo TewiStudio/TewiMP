@@ -16,7 +16,6 @@ using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services;
 using TewiMP.Services.Storage;
-using TewiMP.Services.Plugin;
 
 namespace TewiMP.UI.Controls
 {
@@ -66,7 +65,7 @@ namespace TewiMP.UI.Controls
             {
                 RefreshPlayListButton.Visibility = Visibility.Visible;
                 MusicSourceRoot.Visibility = Visibility.Visible;
-                MusicSourceBtn.Content = MusicListData.PluginInfoGUID;
+                MusicSourceBtn.Content = MusicListData.GetMusicSourcePlugin().PluginInfo.Name;
             }
             if (musicListData.ListDataType == DataType.LocalPlaylist)
             {

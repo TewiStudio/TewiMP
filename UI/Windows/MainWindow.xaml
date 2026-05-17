@@ -7,6 +7,7 @@
     xmlns:local="using:TewiMP.UI.Windows"
     xmlns:winex="using:WinUIEx"
     xmlns:ui="using:CommunityToolkit.WinUI"
+    xmlns:devWinui="using:DevWinUI"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:cmedia="using:CommunityToolkit.WinUI.Media"
     xmlns:behaviors="using:CommunityToolkit.WinUI.Behaviors"
@@ -302,7 +303,7 @@
                                             x:Name="PlayArtist"
                                             Margin="6,0,0,0"
                                             x:FieldModifier="public"
-                                            Text="No media playing"
+                                            Text="TewiStudio"
                                             FontSize="14"
                                             HorizontalAlignment="Left"
                                             RasterizationScale="1.96"
@@ -550,7 +551,7 @@
                                         </Setter>
                                     </Style>
                                     <cmedia:AttachedCardShadow x:Key="CommonShadow"
-                                        Offset="0,0" CornerRadius="0" BlurRadius="32" Color="#30000000"/>
+                                        Offset="0,0" CornerRadius="0" BlurRadius="32" Color="#20222222"/>
                                 </ListView.Resources>
                                 <ListView.Header>
                                     <Grid x:Name="PlayingListHeader">
@@ -625,9 +626,9 @@
                                             </CommandBar>
                                         </Grid>
                                         <controls:ScrollFootButton
-                                            x:Name="PlayingListScrollControl"
-                                            HorizontalAlignment="Right"
-                                            VerticalAlignment="Bottom">
+                                                x:Name="PlayingListScrollControl"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Bottom">
                                         </controls:ScrollFootButton>
                                     </Grid>
                                 </ListView.Header>

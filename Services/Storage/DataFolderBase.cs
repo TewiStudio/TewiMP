@@ -230,7 +230,7 @@ public static class DataFolderBase
         { 
             SettingParams.DesktopLyricOptions.ToString(),
             new JArray() {
-                true, false, false, true
+                true, false, false, false
             }
         },
         { 
@@ -257,7 +257,7 @@ public static class DataFolderBase
         { SettingParams.HotKeyEnable.ToString(), false },
         { SettingParams.HotKeySettings.ToString(), JArray.FromObject(HotKeyService.DefaultRegisterHotKeysList) },
         { SettingParams.StartupWithWindows.ToString(), false },
-        { SettingParams.UseRomajiLyric.ToString(), true },
+        { SettingParams.UseRomajiLyric.ToString(), false },
     };
     
     /// <summary>

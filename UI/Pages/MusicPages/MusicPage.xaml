@@ -9,7 +9,8 @@
     xmlns:data="using:TewiMP.Core"
     xmlns:controls="using:TewiMP.UI.Controls"
     xmlns:uis="using:CommunityToolkit.WinUI"
-    xmlns:ui="using:CommunityToolkit.WinUI.Controls"    
+    xmlns:ui="using:CommunityToolkit.WinUI.Controls"
+    xmlns:devWinui="using:DevWinUI"
     xmlns:brush="using:CommunityToolkit.WinUI.Media"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     x:Name="pageRoot" Loaded="pageRoot_Loaded" x:FieldModifier="Public"
@@ -59,17 +60,17 @@
     <Grid x:Name="_pageRoot">
         <controls:MusicDataFlyout x:Name="MusicDataFlyout"/>
         <controls:ImageEx x:Name="BackgroundBaseImage" IsHitTestVisible="False"
-                          VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="1"
+                          VerticalAlignment="Center" HorizontalAlignment="Center" Opacity="0.1"
                           Stretch="UniformToFill" Loaded="BackgroundBaseImage_Loaded"/>
         <TextBlock x:Name="BridgeTb" TextAlignment="Left" HorizontalAlignment="Left"/>
         <Grid Name="BackgroundFillBase" Background="Transparent"
-              RightTapped="BackgroundFillBase_RightTapped">
+              RightTapped="BackgroundFillBase_RightTapped" Opacity="1">
             <Grid.OpacityTransition>
                 <ScalarTransition/>
             </Grid.OpacityTransition>
             <Rectangle>
                 <Rectangle.Fill>
-                    <brush:BackdropBlurBrush Amount="50" />
+                    <brush:BackdropBlurBrush Amount="60" />
                 </Rectangle.Fill>
             </Rectangle>
             <Rectangle>
@@ -87,9 +88,10 @@
                 <controls:AudioSpectrum
                     Grid.Row="1" Opacity=".55" Margin="0,0,0,12" x:Name="AudioSpectrum1" DrawDbLines="False"
                     StrokeWidth=".2" SmoothWindow="2" SampleCount="256" TiltDbPerOct="-4.5"
-                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                    HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Foreground="{ThemeResource AccentBrush}"/>
             </Grid>
         </Grid>
+        <Rectangle Fill="Transparent" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
         <Grid Padding="0" x:Name="InterfaceBaseGrid">
             <Grid.OpacityTransition>
                 <ScalarTransition Duration="0:0:0.25"/>
@@ -103,7 +105,12 @@
                     <ColumnDefinition Width="*" x:Name="InfoPageColumn"/>
                     <ColumnDefinition Width="1.4*" x:Name="LrcPageColumn"/>
                 </Grid.ColumnDefinitions>
-                <Grid x:Name="InfoBaseGrid" VerticalAlignment="Stretch" Margin="0,0,30,0" SizeChanged="MusicPage_SizeChanged">
+                <Grid x:Name="InfoBaseGrid" VerticalAlignment="Center" HorizontalAlignment="Stretch" Margin="0,0,30,0" SizeChanged="MusicPage_SizeChanged">
+                    <Grid.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </Grid.Transitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" x:Name="ImageVer"/>
                         <RowDefinition Height="*" x:Name="LyricSccondRow"/>
@@ -253,6 +260,11 @@
                 </Grid>
 
                 <Grid x:Name="LyricBaseGrid" Grid.Column="1" Grid.Row="0">
+                    <Grid.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </Grid.Transitions>
                     <ui:OpacityMaskView x:Name="LrcBaseGrid">
                         <ui:OpacityMaskView.OpacityMask>
                             <Rectangle>
@@ -266,23 +278,24 @@
                                 </Rectangle.Fill>
                             </Rectangle>
                         </ui:OpacityMaskView.OpacityMask>
-
-                        <ListView x:Name="LrcBaseListView"
-                                  Loaded="LrcBaseListView_Loaded"
-                                  Background="{x:Null}"
-                                  SelectionChanged="LrcBaseListView_SelectionChanged"
-                                  ScrollViewer.VerticalScrollBarVisibility="Hidden"
-                                  IsFocusEngagementEnabled="True"
-                                  SizeChanged="LrcBaseListView_SizeChanged"
-                                  HorizontalContentAlignment="Stretch"
-                                  ItemTemplate="{ThemeResource LyricTemplate}"
-                                  PointerWheelChanged="LrcSecondListView_PointerWheelChanged">
-                        </ListView>
+                        <Grid>
+                            <ListView x:Name="LrcBaseListView"
+                                      Loaded="LrcBaseListView_Loaded"
+                                      Background="{x:Null}"
+                                      SelectionChanged="LrcBaseListView_SelectionChanged"
+                                      ScrollViewer.VerticalScrollBarVisibility="Hidden"
+                                      IsFocusEngagementEnabled="True"
+                                      SizeChanged="LrcBaseListView_SizeChanged"
+                                      HorizontalContentAlignment="Stretch"
+                                      ItemTemplate="{ThemeResource LyricTemplate}"
+                                      PointerWheelChanged="LrcSecondListView_PointerWheelChanged">
+                            </ListView>
+                        </Grid>
                     </ui:OpacityMaskView>
                 </Grid>
             </Grid>
 
-            <Grid Grid.Row="1" Padding="36,0">
+            <Grid x:Name="ControlRoot" Grid.Row="1" Padding="36,0" Visibility="Visible">
                 <Grid x:Name="ControlBar" Padding="0,0">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="auto"/>

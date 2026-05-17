@@ -292,6 +292,7 @@ namespace TewiMP.UI.Pages.MusicPages
                     LrcPageColumn.Width = new(1.4, GridUnitType.Star);
                     //BridgeTb.TextAlignment = TextAlignment.Left;
                     LyricItem.SetTextAlignmentS(TextAlignment.Left);
+                    InfoBaseGrid.VerticalAlignment = VerticalAlignment.Center;
                     InfoBaseGrid.Margin = new(0, 0, 30, 0);
 
                     ImageVer.Height = new(1, GridUnitType.Star);
@@ -304,6 +305,7 @@ namespace TewiMP.UI.Pages.MusicPages
                     isMiniPage = true;
                     LyricSccondRow.Height = new(1, GridUnitType.Star);
                     LrcPageColumn.Width = new(0);
+                    InfoBaseGrid.VerticalAlignment = VerticalAlignment.Stretch;
                     //BridgeTb.TextAlignment = TextAlignment.Center;
                     LyricItem.SetTextAlignmentS(TextAlignment.Center);
                     InfoBaseGrid.Margin = new(0);

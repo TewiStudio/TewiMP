@@ -83,7 +83,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
             }
             else
             {
-                AppWindow.Resize(new SizeInt32() { Width = (int)(850 * dpi), Height = (int)(120 * dpi) });
+                AppWindow.Resize(new SizeInt32() { Width = (int)(850 * dpi), Height = (int)(132 * dpi) });
                 if (!App.MainWindowInstance.isMinSize)
                 {
                     PointInt32 pointInt32 = new(
@@ -117,47 +117,47 @@ public sealed partial class DesktopLyricWindow : WindowEx
         T2Base.SizeChanged += T1Base_SizeChanged;
         LyricRomajiPopup_tb.SizeChanged += T1Base_SizeChanged;*/
     }
-/*
-    private void T1Base_SizeChanged(object sender, SizeChangedEventArgs e)
-    {
-        CrateShadow();
-    }
-
-    Visual T1Visual = null;
-    Visual T2Visual = null;
-    Visual RTVisual = null;
-    private async void CrateShadow()
-    {
-        await Task.Delay(10);
-        T1Visual = ElementCompositionPreview.GetElementVisual(T1Base);
-        T2Visual = ElementCompositionPreview.GetElementVisual(T2Base);
-        RTVisual = ElementCompositionPreview.GetElementVisual(LyricRomajiPopup_tb);
-
-        TextBlock[] crateShadowElementList = { T1Base, T2Base, LyricRomajiPopup_tb };
-        Visual[] crateShadowVisualList = { T1Visual, T2Visual, RTVisual };
-        DropShadow[] shadowList = new DropShadow[3];
-        for (int i = 0; i < 3; i++)
+    /*
+        private void T1Base_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            shadowList[i]?.Dispose();
-
-            var element = crateShadowElementList[i];
-            var visual = crateShadowVisualList[i];
-            var compositor = visual.Compositor;
-            var basicRectVisual = compositor.CreateSpriteVisual();
-            basicRectVisual.Size = element.RenderSize.ToVector2();
-
-            DropShadow dropShadow = compositor.CreateDropShadow();
-            dropShadow.BlurRadius = 15f;
-            dropShadow.Opacity = 1f;
-            dropShadow.Color = Windows.UI.Color.FromArgb(255, 50, 50, 50);
-            dropShadow.Mask = element.GetAlphaMask();
-            shadowList[i] = dropShadow;
-
-            basicRectVisual.Shadow = dropShadow;
-            ElementCompositionPreview.SetElementChildVisual(element, basicRectVisual);
+            CrateShadow();
         }
-    }
-*/
+
+        Visual T1Visual = null;
+        Visual T2Visual = null;
+        Visual RTVisual = null;
+        private async void CrateShadow()
+        {
+            await Task.Delay(10);
+            T1Visual = ElementCompositionPreview.GetElementVisual(T1Base);
+            T2Visual = ElementCompositionPreview.GetElementVisual(T2Base);
+            RTVisual = ElementCompositionPreview.GetElementVisual(LyricRomajiPopup_tb);
+
+            TextBlock[] crateShadowElementList = { T1Base, T2Base, LyricRomajiPopup_tb };
+            Visual[] crateShadowVisualList = { T1Visual, T2Visual, RTVisual };
+            DropShadow[] shadowList = new DropShadow[3];
+            for (int i = 0; i < 3; i++)
+            {
+                shadowList[i]?.Dispose();
+
+                var element = crateShadowElementList[i];
+                var visual = crateShadowVisualList[i];
+                var compositor = visual.Compositor;
+                var basicRectVisual = compositor.CreateSpriteVisual();
+                basicRectVisual.Size = element.RenderSize.ToVector2();
+
+                DropShadow dropShadow = compositor.CreateDropShadow();
+                dropShadow.BlurRadius = 15f;
+                dropShadow.Opacity = 1f;
+                dropShadow.Color = Windows.UI.Color.FromArgb(255, 50, 50, 50);
+                dropShadow.Mask = element.GetAlphaMask();
+                shadowList[i] = dropShadow;
+
+                basicRectVisual.Shadow = dropShadow;
+                ElementCompositionPreview.SetElementChildVisual(element, basicRectVisual);
+            }
+        }
+    */
     private void AppWindow_Closing(AppWindow sender, AppWindowClosingEventArgs args)
     {
         RemoveEvents();
@@ -173,6 +173,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
         App.Instance.AudioService.VolumeChanged += AudioService_VolumeChanged;
         App.Instance.AudioService.TimingChanged += AudioService_TimingChanged;
         App.Instance.LyricService.LyricTimingChanged += LyricManager_LyricTimingChanged;
+        App.Instance.PlayingListService.NowPlayingImageLoaded += PlayingListService_NowPlayingImageLoaded;
         AudioService_PlayStateChanged(App.Instance.AudioService);
         AudioService_TimingChanged(App.Instance.AudioService);
         LyricManager_LyricTimingChanged(App.Instance.LyricService.NowLyricsData);
@@ -183,11 +184,13 @@ public sealed partial class DesktopLyricWindow : WindowEx
     public void RemoveEvents()
     {
         LogService.Log(nameof(DesktopLyricWindow), "Removed Events.");
+        AppWindow.Closing -= AppWindow_Closing;
         App.Instance.AudioService.SourceChanged -= AudioService_SourceChanged;
         App.Instance.AudioService.PlayStateChanged -= AudioService_PlayStateChanged;
         App.Instance.AudioService.VolumeChanged -= AudioService_VolumeChanged;
         App.Instance.AudioService.TimingChanged -= AudioService_TimingChanged;
         App.Instance.LyricService.LyricTimingChanged -= LyricManager_LyricTimingChanged;
+        App.Instance.PlayingListService.NowPlayingImageLoaded -= PlayingListService_NowPlayingImageLoaded;
     }
 
     public void SetLyricOpacity(double value)
@@ -197,6 +200,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
 
     private void SetLyricIntervalControlProgress(double value)
     {
+        double disableOpacity = .3;
         if (value >= .8)
         {
             LyricIntervalCircle1.Opacity = 1;
@@ -211,39 +215,40 @@ public sealed partial class DesktopLyricWindow : WindowEx
             LyricIntervalCircle2.Opacity = 1;
             LyricIntervalCircle3.Opacity = 1;
             LyricIntervalCircle4.Opacity = 1;
-            LyricIntervalCircle5.Opacity = 0;
+            LyricIntervalCircle5.Opacity = disableOpacity;
         }
         else if (value >= .4)
         {
             LyricIntervalCircle1.Opacity = 1;
             LyricIntervalCircle2.Opacity = 1;
             LyricIntervalCircle3.Opacity = 1;
-            LyricIntervalCircle4.Opacity = 0;
-            LyricIntervalCircle5.Opacity = 0;
+            LyricIntervalCircle4.Opacity = disableOpacity;
+            LyricIntervalCircle5.Opacity = disableOpacity;
         }
         else if (value >= .2)
         {
             LyricIntervalCircle1.Opacity = 1;
             LyricIntervalCircle2.Opacity = 1;
-            LyricIntervalCircle3.Opacity = 0;
-            LyricIntervalCircle4.Opacity = 0;
-            LyricIntervalCircle5.Opacity = 0;
+            LyricIntervalCircle3.Opacity = disableOpacity;
+            LyricIntervalCircle4.Opacity = disableOpacity;
+            LyricIntervalCircle5.Opacity = disableOpacity;
         }
         else if (value > 0)
         {
             LyricIntervalCircle1.Opacity = 1;
-            LyricIntervalCircle2.Opacity = 0;
-            LyricIntervalCircle3.Opacity = 0;
-            LyricIntervalCircle4.Opacity = 0;
-            LyricIntervalCircle5.Opacity = 0;
+            LyricIntervalCircle2.Opacity = disableOpacity;
+            LyricIntervalCircle3.Opacity = disableOpacity;
+            LyricIntervalCircle4.Opacity = disableOpacity;
+            LyricIntervalCircle5.Opacity = disableOpacity;
         }
         else
         {
-            LyricIntervalCircle1.Opacity = 0;
-            LyricIntervalCircle2.Opacity = 0;
-            LyricIntervalCircle3.Opacity = 0;
-            LyricIntervalCircle4.Opacity = 0;
-            LyricIntervalCircle5.Opacity = 0;
+            LyricIntervalCircle1.Opacity = disableOpacity;
+            LyricIntervalCircle2.Opacity = disableOpacity;
+            LyricIntervalCircle3.Opacity = disableOpacity;
+            LyricIntervalCircle4.Opacity = disableOpacity;
+            LyricIntervalCircle5.Opacity = disableOpacity;
+            LyricIntervalRoot.Visibility = Visibility.Collapsed;
         }
 
     }
@@ -309,6 +314,10 @@ public sealed partial class DesktopLyricWindow : WindowEx
         ShowInfo($"正在播放：{AudioService.MusicData.Title}");
     }
 
+    private void PlayingListService_NowPlayingImageLoaded(Uri imageSource, string path)
+    {
+    }
+
     int showCount = 0;
     private async void ShowInfo(string text)
     {
@@ -344,15 +353,21 @@ public sealed partial class DesktopLyricWindow : WindowEx
         lyricIntervalEnd = TimeSpan.MinValue;
         App.Instance.LyricService.FastUpdateMode = false;
 
+        var lrcForeground = App.Current.Resources["LrcForeground"] as SolidColorBrush;
+        var lrcSecondForeground = App.Current.Resources["LrcSecondForeground"] as SolidColorBrush;
+
         if (nowLyricsData is null)
         {
             if (App.Instance.AudioService.MusicData != null)
             {
                 T1.Text = App.Instance.AudioService.MusicData.Title;
-                T2.Text = App.Instance.AudioService.MusicData.ButtonName;
+                T2.Text = App.Instance.AudioService.MusicData.ArtistName;
             }
-            T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
-            T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+
+            T1.Foreground = lrcForeground;
+            T2.Foreground = lrcForeground;
+            T1Shadow.Color = lrcForeground.Color;
+            T2Shadow.Color = lrcForeground.Color;
 
             if (LyricTranslateTextPosition == LyricTranslateTextPosition.Left)
             {
@@ -376,9 +391,11 @@ public sealed partial class DesktopLyricWindow : WindowEx
         if (nowLyricsData.Lyric is null)
         {
             T1.Text = App.Instance.AudioService.MusicData.Title;
-            T2.Text = App.Instance.AudioService.MusicData.ButtonName;
-            T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
-            T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+            T2.Text = App.Instance.AudioService.MusicData.ArtistName;
+            T1.Foreground = lrcForeground;
+            T2.Foreground = lrcForeground;
+            T1Shadow.Color = lrcForeground.Color;
+            T2Shadow.Color = lrcForeground.Color;
 
             if (LyricTranslateTextPosition == LyricTranslateTextPosition.Left)
             {
@@ -409,11 +426,11 @@ public sealed partial class DesktopLyricWindow : WindowEx
             }
             return;
         }
-/*
-        var accentBrush = (SolidColorBrush)(App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ?
-            App.Current.Resources["MusicAlbumAccentBrushReverse"] :
-            App.Current.Resources["MusicAlbumAccentBrush"]);
-*/
+        /*
+                var accentBrush = (SolidColorBrush)(App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ?
+                    App.Current.Resources["MusicAlbumAccentBrushReverse"] :
+                    App.Current.Resources["MusicAlbumAccentBrush"]);
+        */
         var accentBrush = (SolidColorBrush)App.Current.Resources["MusicAlbumAccentBrush"];
         int nowLyricNum = App.Instance.LyricService.NowPlayingLyrics.IndexOf(nowLyricsData);
         LyricData nextLyric = null;
@@ -511,6 +528,8 @@ public sealed partial class DesktopLyricWindow : WindowEx
             {
                 T1.Foreground = accentBrush;
                 T2.Foreground = accentBrush;
+                T1Shadow.Color = accentBrush.Color;
+                T2Shadow.Color = accentBrush.Color;
             }
             else
             {
@@ -519,8 +538,10 @@ public sealed partial class DesktopLyricWindow : WindowEx
                     lyricIntervalStart = beforeLyric.LyricTimeSpan;
                     lyricIntervalEnd = nowLyricsData.LyricTimeSpan;
                 }
-                T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
-                T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                T1.Foreground = lrcForeground;
+                T2.Foreground = lrcForeground;
+                T1Shadow.Color = lrcForeground.Color;
+                T2Shadow.Color = lrcForeground.Color;
             }
 
             animationTextVisual(1);
@@ -598,24 +619,33 @@ public sealed partial class DesktopLyricWindow : WindowEx
                     T1.Text = t1text;
                     if (isNext)
                     {
-                        T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
-                        T2.Foreground = root.Resources["LrcSecondForeground"] as SolidColorBrush;
+                        T1.Foreground = lrcForeground;
+                        T2.Foreground = lrcSecondForeground;
+                        T1Shadow.Color = lrcForeground.Color;
+                        T2Shadow.Color = lrcSecondForeground.Color;
                     }
                     else
                     {
                         IsT1Focus = false;
                         T1.Foreground = accentBrush;
-                        T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                        T2.Foreground = lrcForeground;
+                        T1Shadow.Color = accentBrush.Color;
+                        T2Shadow.Color = lrcForeground.Color;
                     }
 
                     if (nextData.Lyric != null) T2.Text = t2text;
-                    else T2.Foreground = accentBrush;
+                    else // 最后一句歌词
+                    {
+                        T2.Foreground = accentBrush;
+                        T2Shadow.Color = accentBrush.Color;
+                    }
                 }
                 else
                 {
                     T2.Text = t1text;
 
-                    T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                    T1.Foreground = lrcForeground;
+                    T1Shadow.Color = lrcForeground.Color;
                     if (isNext)
                     {
                         if (nowLyricsData.LyricTimeSpan - beforeLyric.LyricTimeSpan >= TimeSpan.FromSeconds(5))
@@ -623,18 +653,26 @@ public sealed partial class DesktopLyricWindow : WindowEx
                             lyricIntervalStart = beforeLyric.LyricTimeSpan;
                             lyricIntervalEnd = nowLyricsData.LyricTimeSpan;
                         }
-                        T1.Foreground = root.Resources["LrcSecondForeground"] as SolidColorBrush;
-                        T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                        T1.Foreground = lrcSecondForeground;
+                        T2.Foreground = lrcForeground;
+                        T1Shadow.Color = lrcSecondForeground.Color;
+                        T2Shadow.Color = lrcForeground.Color;
                     }
                     else
                     {
                         IsT1Focus = true;
-                        T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                        T1.Foreground = lrcForeground;
                         T2.Foreground = accentBrush;
+                        T1Shadow.Color = lrcForeground.Color;
+                        T2Shadow.Color = accentBrush.Color;
                     }
 
                     if (nextData.Lyric != null) T1.Text = t2text;
-                    else T1.Foreground = accentBrush;
+                    else
+                    {
+                        T1.Foreground = accentBrush;
+                        T1Shadow.Color = accentBrush.Color;
+                    }
                 }
             }
             else if (LyricTextBehavior == LyricTextBehavior.MainLyric)
@@ -642,30 +680,51 @@ public sealed partial class DesktopLyricWindow : WindowEx
                 T1.Text = t1text;
                 T2.Text = t2text;
                 if (isNext)
-                    T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                {
+                    T1.Foreground = lrcForeground;
+                    T1Shadow.Color = lrcForeground.Color;
+                }
                 else
+                {
                     T1.Foreground = accentBrush;
-                T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                    T1Shadow.Color = accentBrush.Color;
+                }
+                T2.Foreground = lrcForeground;
+                T2Shadow.Color = lrcForeground.Color;
             }
             else if (LyricTextBehavior == LyricTextBehavior.NextLyric)
             {
                 T1.Text = t2text;
                 T2.Text = t1text;
                 if (isNext)
-                    T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                {
+                    T2.Foreground = lrcForeground;
+                    T2Shadow.Color = lrcForeground.Color;
+                }
                 else
+                {
                     T2.Foreground = accentBrush;
-                T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                    T2Shadow.Color = accentBrush.Color;
+                }
+                T1.Foreground = lrcForeground;
+                T2Shadow.Color = lrcForeground.Color;
             }
             else if (LyricTextBehavior == LyricTextBehavior.OnlyMainLyric)
             {
                 T1.Text = t1text;
                 T2.Text = null;
                 if (isNext)
-                    T1.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                {
+                    T1.Foreground = lrcForeground;
+                    T1Shadow.Color = lrcForeground.Color;
+                }
                 else
+                {
                     T1.Foreground = accentBrush;
-                T2.Foreground = root.Resources["LrcForeground"] as SolidColorBrush;
+                    T1Shadow.Color = accentBrush.Color;
+                }
+                T2.Foreground = lrcForeground;
+                T2Shadow.Color = lrcForeground.Color;
             }
 
             if (nowLyricsData.LyricTimeSpan - beforeLyric?.LyricTimeSpan >= TimeSpan.FromSeconds(5))
@@ -718,7 +777,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
 
     private void Window_SizeChanged(object sender, WindowSizeChangedEventArgs args)
     {
-
+        //LogService.Info("DEBUG", $"{AppWindow.Size.Width}x{AppWindow.Size.Height}");
     }
 
     private void Grid_Loaded(object sender, RoutedEventArgs e)
@@ -782,7 +841,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
                 new(0, toolBarHeight, toolBarWidth, windowHeight - toolBarHeight)
             ];
         }
-        
+
         AppWindow.TitleBar.SetDragRectangles(rectInt32s);
     }
 
@@ -933,7 +992,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
     private void ResizeButton_Click(object sender, RoutedEventArgs e)
     {
         var dpi = CodeHelper.GetScaleAdjustment(this);
-        AppWindow.Resize(new SizeInt32() { Width = (int)(850 * dpi), Height = (int)(120 * dpi) });
+        AppWindow.Resize(new SizeInt32() { Width = (int)(850 * dpi), Height = (int)(132 * dpi) });
     }
 
     private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
@@ -947,10 +1006,10 @@ public sealed partial class DesktopLyricWindow : WindowEx
                 this.Move(0, 0);
                 break;
             case "1":
-                this.Move(0, displayArea.WorkArea.Height / 2 - (int)(Height / 2));
+                this.Move(0, displayArea.WorkArea.Height / 2 - AppWindow.Size.Height / 2);
                 break;
             case "2":
-                this.Move(0, displayArea.WorkArea.Height - (int)Height);
+                this.Move(0, displayArea.WorkArea.Height - AppWindow.Size.Height);
                 break;
         }
     }
@@ -963,13 +1022,13 @@ public sealed partial class DesktopLyricWindow : WindowEx
         switch (tag)
         {
             case "0":
-                this.Move(displayArea.WorkArea.Width / 2 - (int)(Width / 2), 0);
+                this.Move(displayArea.WorkArea.Width / 2 - AppWindow.Size.Width / 2, 0);
                 break;
             case "1":
-                this.Move(displayArea.WorkArea.Width / 2 - (int)(Width / 2), displayArea.WorkArea.Height / 2 - (int)(Height / 2));
+                this.Move(displayArea.WorkArea.Width / 2 - AppWindow.Size.Width / 2, displayArea.WorkArea.Height / 2 - AppWindow.Size.Height / 2);
                 break;
             case "2":
-                this.Move(displayArea.WorkArea.Width / 2 - (int)(Width / 2), displayArea.WorkArea.Height - (int)Height);
+                this.Move(displayArea.WorkArea.Width / 2 - AppWindow.Size.Width / 2, displayArea.WorkArea.Height - AppWindow.Size.Height);
                 break;
         }
     }
@@ -982,13 +1041,13 @@ public sealed partial class DesktopLyricWindow : WindowEx
         switch (tag)
         {
             case "0":
-                this.Move(displayArea.WorkArea.Width - (int)Width, 0);
+                this.Move(displayArea.WorkArea.Width - AppWindow.Size.Width, 0);
                 break;
             case "1":
-                this.Move(displayArea.WorkArea.Width - (int)Width, displayArea.WorkArea.Height / 2 - (int)(Height / 2));
+                this.Move(displayArea.WorkArea.Width - AppWindow.Size.Width, displayArea.WorkArea.Height / 2 - AppWindow.Size.Height / 2);
                 break;
             case "2":
-                this.Move(displayArea.WorkArea.Width - (int)Width, displayArea.WorkArea.Height - (int)Height);
+                this.Move(displayArea.WorkArea.Width - AppWindow.Size.Width, displayArea.WorkArea.Height - AppWindow.Size.Height);
                 break;
         }
     }
@@ -1004,10 +1063,10 @@ public sealed partial class DesktopLyricWindow : WindowEx
                 this.Move(0, AppWindow.Position.Y);
                 break;
             case "1":
-                this.Move(displayArea.WorkArea.Width / 2 - (int)Width / 2, AppWindow.Position.Y);
+                this.Move(displayArea.WorkArea.Width / 2 - AppWindow.Size.Width / 2, AppWindow.Position.Y);
                 break;
             case "2":
-                this.Move(displayArea.WorkArea.Width - (int)Width, AppWindow.Position.Y);
+                this.Move(displayArea.WorkArea.Width - AppWindow.Size.Width, AppWindow.Position.Y);
                 break;
         }
     }
@@ -1023,10 +1082,10 @@ public sealed partial class DesktopLyricWindow : WindowEx
                 this.Move(AppWindow.Position.X, 0);
                 break;
             case "1":
-                this.Move(AppWindow.Position.X, displayArea.WorkArea.Height / 2 - (int)Height / 2);
+                this.Move(AppWindow.Position.X, displayArea.WorkArea.Height / 2 - AppWindow.Size.Height / 2);
                 break;
             case "2":
-                this.Move(AppWindow.Position.X, displayArea.WorkArea.Height - (int)Height);
+                this.Move(AppWindow.Position.X, displayArea.WorkArea.Height - AppWindow.Size.Height);
                 break;
         }
     }
@@ -1038,5 +1097,40 @@ public sealed partial class DesktopLyricWindow : WindowEx
         App.MainWindowInstance.SetNavViewContent(
             typeof(SettingPage),
             "open desktopLyric");
+    }
+
+    private void RadioMenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+    {
+        var item = sender as RadioMenuFlyoutItem;
+        var tag = item.Tag as string;
+        int width = 850;
+        int height = 132;
+
+        switch (tag)
+        {
+            case "0":
+                width = 720;
+                height = 102;
+                break;
+            case "1":
+                width = 850;
+                height = 132;
+                break;
+            case "2":
+                width = 1100;
+                height = 170;
+                break;
+            case "3":
+                width = 1800;
+                height = 246;
+                break;
+        }
+
+        AppWindow.Resize(
+            new SizeInt32()
+            {
+                Width = (int)(width * this.GetDpiForWindow() / 96.0),
+                Height = (int)(height * (this.GetDpiForWindow() / 96.0))
+            });
     }
 }

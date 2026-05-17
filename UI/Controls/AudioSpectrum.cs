@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Windows.UI;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Graphics.Canvas;
 using Microsoft.Graphics.Canvas.Brushes;
@@ -17,7 +18,6 @@ using TewiMP.Core.Audio;
 using TewiMP.Helpers;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Media.Audio.AudioEffects;
-using Microsoft.UI.Xaml.Media;
 
 namespace TewiMP.UI.Controls
 {
@@ -855,7 +855,8 @@ namespace TewiMP.UI.Controls
                         alpha *= reduce;
                     }
 
-                    gds.DrawLine(x, 0, x, height, textColor.A((byte)alpha), thickness, dash);
+                    if (f != 20)
+                        gds.DrawLine(x, 0, x, height, textColor.A((byte)alpha), thickness, dash);
 
                     // 绘制文字标签
                     string label = f >= 1000 ? $"{f / 1000:0.#}kHz" : $"{(int)f}Hz";

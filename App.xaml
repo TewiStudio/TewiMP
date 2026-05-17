@@ -25,6 +25,11 @@
                     <SolidColorBrush x:Key="HeaderLowForeground" Color="#FF878787"/>
                     <SolidColorBrush x:Key="BorderNormal" Color="#10FFFFFF"/>
                     <SolidColorBrush x:Key="MusicPageLrcForeground" Color="#4DFFFFFF"/>
+                    <SolidColorBrush x:Key="MusicPageLrcStroke" Color="#10000000"/>
+                    <SolidColorBrush x:Key="LrcForeground" Color="#E0FFFFFF"/>
+                    <SolidColorBrush x:Key="LrcSecondForeground" Color="#FF999999"/>
+                    <SolidColorBrush x:Key="LrcStrokeBrush" Color="#FF000000"/>
+                    <x:Double x:Key="LrcStroke">.3</x:Double>
                     <StaticResource x:Key="AcrylicNormal" ResourceKey="AcrylicBackgroundFillColorDefaultBrush"/>
                     <Color x:Key="MusicPageImageBlurFallbackColor">#BA000000</Color>
                     <StaticResource x:Key="MusicPageSelectLyricForeground" ResourceKey="AccentAAFillColorTertiaryBrush"/>
@@ -40,6 +45,11 @@
                     <SolidColorBrush x:Key="HeaderLowForeground" Color="#FF424242"/>
                     <SolidColorBrush x:Key="BorderNormal" Color="#10000000"/>
                     <SolidColorBrush x:Key="MusicPageLrcForeground" Color="#4F000000"/>
+                    <SolidColorBrush x:Key="MusicPageLrcStroke" Color="#40DDDDDD"/>
+                    <SolidColorBrush x:Key="LrcForeground" Color="#DD303030"/>
+                    <SolidColorBrush x:Key="LrcSecondForeground" Color="#DD808080"/>
+                    <SolidColorBrush x:Key="LrcStrokeBrush" Color="#EEFFFFFF"/>
+                    <x:Double x:Key="LrcStroke">.2</x:Double>
                     <StaticResource x:Key="AcrylicNormal" ResourceKey="AcrylicBackgroundFillColorBaseBrush"/>
                     <Color x:Key="MusicPageImageBlurFallbackColor">#CADDDDDD</Color>
                     <StaticResource x:Key="MusicPageSelectLyricForeground" ResourceKey="AccentTextFillColorSecondaryBrush"/>

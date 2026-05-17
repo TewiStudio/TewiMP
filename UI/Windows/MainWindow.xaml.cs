@@ -61,7 +61,7 @@ public sealed partial class MainWindow : WindowEx
     {
         get
         {
-            return this.GetDpiForWindow() / 100.0;
+            return this.GetDpiForWindow() / 96.0;
         }
     }
     public void InvokeDpiEvent()
@@ -365,7 +365,10 @@ public sealed partial class MainWindow : WindowEx
                 PlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
             PlayingListBaseViewScrollViewer.ChangeView(null, PlayingListBaseViewScrollViewer.ScrollableHeight, null);
         };
-
+/*
+        BottomPlayGrid.Lights.Add(new DevWinUI.AmbLight());
+        BottomPlayGrid.Lights.Add(new DevWinUI.HoverLight());
+        BottomPlayGrid.Lights.Add(new DevWinUI.RippleLight());*/
         Canvas.SetZIndex(AppTitleBar, 1);
 
         StaringPrepare();
@@ -537,7 +540,7 @@ public sealed partial class MainWindow : WindowEx
         if (DebugViewPopup.IsOpen)
         {
             DebugView_Detail_WindowSizeRun.Text = $"{WindowGridBase.ActualWidth}x{WindowGridBase.ActualHeight}";
-            DebugViewPopup.VerticalOffset = AppWindow.Size.Height / NowDPI - 24;
+            DebugViewPopup.VerticalOffset = AppWindow.Size.Height / NowDPI;
         }
         //NotifyListView.Padding = new(0, GridBase.ActualHeight, 0, 12);
         /*

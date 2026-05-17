@@ -3,6 +3,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TewiMP.UI.Controls"
+    xmlns:devWinui="using:DevWinUI"
     xmlns:ui="using:CommunityToolkit.WinUI"   
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -24,17 +25,19 @@
     </Grid>
     <Grid Grid.Row="1">
         <Border x:Name="LyricTextBlockShadowTarget"/>
-        <TextBlock x:Name="LyricTextBlock" TextWrapping="Wrap"
-               FontSize="24">
+        <devWinui:TextBlockStrokeView StrokeThickness=".5" StrokeBrush="{ThemeResource MusicPageLrcStroke}">
+            <TextBlock x:Name="LyricTextBlock" TextWrapping="Wrap"
+                       FontSize="24">
             <ui:Effects.Shadow>
                 <ui:AttachedDropShadow BlurRadius="18" Color="#60555555" CastTo="{x:Bind LyricTextBlockShadowTarget}"/>
             </ui:Effects.Shadow>
-        </TextBlock>
+            </TextBlock>
+        </devWinui:TextBlockStrokeView>
     </Grid>
 
     <Popup
         x:Name="DebugTimeDisplayer"
-        VerticalOffset="-12"
+        VerticalOffset="-12" Opacity="0"
         ShouldConstrainToRootBounds="True">
         <TextBlock x:Name="DebugTimeDisplayer_TextBlock" Text="time" IsHitTestVisible="False"/>
     </Popup>

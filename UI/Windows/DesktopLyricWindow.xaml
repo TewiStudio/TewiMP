@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:winex="using:WinUIEx"
+    xmlns:devWinui="using:DevWinUI"
     xmlns:local="using:TewiMP.UI.Windows"
     xmlns:controls="using:TewiMP.UI.Controls"
     mc:Ignorable="d" SizeChanged="Window_SizeChanged" Closed="DesktopLyricWindow_Closed"
@@ -16,13 +17,11 @@
           Padding="0" Background="Transparent">
         <Grid.Resources>
             <ResourceDictionary>
-                <SolidColorBrush x:Key="LrcForeground" Color="#E0FFFFFF"/>
-                <SolidColorBrush x:Key="LrcSecondForeground" Color="#A0AAAAAA"/>
                 <StaticResource x:Key="AccentLrcForeground" ResourceKey="MusicAlbumAccentBrush"/>
             </ResourceDictionary>
         </Grid.Resources>
         <Rectangle
-            VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Visibility="Visible"
             Fill="{ThemeResource ControlOnImageFillColorDefaultBrush}" x:Name="BackgroundFill">
             <Rectangle.OpacityTransition>
                 <ScalarTransition/>
@@ -36,38 +35,34 @@
             <Grid x:Name="V1" Grid.Row="0" HorizontalAlignment="Stretch">
                 <Viewbox x:Name="T1BaseViewbox">
                     <Grid x:Name="T1BaseParent">
-                        <Grid.Transitions>
-                            <TransitionCollection>
-                                <ContentThemeTransition/>
-                            </TransitionCollection>
-                        </Grid.Transitions>
                         <Border x:Name="T1ShadowTarget"/>
-                        <TextBlock x:Name="T1Base">
-                            <ui:Effects.Shadow>
-                                <ui:AttachedDropShadow Opacity="1" BlurRadius="10" Offset="0,0.2" Color="#555555" CastTo="{x:Bind T1ShadowTarget}"/>
-                            </ui:Effects.Shadow>
-                            <Run x:Name="T1" Text="TewiMP" Foreground="{ThemeResource LrcForeground}"/>
-                            <Run x:Name="T11" Foreground="{ThemeResource LrcSecondForeground}" FontSize="10"/>
-                        </TextBlock>
+                        <devWinui:TextBlockStrokeView StrokeThickness="{ThemeResource LrcStroke}" Padding="0"
+                                                      StrokeBrush="{ThemeResource LrcStrokeBrush}">
+                            <TextBlock x:Name="T1Base">
+                                <ui:Effects.Shadow>
+                                    <ui:AttachedDropShadow x:Name="T1Shadow" Opacity="0.25" BlurRadius="8" Offset="0,0.2" Color="#555555" CastTo="{x:Bind T1ShadowTarget}"/>
+                                </ui:Effects.Shadow>
+                                <Run x:Name="T1" Text="TewiMP" Foreground="{ThemeResource LrcForeground}"/>
+                                <Run x:Name="T11" Text="x4" Foreground="{ThemeResource LrcForeground}" FontSize="9"/>
+                            </TextBlock>
+                        </devWinui:TextBlockStrokeView>
                     </Grid>
                 </Viewbox>
             </Grid>
             <Grid x:Name="V2" Grid.Row="1" HorizontalAlignment="Stretch">
                 <Viewbox x:Name="T2BaseViewbox">
                     <Grid x:Name="T2BaseParent">
-                        <Grid.Transitions>
-                            <TransitionCollection>
-                                <ContentThemeTransition/>
-                            </TransitionCollection>
-                        </Grid.Transitions>
                         <Border x:Name="T2ShadowTarget"/>
-                        <TextBlock x:Name="T2Base" Grid.Column="1">
-                            <ui:Effects.Shadow>
-                                <ui:AttachedDropShadow Opacity=".8" BlurRadius="10" Offset="0,0.2" Color="#555555" CastTo="{x:Bind T2ShadowTarget}"/>
-                            </ui:Effects.Shadow>
-                            <Run x:Name="T2" Text="无歌词" Foreground="{ThemeResource LrcForeground}"/>
-                            <Run x:Name="T21" Foreground="{ThemeResource LrcSecondForeground}" FontSize="10"/>
-                        </TextBlock>
+                        <devWinui:TextBlockStrokeView StrokeThickness="{ThemeResource LrcStroke}" Padding="0"
+                                                      StrokeBrush="{ThemeResource LrcStrokeBrush}">
+                            <TextBlock x:Name="T2Base" Grid.Column="1">
+                                <ui:Effects.Shadow>
+                                    <ui:AttachedDropShadow x:Name="T2Shadow" Opacity="0.25" BlurRadius="8" Offset="0,0.2" Color="#555555" CastTo="{x:Bind T2ShadowTarget}"/>
+                                </ui:Effects.Shadow>
+                                <Run x:Name="T2" Text="无歌词" Foreground="{ThemeResource LrcForeground}"/>
+                                <Run x:Name="T21" Foreground="{ThemeResource LrcForeground}" FontSize="9"/>
+                            </TextBlock>
+                        </devWinui:TextBlockStrokeView>
                     </Grid>
                 </Viewbox>
             </Grid>
@@ -75,11 +70,6 @@
 
         <Grid x:Name="TRBaseParent"
               HorizontalAlignment="Center">
-            <Grid.Transitions>
-                <TransitionCollection>
-                    <ContentThemeTransition/>
-                </TransitionCollection>
-            </Grid.Transitions>
             <Border x:Name="TRShadowTarget"/>
             <TextBlock x:Name="LyricRomajiPopup_tb"
                        FontSize="14"
@@ -99,15 +89,19 @@
                 Visibility="Collapsed"
                 Orientation="Horizontal"
                 Spacing="2" Margin="0,8,0,4"
-                VerticalAlignment="Top"
-                HorizontalAlignment="Center">
+                VerticalAlignment="Bottom"
+                HorizontalAlignment="Center"
+                Padding="4,2"
+                BorderThickness="1" CornerRadius="4"
+                Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource ControlElevationBorderBrush}">
                 <StackPanel.Resources>
                     <Style TargetType="Rectangle">
                         <Setter Property="Width" Value="15"/>
                         <Setter Property="Height" Value="15"/>
                         <Setter Property="Fill" Value="{ThemeResource MusicAlbumAccentBrush}"/>
-                        <Setter Property="Stroke" Value="{ThemeResource AccentControlElevationBorderBrush}"/>
-                        <Setter Property="StrokeThickness" Value="1"/>
+                        <Setter Property="Stroke" Value="{ThemeResource LrcStrokeBrush}"/>
+                        <Setter Property="StrokeThickness" Value=".8"/>
                         <Setter Property="RadiusX" Value="7.5"/>
                         <Setter Property="RadiusY" Value="7.5"/>
                     </Style>
@@ -229,6 +223,12 @@
                                     <MenuFlyoutItem Text="中" Tag="1" Click="MenuFlyoutItem_Click_2"/>
                                     <MenuFlyoutItem Text="下" Tag="2" Click="MenuFlyoutItem_Click_2"/>
                                 </MenuFlyoutSubItem>
+                            </MenuFlyoutSubItem>
+                            <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE743;}" Text="大小预设">
+                                <RadioMenuFlyoutItem GroupName="windowSize" Click="RadioMenuFlyoutItem_Click" Tag="0" Text="小"/>
+                                <RadioMenuFlyoutItem GroupName="windowSize" Click="RadioMenuFlyoutItem_Click" Tag="1" Text="正常" IsChecked="True"/>
+                                <RadioMenuFlyoutItem GroupName="windowSize" Click="RadioMenuFlyoutItem_Click" Tag="2" Text="大"/>
+                                <RadioMenuFlyoutItem GroupName="windowSize" Click="RadioMenuFlyoutItem_Click" Tag="3" Text="超大"/>
                             </MenuFlyoutSubItem>
                             <MenuFlyoutItem Icon="{ui:FontIcon Glyph=&#xE72C;}" Click="ResizeButton_Click" Text="恢复默认大小"/>
                         </MenuFlyout>
