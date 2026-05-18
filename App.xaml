@@ -17,6 +17,7 @@
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Dark">
                     <SolidColorBrush x:Key="SystemControlHighlightAccentBrush" Color="Green"/>
+                    <StaticResource x:Key="PlayButtonStroke" ResourceKey="SurfaceStrokeColorFlyoutBrush"/>
                     <StaticResource x:Key="PlayButtonBrush" ResourceKey="AccentFillColorDefaultBrush"/>
                     <SolidColorBrush x:Key="SongHistoryCardBackground" Color="#06FFFFFF"/>
                     <SolidColorBrush x:Key="ArtistInfoBackground" Color="#66000000"/>
@@ -37,6 +38,7 @@
                     <AcrylicBrush x:Key="MusicPageImageAcrylicBrush" TintLuminosityOpacity="0.85" TintOpacity="0.0" FallbackColor="#BA000000" TintColor="#FF202020" Opacity="1"/>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
+                    <StaticResource x:Key="PlayButtonStroke" ResourceKey="SurfaceStrokeColorFlyoutBrush"/>
                     <StaticResource x:Key="PlayButtonBrush" ResourceKey="AccentFillColorDefaultBrush"/>
                     <SolidColorBrush x:Key="SongHistoryCardBackground" Color="#09000000"/>
                     <SolidColorBrush x:Key="ArtistInfoBackground" Color="#AAFFFFFF"/>

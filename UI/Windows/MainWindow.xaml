@@ -197,17 +197,37 @@
                         <RectangleGeometry x:Name="NavViewContentBase_RGClip" Rect="0,0,400,400"/>
                     </Grid.Clip>
                     <!--<Rectangle Fill="{ThemeResource BottomBackground}" VerticalAlignment="Bottom" Height="86"/>-->
-                    <Frame
-                        x:Name="ContentFrame"
-                        IsTabStop="True"
-                        CornerRadius="0"
-                        Padding="0,0,0,86"/>
+                    <cc:OpacityMaskView HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                        <cc:OpacityMaskView.OpacityMask>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <Rectangle Fill="White"/>
+                                <Rectangle Height="92" Grid.Row="1">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#FFFFFFFF" />
+                                            <GradientStop Offset=".3" Color="#80FFFFFF" />
+                                            <GradientStop Offset="1" Color="Transparent" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </Grid>
+                        </cc:OpacityMaskView.OpacityMask>
+                        <Frame
+                            x:Name="ContentFrame"
+                            IsTabStop="True"
+                            CornerRadius="0"
+                            Padding="0,0,0,86"/>
+                    </cc:OpacityMaskView>
                     <Grid
                         VerticalAlignment="Bottom"
                         Height="86"
-                        Background="{ThemeResource AcrylicNormal}"
+                        Background="Transparent"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,1,0,0"
+                        BorderThickness="0,0,0,0"
                         x:Name="BottomPlayGrid">
                         <Button
                             Background="Transparent"

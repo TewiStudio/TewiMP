@@ -313,7 +313,7 @@ namespace TewiMP.UI.Pages.MusicPages
                     AlbumImageBorder.MaxWidth = InfoBaseGrid.ActualHeight;
                     AlbumImageBorder.MaxHeight = InfoBaseGrid.ActualHeight / 1.5;
 
-                    if (InfoBaseGrid.ActualHeight <= 616 || InfoBaseGrid.ActualWidth <= 160)
+                    if (InfoBaseGrid.ActualHeight < 710 || InfoBaseGrid.ActualWidth <= 160)
                     {
                         isMiniPageOnlyLyric = true;
                         ImageVer.Height = new(0, GridUnitType.Pixel);
@@ -383,7 +383,7 @@ namespace TewiMP.UI.Pages.MusicPages
                             //await LrcSecondListView.SmoothScrollIntoViewWithItemAsync(App.Instance.lyricManager.NowLyricsData, ScrollItemPlacement.Center, disableAnimation);
                             sv.ChangeView(null, c.ActualOffset.Y + c.ActualSize.Y / 2, null, disableAnimation);
                         else
-                            await LrcSecondListView.SmoothScrollIntoViewWithItemAsync(App.Instance.LyricService.NowLyricsData, ScrollItemPlacement.Top, disableAnimation);
+                            await LrcSecondListView.SmoothScrollIntoViewWithItemAsync(App.Instance.LyricService.NowLyricsData, ScrollItemPlacement.Top, disableAnimation, additionalVerticalOffset: -12);
                             //sv.ChangeView(null, c.ActualOffset.Y - c.ActualSize.Y, null, disableAnimation);
                     }
                 }

@@ -7,7 +7,7 @@
     xmlns:ui="using:CommunityToolkit.WinUI"   
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" HorizontalAlignment="Stretch" DataContextChanged="Grid_DataContextChanged"
+    mc:Ignorable="d" DataContextChanged="Grid_DataContextChanged"
     Loaded="Grid_Loaded" Unloaded="Grid_Unloaded" Background="{x:Null}">
 
     <Grid.RowDefinitions>

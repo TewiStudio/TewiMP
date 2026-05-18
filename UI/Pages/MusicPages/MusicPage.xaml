@@ -22,7 +22,10 @@
         <StaticResource x:Key="AccentBrushNormal" ResourceKey="MusicAlbumAccentBrush"/>
         <StaticResource x:Key="AccentBrushReverse" ResourceKey="MusicAlbumAccentBrushReverse"/>
         <DataTemplate x:Key="LyricTemplate" x:DataType="data:LyricData">
-            <controls:LyricItem/>
+            <controls:LyricItem HorizontalAlignment="Stretch"/>
+        </DataTemplate>
+        <DataTemplate x:Key="LyricTemplateCenter" x:DataType="data:LyricData">
+            <controls:LyricItem HorizontalAlignment="Center"/>
         </DataTemplate>
         <Style TargetType="ListViewItem">
             <Setter Property="Template">
@@ -135,20 +138,34 @@
                                         HorizontalAlignment="Center"
                                         SizeChanged="MusicPage_SizeChanged">
                         <ui:OpacityMaskView.OpacityMask>
-                            <Rectangle>
-                                <Rectangle.Fill>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-                                        <GradientStop Offset="0" Color="Transparent" />
-                                        <GradientStop Offset=".15" Color="White" />
-                                        <GradientStop Offset=".85" Color="White" />
-                                        <GradientStop Offset="1" Color="Transparent" />
-                                    </LinearGradientBrush>
-                                </Rectangle.Fill>
-                            </Rectangle>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="auto"/>
+                                </Grid.RowDefinitions>
+                                <Rectangle Grid.Row="0" Height="24">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="Transparent" />
+                                            <GradientStop Offset="1" Color="White" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                                <Rectangle Fill="White" Grid.Row="1"/>
+                                <Rectangle Grid.Row="2" Height="24">
+                                    <Rectangle.Fill>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="1" Color="Transparent" />
+                                            <GradientStop Offset="0" Color="White" />
+                                        </LinearGradientBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+                            </Grid>
                         </ui:OpacityMaskView.OpacityMask>
                         <ListView x:Name="LrcSecondListView"
                                   ItemsSource="{Binding ElementName=LrcBaseListView,Path=ItemsSource}"
-                                  ItemTemplate="{ThemeResource LyricTemplate}"
+                                  ItemTemplate="{ThemeResource LyricTemplateCenter}"
                                   ScrollViewer.VerticalScrollBarVisibility="Hidden"
                                   SelectionChanged="LrcBaseListView_SelectionChanged"
                                   SizeChanged="LrcBaseListView_SizeChanged"

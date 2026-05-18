@@ -1036,7 +1036,7 @@ public sealed partial class MainWindow : WindowEx
     }
 
     private void AudioService_TimingChanged(AudioService AudioService)
-    {
+        {
         if (doNotChangeTiming) return;
         if (AudioService.FileReader is null) return;
         PlayRing.Minimum = 0;

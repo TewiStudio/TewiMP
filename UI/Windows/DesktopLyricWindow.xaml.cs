@@ -1,25 +1,25 @@
-﻿using Microsoft.UI;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Media;
-using NAudio.Wave;
-using System;
-using System.Collections.ObjectModel;
+﻿using System;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Composition;
+using Windows.UI;
+using Windows.Graphics;
+using WinUIEx;
+using NAudio.Wave;
+using Vanara.PInvoke;
 using TewiMP.Core;
 using TewiMP.Helpers;
-using TewiMP.Services;
-using TewiMP.Services.Media.Audio;
-using TewiMP.Services.Storage;
 using TewiMP.UI.Pages;
-using Vanara.PInvoke;
-using Windows.Graphics;
-using Windows.UI;
-using WinUIEx;
+using TewiMP.Services;
+using TewiMP.Services.Storage;
+using TewiMP.Services.Media.Audio;
 
 namespace TewiMP.UI.Windows;
 
@@ -200,7 +200,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
 
     private void SetLyricIntervalControlProgress(double value)
     {
-        double disableOpacity = .3;
+        double disableOpacity = .1;
         if (value >= .8)
         {
             LyricIntervalCircle1.Opacity = 1;
