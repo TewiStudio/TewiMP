@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI.Animations;
 using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
@@ -57,7 +58,7 @@ public sealed partial class MainWindow : WindowEx
     public BackdropType CurrentBackdrop;
     public MusicPage SMusicPage = new();
     public ScrollViewer PlayingListBaseViewScrollViewer;
-    public  ContentDialog AsyncDialog = null;
+    public ContentDialog AsyncDialog = null;
     public double NowDPI
     {
         get
@@ -71,7 +72,7 @@ public sealed partial class MainWindow : WindowEx
     }
     public delegate void WindowDpiChangedDelegate(double newDPI);
     public event WindowDpiChangedDelegate WindowDpiChanged;
-    
+
     public delegate void WindowViewStateChangedDelegate(bool isView);
     public event WindowViewStateChangedDelegate WindowViewStateChanged;
 
@@ -292,7 +293,7 @@ public sealed partial class MainWindow : WindowEx
         var screenHeight = displayArea.WorkArea.Height;
         // 设置参数
         if (screenWidth <= windowWidth ||
-            screenHeight<= windowHeight)
+            screenHeight <= windowHeight)
         {
             if (isPreparedActivate)
                 this.Maximize();
@@ -366,10 +367,10 @@ public sealed partial class MainWindow : WindowEx
                 PlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
             PlayingListBaseViewScrollViewer.ChangeView(null, PlayingListBaseViewScrollViewer.ScrollableHeight, null);
         };
-/*
-        BottomPlayGrid.Lights.Add(new DevWinUI.AmbLight());
-        BottomPlayGrid.Lights.Add(new DevWinUI.HoverLight());
-        BottomPlayGrid.Lights.Add(new DevWinUI.RippleLight());*/
+        /*
+                BottomPlayGrid.Lights.Add(new DevWinUI.AmbLight());
+                BottomPlayGrid.Lights.Add(new DevWinUI.HoverLight());
+                BottomPlayGrid.Lights.Add(new DevWinUI.RippleLight());*/
         Canvas.SetZIndex(AppTitleBar, 1);
 
         StaringPrepare();
@@ -557,7 +558,7 @@ public sealed partial class MainWindow : WindowEx
         //SNotifyListViewScrollViewer = (VisualTreeHelper.GetChild(NotifyListView, 0) as Border).Child as ScrollViewer;
         //AddNotify("测试版本", "此应用程序是一份内测版本。", NotifySeverity.Warning, TimeSpan.MaxValue);
     }
-    
+
     public void UpdatePlayListFlyoutHeight()
     {
         try
@@ -1038,7 +1039,7 @@ public sealed partial class MainWindow : WindowEx
     }
 
     private void AudioService_TimingChanged(AudioService AudioService)
-        {
+    {
         if (doNotChangeTiming) return;
         if (AudioService.FileReader is null) return;
         PlayRing.Minimum = 0;
@@ -1149,7 +1150,7 @@ public sealed partial class MainWindow : WindowEx
 
         NavigationViewItem item = sender.SelectedItem as NavigationViewItem;
         if (item is null) return;
-        
+
         if (item == NavView.MenuItems[1] as NavigationViewItem)
             SetNavViewContent(typeof(SearchPage));
         else if (item == NavView.MenuItems[2] as NavigationViewItem)
@@ -1485,39 +1486,12 @@ public sealed partial class MainWindow : WindowEx
         }
     }
 
-    Visual musicPageVisual;
-    Vector3KeyFrameAnimation musicPageVisualClosingAnimation;
-    Vector3KeyFrameAnimation musicPageVisualOpeningAnimation;
-    void InitMusicPageVisuals(bool onlyUpdateOffset = false)
-    {
-        musicPageVisualClosingAnimation?.Dispose();
-        musicPageVisualOpeningAnimation?.Dispose();
-        AnimateHelper.AnimateOffset(
-            MusicPageBaseFrame,
-            0, (float)MusicPageBaseGrid.ActualHeight, 0,
-            0.22,
-            0.5f, 0, 0.75f, 0,
-            out musicPageVisual, out Compositor compositor, out musicPageVisualClosingAnimation);
-
-        AnimateHelper.AnimateOffset(
-            MusicPageBaseFrame,
-            0, 0, 0,
-            0.5,
-            0.16f, 1, 0.3f, 1,
-            out musicPageVisual, out Compositor compositor1, out musicPageVisualOpeningAnimation);
-
-        if (onlyUpdateOffset) return;
-        musicPageVisual.Offset = new(0, (float)MusicPageBaseGrid.ActualHeight, 0);
-        MusicPageBaseFrame.Visibility = Visibility.Collapsed;
-    }
     public bool InOpenMusicPage { get; set; } = false;
     bool isFirstInMusicPage = true;
     bool isHiddenMusicPageAnimationNotCompleted = false;
-    public void OpenOrCloseMusicPage()
+    public async Task OpenOrCloseMusicPage()
     {
         if (App.Instance.AudioService.MusicData is null) return;
-        if (musicPageVisual is null) InitMusicPageVisuals();
-        else InitMusicPageVisuals(true);
 
         MusicPageBaseFrame.Content = SMusicPage;
         if (InOpenMusicPage)
@@ -1525,22 +1499,13 @@ public sealed partial class MainWindow : WindowEx
             InOpenMusicPage = false;
             isHiddenMusicPageAnimationNotCompleted = true;
 
-            LogService.Log(nameof(MainWindow), "主界面被显示。");
             GridBase.Visibility = Visibility.Visible;
             InitializeTitleBar(WindowGridBase.ActualTheme);
-            musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualClosingAnimation);
-            musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
-            {
-                if (!InOpenMusicPage)
-                {
-                    MusicPageBaseFrame.Visibility = Visibility.Collapsed;
-                    isHiddenMusicPageAnimationNotCompleted = false;
-                }
-            };
 
             SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
             MusicPageViewStateChanged?.Invoke(MusicPageViewState.Hidden);
 
+            #region connected animations
             ConnectedAnimation canimation =
                 ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation");
             if (canimation != null)
@@ -1559,7 +1524,6 @@ public sealed partial class MainWindow : WindowEx
             {
                 canimation2.TryStart(PlayArtist);
             }
-
             if (App.Instance.LyricService.NowPlayingLyrics.Any())
             {
                 ConnectedAnimation canimation3 =
@@ -1569,6 +1533,17 @@ public sealed partial class MainWindow : WindowEx
                     canimation3.TryStart(LyricTextBlock);
                 }
             }
+            #endregion
+
+            await AnimationBuilder.Create()
+                .Offset(Axis.Y, MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.22), easingType: EasingType.Circle, easingMode: EasingMode.EaseIn)
+                .StartAsync(MusicPageBaseGrid);
+
+            if (!InOpenMusicPage)
+            {
+                MusicPageBaseFrame.Visibility = Visibility.Collapsed;
+                isHiddenMusicPageAnimationNotCompleted = false;
+            }
         }
         else
         {
@@ -1576,42 +1551,25 @@ public sealed partial class MainWindow : WindowEx
 
             MusicPageBaseFrame.Visibility = Visibility.Visible;
             InitializeTitleBar(SMusicPage.pageRoot.ActualTheme);
-            musicPageVisual.Offset = new(0, (float)MusicPageBaseGrid.ActualHeight, 0);
-            musicPageVisual.StartAnimation(nameof(musicPageVisual.Offset), musicPageVisualOpeningAnimation);
-            musicPageVisual.Compositor.GetCommitBatch(CompositionBatchTypes.Animation).Completed += (_, __) =>
-            {
-                if (InOpenMusicPage && !isHiddenMusicPageAnimationNotCompleted)
-                {
-                    GridBase.Visibility = Visibility.Collapsed;
-#if DEBUG
-                    LogService.Log(nameof(MainWindow), "主界面被隐藏。");
-#endif
-                }
-            };
 
             SMusicPage.MusicPageViewStateChange(MusicPageViewState.View);
             MusicPageViewStateChanged?.Invoke(MusicPageViewState.View);
-        }
-    }
 
-    private async void SetMainPageVisibility(bool visibility)
-    {
-        if (visibility)
-        {
-            GridBase.Visibility = Visibility.Visible;
-            LogService.Log(nameof(MainWindow), "主界面被显示。");
-            await Task.Delay(220);
-            if (!InOpenMusicPage)
-                MusicPageBaseFrame.Visibility = Visibility.Collapsed;
-        }
-        else
-        {
-            MusicPageBaseFrame.Visibility = Visibility.Visible;
-            await Task.Delay(500);
-            if (InOpenMusicPage)
+            if (isFirstInMusicPage)
+            {
+                isFirstInMusicPage = false;
+                await AnimationBuilder.Create()
+                    .Offset(Axis.Y, 0, from: MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Cubic, easingMode: EasingMode.EaseOut)
+                    .StartAsync(MusicPageBaseGrid);
+            }
+            else await AnimationBuilder.Create()
+                    .Offset(Axis.Y, 0, duration: TimeSpan.FromSeconds(.4), easingType: EasingType.Circle, easingMode: EasingMode.EaseOut)
+                    .StartAsync(MusicPageBaseGrid);
+
+
+            if (InOpenMusicPage && !isHiddenMusicPageAnimationNotCompleted)
             {
                 GridBase.Visibility = Visibility.Collapsed;
-                LogService.Log(nameof(MainWindow), "主界面被隐藏。");
             }
         }
     }

@@ -93,13 +93,13 @@
                 Padding="3,2"
                 BorderThickness="1" CornerRadius="10"
                 Background="{ThemeResource ControlOnImageFillColorDefaultBrush}"
-                BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+                BorderBrush="{ThemeResource LrcSecondForeground}">
                 <StackPanel.Resources>
                     <Style TargetType="Rectangle">
                         <Setter Property="Width" Value="14"/>
                         <Setter Property="Height" Value="14"/>
                         <Setter Property="Fill" Value="{ThemeResource MusicAlbumAccentBrush}"/>
-                        <Setter Property="Stroke" Value="{ThemeResource ControlElevationBorderBrush}"/>
+                        <Setter Property="Stroke" Value="{ThemeResource LrcStrokeBrush}"/>
                         <Setter Property="StrokeThickness" Value="1"/>
                         <Setter Property="RadiusX" Value="7.5"/>
                         <Setter Property="RadiusY" Value="7.5"/>

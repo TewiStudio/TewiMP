@@ -550,6 +550,8 @@ public sealed partial class PlayListPage : Page
         App.Instance.PlayListReader.Updated += PlayListReader_Updated;
         App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
         App.MainWindowInstance.InKeyDownEvent += MainWindow_InKeyDownEvent;
+        App.MainWindowInstance.MusicPageViewStateChanged -= MainWindowInstance_MusicPageViewStateChanged;
+        App.MainWindowInstance.MusicPageViewStateChanged += MainWindowInstance_MusicPageViewStateChanged;
         ItemList_Header_Search_Control.SearchingAItem -= ItemList_Header_Search_Control_SearchingAItem;
         ItemList_Header_Search_Control.SearchingAItem += ItemList_Header_Search_Control_SearchingAItem;
         ItemList_Header_Search_Control.IsOpenChanged -= ItemList_Header_Search_Control_IsOpenChanged;
@@ -566,6 +568,7 @@ public sealed partial class PlayListPage : Page
     {
         App.Instance.PlayListReader.Updated -= PlayListReader_Updated;
         App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
+        App.MainWindowInstance.MusicPageViewStateChanged -= MainWindowInstance_MusicPageViewStateChanged;
         ItemList_Header_Search_Control.SearchingAItem -= ItemList_Header_Search_Control_SearchingAItem;
         ItemList_Header_Search_Control.IsOpenChanged -= ItemList_Header_Search_Control_IsOpenChanged;
         ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToNowPlaying_Button_Click;
@@ -922,6 +925,14 @@ public sealed partial class PlayListPage : Page
                     ItemsList_Header_Info_CommandBar.Focus(FocusState.Programmatic);
             }
         }
+    }
+
+    private void MainWindowInstance_MusicPageViewStateChanged(MusicPages.MusicPageViewState musicPageViewState)
+    {
+        if (musicPageViewState == MusicPages.MusicPageViewState.Hidden)
+            ItemsList_Header_Foot_Root.IsOpen = true;
+        else
+            ItemsList_Header_Foot_Root.IsOpen = false;
     }
 
     private async void Page_ActualThemeChanged(FrameworkElement sender, object args)

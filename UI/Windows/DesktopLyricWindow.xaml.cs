@@ -200,7 +200,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
 
     private void SetLyricIntervalControlProgress(double value)
     {
-        double disableOpacity = .1;
+        double disableOpacity = .2;
         if (value >= .8)
         {
             LyricIntervalCircle1.Opacity = 1;

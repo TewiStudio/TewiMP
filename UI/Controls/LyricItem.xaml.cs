@@ -70,7 +70,7 @@ namespace TewiMP.UI.Controls
         {
 #if DEBUG
             DebugTimeDisplayer.XamlRoot = this.XamlRoot;
-            DebugTimeDisplayer.IsOpen = true;
+            //DebugTimeDisplayer.IsOpen = true;
 #endif
         }
 
