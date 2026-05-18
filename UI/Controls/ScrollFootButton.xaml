@@ -26,10 +26,19 @@
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
+        <SystemBackdropElement CornerRadius="4">
+            <SystemBackdropElement.SystemBackdrop>
+                <DesktopAcrylicBackdrop/>
+            </SystemBackdropElement.SystemBackdrop>
+        </SystemBackdropElement>
+        <SystemBackdropElement Grid.Column="1" Margin="8,0,0,0" CornerRadius="4">
+            <SystemBackdropElement.SystemBackdrop>
+                <DesktopAcrylicBackdrop/>
+            </SystemBackdropElement.SystemBackdrop>
+        </SystemBackdropElement>
         <StackPanel
             Orientation="Horizontal"
             BorderThickness="1" CornerRadius="4"
-            Background="{ThemeResource AcrylicNormal}"
             BorderBrush="{ThemeResource ControlElevationBorderBrush}">
             <Button
                 x:FieldModifier="Public" x:Name="PositionToBottom_Button"
@@ -57,7 +66,6 @@
         <Border
             x:Name="PositionToNowPlaying_Root"
             BorderThickness="1" CornerRadius="4" Margin="8,0,0,0"
-            Background="{ThemeResource AcrylicNormal}"
             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
             Visibility="{Binding ElementName=PositionToNowPlaying_Button, Path=Visibility}"
             Grid.Column="1">

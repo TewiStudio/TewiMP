@@ -36,6 +36,7 @@
                     <StaticResource x:Key="MusicPageSelectLyricForeground" ResourceKey="AccentAAFillColorTertiaryBrush"/>
                     <Color x:Key="BlurImageAcrylicBrush">#272727</Color>
                     <AcrylicBrush x:Key="MusicPageImageAcrylicBrush" TintLuminosityOpacity="0.85" TintOpacity="0.0" FallbackColor="#BA000000" TintColor="#FF202020" Opacity="1"/>
+                    <Color x:Key="PlayingListShadow">#00000000</Color>
                 </ResourceDictionary>
                 <ResourceDictionary x:Key="Light">
                     <StaticResource x:Key="PlayButtonStroke" ResourceKey="SurfaceStrokeColorFlyoutBrush"/>
@@ -57,6 +58,7 @@
                     <StaticResource x:Key="MusicPageSelectLyricForeground" ResourceKey="AccentTextFillColorSecondaryBrush"/>
                     <Color x:Key="BlurImageAcrylicBrush">#E5E5E5</Color>
                     <AcrylicBrush x:Key="MusicPageImageAcrylicBrush" TintLuminosityOpacity="0.85" TintOpacity="0.0" FallbackColor="#CADDDDDD" TintColor="#EEEEEE" Opacity="1"/>
+                    <Color x:Key="PlayingListShadow">#20222222</Color>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
             

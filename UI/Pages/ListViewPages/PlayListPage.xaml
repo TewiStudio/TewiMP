@@ -553,12 +553,6 @@
                             </Grid>
                         </Grid>
                     </Grid>
-                    <Grid x:Name="ItemsList_Header_Foot_Root">
-                        <controls:ScrollFootButton
-                            x:Name="ItemsList_Header_Foot_Buttons"
-                            VerticalAlignment="Bottom"
-                            HorizontalAlignment="Right"/>
-                    </Grid>
                     <Grid 
                         x:Name="ItemList_Header_Search_Root"
                         VerticalAlignment="Bottom" >
@@ -579,6 +573,13 @@
                 </Grid>
             </ListView.Footer>
         </ListView>
+        <Popup x:Name="ItemsList_Header_Foot_Root"
+               ShouldConstrainToRootBounds="False" IsLightDismissEnabled="False"
+               VerticalAlignment="Bottom" HorizontalAlignment="Right"
+               HorizontalOffset="-148" VerticalOffset="-50">
+            <controls:ScrollFootButton
+                            x:Name="ItemsList_Header_Foot_Buttons"/>
+        </Popup>
         <controls:LoadingTip x:Name="LoadingTipControl"
                              VerticalAlignment="Bottom"
                              HorizontalAlignment="Center"

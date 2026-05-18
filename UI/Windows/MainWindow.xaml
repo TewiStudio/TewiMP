@@ -193,11 +193,12 @@
                 <Grid
                     x:Name="NavViewContentBase"
                     SizeChanged="NavViewContentBase_SizeChanged">
-                    <Grid.Clip>
-                        <RectangleGeometry x:Name="NavViewContentBase_RGClip" Rect="0,0,400,400"/>
-                    </Grid.Clip>
-                    <!--<Rectangle Fill="{ThemeResource BottomBackground}" VerticalAlignment="Bottom" Height="86"/>-->
-                    <cc:OpacityMaskView HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
+                    <Grid>
+                        <Grid.Clip>
+                            <RectangleGeometry x:Name="NavViewContentBase_RGClip" Rect="0,0,400,400"/>
+                        </Grid.Clip>
+                        <!--<Rectangle Fill="{ThemeResource BottomBackground}" VerticalAlignment="Bottom" Height="86"/>-->
+                        <!--<cc:OpacityMaskView HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch">
                         <cc:OpacityMaskView.OpacityMask>
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -205,29 +206,40 @@
                                     <RowDefinition Height="auto"/>
                                 </Grid.RowDefinitions>
                                 <Rectangle Fill="White"/>
-                                <Rectangle Height="92" Grid.Row="1">
-                                    <Rectangle.Fill>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <Rectangle Height="86" Grid.Row="1">
+                                    <Rectangle.Fill>-->
+                        <!--<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
                                             <GradientStop Offset="0" Color="#FFFFFFFF" />
-                                            <GradientStop Offset=".3" Color="#80FFFFFF" />
+                                            <GradientStop Offset=".3" Color="#90FFFFFF" />
                                             <GradientStop Offset="1" Color="Transparent" />
+                                        </LinearGradientBrush>-->
+                        <!--<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="#FFFFFFFF" />
+                                            <GradientStop Offset=".13" Color="Transparent" />
+                                        </LinearGradientBrush>-->
+                        <!--<LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                            <GradientStop Offset="0" Color="Transparent" />
                                         </LinearGradientBrush>
                                     </Rectangle.Fill>
                                 </Rectangle>
                             </Grid>
                         </cc:OpacityMaskView.OpacityMask>
+                        <Grid>-->
                         <Frame
-                            x:Name="ContentFrame"
-                            IsTabStop="True"
-                            CornerRadius="0"
-                            Padding="0,0,0,86"/>
-                    </cc:OpacityMaskView>
+                                x:Name="ContentFrame"
+                                IsTabStop="True"
+                                CornerRadius="0"
+                                Padding="0,0,0,86"/>
+                        <!--<Rectangle VerticalAlignment="Bottom" Height="86" Fill="Transparent"/>-->
+                        <!--<devWinui:LinearGradientBlurPanel VerticalAlignment="Bottom" MaxBlurAmount="50" Height="86" StartPoint="0,1" EndPoint="0,0"/>-->
+                        <!--</Grid>
+                    </cc:OpacityMaskView>-->
+                    </Grid>
                     <Grid
                         VerticalAlignment="Bottom"
                         Height="86"
-                        Background="Transparent"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,0"
+                        BorderThickness="0,1,0,0"
                         x:Name="BottomPlayGrid">
                         <Button
                             Background="Transparent"
@@ -513,10 +525,10 @@
 
                 <Flyout
                     x:Name="PlayingListBasePopup"
-                    ShouldConstrainToRootBounds="True">
+                    ShouldConstrainToRootBounds="False">
                     <Flyout.FlyoutPresenterStyle>
                         <Style TargetType="FlyoutPresenter">
-                            <Setter Property="Background" Value="{ThemeResource AcrylicNormal}"/>
+                            <Setter Property="Background" Value="Transparent"/>
                             <Setter Property="ScrollViewer.VerticalScrollMode" Value="Disabled" />
                             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Disabled" />
                             <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Disabled" />
@@ -534,6 +546,11 @@
                         MaxHeight="800"
                         VerticalAlignment="Stretch"
                         HorizontalAlignment="Stretch">
+                        <SystemBackdropElement CornerRadius="8">
+                            <SystemBackdropElement.SystemBackdrop>
+                                <DesktopAcrylicBackdrop/>
+                            </SystemBackdropElement.SystemBackdrop>
+                        </SystemBackdropElement>
                         <Grid>
                             <!--<cc:OpacityMaskView>
                             <cc:OpacityMaskView.OpacityMask>
@@ -571,7 +588,7 @@
                                         </Setter>
                                     </Style>
                                     <cmedia:AttachedCardShadow x:Key="CommonShadow"
-                                        Offset="0,0" CornerRadius="0" BlurRadius="32" Color="#20222222"/>
+                                        Offset="0,0" CornerRadius="0" BlurRadius="32" Color="{ThemeResource PlayingListShadow}"/>
                                 </ListView.Resources>
                                 <ListView.Header>
                                     <Grid x:Name="PlayingListHeader">
@@ -580,15 +597,15 @@
                                         </interactivity:Interaction.Behaviors>
                                         <Grid
                                             x:Name="PlayingListHeaderBaseGrid"
-                                            Background="{ThemeResource AcrylicNormal}"
                                             BorderBrush="{ThemeResource SurfaceStrokeColorFlyoutBrush}"
-                                            BorderThickness="0,0,0,1" Margin="0,0,0,6"
+                                            BorderThickness="0,0,0,1" Margin="0,0,0,0"
                                             ui:Effects.Shadow="{StaticResource CommonShadow}"
 >
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition/>
                                                 <ColumnDefinition Width="auto"/>
                                             </Grid.ColumnDefinitions>
+                                            
                                             <TextBlock
                                                 Text="当前播放列表"
                                                 Style="{ThemeResource SubTBHeader}"
@@ -674,15 +691,21 @@
                 </Flyout>
 
                 <Flyout x:Name="VolumeBasePopup"
-                        ShouldConstrainToRootBounds="True">
+                        ShouldConstrainToRootBounds="false">
                     <Flyout.FlyoutPresenterStyle>
                         <Style TargetType="FlyoutPresenter" BasedOn="{StaticResource DefaultFlyoutPresenterStyle}">
-                            <Setter Property="Background" Value="{ThemeResource AcrylicNormal}"/>
+                            <Setter Property="Background" Value="Transparent"/>
+                            <Setter Property="Padding" Value="0"/>
                             <Setter Property="CornerRadius" Value="8" />
                         </Style>
                     </Flyout.FlyoutPresenterStyle>
-                    <Grid x:Name="VolumeBaseGrid" Margin="-6">
-                        <StackPanel Orientation="Horizontal">
+                    <Grid x:Name="VolumeBaseGrid">
+                        <SystemBackdropElement CornerRadius="8">
+                            <SystemBackdropElement.SystemBackdrop>
+                                <DesktopAcrylicBackdrop/>
+                            </SystemBackdropElement.SystemBackdrop>
+                        </SystemBackdropElement>
+                        <StackPanel Orientation="Horizontal" Margin="10">
                             <Button Padding="12"
                                     BorderThickness="0"
                                     Background="Transparent"

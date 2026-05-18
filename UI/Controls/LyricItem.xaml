@@ -37,8 +37,8 @@
 
     <Popup
         x:Name="DebugTimeDisplayer"
-        VerticalOffset="-12" Opacity="0"
-        ShouldConstrainToRootBounds="True">
+        VerticalOffset="-12" Opacity="1"
+        ShouldConstrainToRootBounds="False">
         <TextBlock x:Name="DebugTimeDisplayer_TextBlock" Text="time" IsHitTestVisible="False"/>
     </Popup>
 </Grid>

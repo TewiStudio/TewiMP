@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections;
+using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -6,10 +7,8 @@ using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Composition;
-using TewiMP.UI.Controls;
-using System.Collections;
-using TewiMP.UI.Pages.ListViewPages;
 using TewiMP.Core.Music;
+using TewiMP.UI.Controls;
 
 namespace TewiMP.UI.Pages
 {
@@ -120,7 +119,7 @@ namespace TewiMP.UI.Pages
             backgroundVisual = ElementCompositionPreview.GetElementVisual(BaseGridView_HeaderRectangle);
             headerFootRootVisual = ElementCompositionPreview.GetElementVisual(BaseGridView_HeaderGrid_Foot_Root);
         }
-        // 类成员变量 (保持引用，不要 Dispose)
+
         private ExpressionAnimation _offsetAnim;
         private ExpressionAnimation _logoScaleAnim;
         private ExpressionAnimation _logoOffsetAnim;

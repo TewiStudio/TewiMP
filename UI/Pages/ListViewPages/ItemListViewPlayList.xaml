@@ -22,7 +22,6 @@
     <Grid x:Name="root" Loaded="menu_border_Loaded" SizeChanged="Result_BaseGrid_SizeChanged">
         <ListView x:Name="Children"
                   Background="Transparent"
-                  ScrollViewer.CanContentRenderOutsideBounds="True"
                   SelectionMode="None"
                   SelectionChanged="Children_SelectionChanged"
                   ItemsSource="{x:Bind MusicDataList}"

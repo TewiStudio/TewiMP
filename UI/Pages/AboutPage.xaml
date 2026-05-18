@@ -11,7 +11,7 @@
     xmlns:storage="using:TewiMP.Services.Storage"
     mc:Ignorable="d" Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Grid>
-        <ScrollView ScrollViewer.CanContentRenderOutsideBounds="True" ScrollViewer.ZoomMode="Enabled">
+        <ScrollViewer ScrollViewer.ZoomMode="Enabled" ScrollViewer.CanContentRenderOutsideBounds="True">
             <StackPanel HorizontalAlignment="Stretch"
                         Orientation="Vertical"
                         Margin="16" Spacing="12">
@@ -357,6 +357,6 @@
                     </Button>
                 </StackPanel>
             </StackPanel>
-        </ScrollView>
+        </ScrollViewer>
     </Grid>
 </Page>

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using CommunityToolkit.WinUI;
 using Microsoft.UI;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
@@ -10,26 +6,31 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Animation;
-using Windows.UI;
-using Windows.Storage;
-using Windows.Graphics;
-using Windows.ApplicationModel.DataTransfer;
-using CommunityToolkit.WinUI;
-using WinRT;
-using WinUIEx;
 using NAudio.Wave;
-using TewiMP.Helpers;
-using TewiMP.UI.Controls;
-using TewiMP.Services.Storage;
-using TewiMP.Services;
-using TewiMP.UI.Pages;
-using TewiMP.UI.Pages.MusicPages;
-using TewiMP.Services.Media.Audio;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading.Tasks;
 using TewiMP.Core;
 using TewiMP.Core.Music;
+using TewiMP.Helpers;
+using TewiMP.Services;
+using TewiMP.Services.Media.Audio;
+using TewiMP.Services.Storage;
+using TewiMP.UI.Controls;
+using TewiMP.UI.Pages;
+using TewiMP.UI.Pages.MusicPages;
+using Windows.ApplicationModel.DataTransfer;
+using Windows.Graphics;
+using Windows.Storage;
+using Windows.UI;
+using WinRT;
+using WinUIEx;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -820,6 +821,7 @@ public sealed partial class MainWindow : WindowEx
 
     private void LyricManager_PlayingLyricSelectedChange(LyricData _)
     {
+        return;
         try
         {
             if (_ is null) { SetLyricToNormal(); return; }
@@ -1122,7 +1124,7 @@ public sealed partial class MainWindow : WindowEx
     {
         NavViewContentBase_RGClip.Rect = new global::Windows.Foundation.Rect(0, 0,
             NavViewContentBase.ActualWidth,
-            AppWindow.Size.Height - AppTitleBar.ActualHeight);
+            NavViewContentBase.ActualHeight - BottomPlayGrid.ActualHeight);
     }
 
     public void SetNavViewContent(Type type, object param = null, NavigationTransitionInfo navigationTransitionInfo = null)
@@ -1415,6 +1417,9 @@ public sealed partial class MainWindow : WindowEx
         PlayingListBasePopup.Closed += TeachingTipPlayingList_Closed;
     }
 
+    ItemsStackPanel _itemStackPanel;
+    Visual _itemStackPanelVisual;
+    InsetClip _itemStackPanelClip;
     private void TeachingTipPlayingList_Opened(object sender, object e)
     {
         ToolTipService.SetToolTip(PlayModeSelector, $"当前播放模式：{App.Instance.PlayingListService.PlayBehavior}");
@@ -1423,6 +1428,15 @@ public sealed partial class MainWindow : WindowEx
             -16,
             (float)(PlayingListBaseView.ActualHeight - PlayingListScrollControl.ActualHeight - 20 - 16),
             0);
+
+        if (_itemStackPanelClip is null)
+        {
+            _itemStackPanel = CodeHelper.FindDescendant<ItemsStackPanel>(PlayingListBaseView);
+            _itemStackPanelVisual = ElementCompositionPreview.GetElementVisual(_itemStackPanel);
+            _itemStackPanelClip = _itemStackPanelVisual.Compositor.CreateInsetClip();
+            _itemStackPanelVisual.Clip = _itemStackPanelClip;
+        }
+        UpdatePlayingListShyHeader();
     }
 
     private void TeachingTipPlayingList_Closed(object sender, object e)
@@ -1825,68 +1839,25 @@ public sealed partial class MainWindow : WindowEx
         });
     }
 
+    ScrollViewer _playingListScrollViewer;
+    CompositionPropertySet _playingListScrollerPropertySet;
+    ExpressionAnimation _playingListItemsStackClipAnim;
     public void UpdatePlayingListShyHeader()
     {
-        /*
-        // 设置header为顶层
-        var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)PlayingListBaseView.Header);
-        var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
-        Canvas.SetZIndex(headerContainer, 1);
+        if (_playingListScrollViewer is null || _playingListScrollerPropertySet is null)
+        {
+            _playingListScrollViewer = CodeHelper.FindDescendant<ScrollViewer>(PlayingListBaseView);
+            _playingListScrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(_playingListScrollViewer);
+        }
 
-        var scrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
+        if (_playingListItemsStackClipAnim is null)
+        {
+            string exp = $"-scroller.Translation.Y";
+            _playingListItemsStackClipAnim = _itemStackPanelVisual.Compositor.CreateExpressionAnimation(exp);
+            _playingListItemsStackClipAnim.SetReferenceParameter("scroller", _playingListScrollerPropertySet);
+        }
+        _itemStackPanelClip.StartAnimation(nameof(_itemStackPanelClip.TopInset), _playingListItemsStackClipAnim);
 
-        CompositionPropertySet scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
-        Compositor compositor = scrollerPropertySet.Compositor;
-
-        var padingSize = 40;
-        // Get the visual that represents our HeaderTextBlock 
-        // And define the progress animation string
-        var headerVisual = ElementCompositionPreview.GetElementVisual(PlayingListBaseGrid1);
-        String progress = $"Clamp(-scroller.Translation.Y / {padingSize}, 0, 1.0)";
-
-        // Shift the header by 50 pixels when scrolling down
-        var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {padingSize}");
-        offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
-        headerVisual.StartAnimation("Offset.Y", offsetExpression);
-
-        
-        Visual textVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
-        Vector3 finalOffset = new Vector3(0, 10, 0);
-        var headerOffsetAnimation = compositor.CreateExpressionAnimation($"Lerp(Vector3(0,0,0), finalOffset, {progress})");
-        headerOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-        headerOffsetAnimation.SetVector3Parameter("finalOffset", finalOffset);
-        textVisual.StartAnimation(nameof(Visual.Offset), headerOffsetAnimation);
-        
-
-        // Logo scale and transform                                          from               to
-        var logoHeaderScaleAnimation = compositor.CreateExpressionAnimation("Lerp(Vector2(1,1), Vector2(0.7, 0.7), " + progress + ")");
-        logoHeaderScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-
-        var logoVisual = ElementCompositionPreview.GetElementVisual(PlayingListBaseTextBlock);
-        logoVisual.StartAnimation("Scale.xy", logoHeaderScaleAnimation);
-
-        var logoVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 24, {progress})");
-        logoVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-        logoVisual.StartAnimation("Offset.Y", logoVisualOffsetYAnimation);
-
-        var logoVisualOffsetXAnimation = compositor.CreateExpressionAnimation($"Lerp(0, -12, {progress})");
-        logoVisualOffsetXAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-        logoVisual.StartAnimation("Offset.X", logoVisualOffsetXAnimation);
-        
-        var stackVisual = ElementCompositionPreview.GetElementVisual(PlayingListBaseStackPanel);
-        var stackVisualOffsetXAnimation = compositor.CreateExpressionAnimation($"Lerp(144, 330, {progress})");
-        stackVisualOffsetXAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-        stackVisual.StartAnimation("Offset.X", stackVisualOffsetXAnimation);
-
-        var stackVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(12, 20, {progress})");
-        stackVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-        stackVisual.StartAnimation("Offset.Y", stackVisualOffsetYAnimation);
-
-        var backgroundVisual = ElementCompositionPreview.GetElementVisual(PlayingListBaseRectangle);
-        var backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
-        backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-        backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
-        */
     }
     #endregion
 

@@ -243,13 +243,7 @@ namespace TewiMP.UI.Controls
         private static readonly AnimationBuilder HighlightStrokeOpacityFadeOutAnimation = 
             AnimationBuilder.Create().Opacity().TimedKeyFrames(k => k
                 .KeyFrame(TimeSpan.FromSeconds(1), 1)
-                .KeyFrame(TimeSpan.FromSeconds(2), .45)
-                .KeyFrame(TimeSpan.FromSeconds(3), 1)
-                .KeyFrame(TimeSpan.FromSeconds(4), .45)
-                .KeyFrame(TimeSpan.FromSeconds(5), 1)
-                .KeyFrame(TimeSpan.FromSeconds(6), .45)
-                .KeyFrame(TimeSpan.FromSeconds(7), 1)
-                .KeyFrame(TimeSpan.FromSeconds(10), 0));
+                .KeyFrame(TimeSpan.FromSeconds(4), 0));
         private static readonly AnimationBuilder HighlightStrokeOpacityFadeOutFastAnimation = 
             AnimationBuilder.Create().Opacity(0, duration: TimeSpan.FromSeconds(.2));
         void InitVisuals()
