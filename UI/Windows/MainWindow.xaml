@@ -598,7 +598,7 @@
                                         <Grid
                                             x:Name="PlayingListHeaderBaseGrid"
                                             BorderBrush="{ThemeResource SurfaceStrokeColorFlyoutBrush}"
-                                            BorderThickness="0,0,0,1" Margin="0,0,0,0"
+                                            BorderThickness="0,0,0,1" Margin="0,0,0,8"
                                             ui:Effects.Shadow="{StaticResource CommonShadow}"
 >
                                             <Grid.ColumnDefinitions>

@@ -1810,9 +1810,10 @@ public sealed partial class MainWindow : WindowEx
 
         if (_playingListItemsStackClipAnim is null)
         {
-            string exp = $"-scroller.Translation.Y";
+            string exp = "-scroller.Translation.Y - margin";
             _playingListItemsStackClipAnim = _itemStackPanelVisual.Compositor.CreateExpressionAnimation(exp);
             _playingListItemsStackClipAnim.SetReferenceParameter("scroller", _playingListScrollerPropertySet);
+            _playingListItemsStackClipAnim.SetScalarParameter("margin", (float)PlayingListHeaderBaseGrid.Margin.Bottom);
         }
         _itemStackPanelClip.StartAnimation(nameof(_itemStackPanelClip.TopInset), _playingListItemsStackClipAnim);
 
