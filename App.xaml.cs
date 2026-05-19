@@ -31,6 +31,7 @@ using TewiMP.Core.Audio;
 using TewiMP.Core.Music;
 using WinRT.Interop;
 using TewiMP.Services.Plugin;
+using Windows.UI.ViewManagement;
 
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.
@@ -115,6 +116,8 @@ public partial class App : Application
     public NotifyIconWindow NotifyIconWindow;
     public TaskBarInfoWindow taskBarInfoWindow;
     #endregion
+
+    public UISettings UISettings { get; set; } = new();
 
     /// <summary>
     /// Initializes the singleton application object.  This is the first line of authored code
@@ -315,17 +318,22 @@ public partial class App : Application
             }
             catch { }
         };
-/*
-        StartingSettings = DataFolderBase.JSettingData;
-        var accentColor = StartingSettings[DataFolderBase.SettingParams.ThemeAccentColor.ToString()];
-        if (accentColor != null)
+        UISettings.ColorValuesChanged += async (uiSettings, obj) =>
         {
-            Current.Resources["SystemAccentColor"] = Windows.UI.Color.FromArgb(255, 2,255,2);
-            Current.Resources["SystemAccentColorLight2"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
-            Current.Resources["SystemAccentColorDark1"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
+            MainWindowInstance.Invoke(async () =>
+                await PlayingListService.UpdateImageColor(true));
+        };
+        /*
+                StartingSettings = DataFolderBase.JSettingData;
+                var accentColor = StartingSettings[DataFolderBase.SettingParams.ThemeAccentColor.ToString()];
+                if (accentColor != null)
+                {
+                    Current.Resources["SystemAccentColor"] = Windows.UI.Color.FromArgb(255, 2,255,2);
+                    Current.Resources["SystemAccentColorLight2"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
+                    Current.Resources["SystemAccentColorDark1"] = Windows.UI.Color.FromArgb(255, 2, 255, 2);
 
-            //LogManager.Log(Current.Resources["SystemAccentColorLight2"].GetType());
-        }*/
+                    //LogManager.Log(Current.Resources["SystemAccentColorLight2"].GetType());
+                }*/
         LoadSettings();
 
         // WinUI Bug: 获取不到启动参数

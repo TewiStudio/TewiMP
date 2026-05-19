@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using TewiMP.Core.Music;
 using TewiMP.Services.Storage;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TewiMP.Helpers
 {
@@ -116,7 +117,7 @@ namespace TewiMP.Helpers
                 if (musicData.From == MusicFrom.localMusic)
                 {
                     var file = new FileInfo(musicData.InLocal);
-                    string lrcPath = $"{file.FullName.Replace(file.Extension, "")}.lrc";
+                    string lrcPath = $"{(string.IsNullOrEmpty(file.Extension) ? file.FullName : file.FullName.Replace(file.Extension, ""))}.lrc";
                     if (File.Exists(lrcPath)) return lrcPath;
                 }
                 else
@@ -138,11 +139,14 @@ namespace TewiMP.Helpers
         public static Uri ToImageUri(this string filePath)
         {
             //System.Diagnostics.LogManager.Log(filePath);
-            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
-            {
-                filePath = DataFolderBase.IconPNGPath;
-            }
-            return new Uri(filePath);
+
+            if (!Uri.TryCreate(filePath, UriKind.Absolute, out var uri))
+                return new(DataFolderBase.IconPNGPath);
+
+            if (uri.IsFile && !File.Exists(uri.LocalPath))
+                return new(DataFolderBase.IconPNGPath);
+
+            return uri;
         }
     }
 }

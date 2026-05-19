@@ -21,6 +21,7 @@ public static class PluginService
         LogService.Log(nameof(PluginService), "初始化 PluginManager.");
         RemoveAllPlugin();
 
+#if !DEBUG
         DirectoryInfo directoryInfo = new(DataFolderBase.PluginFolder);
         var dllFiles = directoryInfo.GetFiles();
         LogService.Log(nameof(PluginService), $"Scanned plugins count: {dllFiles.Length}.");
@@ -31,7 +32,7 @@ public static class PluginService
             var dllFile = dllFiles[i];
             AddPlugin(dllFile.FullName);
         }
-
+#endif
 #if DEBUG
         Assembly assembly = Assembly.GetExecutingAssembly();
 

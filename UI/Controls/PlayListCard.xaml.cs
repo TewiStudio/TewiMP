@@ -17,181 +17,181 @@ using TewiMP.Helpers;
 using TewiMP.Services;
 using TewiMP.Services.Storage;
 
-namespace TewiMP.UI.Controls
+namespace TewiMP.UI.Controls;
+
+public partial class PlayListCard : Grid
 {
-    public partial class PlayListCard : Grid
+    private MusicListData MusicListData { get; set; }
+    public double ImageScaleDPI { get; set; } = 1.0;
+    public string ID { get; set; }
+    public ImageEx ConnectAnimationElement { get; set; }
+    public TextBlock ConnectAnimationElement1 { get; set; }
+
+    public PlayListCard()
     {
-        private MusicListData MusicListData { get; set; }
-        public double ImageScaleDPI { get; set; } = 1.0;
-        public string ID { get; set; }
-        public ImageEx ConnectAnimationElement { get; set; }
-        public TextBlock ConnectAnimationElement1 { get; set; }
+        InitializeComponent();
+        ConnectAnimationElement = PlayListImage;
+        ConnectAnimationElement1 = TextBaseTb;
+    }
 
-        public PlayListCard()
+    private void PlayListCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
+    {
+        if (DataContext is not null)
         {
-            InitializeComponent();
-            ConnectAnimationElement = PlayListImage;
-            ConnectAnimationElement1 = TextBaseTb;
-        }
-
-        private void PlayListCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
-        {
-            if (DataContext is not null)
+            if (DataContext is MusicListData)
             {
-                if (DataContext is MusicListData)
-                {
-                    Init(DataContext as MusicListData);
-                }
+                Init(DataContext as MusicListData);
             }
         }
+    }
 
-        public void Init(MusicFrom musicFrom, string id)
-        {/*
+    public void Init(MusicFrom musicFrom, string id)
+    {/*
             MusicListData = await App.Instance.metingServices.NeteaseServices.GetPlayList(id);
             Init(MusicListData);
             UILoaded(null, null);*/
-        }
+    }
 
-        public void Init(MusicListData musicListData)
+    public void Init(MusicListData musicListData)
+    {
+        MusicListData = musicListData;
+        UpdateImage();
+        if (MusicListData.ListDataType != DataType.Playlist)
         {
-            MusicListData = musicListData;
-            UpdateImage();
-            if (MusicListData.ListDataType != DataType.Playlist)
-            {
-                RefreshPlayListButton.Visibility = Visibility.Collapsed;
-                MusicSourceRoot.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                RefreshPlayListButton.Visibility = Visibility.Visible;
-                MusicSourceRoot.Visibility = Visibility.Visible;
-                MusicSourceBtn.Content = MusicListData.GetMusicSourcePlugin().PluginInfo.Name;
-            }
-            if (musicListData.ListDataType == DataType.LocalPlaylist)
-            {
-                EditPlayListButton.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                EditPlayListButton.Visibility = Visibility.Collapsed;
-            }
+            RefreshPlayListButton.Visibility = Visibility.Collapsed;
+            MusicSourceRoot.Visibility = Visibility.Collapsed;
         }
-
-        public async void UpdateImage()
+        else
         {
-            //ExitMass();
-            if (MusicListData != null)
+            RefreshPlayListButton.Visibility = Visibility.Visible;
+            MusicSourceRoot.Visibility = Visibility.Visible;
+            MusicSourceBtn.Content = MusicListData.GetMusicSourcePlugin().PluginInfo.Name;
+        }
+        if (musicListData.ListDataType == DataType.LocalPlaylist)
+        {
+            EditPlayListButton.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            EditPlayListButton.Visibility = Visibility.Collapsed;
+        }
+    }
+
+    public async void UpdateImage()
+    {
+        //ExitMass();
+        if (MusicListData != null)
+        {
+            PlayListImage.Source = null;
+            var imageSources = await ImageService.GetImageUri(MusicListData);
+            await Task.Delay(50);
+            PlayListImage.Source = null;
+            PlayListImage.Source = imageSources;
+            PlayListImage.SaveName = $"{MusicListData.ListShowName}";
+        }
+        //CrateShadow();
+    }
+
+    Compositor compositor;
+    DropShadow dropShadow;
+    private void CrateShadow()
+    {
+        return;
+        var visual = ElementCompositionPreview.GetElementVisual(ShadowBaseRectangle);
+        compositor = visual.Compositor;
+
+        var basicRectVisual = compositor.CreateSpriteVisual();
+        basicRectVisual.Size = new Vector2((float)(ActualWidth - 8), (float)ActualHeight);
+
+        dropShadow = compositor.CreateDropShadow();
+        dropShadow.BlurRadius = 150f;
+        dropShadow.Opacity = 1f;
+        dropShadow.Color = Color.FromArgb(255, 0, 0, 0);
+        dropShadow.Offset = new Vector3(0, 0, 0);
+
+        basicRectVisual.Shadow = dropShadow;
+        ElementCompositionPreview.SetElementChildVisual(ShadowBaseRectangle, basicRectVisual);
+    }
+
+    private void UILoaded(object sender, RoutedEventArgs e)
+    {
+        //System.Diagnostics.LogManager.Log(MusicListData.PicturePath);
+    }
+
+    private void UIUnloaded(object sender, RoutedEventArgs e)
+    {
+        Dispose();
+    }
+
+    public void Dispose()
+    {
+        if (PlayListImage != null)
+        {
+            PlayListImage.Source = null;
+        }
+        MusicListData = null;
+        DataContext = null;
+        //PlayListImage = null;
+        //System.Diagnostics.LogManager.Log("[PlayListCard]: Disposed.");
+    }
+
+    private void Grid_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        return;
+        if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
+        {
+            AnimateHelper.AnimateOffset(
+                Children[1] as Border,
+                0, -2, 0,
+                0.2,
+                0.2f, 1f, 0.22f, 1f,
+                out Visual visual, out Compositor compositor, out Vector3KeyFrameAnimation animation);
+            visual.StartAnimation(nameof(visual.Offset), animation);
+            /*
+                            AnimateHelper.AnimateScalar(
+                                ABackColorBaseRectAngle,
+                                1f, 0.2,
+                                0.2f, 1, 0.22f, 1,
+                                out Visual visual2, out Compositor compositor2, out ScalarKeyFrameAnimation animation2);
+                            visual2.StartAnimation(nameof(visual2.Opacity), animation2);
+            */
+            if (dropShadow != null)
             {
-                PlayListImage.Source = null;
-                var imageSources = await ImageService.GetImageUri(MusicListData);
-                await Task.Delay(50);
-                PlayListImage.Source = null;
-                PlayListImage.Source = imageSources;
-                PlayListImage.SaveName = $"{MusicListData.ListShowName}";
-            }
-            //CrateShadow();
-        }
-
-        Compositor compositor;
-        DropShadow dropShadow;
-        private void CrateShadow()
-        {
-            return;
-            var visual = ElementCompositionPreview.GetElementVisual(ShadowBaseRectangle);
-            compositor = visual.Compositor;
-
-            var basicRectVisual = compositor.CreateSpriteVisual();
-            basicRectVisual.Size = new Vector2((float)(ActualWidth - 8), (float)ActualHeight);
-
-            dropShadow = compositor.CreateDropShadow();
-            dropShadow.BlurRadius = 150f;
-            dropShadow.Opacity = 1f;
-            dropShadow.Color = Color.FromArgb(255, 0, 0, 0);
-            dropShadow.Offset = new Vector3(0, 0, 0);
-
-            basicRectVisual.Shadow = dropShadow;
-            ElementCompositionPreview.SetElementChildVisual(ShadowBaseRectangle, basicRectVisual);
-        }
-
-        private void UILoaded(object sender, RoutedEventArgs e)
-        {
-            //System.Diagnostics.LogManager.Log(MusicListData.PicturePath);
-        }
-
-        private void UIUnloaded(object sender, RoutedEventArgs e)
-        {
-            Dispose();
-        }
-
-        public void Dispose()
-        {
-            if (PlayListImage != null)
-            {
-               PlayListImage.Source = null;
-            }
-            MusicListData = null;
-            DataContext = null;
-            //PlayListImage = null;
-            //System.Diagnostics.LogManager.Log("[PlayListCard]: Disposed.");
-        }
-
-        private void Grid_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            return;
-            if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
-            {
-                AnimateHelper.AnimateOffset(
-                    Children[1] as Border,
-                    0, -2, 0,
-                    0.2,
-                    0.2f, 1f, 0.22f, 1f,
-                    out Visual visual, out Compositor compositor, out Vector3KeyFrameAnimation animation);
-                visual.StartAnimation(nameof(visual.Offset), animation);
-/*
-                AnimateHelper.AnimateScalar(
-                    ABackColorBaseRectAngle,
-                    1f, 0.2,
-                    0.2f, 1, 0.22f, 1,
-                    out Visual visual2, out Compositor compositor2, out ScalarKeyFrameAnimation animation2);
-                visual2.StartAnimation(nameof(visual2.Opacity), animation2);
-*/
-                if (dropShadow != null)
-                {
-                    ScalarKeyFrameAnimation blurAnimation = compositor.CreateScalarKeyFrameAnimation();
-                    blurAnimation.InsertKeyFrame(0.5f, 1f);
-                    blurAnimation.Duration = TimeSpan.FromSeconds(0.5);
-                    dropShadow.StartAnimation("Opacity", blurAnimation);
-                }
-            }
-        }
-
-        private void Grid_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            return;
-            if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
-            {
-                AnimateHelper.AnimateOffset(
-                    Children[1] as Border,
-                    0, 0, 0,
-                    0.2,
-                    0.2f, 1f, 0.22f, 1f,
-                    out Visual visual, out Compositor compositor, out Vector3KeyFrameAnimation animation);
-                visual.StartAnimation(nameof(visual.Offset), animation);
-
-                ExitMass();
-
-                if (dropShadow != null)
-                {
-                    ScalarKeyFrameAnimation blurAnimation = compositor.CreateScalarKeyFrameAnimation();
-                    blurAnimation.InsertKeyFrame(1, 0f);
-                    blurAnimation.Duration = TimeSpan.FromSeconds(0.5);
-                    dropShadow.StartAnimation("Opacity", blurAnimation);
-                }
+                ScalarKeyFrameAnimation blurAnimation = compositor.CreateScalarKeyFrameAnimation();
+                blurAnimation.InsertKeyFrame(0.5f, 1f);
+                blurAnimation.Duration = TimeSpan.FromSeconds(0.5);
+                dropShadow.StartAnimation("Opacity", blurAnimation);
             }
         }
+    }
 
-        private void ExitMass()
-        {/*
+    private void Grid_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        return;
+        if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
+        {
+            AnimateHelper.AnimateOffset(
+                Children[1] as Border,
+                0, 0, 0,
+                0.2,
+                0.2f, 1f, 0.22f, 1f,
+                out Visual visual, out Compositor compositor, out Vector3KeyFrameAnimation animation);
+            visual.StartAnimation(nameof(visual.Offset), animation);
+
+            ExitMass();
+
+            if (dropShadow != null)
+            {
+                ScalarKeyFrameAnimation blurAnimation = compositor.CreateScalarKeyFrameAnimation();
+                blurAnimation.InsertKeyFrame(1, 0f);
+                blurAnimation.Duration = TimeSpan.FromSeconds(0.5);
+                dropShadow.StartAnimation("Opacity", blurAnimation);
+            }
+        }
+    }
+
+    private void ExitMass()
+    {/*
             AnimateHelper.AnimateScalar(
                 ABackColorBaseRectAngle,
                 0, 0.2,
@@ -199,116 +199,115 @@ namespace TewiMP.UI.Controls
                 out Visual visual2, out Compositor compositor2, out ScalarKeyFrameAnimation animation2);
             visual2.StartAnimation(nameof(visual2.Opacity), animation2);
 */
-        }
+    }
 
-        bool isPressed = false;
-        bool isRightPressed = false;
-        private void Grid_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-        {
-            isPressed = true;
-            isRightPressed = e.GetCurrentPoint(sender as UIElement).Properties.IsRightButtonPressed;
-        }
+    bool isPressed = false;
+    bool isRightPressed = false;
+    private void Grid_PointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        isPressed = true;
+        isRightPressed = e.GetCurrentPoint(sender as UIElement).Properties.IsRightButtonPressed;
+    }
 
-        private async void Grid_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    private async void Grid_PointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (isPressed && MusicListData != null)
         {
-            if (isPressed && MusicListData != null)
+            if (isRightPressed)
             {
-                if (isRightPressed)
+                FlyoutMenu.ShowAt(sender as FrameworkElement);
+                isRightPressed = false;
+            }
+            else
+            {
+                if (!new UISettings().AnimationsEnabled)
                 {
-                    FlyoutMenu.ShowAt(sender as FrameworkElement);
-                    isRightPressed = false;
+                    await Task.Delay(10); // 当系统动画关闭时，会导致程序卡死
                 }
-                else
-                {
-                    if (!new UISettings().AnimationsEnabled)
-                    {
-                        await Task.Delay(10); // 当系统动画关闭时，会导致程序卡死
-                    }
-                    ListViewPage.SetPageToListViewPage(new() { PageType = PageType.PlayList, Param = MusicListData.MD5 });
-                }
-            }
-            isPressed = false;
-        }
-
-        private void Grid_RightTapped(object sender, Microsoft.UI.Xaml.Input.RightTappedRoutedEventArgs e)
-        {
-            FlyoutMenu.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
-        }
-
-        private void Grid_Holding(object sender, Microsoft.UI.Xaml.Input.HoldingRoutedEventArgs e)
-        {
-            FlyoutMenu.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
-        }
-
-        private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
-        {
-            var isDelete = await App.MainWindowInstance.ShowDialog("确认删除列表", $"真的要删除列表 \"{MusicListData.ListShowName}\" 吗？\n此操作不可恢复。", "取消", "确定", defaultButton: ContentDialogButton.Close);
-            if (isDelete == ContentDialogResult.Primary)
-            {
-                App.MainWindowInstance.AddNotify("正在删除", $"正在删除列表 \"{MusicListData.ListShowName}\"。");
-                await PlayListHelper.DeletePlayList(MusicListData);
-                await App.Instance.PlayListReader.Refresh();
-                App.MainWindowInstance.AddNotify("删除列表成功。", null, NotifySeverity.Complete);
-            }
-        }
-
-        private static async void UpdateMusicList(MusicListData musicListData)
-        {
-            App.MainWindowInstance.AddNotify("正在更新歌单...", null);
-
-            try
-            {
-                var deletePath = (await ImageService.GetImageUri(musicListData)).LocalPath;
-                await Task.Run(() =>
-                {
-                    try
-                    {
-                        if (!string.IsNullOrEmpty(deletePath)) File.Delete(deletePath);
-                    }
-                    catch { }
-                });
-
-                var playlist = await musicListData.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
-                musicListData = playlist;
-
-                var data = await PlayListHelper.ReadData();
-                data[musicListData.ListName] = JObject.FromObject(playlist);
-                await PlayListHelper.SaveData(data);
-
-                await App.Instance.PlayListReader.Refresh();
-                App.MainWindowInstance.AddNotify("更新歌单成功。", null, NotifySeverity.Complete);
-            }
-            catch (Exception ex)
-            {
-                LogService.Error("PlayingList Update Error", ex.ToString());
-                App.MainWindowInstance.AddNotify("更新歌单失败", $"更新歌单时遇到错误，请重试。\n错误信息：{ex}", NotifySeverity.Error);
-            }
-        }
-
-        private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
-        {
-            UpdateMusicList(MusicListData);
-        }
-
-        private void Grid_AccessKeyInvoked(UIElement sender, Microsoft.UI.Xaml.Input.AccessKeyInvokedEventArgs args)
-        {
-            if (MusicListData != null)
                 ListViewPage.SetPageToListViewPage(new() { PageType = PageType.PlayList, Param = MusicListData.MD5 });
+            }
         }
+        isPressed = false;
+    }
 
-        private async void EditPlayListButton_Click(object sender, RoutedEventArgs e)
-        {
-            await Pages.DialogPages.EditPlayListPage.ShowDialog(MusicListData);
-        }
+    private void Grid_RightTapped(object sender, Microsoft.UI.Xaml.Input.RightTappedRoutedEventArgs e)
+    {
+        FlyoutMenu.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
+    }
 
-        private async void InsertButton_Click(object sender, RoutedEventArgs e)
-        {
-            await App.MainWindowInstance.ShowDialog("排序播放列表", "");
-        }
+    private void Grid_Holding(object sender, Microsoft.UI.Xaml.Input.HoldingRoutedEventArgs e)
+    {
+        FlyoutMenu.ShowAt(sender as UIElement, e.GetPosition(sender as UIElement));
+    }
 
-        private async void MusicSourceBtn_Click(object sender, RoutedEventArgs e)
+    private async void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
+    {
+        var isDelete = await App.MainWindowInstance.ShowDialog("确认删除列表", $"真的要删除列表 \"{MusicListData.ListShowName}\" 吗？\n此操作不可恢复。", "取消", "确定", defaultButton: ContentDialogButton.Close);
+        if (isDelete == ContentDialogResult.Primary)
         {
-            await MusicListData.GetMusicSourcePlugin().ShowSettingsDialog();
+            App.MainWindowInstance.AddNotify("正在删除", $"正在删除列表 \"{MusicListData.ListShowName}\"。");
+            await PlayListHelper.DeletePlayList(MusicListData);
+            await App.Instance.PlayListReader.Refresh();
+            App.MainWindowInstance.AddNotify("删除列表成功。", null, NotifySeverity.Complete);
         }
+    }
+
+    private static async void UpdateMusicList(MusicListData musicListData)
+    {
+        App.MainWindowInstance.AddNotify("正在更新歌单...", null);
+
+        try
+        {
+            var deletePath = (await ImageService.GetImageUri(musicListData)).LocalPath;
+            await Task.Run(() =>
+            {
+                try
+                {
+                    if (!string.IsNullOrEmpty(deletePath)) File.Delete(deletePath);
+                }
+                catch { }
+            });
+
+            var playlist = await musicListData.GetMusicSourcePlugin().GetPlayList(musicListData.ID);
+            musicListData = playlist;
+
+            var data = await PlayListHelper.ReadData();
+            data[musicListData.ListName] = JObject.FromObject(playlist);
+            await PlayListHelper.SaveData(data);
+
+            await App.Instance.PlayListReader.Refresh();
+            App.MainWindowInstance.AddNotify("更新歌单成功。", null, NotifySeverity.Complete);
+        }
+        catch (Exception ex)
+        {
+            LogService.Error("PlayingList Update Error", ex.ToString());
+            App.MainWindowInstance.AddNotify("更新歌单失败", $"更新歌单时遇到错误，请重试。\n错误信息：{ex}", NotifySeverity.Error);
+        }
+    }
+
+    private void MenuFlyoutItem_Click_1(object sender, RoutedEventArgs e)
+    {
+        UpdateMusicList(MusicListData);
+    }
+
+    private void Grid_AccessKeyInvoked(UIElement sender, Microsoft.UI.Xaml.Input.AccessKeyInvokedEventArgs args)
+    {
+        if (MusicListData != null)
+            ListViewPage.SetPageToListViewPage(new() { PageType = PageType.PlayList, Param = MusicListData.MD5 });
+    }
+
+    private async void EditPlayListButton_Click(object sender, RoutedEventArgs e)
+    {
+        await Pages.DialogPages.EditPlayListPage.ShowDialog(MusicListData);
+    }
+
+    private async void InsertButton_Click(object sender, RoutedEventArgs e)
+    {
+        await App.MainWindowInstance.ShowDialog("排序播放列表", "");
+    }
+
+    private async void MusicSourceBtn_Click(object sender, RoutedEventArgs e)
+    {
+        await MusicListData.GetMusicSourcePlugin().ShowSettingsDialog();
     }
 }

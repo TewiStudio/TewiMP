@@ -14,7 +14,7 @@ public class MusicListData : OnlyClass, IIsListPage
     public DataType ListDataType { get; set; }
     public string ID { get; set; }
     public PlaySort PlaySort { get; set; }
-    public DateTime CreationTime { get; set; } = DateTime.Now;
+    public DateTime CreationTime { get; set; } = DateTime.MinValue;
     public List<MusicData> Songs { get; set; }
 
     public MusicListData(string listName = null, string listShowName = null, string picturePath = null,

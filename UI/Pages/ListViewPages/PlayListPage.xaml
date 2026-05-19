@@ -397,6 +397,75 @@
                                     Margin="0,0,0,0"
                                     AccessKey="Z">
                                     <CommandBar.SecondaryCommands>
+                                        <AppBarButton
+                                            Label="添加本地文件"
+                                            AccessKey="A"
+                                            ToolTipService.ToolTip="添加本地文件"
+                                            Click="AppBarButton_Click" Tag="addLocal">
+                                            <AppBarButton.Icon>
+                                                <FontIcon Glyph="&#xE8E5;"/>
+                                            </AppBarButton.Icon>
+                                        </AppBarButton>
+                                        <AppBarButton
+                                            Label="搜索"
+                                            AccessKey="F"
+                                            ToolTipService.ToolTip="搜索播放列表中的歌曲"
+                                            Click="AppBarButton_Click" Tag="search">
+                                            <AppBarButton.Icon>
+                                                <FontIcon Glyph="&#xE721;"/>
+                                            </AppBarButton.Icon>
+                                        </AppBarButton>
+
+                                        <AppBarButton
+                                            Click="multiButton_Click"
+                                            Tag="multi_deleteSelect"
+                                            Label="移除选中歌曲"
+                                            ToolTipService.ToolTip="从此列表中移除选中歌曲">
+                                            <AppBarButton.Icon>
+                                                <FontIcon Glyph="&#xE74D;"/>
+                                            </AppBarButton.Icon>
+                                        </AppBarButton>
+                                        <AppBarButton
+                                            Click="multiButton_Click"
+                                            Tag="multi_downloadSelect"
+                                            Label="下载选中歌曲"
+                                            ToolTipService.ToolTip="下载选中歌曲">
+                                            <AppBarButton.Icon>
+                                                <FontIcon Glyph="&#xE896;"/>
+                                            </AppBarButton.Icon>
+                                        </AppBarButton>
+                                        <AppBarButton
+                                            Click="multiButton_Click"
+                                            Tag="multi_addSelectToPlayList"
+                                            Label="添加选中歌曲到播放列表中"
+                                            ToolTipService.ToolTip="添加选中歌曲到播放列表中">
+                                            <AppBarButton.Flyout>
+                                                <MenuFlyout Opening="multi_addSelectToPlayList_flyout_Opening" Closed="multi_addSelectToPlayList_flyout_Closed"/>
+                                            </AppBarButton.Flyout>
+                                            <Viewbox Width="9" Margin="2,0,0,0">
+                                                <Grid>
+                                                    <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
+                                                        VerticalAlignment="Top"/>
+                                                    <FontIcon Glyph="&#xE90B;"
+                                                        VerticalAlignment="Bottom"/>
+                                                </Grid>
+                                            </Viewbox>
+                                        </AppBarButton>
+                                        <AppBarButton
+                                            Click="multiButton_Click"
+                                            Tag="multi_addSelectToPlaying"
+                                            Label="添加选中歌曲到正在播放的列表中"
+                                            ToolTipService.ToolTip="添加选中歌曲到正在播放的列表中">
+                                            <Viewbox Width="9" Margin="2,0,0,0" VerticalAlignment="Center">
+                                                <Grid>
+                                                    <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
+                                                        VerticalAlignment="Top"/>
+                                                    <FontIcon Glyph="&#xEE4A;"
+                                                        VerticalAlignment="Bottom"/>
+                                                </Grid>
+                                            </Viewbox>
+                                        </AppBarButton>
+
                                         <AppBarElementContainer 
                                             AllowFocusOnInteraction="True"
                                             x:Name="SortComboBoxParent">
@@ -409,6 +478,7 @@
                                             </ComboBox>
                                         </AppBarElementContainer>
                                     </CommandBar.SecondaryCommands>
+                                    
                                     <AppBarButton
                                         x:Name="PlayAllButton"
                                         BorderBrush="{ThemeResource ControlElevationBorderBrush}"
@@ -456,24 +526,6 @@
                                             <FontIcon Glyph="&#xEA37;"/>
                                         </AppBarToggleButton.Icon>
                                     </AppBarToggleButton>
-                                    <AppBarButton
-                                        Label="添加本地文件"
-                                        AccessKey="A"
-                                        ToolTipService.ToolTip="添加本地文件"
-                                        Click="AppBarButton_Click" Tag="addLocal">
-                                        <AppBarButton.Icon>
-                                            <FontIcon Glyph="&#xE8E5;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton
-                                        Label="搜索"
-                                        AccessKey="F"
-                                        ToolTipService.ToolTip="搜索播放列表中的歌曲"
-                                        Click="AppBarButton_Click" Tag="search">
-                                        <AppBarButton.Icon>
-                                            <FontIcon Glyph="&#xE721;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
                                     
                                     <AppBarButton
                                         Click="multiButton_Click"
@@ -492,55 +544,6 @@
                                         <AppBarButton.Icon>
                                             <PathIcon Data="{StaticResource 反选}"/>
                                         </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton
-                                        Click="multiButton_Click"
-                                        Tag="multi_deleteSelect"
-                                        Label="移除选中歌曲"
-                                        ToolTipService.ToolTip="从此列表中移除选中歌曲">
-                                        <AppBarButton.Icon>
-                                            <FontIcon Glyph="&#xE74D;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton
-                                        Click="multiButton_Click"
-                                        Tag="multi_downloadSelect"
-                                        Label="下载选中歌曲"
-                                        ToolTipService.ToolTip="下载选中歌曲">
-                                        <AppBarButton.Icon>
-                                            <FontIcon Glyph="&#xE896;"/>
-                                        </AppBarButton.Icon>
-                                    </AppBarButton>
-                                    <AppBarButton
-                                        Click="multiButton_Click"
-                                        Tag="multi_addSelectToPlayList"
-                                        Label="添加选中歌曲到播放列表中"
-                                        ToolTipService.ToolTip="添加选中歌曲到播放列表中">
-                                        <AppBarButton.Flyout>
-                                            <MenuFlyout Opening="multi_addSelectToPlayList_flyout_Opening" Closed="multi_addSelectToPlayList_flyout_Closed"/>
-                                        </AppBarButton.Flyout>
-                                        <Viewbox Width="9" Margin="2,0,0,0">
-                                            <Grid>
-                                                <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
-                                                            VerticalAlignment="Top"/>
-                                                <FontIcon Glyph="&#xE90B;"
-                                                            VerticalAlignment="Bottom"/>
-                                            </Grid>
-                                        </Viewbox>
-                                    </AppBarButton>
-                                    <AppBarButton
-                                        Click="multiButton_Click"
-                                        Tag="multi_addSelectToPlaying"
-                                        Label="添加选中歌曲到正在播放的列表中"
-                                        ToolTipService.ToolTip="添加选中歌曲到正在播放的列表中">
-                                        <Viewbox Width="9" Margin="2,0,0,0" VerticalAlignment="Center">
-                                            <Grid>
-                                                <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
-                                                            VerticalAlignment="Top"/>
-                                                <FontIcon Glyph="&#xEE4A;"
-                                                            VerticalAlignment="Bottom"/>
-                                            </Grid>
-                                        </Viewbox>
                                     </AppBarButton>
                                     <AppBarButton
                                         Click="AppBarButton_Click"

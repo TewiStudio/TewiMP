@@ -84,22 +84,27 @@ public sealed partial class PlayListPage : Page
     {
         if (!this.IsLoaded) return;
         if (musicListBind is null) return;
-
-        foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
+        
+        void SetVisibility(FrameworkElement element)
         {
-            if (((string)element.Tag).Contains("move_"))
-            {
-                element.Visibility = Visibility.Collapsed;
-                continue;
-            }
-            if ((string)element.Tag == "multiSelect") continue;
-            if (((string)element.Tag).Contains("multi"))
-                element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
-            else
+            var tag = (string)element.Tag;
+            if (string.IsNullOrEmpty(tag))
             {
                 element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
+                return;
             }
+            if (tag.Equals("multiSelect") || tag.Contains("move_")) return;
+            if (tag.Contains("multi_"))
+                element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
+            else
+                element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
         }
+
+        foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands.Cast<FrameworkElement>())
+            SetVisibility(element);
+        foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.SecondaryCommands.Cast<FrameworkElement>())
+            SetVisibility(element);
+
         ItemsList.SelectionMode = isChecked ? ListViewSelectionMode.Multiple : ListViewSelectionMode.None;
         UpdateCommandBarWidth();
         MusicDataItem.SetIsCloseMouseEvent(isChecked);
@@ -109,17 +114,26 @@ public sealed partial class PlayListPage : Page
         if (!this.IsLoaded) return;
         if (musicListBind is null) return;
 
-        foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands)
+        void SetVisibility(FrameworkElement element)
         {
-            if (((string)element.Tag).Contains("multi_")) continue;
-            if ((string)element.Tag == "move") continue;
-            if (((string)element.Tag).Contains("move"))
-                element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
-            else
+            var tag = (string)element.Tag;
+            if (string.IsNullOrEmpty(tag))
             {
                 element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
+                return;
             }
+            if (tag.Equals("move") || tag.Contains("multi_")) return;
+            if (tag.Contains("move_"))
+                element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
+            else
+                element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
         }
+
+        foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands.Cast<FrameworkElement>())
+            SetVisibility(element);
+        foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.SecondaryCommands.Cast<FrameworkElement>())
+            SetVisibility(element);
+
         moveButton.Label = isChecked ? "完成排序" : "排序";
         ItemsList.AllowDrop = isChecked;
         ItemsList.CanDragItems = isChecked;
@@ -518,7 +532,7 @@ public sealed partial class PlayListPage : Page
         App.MainWindowInstance.WindowDpiChanged -= MainWindow_WindowDpiChanged;
         App.MainWindowInstance.WindowDpiChanged += MainWindow_WindowDpiChanged;
         ItemsList_Header_Info_TitleTextBlock.Text = musicListData.ListShowName;
-        ItemsList_Header_Info_OtherTextBlock.Text = $"{musicListData.Songs?.Count} 首歌曲";
+        ItemsList_Header_Info_OtherTextBlock.Text = $"共 {musicListData.Songs?.Count} 首\n{musicListData.CreationTime.ToRelativeTime()}";
     }
 
     static Thickness thickness0 = new(0);
@@ -578,17 +592,27 @@ public sealed partial class PlayListPage : Page
 
     async Task InitAccentColor()
     {
-        if (string.IsNullOrEmpty(imageSource.LocalPath))
+        if (imageSource?.IsFile != true)
         {
-            return;
+            var color = App.Instance.PlayingListService.AlbumAccentColor;
+            var textColor = App.Instance.PlayingListService.TextOnAlbumAccentColor;
+            (Resources["AccentColorBrush"] as SolidColorBrush).Color = color;
+            (Resources["AccentColorBrushDark1"] as SolidColorBrush).Color = color.Darken(.1f);
+            (Resources["AccentColorBrushDark2"] as SolidColorBrush).Color = color.Darken(.2f);
+            (Resources["TextOnAccentColorBrush"] as SolidColorBrush).Color = textColor;
+            (Resources["TextOnAccentColorBrushDark1"] as SolidColorBrush).Color = textColor.Darken(.1f);
+            (Resources["TextOnAccentColorBrushDark2"] as SolidColorBrush).Color = textColor.Darken(.2f);
         }
-        var color = await CodeHelper.GetThemeColorAsync(imageSource.LocalPath);
-        (Resources["AccentColorBrush"] as SolidColorBrush).Color = color.Item1;
-        (Resources["AccentColorBrushDark1"] as SolidColorBrush).Color = color.Item1.Darken(.1f);
-        (Resources["AccentColorBrushDark2"] as SolidColorBrush).Color = color.Item1.Darken(.2f);
-        (Resources["TextOnAccentColorBrush"] as SolidColorBrush).Color = color.Item3;
-        (Resources["TextOnAccentColorBrushDark1"] as SolidColorBrush).Color = color.Item3.Darken(.1f);
-        (Resources["TextOnAccentColorBrushDark2"] as SolidColorBrush).Color = color.Item3.Darken(.2f);
+        else
+        {
+            var color = await CodeHelper.GetThemeColorAsync(imageSource.LocalPath);
+            (Resources["AccentColorBrush"] as SolidColorBrush).Color = color.Item1;
+            (Resources["AccentColorBrushDark1"] as SolidColorBrush).Color = color.Item1.Darken(.1f);
+            (Resources["AccentColorBrushDark2"] as SolidColorBrush).Color = color.Item1.Darken(.2f);
+            (Resources["TextOnAccentColorBrush"] as SolidColorBrush).Color = color.Item3;
+            (Resources["TextOnAccentColorBrushDark1"] as SolidColorBrush).Color = color.Item3.Darken(.1f);
+            (Resources["TextOnAccentColorBrushDark2"] as SolidColorBrush).Color = color.Item3.Darken(.2f);
+        }
     }
 
     void Init()

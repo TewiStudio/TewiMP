@@ -537,6 +537,37 @@ namespace TewiMP.Helpers
             return Convert.ToHexString(hashBytes);
         }
 
+        public static string ToRelativeTime(this DateTime time)
+        {
+            var span = DateTime.Now - time;
+
+            bool future = span.TotalSeconds < 0;
+
+            span = span.Duration();
+
+            string suffix = future ? "后" : "前";
+
+            if (span.TotalSeconds < 10)
+                return "刚刚";
+
+            if (span.TotalMinutes < 1)
+                return $"{(int)span.TotalSeconds} 秒{suffix}";
+
+            if (span.TotalHours < 1)
+                return $"{(int)span.TotalMinutes} 分钟{suffix}";
+
+            if (span.TotalDays < 1)
+                return $"{(int)span.TotalHours} 小时{suffix}";
+
+            if (span.TotalDays < 30)
+                return $"{(int)span.TotalDays} 天{suffix}";
+
+            if (span.TotalDays < 365)
+                return $"{(int)(span.TotalDays / 30)} 个月{suffix}";
+
+            return $"{(int)(span.TotalDays / 365)} 年{suffix}";
+        }
+
         public static bool IsAccentColorDark(Windows.UI.Color c)
         {
             //var uiSettings = new UISettings();
@@ -650,7 +681,7 @@ namespace TewiMP.Helpers
 
         public static async Task<(Windows.UI.Color, Windows.UI.Color, Windows.UI.Color)> GetThemeColorAsync(string file)
         {
-            if (!File.Exists(file)) return (Colors.Red, Colors.Red, Colors.Red);
+            if (!File.Exists(file)) return (Colors.Purple, Colors.Black, Colors.White);
             DateTime time = DateTime.Now;
             using var image = Image.FromFile(file);
             using var bitmap = new Bitmap(image.GetThumbnailImage(100, 100, () => false, nint.Zero));

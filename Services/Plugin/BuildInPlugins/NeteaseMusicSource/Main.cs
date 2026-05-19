@@ -1,14 +1,14 @@
-﻿namespace TewiMP.Services.Plugin.BuildInPlugins.NeteaseMusicSource;
-
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
-using TewiMP.Core;
-using TewiMP.Core.Music;
 using Meting4Net.Core;
 using Meting4Net.Core.Models.Standard;
+using TewiMP.Core;
+using TewiMP.Core.Music;
+
+namespace TewiMP.Services.Plugin.BuildInPlugins.NeteaseMusicSource;
 
 public class Main : MusicSourcePlugin
 {
@@ -138,6 +138,7 @@ public class Main : MusicSourcePlugin
         musicListData.ListShowName = (string)playlistJson["name"];
         musicListData.ID = (string)playlistJson["id"];
         musicListData.PicturePath = (string)playlistJson["coverImgUrl"];
+        musicListData.CreationTime = ((long)playlistJson["createTime"]).ToDateTimeFromMillisecondsUnix();
         musicListData.ListFrom = MusicFrom.pluginMusicSource;
         musicListData.PluginInfoGUID = PluginInfo.GUID;
         musicListData.ListDataType = DataType.Playlist;

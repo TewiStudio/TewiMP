@@ -183,7 +183,7 @@ public class LyricService
             await InitLyricList("");
             return;
         }
-        InitLyricList(await Task.Run(async () =>  await LyricHelper.LyricToLrcData(file.Tag.Lyrics)));
+        InitLyricList(await Task.Run(async () =>  await LyricHelper.LyricToLrcData(file.Tag.Lyrics, UseRomajiLyric)));
     }
 
     public async Task InitLyricList(string lyricPath)

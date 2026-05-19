@@ -1,19 +1,21 @@
-﻿using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Threading;
+﻿using DevWinUI;
+using Melanchall.DryWetMidi.Core;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using NAudio;
-using Melanchall.DryWetMidi.Core;
+using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using TewiMP.Helpers;
-using TewiMP.UI.Windows;
 using TewiMP.Core.Music;
+using TewiMP.Helpers;
 using TewiMP.Services.Media;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
+using TewiMP.UI.Windows;
+using Windows.UI.ViewManagement;
 
 namespace TewiMP.Services;
 
@@ -176,23 +178,25 @@ public class PlayingListService
 
         try
         {
-            // 更新 lastMusicData
             lastMusicData = AudioService.MusicData;
-
-            // 通知 UI 开始加载
             NowPlayingImageLoading?.Invoke(null, null);
 
-            // 异步获取图片
             var uri = await ImageService.GetImageUri(AudioService.MusicData);
-
-            // 如果 await 期间又切歌了，直接退出，不要覆盖新歌的数据
+            
+            // 如果 await 期间切歌，直接退出，不要覆盖新歌的数据
             if (currentToken.IsCancellationRequested) return;
 
+            if (uri is null)
+            {
+                //lastMusicData = null;
+                NowPlayingImage = null;
+                NowPlayingImagePath = null;
+                await GetImageColor();
+                NowPlayingImageLoaded?.Invoke(null, null);
+                return;
+            }
             NowPlayingImage = uri;
             NowPlayingImagePath = uri.LocalPath;
-
-            // 处理空图片情况 TODO: FIX THIS
-            if (uri is null) lastMusicData = null;
 
             // 提取颜色。确保此时 NowPlayingImagePath 已经是新的
             await GetImageColor();
@@ -468,7 +472,10 @@ public class PlayingListService
         if (string.IsNullOrEmpty(nowImagePath))
         {
             // 路径为空，重置为系统主题色
-            var systemAccent = (Windows.UI.Color)App.Current.Resources["SystemAccentColor"];
+            var systemAccent = App.Instance.UISettings.GetColorValue(
+                App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ?
+                    UIColorType.AccentDark1 : UIColorType.AccentLight2);
+
             albumColor = systemAccent;
             albumColorReverse = systemAccent;
             textColorOnAlbum = CodeHelper.IsAccentColorDark(albumColor) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0);
@@ -481,7 +488,7 @@ public class PlayingListService
 
                 if (nowImagePath != NowPlayingImagePath)
                 {
-                    LogService.Info(nameof(PlayingListService), "图片路径已变更，放弃应用旧的颜色计算结果。");
+                    LogService.Info(nameof(PlayingListService), "Album path has changed.");
                     return;
                 }
 
@@ -493,9 +500,12 @@ public class PlayingListService
             }
             catch (Exception ex)
             {
-                LogService.Error(nameof(PlayingListService), $"提取颜色失败，回退到默认颜色: {ex.Message}");
+                LogService.Error(nameof(PlayingListService), $"Cannot read album color: {ex.Message}");
 
-                var systemAccent = (Windows.UI.Color)App.Current.Resources["SystemAccentColor"];
+                var systemAccent = App.Instance.UISettings.GetColorValue(
+                    App.MainWindowInstance.WindowGridBase.ActualTheme == ElementTheme.Light ?
+                        UIColorType.AccentDark1 : UIColorType.AccentLight2);
+
                 albumColor = systemAccent;
                 albumColorReverse = systemAccent;
                 textColorOnAlbum = Colors.White;

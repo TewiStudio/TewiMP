@@ -31,6 +31,9 @@ public static class PlayListHelper
 
     public static async Task AddPlayList(MusicListData musicListData)
     {
+        if (musicListData.CreationTime == DateTime.MinValue)
+            musicListData.CreationTime = DateTime.Now;
+
         var jdata = await ReadData();
         jdata = AddPlayList(musicListData, jdata);
         await SaveData(jdata);
