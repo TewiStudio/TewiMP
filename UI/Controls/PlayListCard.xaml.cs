@@ -1,21 +1,24 @@
-﻿using System;
+﻿using DevWinUI;
+using Microsoft.UI;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using Newtonsoft.Json.Linq;
+using System;
 using System.IO;
 using System.Numerics;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Composition;
-using Windows.UI;
-using Windows.UI.ViewManagement;
-using Newtonsoft.Json.Linq;
-using TewiMP.Services.Media;
-using TewiMP.UI.Windows;
-using TewiMP.UI.Pages.ListViewPages;
 using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services;
+using TewiMP.Services.Media;
 using TewiMP.Services.Storage;
+using TewiMP.UI.Pages.ListViewPages;
+using TewiMP.UI.Windows;
+using Windows.UI;
+using Windows.UI.ViewManagement;
 
 namespace TewiMP.UI.Controls;
 
@@ -43,6 +46,21 @@ public partial class PlayListCard : Grid
                 Init(DataContext as MusicListData);
             }
         }
+    }
+
+    async Task InitAccentColor(Uri imageSource)
+    {
+        return;/*
+        if (imageSource?.IsFile != true)
+        {
+            var color = ActualTheme == ElementTheme.Light ? Colors.White.A(230) : Colors.Black.A(150);
+            LinearMaskEndColor.Color = color;
+        }
+        else
+        {
+            var color = await CodeHelper.GetThemeColorAsync(imageSource.LocalPath);
+            LinearMaskEndColor.Color = ActualTheme == ElementTheme.Light ? color.Item1.LighterBy(.9f) : color.Item1.DarkerBy(.8f);
+        }*/
     }
 
     public void Init(MusicFrom musicFrom, string id)
@@ -84,10 +102,10 @@ public partial class PlayListCard : Grid
         {
             PlayListImage.Source = null;
             var imageSources = await ImageService.GetImageUri(MusicListData);
-            await Task.Delay(50);
             PlayListImage.Source = null;
             PlayListImage.Source = imageSources;
             PlayListImage.SaveName = $"{MusicListData.ListShowName}";
+            await InitAccentColor(imageSources);
         }
         //CrateShadow();
     }
@@ -137,7 +155,7 @@ public partial class PlayListCard : Grid
 
     private void Grid_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        return;
+        return;/*
         if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
         {
             AnimateHelper.AnimateOffset(
@@ -147,14 +165,14 @@ public partial class PlayListCard : Grid
                 0.2f, 1f, 0.22f, 1f,
                 out Visual visual, out Compositor compositor, out Vector3KeyFrameAnimation animation);
             visual.StartAnimation(nameof(visual.Offset), animation);
-            /*
+            *//*
                             AnimateHelper.AnimateScalar(
                                 ABackColorBaseRectAngle,
                                 1f, 0.2,
                                 0.2f, 1, 0.22f, 1,
                                 out Visual visual2, out Compositor compositor2, out ScalarKeyFrameAnimation animation2);
                             visual2.StartAnimation(nameof(visual2.Opacity), animation2);
-            */
+            *//*
             if (dropShadow != null)
             {
                 ScalarKeyFrameAnimation blurAnimation = compositor.CreateScalarKeyFrameAnimation();
@@ -162,12 +180,12 @@ public partial class PlayListCard : Grid
                 blurAnimation.Duration = TimeSpan.FromSeconds(0.5);
                 dropShadow.StartAnimation("Opacity", blurAnimation);
             }
-        }
+        }*/
     }
 
     private void Grid_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        return;
+        return;/*
         if (e.GetCurrentPoint(sender as UIElement).PointerDeviceType == Microsoft.UI.Input.PointerDeviceType.Mouse)
         {
             AnimateHelper.AnimateOffset(
@@ -187,7 +205,7 @@ public partial class PlayListCard : Grid
                 blurAnimation.Duration = TimeSpan.FromSeconds(0.5);
                 dropShadow.StartAnimation("Opacity", blurAnimation);
             }
-        }
+        }*/
     }
 
     private void ExitMass()

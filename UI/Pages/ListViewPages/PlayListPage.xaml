@@ -398,6 +398,15 @@
                                     AccessKey="Z">
                                     <CommandBar.SecondaryCommands>
                                         <AppBarButton
+                                            Label="搜索"
+                                            AccessKey="F"
+                                            ToolTipService.ToolTip="搜索播放列表中的歌曲"
+                                            Click="AppBarButton_Click" Tag="search">
+                                            <AppBarButton.Icon>
+                                                <FontIcon Glyph="&#xE721;"/>
+                                            </AppBarButton.Icon>
+                                        </AppBarButton>
+                                        <AppBarButton
                                             Label="添加本地文件"
                                             AccessKey="A"
                                             ToolTipService.ToolTip="添加本地文件"
@@ -407,15 +416,14 @@
                                             </AppBarButton.Icon>
                                         </AppBarButton>
                                         <AppBarButton
-                                            Label="搜索"
-                                            AccessKey="F"
-                                            ToolTipService.ToolTip="搜索播放列表中的歌曲"
-                                            Click="AppBarButton_Click" Tag="search">
-                                            <AppBarButton.Icon>
-                                                <FontIcon Glyph="&#xE721;"/>
-                                            </AppBarButton.Icon>
+                                            x:Name="editButton"
+                                            Label="编辑播放列表"
+                                            AccessKey="A"
+                                            Icon="Edit"
+                                            ToolTipService.ToolTip="添加本地文件"
+                                            Click="AppBarButton_Click" Tag="edit_list">
                                         </AppBarButton>
-
+                                        
                                         <AppBarButton
                                             Click="multiButton_Click"
                                             Tag="multi_deleteSelect"

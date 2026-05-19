@@ -206,7 +206,7 @@
                                 <MenuFlyoutItem Text="居中" Tag="1" Click="MenuFlyoutItem_Click_4"/>
                                 <MenuFlyoutItem Text="靠下" Tag="2" Click="MenuFlyoutItem_Click_4"/>
                             </MenuFlyoutSubItem>
-                            <MenuFlyoutSubItem Text="移动到屏幕锚点">
+                            <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xECE9;}" Text="移动到屏幕锚点">
                                 <MenuFlyoutSubItem Text="左侧">
                                     <MenuFlyoutItem Text="上" Tag="0" Click="MenuFlyoutItem_Click"/>
                                     <MenuFlyoutItem Text="中" Tag="1" Click="MenuFlyoutItem_Click"/>
@@ -223,7 +223,7 @@
                                     <MenuFlyoutItem Text="下" Tag="2" Click="MenuFlyoutItem_Click_2"/>
                                 </MenuFlyoutSubItem>
                             </MenuFlyoutSubItem>
-                            <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE743;}" Text="大小预设">
+                            <MenuFlyoutSubItem Icon="{ui:FontIcon Glyph=&#xE9A6;}" Text="大小预设">
                                 <RadioMenuFlyoutItem GroupName="windowSize" Click="RadioMenuFlyoutItem_Click" Tag="0" Text="小"/>
                                 <RadioMenuFlyoutItem GroupName="windowSize" Click="RadioMenuFlyoutItem_Click" Tag="1" Text="正常" IsChecked="True"/>
                                 <RadioMenuFlyoutItem GroupName="windowSize" Click="RadioMenuFlyoutItem_Click" Tag="2" Text="大"/>

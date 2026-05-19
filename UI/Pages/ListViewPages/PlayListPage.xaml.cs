@@ -97,7 +97,13 @@ public sealed partial class PlayListPage : Page
             if (tag.Contains("multi_"))
                 element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
             else
-                element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
+            {
+                if (tag.Contains("edit_"))
+                    element.Visibility = Visibility.Collapsed;
+                    //element.Visibility = isChecked ? Visibility.Collapsed : musicListData?.ListDataType == DataType.LocalPlaylist ? Visibility.Visible : Visibility.Collapsed;
+                else
+                    element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
+            }
         }
 
         foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands.Cast<FrameworkElement>())
@@ -126,7 +132,13 @@ public sealed partial class PlayListPage : Page
             if (tag.Contains("move_"))
                 element.Visibility = isChecked ? Visibility.Visible : Visibility.Collapsed;
             else
-                element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
+            {
+                if (tag.Contains("edit_"))
+                    element.Visibility = Visibility.Collapsed;
+                //element.Visibility = isChecked ? Visibility.Collapsed : musicListData?.ListDataType == DataType.LocalPlaylist ? Visibility.Visible : Visibility.Collapsed;
+                else
+                    element.Visibility = isChecked ? Visibility.Collapsed : Visibility.Visible;
+            }
         }
 
         foreach (FrameworkElement element in ItemsList_Header_Info_CommandBar.PrimaryCommands.Cast<FrameworkElement>())
@@ -789,6 +801,10 @@ public sealed partial class PlayListPage : Page
                 break;
             case "search":
                 ItemList_Header_Search_Control.IsOpen = !ItemList_Header_Search_Control.IsOpen;
+                break;
+            case "edit_list":
+                await DialogPages.EditPlayListPage.ShowDialog(musicListData);
+                Init();
                 break;
             case "move_Cancel":
                 moveButton.IsChecked = !moveButton.IsChecked;
