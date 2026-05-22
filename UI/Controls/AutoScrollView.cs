@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Threading.Tasks;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
@@ -6,348 +6,347 @@ using Microsoft.UI.Xaml.Markup;
 using Microsoft.UI.Xaml.Shapes;
 using Microsoft.UI.Xaml.Controls;
 
-namespace TewiMP.UI.Controls
+namespace TewiMP.UI.Controls;
+
+[ContentProperty(Name = "Content")]
+public sealed partial class AutoScrollView : Control
 {
-    [ContentProperty(Name = "Content")]
-    public sealed partial class AutoScrollView : Control
+    public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
+        nameof(Content),
+        typeof(object),
+        typeof(AutoScrollView),
+        new PropertyMetadata(null)
+    );
+
+    public object Content
     {
-        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
-            nameof(Content),
-            typeof(object),
-            typeof(AutoScrollView),
-            new PropertyMetadata(null)
-        );
+        get => GetValue(ContentProperty);
+        set => SetValue(ContentProperty, value);
+    }
 
-        public object Content
+    public static readonly DependencyProperty RepeatTimeProperty = DependencyProperty.Register(
+        "RepeatTime",
+        typeof(int),
+        typeof(AutoScrollView),
+        new PropertyMetadata(3000, null)
+    );
+
+    public int RepeatTime
+    {
+        get => (int)GetValue(RepeatTimeProperty);
+        set => SetValue(RepeatTimeProperty, value);
+    }
+
+    public static readonly DependencyProperty ScrollSpeedRatioProperty = DependencyProperty.Register(
+        "ScrollSpeedRatio",
+        typeof(double),
+        typeof(AutoScrollView),
+        new PropertyMetadata(.55d, null)
+    );
+
+    public double ScrollSpeedRatio
+    {
+        get => (double)GetValue(ScrollSpeedRatioProperty);
+        set => SetValue(ScrollSpeedRatioProperty, value);
+    }
+
+    public static readonly DependencyProperty MaskSizeProperty = DependencyProperty.Register(
+        "MaskSize",
+        typeof(int),
+        typeof(AutoScrollView),
+        new PropertyMetadata(15, new((_, __) =>
         {
-            get => GetValue(ContentProperty);
-            set => SetValue(ContentProperty, value);
-        }
+            (_ as AutoScrollView)?.ComputeGradientStops();
+        })
+    ));
 
-        public static readonly DependencyProperty RepeatTimeProperty = DependencyProperty.Register(
-            "RepeatTime",
-            typeof(int),
-            typeof(AutoScrollView),
-            new PropertyMetadata(3000, null)
-        );
+    public int MaskSize
+    {
+        get => (int)GetValue(MaskSizeProperty);
+        set => SetValue(MaskSizeProperty, value);
+    }
 
-        public int RepeatTime
+    public static readonly DependencyProperty PauseProperty = DependencyProperty.Register(
+        "Pause",
+        typeof(bool),
+        typeof(AutoScrollView),
+        new PropertyMetadata(false, null)
+    );
+
+    public bool Pause
+    {
+        get => (bool)GetValue(PauseProperty);
+        set
         {
-            get => (int)GetValue(RepeatTimeProperty);
-            set => SetValue(RepeatTimeProperty, value);
-        }
-
-        public static readonly DependencyProperty ScrollSpeedRatioProperty = DependencyProperty.Register(
-            "ScrollSpeedRatio",
-            typeof(double),
-            typeof(AutoScrollView),
-            new PropertyMetadata(.55d, null)
-        );
-
-        public double ScrollSpeedRatio
-        {
-            get => (double)GetValue(ScrollSpeedRatioProperty);
-            set => SetValue(ScrollSpeedRatioProperty, value);
-        }
-
-        public static readonly DependencyProperty MaskSizeProperty = DependencyProperty.Register(
-            "MaskSize",
-            typeof(int),
-            typeof(AutoScrollView),
-            new PropertyMetadata(15, new((_,  __) =>
+            SetValue(PauseProperty, value);
+            if (!value)
             {
-                (_ as AutoScrollView)?.ComputeGradientStops();
-            })
-        ));
-
-        public int MaskSize
-        {
-            get => (int)GetValue(MaskSizeProperty);
-            set => SetValue(MaskSizeProperty, value);
-        }
-
-        public static readonly DependencyProperty PauseProperty = DependencyProperty.Register(
-            "Pause",
-            typeof(bool),
-            typeof(AutoScrollView),
-            new PropertyMetadata(false, null)
-        );
-
-        public bool Pause
-        {
-            get => (bool)GetValue(PauseProperty);
-            set
-            {
-                SetValue(PauseProperty, value);
-                if (!value)
-                {
-                    RepeatChangeView();
-                    _beforeIsHorizontalScrolling = 1;
-                    IsHorizontalScrolling = 1;
-                    ComputeGradientStops();
-                }
-                else
-                {
-                    _scrollView?.ScrollTo(0, 0, new(ScrollingAnimationMode.Disabled, ScrollingSnapPointsMode.Ignore));
-                    _beforeIsHorizontalScrolling = 1;
-                    IsHorizontalScrolling = 1;
-                    ComputeGradientStops();
-                }
-            }
-        }
-
-        bool isAddedVelocity = false;
-        int _isHorizontalScrolling = 1;
-        int _beforeIsHorizontalScrolling = 1;
-
-        /// <summary>
-        /// 1 Œ™≤ª∂Ø, 0 Œ™Õ˘ªÿ£¨ 2 Œ™Õ˘«∞
-        /// </summary>
-        public int IsHorizontalScrolling
-        {
-            get => _isHorizontalScrolling;
-            set
-            {
-                _beforeIsHorizontalScrolling = _isHorizontalScrolling;
-                _isHorizontalScrolling = value;
-            }
-        }
-        public bool IsHorizontalContentOutOfBounds { get; private set; } = false;
-        public bool IsVerticalContentOutOfBounds { get; private set; } = false;
-
-        public AutoScrollView()
-        {
-            DefaultStyleKey = typeof(AutoScrollView);
-        }
-
-        #region Events
-        private GradientStop _gs1;
-        private GradientStop _gs2;
-        private Rectangle _gs1a;
-        private Rectangle _gs2a;
-        private ContentPresenter _contentPresenter;
-        private ScrollView _scrollView;
-        protected override void OnApplyTemplate()
-        {
-            base.OnApplyTemplate();
-
-            Loaded += AutoScrollView_Loaded;
-            Unloaded += AutoScrollView_Unloaded;
-            _gs1 = GetTemplateChild("PART_GS1") as GradientStop;
-            _gs2 = GetTemplateChild("PART_GS2") as GradientStop;
-            _gs1a = GetTemplateChild("PART_GS1_animation") as Rectangle;
-            _gs2a = GetTemplateChild("PART_GS2_animation") as Rectangle;
-            _contentPresenter = GetTemplateChild("PART_ContentPresenter") as ContentPresenter;
-            _scrollView = GetTemplateChild("PART_ScrollView") as ScrollView;
-
-            if (_scrollView != null)
-            {
-                _scrollView.SizeChanged -= _scrollView_SizeChanged;
-                _scrollView.SizeChanged += _scrollView_SizeChanged;
-
-                _scrollView.ViewChanged -= _scrollView_ViewChanged;
-                _scrollView.ViewChanged += _scrollView_ViewChanged;
-
-                _scrollView.ExtentChanged -= _scrollView_ExtentChanged;
-                _scrollView.ExtentChanged += _scrollView_ExtentChanged;
-
-                _scrollView.ScrollCompleted -= _scrollView_ScrollCompleted;
-                _scrollView.ScrollCompleted += _scrollView_ScrollCompleted;
-
-                _scrollView.ViewChanged -= _scrollView_ViewChanged1;
-                _scrollView.ViewChanged += _scrollView_ViewChanged1;
-            }
-
-            ComputeGradientStops();
-        }
-
-        private void AutoScrollView_Loaded(object sender, RoutedEventArgs e)
-        {
-            RepeatChangeView();
-        }
-
-        private void AutoScrollView_Unloaded(object sender, RoutedEventArgs e)
-        {
-            if (_scrollView != null)
-            {
-                _scrollView.SizeChanged -= _scrollView_SizeChanged;
-                _scrollView.ViewChanged -= _scrollView_ViewChanged;
-                _scrollView.ExtentChanged -= _scrollView_ExtentChanged;
-                _scrollView.ScrollCompleted -= _scrollView_ScrollCompleted;
-                _scrollView.ViewChanged -= _scrollView_ViewChanged1;
-            }
-            Loaded -= AutoScrollView_Loaded;
-            Unloaded -= AutoScrollView_Unloaded;
-        }
-
-        private void _scrollView_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            GetSizeResult();
-            ComputeGradientStops();
-            RepeatChangeView();
-        }
-
-        private void _scrollView_ViewChanged(ScrollView sender, object args)
-        {
-
-        }
-
-        private void _scrollView_ExtentChanged(ScrollView sender, object args)
-        {
-            _scrollView.ScrollTo(0, 0, new(ScrollingAnimationMode.Disabled, ScrollingSnapPointsMode.Ignore));
-            RepeatChangeView();
-            ComputeGradientStops();
-        }
-
-        private void _scrollView_ScrollCompleted(ScrollView sender, ScrollingScrollCompletedEventArgs args)
-        {
-            IsHorizontalScrolling = 1;
-            if (Pause) return;
-            RepeatChangeView();
-            ComputeGradientStops();
-        }
-        
-        private void _scrollView_ViewChanged1(ScrollView sender, object args)
-        {
-
-        }
-        #endregion
-
-        /// <summary>
-        /// º∆À„Õ∏√˜Ω•±‰∆´“∆÷µ
-        /// </summary>
-        public void ComputeGradientStops()
-        {
-            if (_gs1 is null || _gs2 is null) return;
-
-            double gs1Offset = 0;
-            double gs2Offset = 0;
-
-            // µº÷¬≤ºæ÷À¿—≠ª∑
-            // Ω•±‰–ßπ˚µƒ∆´“∆¡øº∆À„£¨Œﬁ¬€ µº øÌ∂» «∂‡…Ÿ£¨∆´“∆¡øµƒΩ·π˚∂º”¶∏√ « MaskSize
-            /*if (ActualWidth <= MaskSize)
-            {
-                // µ± µº øÌ∂»Ã´–° ±Ω´∆´“∆÷µ…Ë÷√Œ™ µº øÌ∂»µƒÀƒ∑÷÷Æ“ª
-                gs1Offset = ActualWidth / 2d;
-                gs2Offset = 1d - ActualWidth / 2d;
-                _contentPresenter.Padding = new(0, 0, ActualWidth / 4d, 0);
-            }
-            else*/
-            
-            // º∆À„ MaskSize ‘⁄–¬øÌ∂»÷–µƒ’º±»
-            gs1Offset = MaskSize / ActualWidth;
-            gs2Offset = 1d - MaskSize / ActualWidth;
-            _contentPresenter.Padding = new(0, 0, IsHorizontalContentOutOfBounds ? MaskSize : 0, 0);
-            
-
-            _gs1a.Width = MaskSize;
-            _gs2a.Width = MaskSize;
-            if (IsHorizontalScrolling == 1) // µ±πˆ∂ØÕ£÷π ±
-            {
-                if (_beforeIsHorizontalScrolling == 2)
-                {
-                    _gs1a.Opacity = 0;
-                    _gs2a.Opacity = 1;
-                }
-                else if (_beforeIsHorizontalScrolling == 0)
-                {
-                    _gs1a.Opacity = 1;
-                    _gs2a.Opacity = 0;
-                }
-                else
-                {
-                    if (IsHorizontalContentOutOfBounds)
-                    {
-                        _gs1a.Opacity = 1;
-                        _gs2a.Opacity = 0;
-                    }
-                    else
-                    {
-                        _gs1a.Opacity = 1;
-                        _gs2a.Opacity = 1;
-                    }
-                }
-            }
-            else if (IsHorizontalScrolling == 2 || IsHorizontalScrolling == 0) // µ±œÚ«∞œÚ∫Ûπˆ∂Ø ±
-            {
-                if (IsHorizontalScrolling == 0)
-                {
-                    _gs1a.Opacity = 1;
-                    _gs2a.Opacity = 0;
-                }
-                else
-                {
-                    _gs1a.Opacity = 0;
-                    _gs2a.Opacity = 0;
-                }
-            }
-
-            _gs1.Offset = double.Clamp(gs1Offset, 0, 1);
-            _gs2.Offset = double.Clamp(gs2Offset, 0, 1);
-            //LogManager.Info("Debug", $"{_gs1.Offset} / {_gs2.Offset} | {ActualWidth * _gs1.Offset} : {ActualWidth}");
-        }
-
-        /// <summary>
-        /// µ±ƒ⁄»›¥Û–°∑¢…˙±‰ªØ ±£¨≈–∂œ Content  «∑Ò≥¨≥ˆ±ﬂΩÁ
-        /// </summary>
-        private void GetSizeResult()
-        {
-            if (_contentPresenter is null) return;
-            var content = _contentPresenter;
-
-            if (content.ActualWidth > ActualWidth) IsHorizontalContentOutOfBounds = true;
-            else IsHorizontalContentOutOfBounds = false;
-            if (content.ActualHeight > ActualHeight) IsVerticalContentOutOfBounds = true;
-            else IsVerticalContentOutOfBounds = false;
-            //LogManager.Info("Debug", $"IsHorizontalContentOutOfBounds: {IsHorizontalContentOutOfBounds} / IsVerticalContentOutOfBounds: {IsVerticalContentOutOfBounds}");
-        }
-
-        private async void RepeatChangeView()
-        {
-            if (Content is null) return;
-            if (Visibility == Visibility.Collapsed) return;
-            if (isAddedVelocity) return;
-            if (ActualSize.X <= 0 || ActualSize.Y <= 0) return;
-
-            GetSizeResult();
-            if (!IsHorizontalContentOutOfBounds && !IsVerticalContentOutOfBounds) return;
-
-            isAddedVelocity = true;
-            await Task.Delay(RepeatTime);
-            isAddedVelocity = false;
-
-            if (Pause)
-            {
+                RepeatChangeView();
+                _beforeIsHorizontalScrolling = 1;
+                IsHorizontalScrolling = 1;
                 ComputeGradientStops();
-                return;
             }
-
-            GetSizeResult();
-            if (!IsHorizontalContentOutOfBounds && !IsVerticalContentOutOfBounds) return;
-
-            if (_scrollView.HorizontalOffset != 0) // µ±«∞Œª÷√≤ªŒª”⁄∆ º ±£¨ª¨∂ØµΩ∆ º
+            else
             {
-                _scrollView.ScrollTo(0, 0, new(ScrollingAnimationMode.Enabled));
-                IsHorizontalScrolling = 0;
+                _scrollView?.ScrollTo(0, 0, new(ScrollingAnimationMode.Disabled, ScrollingSnapPointsMode.Ignore));
+                _beforeIsHorizontalScrolling = 1;
+                IsHorizontalScrolling = 1;
                 ComputeGradientStops();
-                return;
             }
-
-            // º∆À„ Content  µº ≥§∂»≤¢ø™ ºπˆ∂Ø
-            if (IsHorizontalContentOutOfBounds)
-            {
-                float velocity = (float)Math.Min(80f, Math.Max(4, ActualWidth / 4 + _contentPresenter.ActualWidth / 12));
-                _scrollView.AddScrollVelocity(new(velocity * (float)ScrollSpeedRatio, 0), new());
-                IsHorizontalScrolling = 2;
-            }
-            if (IsVerticalContentOutOfBounds)
-            {
-                float velocity = Math.Min(80f, Math.Max(4f, ActualSize.Y / 4 + _contentPresenter.ActualSize.Y / 12));
-                _scrollView.AddScrollVelocity(new(0, velocity * (float)ScrollSpeedRatio), new());
-            }
-
-            ComputeGradientStops();
         }
+    }
+
+    bool isAddedVelocity = false;
+    int _isHorizontalScrolling = 1;
+    int _beforeIsHorizontalScrolling = 1;
+
+    /// <summary>
+    /// 1 ‰∏∫‰∏çÂä®, 0 ‰∏∫ÂæÄÂõûÔºå 2 ‰∏∫ÂæÄÂâç
+    /// </summary>
+    public int IsHorizontalScrolling
+    {
+        get => _isHorizontalScrolling;
+        set
+        {
+            _beforeIsHorizontalScrolling = _isHorizontalScrolling;
+            _isHorizontalScrolling = value;
+        }
+    }
+    public bool IsHorizontalContentOutOfBounds { get; private set; } = false;
+    public bool IsVerticalContentOutOfBounds { get; private set; } = false;
+
+    public AutoScrollView()
+    {
+        DefaultStyleKey = typeof(AutoScrollView);
+    }
+
+    #region Events
+    private GradientStop _gs1;
+    private GradientStop _gs2;
+    private Rectangle _gs1a;
+    private Rectangle _gs2a;
+    private ContentPresenter _contentPresenter;
+    private ScrollView _scrollView;
+    protected override void OnApplyTemplate()
+    {
+        base.OnApplyTemplate();
+
+        Loaded += AutoScrollView_Loaded;
+        Unloaded += AutoScrollView_Unloaded;
+        _gs1 = GetTemplateChild("PART_GS1") as GradientStop;
+        _gs2 = GetTemplateChild("PART_GS2") as GradientStop;
+        _gs1a = GetTemplateChild("PART_GS1_animation") as Rectangle;
+        _gs2a = GetTemplateChild("PART_GS2_animation") as Rectangle;
+        _contentPresenter = GetTemplateChild("PART_ContentPresenter") as ContentPresenter;
+        _scrollView = GetTemplateChild("PART_ScrollView") as ScrollView;
+
+        if (_scrollView != null)
+        {
+            _scrollView.SizeChanged -= _scrollView_SizeChanged;
+            _scrollView.SizeChanged += _scrollView_SizeChanged;
+
+            _scrollView.ViewChanged -= _scrollView_ViewChanged;
+            _scrollView.ViewChanged += _scrollView_ViewChanged;
+
+            _scrollView.ExtentChanged -= _scrollView_ExtentChanged;
+            _scrollView.ExtentChanged += _scrollView_ExtentChanged;
+
+            _scrollView.ScrollCompleted -= _scrollView_ScrollCompleted;
+            _scrollView.ScrollCompleted += _scrollView_ScrollCompleted;
+
+            _scrollView.ViewChanged -= _scrollView_ViewChanged1;
+            _scrollView.ViewChanged += _scrollView_ViewChanged1;
+        }
+
+        ComputeGradientStops();
+    }
+
+    private void AutoScrollView_Loaded(object sender, RoutedEventArgs e)
+    {
+        RepeatChangeView();
+    }
+
+    private void AutoScrollView_Unloaded(object sender, RoutedEventArgs e)
+    {
+        if (_scrollView != null)
+        {
+            _scrollView.SizeChanged -= _scrollView_SizeChanged;
+            _scrollView.ViewChanged -= _scrollView_ViewChanged;
+            _scrollView.ExtentChanged -= _scrollView_ExtentChanged;
+            _scrollView.ScrollCompleted -= _scrollView_ScrollCompleted;
+            _scrollView.ViewChanged -= _scrollView_ViewChanged1;
+        }
+        Loaded -= AutoScrollView_Loaded;
+        Unloaded -= AutoScrollView_Unloaded;
+    }
+
+    private void _scrollView_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        GetSizeResult();
+        ComputeGradientStops();
+        RepeatChangeView();
+    }
+
+    private void _scrollView_ViewChanged(ScrollView sender, object args)
+    {
 
     }
+
+    private void _scrollView_ExtentChanged(ScrollView sender, object args)
+    {
+        _scrollView.ScrollTo(0, 0, new(ScrollingAnimationMode.Disabled, ScrollingSnapPointsMode.Ignore));
+        RepeatChangeView();
+        ComputeGradientStops();
+    }
+
+    private void _scrollView_ScrollCompleted(ScrollView sender, ScrollingScrollCompletedEventArgs args)
+    {
+        IsHorizontalScrolling = 1;
+        if (Pause) return;
+        RepeatChangeView();
+        ComputeGradientStops();
+    }
+
+    private void _scrollView_ViewChanged1(ScrollView sender, object args)
+    {
+
+    }
+    #endregion
+
+    /// <summary>
+    /// ËÆ°ÁÆóÈÄèÊòéÊ∏êÂèòÂÅèÁßªÂÄº
+    /// </summary>
+    public void ComputeGradientStops()
+    {
+        if (_gs1 is null || _gs2 is null) return;
+
+        double gs1Offset = 0;
+        double gs2Offset = 0;
+
+        // ÂØºËá¥Â∏ÉÂ±ÄÊ≠ªÂæ™ÁéØ
+        // Ê∏êÂèòÊïàÊûúÁöÑÂÅèÁßªÈáèËÆ°ÁÆóÔºåÊó†ËÆ∫ÂÆûÈôÖÂÆΩÂ∫¶ÊòØÂ§öÂ∞ëÔºåÂÅèÁßªÈáèÁöÑÁªìÊûúÈÉΩÂ∫îËØ•ÊòØ MaskSize
+        /*if (ActualWidth <= MaskSize)
+        {
+            // ÂΩìÂÆûÈôÖÂÆΩÂ∫¶Â§™Â∞èÊó∂Â∞ÜÂÅèÁßªÂÄºËÆæÁΩÆ‰∏∫ÂÆûÈôÖÂÆΩÂ∫¶ÁöÑÂõõÂàÜ‰πã‰∏Ä
+            gs1Offset = ActualWidth / 2d;
+            gs2Offset = 1d - ActualWidth / 2d;
+            _contentPresenter.Padding = new(0, 0, ActualWidth / 4d, 0);
+        }
+        else*/
+
+        // ËÆ°ÁÆó MaskSize Âú®Êñ∞ÂÆΩÂ∫¶‰∏≠ÁöÑÂç†ÊØî
+        gs1Offset = MaskSize / ActualWidth;
+        gs2Offset = 1d - MaskSize / ActualWidth;
+        _contentPresenter.Padding = new(0, 0, IsHorizontalContentOutOfBounds ? MaskSize : 0, 0);
+
+
+        _gs1a.Width = MaskSize;
+        _gs2a.Width = MaskSize;
+        if (IsHorizontalScrolling == 1) // ÂΩìÊªöÂä®ÂÅúÊ≠¢Êó∂
+        {
+            if (_beforeIsHorizontalScrolling == 2)
+            {
+                _gs1a.Opacity = 0;
+                _gs2a.Opacity = 1;
+            }
+            else if (_beforeIsHorizontalScrolling == 0)
+            {
+                _gs1a.Opacity = 1;
+                _gs2a.Opacity = 0;
+            }
+            else
+            {
+                if (IsHorizontalContentOutOfBounds)
+                {
+                    _gs1a.Opacity = 1;
+                    _gs2a.Opacity = 0;
+                }
+                else
+                {
+                    _gs1a.Opacity = 1;
+                    _gs2a.Opacity = 1;
+                }
+            }
+        }
+        else if (IsHorizontalScrolling == 2 || IsHorizontalScrolling == 0) // ÂΩìÂêëÂâçÂêëÂêéÊªöÂä®Êó∂
+        {
+            if (IsHorizontalScrolling == 0)
+            {
+                _gs1a.Opacity = 1;
+                _gs2a.Opacity = 0;
+            }
+            else
+            {
+                _gs1a.Opacity = 0;
+                _gs2a.Opacity = 0;
+            }
+        }
+
+        _gs1.Offset = double.Clamp(gs1Offset, 0, 1);
+        _gs2.Offset = double.Clamp(gs2Offset, 0, 1);
+        //LogManager.Info("Debug", $"{_gs1.Offset} / {_gs2.Offset} | {ActualWidth * _gs1.Offset} : {ActualWidth}");
+    }
+
+    /// <summary>
+    /// ÂΩìÂÜÖÂÆπÂ§ßÂ∞èÂèëÁîüÂèòÂåñÊó∂ÔºåÂà§Êñ≠ Content ÊòØÂê¶Ë∂ÖÂá∫ËæπÁïå
+    /// </summary>
+    private void GetSizeResult()
+    {
+        if (_contentPresenter is null) return;
+        var content = _contentPresenter;
+
+        if (content.ActualWidth > ActualWidth) IsHorizontalContentOutOfBounds = true;
+        else IsHorizontalContentOutOfBounds = false;
+        if (content.ActualHeight > ActualHeight) IsVerticalContentOutOfBounds = true;
+        else IsVerticalContentOutOfBounds = false;
+        //LogManager.Info("Debug", $"IsHorizontalContentOutOfBounds: {IsHorizontalContentOutOfBounds} / IsVerticalContentOutOfBounds: {IsVerticalContentOutOfBounds}");
+    }
+
+    private async void RepeatChangeView()
+    {
+        if (Content is null) return;
+        if (Visibility == Visibility.Collapsed) return;
+        if (isAddedVelocity) return;
+        if (ActualSize.X <= 0 || ActualSize.Y <= 0) return;
+
+        GetSizeResult();
+        if (!IsHorizontalContentOutOfBounds && !IsVerticalContentOutOfBounds) return;
+
+        isAddedVelocity = true;
+        await Task.Delay(RepeatTime);
+        isAddedVelocity = false;
+
+        if (Pause)
+        {
+            ComputeGradientStops();
+            return;
+        }
+
+        GetSizeResult();
+        if (!IsHorizontalContentOutOfBounds && !IsVerticalContentOutOfBounds) return;
+
+        if (_scrollView.HorizontalOffset != 0) // ÂΩìÂâç‰ΩçÁΩÆ‰∏ç‰Ωç‰∫éËµ∑ÂßãÊó∂ÔºåÊªëÂä®Âà∞Ëµ∑Âßã
+        {
+            _scrollView.ScrollTo(0, 0, new(ScrollingAnimationMode.Enabled));
+            IsHorizontalScrolling = 0;
+            ComputeGradientStops();
+            return;
+        }
+
+        // ËÆ°ÁÆó Content ÂÆûÈôÖÈïøÂ∫¶Âπ∂ÂºÄÂßãÊªöÂä®
+        if (IsHorizontalContentOutOfBounds)
+        {
+            float velocity = (float)Math.Min(80f, Math.Max(4, ActualWidth / 4 + _contentPresenter.ActualWidth / 12));
+            _scrollView.AddScrollVelocity(new(velocity * (float)ScrollSpeedRatio, 0), new());
+            IsHorizontalScrolling = 2;
+        }
+        if (IsVerticalContentOutOfBounds)
+        {
+            float velocity = Math.Min(80f, Math.Max(4f, ActualSize.Y / 4 + _contentPresenter.ActualSize.Y / 12));
+            _scrollView.AddScrollVelocity(new(0, velocity * (float)ScrollSpeedRatio), new());
+        }
+
+        ComputeGradientStops();
+    }
+
 }

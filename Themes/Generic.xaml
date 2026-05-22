@@ -53,6 +53,19 @@
         </Setter>
     </Style>
 
+    <Style TargetType="local2:StickHeaderListView">
+        <Setter Property="Header">
+            <Setter.Value>
+                <Grid x:Name="Header_Root">
+                    <Border x:Name="Header_Background" Background="Transparent"    
+                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                        BorderThickness="0,0,0,1"/>
+                    <TextBlock x:Name="Header_TextBlock" Text="null" Style="{ThemeResource TBHeader}"/>
+                </Grid>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="local2:AudioSpectrum">
 
         <Setter Property="Foreground"

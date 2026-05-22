@@ -6,42 +6,37 @@
     xmlns:controls="using:TewiMP.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
-
-    <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None">
-
-        <ListView.Header>
-            <Grid x:Name="HeaderBaseGrid">
-                <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1"/>
-                <TextBlock x:Name="HeaderBaseTextBlock" Text="Test" Style="{ThemeResource TBHeader}"/>
-            </Grid>
-        </ListView.Header>
-        
-        
-        <Grid Margin="80,0,0,0" Background="Gray" HorizontalAlignment="Left">
-            <controls:AutoScrollView Background="red" MaskSize="100" x:Name="asv">
-                <controls:AutoScrollView.Content>
-                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-                </controls:AutoScrollView.Content>
-            </controls:AutoScrollView>
-        </Grid>
-        <controls:AutoScrollView>
-            <controls:AutoScrollView.Content>
-                ASD asda asdasdasd ASDCVXVCXCVXCVXCVXFDGFDHGHhd vcbcvbfhdfdhtrtrqrf
-            </controls:AutoScrollView.Content>
-        </controls:AutoScrollView>
-        <controls:AutoScrollView>
-            <controls:AutoScrollView.Content>
-                <TextBlock FontSize="30">
-                    ASD asda asdasdasd ASDCVXVCXCVXCVXCVXFDGFDHGHhd vcbcvbfhdfdhtrtrqrf
-                </TextBlock>
-            </controls:AutoScrollView.Content>
-        </controls:AutoScrollView>
-        <Button Content="Pause" Click="Button_Click"/>
-
-    </ListView>
+    mc:Ignorable="d">
+    <controls:StickHeaderListView>
+        <x:String>a</x:String>
+        <x:String>b</x:String>
+        <x:String>c</x:String>
+        <x:String>d</x:String>
+        <x:String>e</x:String>
+        <x:String>f</x:String>
+        <x:String>g</x:String>
+        <x:String>h</x:String>
+        <x:String>i</x:String>
+        <x:String>j</x:String>
+        <x:String>k</x:String>
+        <x:String>l</x:String>
+        <x:String>m</x:String>
+        <x:String>n</x:String>
+        <x:String>o</x:String>
+        <x:String>p</x:String>
+        <x:String>q</x:String>
+        <x:String>r</x:String>
+        <x:String>s</x:String>
+        <x:String>t</x:String>
+        <x:String>u</x:String>
+        <x:String>v</x:String>
+        <x:String>w</x:String>
+        <x:String>x</x:String>
+        <x:String>y</x:String>
+        <x:String>z</x:String>
+        <x:String>a</x:String>
+        <x:String>a</x:String>
+        <x:String>a</x:String>
+        <x:String>a</x:String>
+    </controls:StickHeaderListView>
 </Page>

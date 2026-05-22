@@ -1644,8 +1644,8 @@ public sealed partial class MainWindow : WindowEx
             case global::Windows.System.VirtualKey.T:
                 if (isControlDown && isShiftDown)
                 {
-                    //SetNavViewContent(typeof(TestPage));
-                    SetNavViewContent(typeof(SettingEqPage));
+                    SetNavViewContent(typeof(TestPage));
+                    //SetNavViewContent(typeof(SettingEqPage));
                 }
                 break;
         }
