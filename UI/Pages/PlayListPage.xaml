@@ -19,30 +19,35 @@
                   SelectionMode="None"
                   ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}">
             <ListView.Header>
-                <c:StickTitleHeader x:Name="StickTitleHeader" Title="播放列表">
-                    <c:StickTitleHeader.CommandBar>
-                        <CommandBar VerticalAlignment="Bottom" Margin="0,0,8,0"
-                                    OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
-                            <AppBarButton Label="添加/导入" AccessKey="A" Click="AppBarButton_Click_1">
-                                <AppBarButton.Icon>
-                                    <FontIcon Glyph="&#xE710;"/>
-                                </AppBarButton.Icon>
-                            </AppBarButton>
-                            <AppBarButton Label="排序" AccessKey="L" Click="AppBarButton_Click_2">
-                                <AppBarButton.Icon>
-                                    <FontIcon Glyph="&#xE8CB;"/>
-                                </AppBarButton.Icon>
-                            </AppBarButton>
-                            <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
-                                <AppBarButton.Icon>
-                                    <FontIcon Glyph="&#xE72C;"/>
-                                </AppBarButton.Icon>
-                            </AppBarButton>
-                        </CommandBar>
-                    </c:StickTitleHeader.CommandBar>
-                </c:StickTitleHeader>
+                <Grid>
+                    <c:StickTitleHeader x:Name="StickTitleHeader" Title="播放列表">
+                        <c:StickTitleHeader.CommandBar>
+                            <CommandBar VerticalAlignment="Bottom" Margin="0,0,8,0"
+                                        OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
+                                <AppBarButton Label="添加/导入" AccessKey="A" Click="AppBarButton_Click_1">
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xE710;"/>
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                                <AppBarButton Label="排序" AccessKey="L" Click="AppBarButton_Click_2">
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xE8CB;"/>
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                                <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
+                                    <AppBarButton.Icon>
+                                        <FontIcon Glyph="&#xE72C;"/>
+                                    </AppBarButton.Icon>
+                                </AppBarButton>
+                            </CommandBar>
+                        </c:StickTitleHeader.CommandBar>
+                    </c:StickTitleHeader>
+                    <c:StickVerticalBottom>
+                        <c:ScrollFootButton HorizontalAlignment="Right" Margin="0,0,16,8" IsPositionToNowPlayingButtonShow="False" PositionButtonClick="PositionToButton_Click"/>
+                    </c:StickVerticalBottom>
+                </Grid>
             </ListView.Header>
-            <ItemsView x:Name="ItemsViewer" SelectionMode="None" Margin="16,0,16,44"
+            <ItemsView x:Name="ItemsViewer" SelectionMode="None" Margin="16,0,16,8"
                        HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ItemsView.Resources>
                     <SolidColorBrush x:Key="ItemContainerPointerOverBackground" Color="Transparent"/>

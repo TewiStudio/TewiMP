@@ -57,6 +57,8 @@ public partial class StickVerticalBottom : ContentControl
         {
             _scrollerPropSet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
             _compositor = _scrollerPropSet.Compositor;
+
+            Canvas.SetZIndex(CodeHelper.FindParent<ContentControl>(this), 1);
         }
 
         // Visuals
