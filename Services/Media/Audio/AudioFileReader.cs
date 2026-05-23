@@ -218,6 +218,7 @@ public class AudioFileReader : WaveStream, ISampleProvider
     // 均衡器
     public void CreateFilters()
     {
+        if (isMidi) return;
         _filters.Clear();
         _passFilters.Clear();
 

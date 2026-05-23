@@ -1,10 +1,11 @@
-﻿using Microsoft.UI.Composition;
+﻿using System.Threading.Tasks;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Markup;
-using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
+using Windows.Foundation;
+using TewiMP.Services;
 
 namespace TewiMP.UI.Controls;
 
@@ -47,6 +48,8 @@ public partial class StickTitleHeader : Control
 
     #region Stick Header
     private ScrollViewer _cachedScrollViewer;
+    private ItemsStackPanel _cachedItemsStackPanel;
+    private ContentControl _cachedContentControl;
     private CompositionPropertySet _scrollerPropSet;
     private Compositor _compositor;
     private InsetClip _itemsStackPanelClip;
@@ -66,12 +69,29 @@ public partial class StickTitleHeader : Control
         {
             _cachedScrollViewer = sv;
             _cachedScrollViewer.CanContentRenderOutsideBounds = true;
-
-            var itemsStackPanel = CodeHelper.FindDescendant<ItemsStackPanel>(sv);
-            var itemsStackPanelVisual = ElementCompositionPreview.GetElementVisual(itemsStackPanel);
-            _itemsStackPanelClip = itemsStackPanelVisual.Compositor.CreateInsetClip();
-            itemsStackPanelVisual.Clip = _itemsStackPanelClip;
             return sv;
+        }
+        return null;
+    }
+
+    private ItemsStackPanel GetItemsStackPanel(DependencyObject root)
+    {
+        if (_cachedItemsStackPanel != null) return _cachedItemsStackPanel;
+        if (CodeHelper.FindParent<ItemsPresenter>(root) is ItemsPresenter itemsPresenter)
+        {
+            _cachedItemsStackPanel = CodeHelper.FindDescendant<ItemsStackPanel>(itemsPresenter);
+            return _cachedItemsStackPanel;
+        }
+        return null;
+    }
+
+    private ContentControl GetContentControl(DependencyObject root)
+    {
+        if (_cachedContentControl != null) return _cachedContentControl;
+        if (CodeHelper.FindParent<ContentControl>(root) is ContentControl contentControl)
+        {
+            _cachedContentControl = contentControl;
+            return _cachedContentControl;
         }
         return null;
     }
@@ -81,19 +101,15 @@ public partial class StickTitleHeader : Control
         var scrollViewer = GetScrollViewer(this);
         if (scrollViewer is null) return;
 
-        if (_PART_Root != null)
+        var itemsStackPanel = GetItemsStackPanel(this);
+        if (itemsStackPanel is not null)
         {
-            var headerPresenter = VisualTreeHelper.GetParent(_PART_Root) as UIElement;
-            if (headerPresenter != null)
-            {
-                var headerContainer = VisualTreeHelper.GetParent(headerPresenter) as UIElement;
-                if (headerContainer != null && Canvas.GetZIndex(headerContainer) != 1)
-                {
-                    Canvas.SetZIndex(headerContainer, 1);
-                }
-            }
+            var itemsStackPanelVisual = ElementCompositionPreview.GetElementVisual(itemsStackPanel);
+            _itemsStackPanelClip = itemsStackPanelVisual.Compositor.CreateInsetClip();
+            itemsStackPanelVisual.Clip = _itemsStackPanelClip;
         }
 
+        var contentControl = GetContentControl(this);
         if (_scrollerPropSet is null)
         {
             _scrollerPropSet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
@@ -119,14 +135,19 @@ public partial class StickTitleHeader : Control
         headerRootVisual.StartAnimation("Offset.Y", _offsetAnim);
 
         // ItemsStack Clip
-        if (_itemsStackClipAnim is null)
+        if (_itemsStackPanelClip is not null)
         {
-            string exp = $"-scroller.Translation.Y - ({ProgressExp} * Padding)";
-            _itemsStackClipAnim = _compositor.CreateExpressionAnimation(exp);
-            _itemsStackClipAnim.SetReferenceParameter("scroller", _scrollerPropSet);
+            if (_itemsStackClipAnim is null)
+            {
+                string exp = $"-scroller.Translation.Y - ({ProgressExp} * Padding) - headerHeight + height";
+                _itemsStackClipAnim = _compositor.CreateExpressionAnimation(exp);
+                _itemsStackClipAnim.SetReferenceParameter("scroller", _scrollerPropSet);
+            }
+            _itemsStackClipAnim.SetScalarParameter("Padding", paddingSize);
+            _itemsStackClipAnim.SetScalarParameter("headerHeight", contentControl.ActualSize.Y);
+            _itemsStackClipAnim.SetScalarParameter("height", ActualSize.Y);
+            _itemsStackPanelClip.StartAnimation(nameof(_itemsStackPanelClip.TopInset), _itemsStackClipAnim);
         }
-        _itemsStackClipAnim.SetScalarParameter("Padding", paddingSize);
-        _itemsStackPanelClip.StartAnimation(nameof(_itemsStackPanelClip.TopInset), _itemsStackClipAnim);
 
         // Title Scale
         if (_titleScaleAnim is null)
@@ -149,7 +170,6 @@ public partial class StickTitleHeader : Control
         }
         _titleOffsetAnim.SetScalarParameter("Padding", paddingSize);
         titleVisual.StartAnimation(nameof(titleVisual.Offset), _titleOffsetAnim);
-
 
         // --------------
         // Background Opacity
@@ -189,12 +209,14 @@ public partial class StickTitleHeader : Control
     private void StickHeaderListView_Loaded(object sender, RoutedEventArgs e)
     {
         SizeChanged += StickHeaderListView_SizeChanged;
+        GetContentControl(this).SizeChanged += StickHeaderListView_SizeChanged;
         UpdateStickHeader();
     }
 
     private void StickHeaderListView_Unloaded(object sender, RoutedEventArgs e)
     {
         SizeChanged -= StickHeaderListView_SizeChanged;
+        GetContentControl(this).SizeChanged -= StickHeaderListView_SizeChanged;
         Loaded -= StickHeaderListView_Loaded;
         Unloaded -= StickHeaderListView_Unloaded;
     }

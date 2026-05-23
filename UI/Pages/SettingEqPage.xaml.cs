@@ -48,120 +48,6 @@ namespace TewiMP.UI.Pages
 
         void Init()
         {
-            InitVisual();
-            InitShyHeader();
-        }
-
-        ScrollViewer scrollViewer;
-        CompositionPropertySet scrollerPropertySet;
-        Compositor compositor;
-        Visual headerVisual;
-        Visual backgroundVisual;
-        Visual logoVisual;
-        Visual headerFootRootVisual;
-        void InitVisual()
-        {
-            // 设置header为顶层
-            var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)ListViewBase.Header);
-            var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
-            Canvas.SetZIndex(headerContainer, 1);
-
-            scrollViewer = (VisualTreeHelper.GetChild(ListViewBase, 0) as Border).Child as ScrollViewer;
-            scrollViewer.CanContentRenderOutsideBounds = true;
-            scrollViewer.ViewChanging -= ScrollViewer_ViewChanging;
-            scrollViewer.ViewChanging += ScrollViewer_ViewChanging;
-
-            scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
-            compositor = scrollerPropertySet.Compositor;
-            headerVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseGrid);
-            logoVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseTextBlock);
-            backgroundVisual = ElementCompositionPreview.GetElementVisual(HeaderBaseRectangle);
-            headerFootRootVisual = ElementCompositionPreview.GetElementVisual(HeaderFootRoot);
-        }
-
-
-        ExpressionAnimation offsetExpression;
-        ExpressionAnimation logoHeaderScaleAnimation;
-        ExpressionAnimation logoVisualOffsetYAnimation;
-        ExpressionAnimation logoVisualOffsetXAnimation;
-        ExpressionAnimation backgroundVisualOpacityAnimation;
-        ExpressionAnimation headerFootRootVisualOffsetAnimation;
-        void InitShyHeader()
-        {
-            if (!IsLoaded) return;
-            if (scrollViewer is null) return;
-
-            var paddingSize = 40;
-            var progress = $"Clamp(-scroller.Translation.Y / {paddingSize}, 0, 1.0)";
-
-            offsetExpression?.Dispose();
-            offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - Round({progress} * {paddingSize})");
-            offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerVisual.StartAnimation("Offset.Y", offsetExpression);
-
-            logoHeaderScaleAnimation?.Dispose();
-            logoHeaderScaleAnimation = compositor.CreateExpressionAnimation("Lerp(Vector2(1,1), Vector2(0.7, 0.7), " + progress + ")");
-            logoHeaderScaleAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation("Scale.xy", logoHeaderScaleAnimation);
-
-            logoVisualOffsetYAnimation?.Dispose();
-            logoVisualOffsetYAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 24, {progress})");
-            logoVisualOffsetYAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation("Offset.Y", logoVisualOffsetYAnimation);
-
-            logoVisualOffsetXAnimation?.Dispose();
-            logoVisualOffsetXAnimation = compositor.CreateExpressionAnimation($"Lerp(0, -12, {progress})");
-            logoVisualOffsetXAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            logoVisual.StartAnimation("Offset.X", logoVisualOffsetXAnimation);
-
-            backgroundVisualOpacityAnimation?.Dispose();
-            backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
-            backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
-            
-            headerFootRootVisualOffsetAnimation?.Dispose();
-            headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
-                $"Lerp(" +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{paddingSize} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"{progress})");
-            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
-        }
-
-        void DisposeVisuals()
-        {
-            offsetExpression?.Dispose();
-            logoHeaderScaleAnimation?.Dispose();
-            logoVisualOffsetYAnimation?.Dispose();
-            logoVisualOffsetXAnimation?.Dispose();
-            backgroundVisualOpacityAnimation?.Dispose();
-            headerFootRootVisualOffsetAnimation?.Dispose();
-
-            scrollViewer = null;
-            scrollerPropertySet = null;
-            compositor = null;
-            headerVisual = null;
-            backgroundVisual = null;
-            logoVisual = null;
-            headerFootRootVisual = null;
-            offsetExpression = null;
-            logoHeaderScaleAnimation = null;
-            logoVisualOffsetYAnimation = null;
-            logoVisualOffsetXAnimation = null;
-            backgroundVisualOpacityAnimation = null;
-            headerFootRootVisualOffsetAnimation = null;
-        }
-
-        private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
-        {
-            headerVisual.IsPixelSnappingEnabled = true;
         }
 
         private async void AddOutDeviceToFlyOut()
@@ -199,7 +85,7 @@ namespace TewiMP.UI.Pages
         }
 
         bool isInLoaded = false;
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             isInLoaded = true;
             GraphicEqToggleButton.IsOn = AudioFilterStatic.GraphicEqEnable;
@@ -222,13 +108,10 @@ namespace TewiMP.UI.Pages
             AudioService_EqualizerBandChanged(AudioService);
 
             Init();
-            await Task.Delay(10);
-            InitShyHeader();
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            DisposeVisuals();
             AudioService.EqEnableChanged -= AudioService_EqEnableChanged;
             AudioService.EqBandChanged -= AudioService_EqualizerBandChanged;
             App.MainWindowInstance.MainViewStateChanged -= MainWindowInstance_MainViewStateChanged;
@@ -258,11 +141,6 @@ namespace TewiMP.UI.Pages
                 c.Click -= C_Click;
                 c.Unloaded -= C_Unloaded;
             }
-        }
-
-        private void Page_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            InitShyHeader();
         }
 
         private void EqEnableSwitcher_Toggled(object sender, RoutedEventArgs e)

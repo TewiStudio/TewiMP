@@ -14,7 +14,7 @@
     xmlns:controls="using:TewiMP.UI.Controls"
     xmlns:data="using:TewiMP.Core.Audio"
     xmlns:dialogs="using:TewiMP.UI.Pages.DialogPages"
-    mc:Ignorable="d" SizeChanged="Page_SizeChanged"
+    mc:Ignorable="d"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded">
 
     <Page.Resources>
@@ -44,60 +44,67 @@
             x:Name="ListViewBase"
             HorizontalContentAlignment="Center"
             SelectionMode="None"
-            Padding="0,0,0,94">
+            Padding="0,0,0,6">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
-                    <Setter Property="Margin" Value="16,2"/>
+                    <Setter Property="Margin" Value="0,2,4,2"/>
                 </Style>
             </ListView.ItemContainerStyle>
 
             <ListView.Header>
-                <Grid x:Name="HeaderBaseGrid">
-                    <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1">
-                    </Border>
-                    <TextBlock x:Name="HeaderBaseTextBlock" Text="音效" Style="{ThemeResource TBHeader}"/>
-                    <Grid x:Name="HeaderFootRoot">
-                        <Grid
-                            x:Name="tSpectrumRoot"
-                            ui:TransitionHelper.Id="background"
-                            CornerRadius="4"
+                <Grid>
+                    <controls:StickTitleHeader Title="音效" VerticalAlignment="Top"/>
+                    <controls:StickVerticalBottom>
+                        <Border 
+                            Width="140" Height="70"
                             HorizontalAlignment="Right"
                             VerticalAlignment="Center"
-                            Background="{ThemeResource AcrylicNormal}">
-                            <Button
-                                Padding="0"
-                                Background="Transparent"
-                                ToolTipService.ToolTip="展开图形均衡器频谱">
-                                <i:Interaction.Behaviors>
-                                    <i:EventTriggerBehavior EventName="Click">
-                                        <ui:StartTransitionAction
-                                            Source="{Binding ElementName=tSpectrumRoot}"
-                                            Target="{Binding ElementName=AudioSpectrumRoot}"
-                                            Transition="{StaticResource MyTransitionHelper}" />
-                                    </i:EventTriggerBehavior>
-                                </i:Interaction.Behaviors>
-                                <controls:AudioSpectrum
-                                    x:Name="spectrumCanvas"
-                                    ui:TransitionHelper.Id="image"
+                            Margin="0,0,16,8">
+                            <Grid
+                                x:Name="tSpectrumRoot"
+                                ui:TransitionHelper.Id="background"
+                                CornerRadius="4"
+                                BorderThickness="0"
+                                Background="{ThemeResource AcrylicNormal}"
+                                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                <Button
+                                    x:Name="spectrumButton"
+                                    Padding="0"
                                     Background="Transparent"
-                                    StrokeWidth="0"
-                                    SmoothingUpFactor=".1"
-                                    SmoothingDownFactor=".1"
-                                    DrawEqLines="True"
-                                    DrawEqLinesStrokeWidth="1"
-                                    DrawEqPoints="True"
-                                    DrawEqPointsRadius="2"
-                                    Width="140"
-                                    Height="70"/>
-                            </Button>
-                            <FontIcon
-                                IsHitTestVisible="False" Glyph="&#xE740;" FontSize="15"
-                                HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                Margin="9"/>
-                        </Grid>
-                    </Grid>
+                                    ToolTipService.ToolTip="展开图形均衡器频谱"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    VerticalContentAlignment="Stretch">
+                                    <i:Interaction.Behaviors>
+                                        <i:EventTriggerBehavior EventName="Click">
+                                            <ui:StartTransitionAction
+                                                Source="{Binding ElementName=tSpectrumRoot}"
+                                                Target="{Binding ElementName=AudioSpectrumRoot}"
+                                                Transition="{StaticResource MyTransitionHelper}" />
+                                        </i:EventTriggerBehavior>
+                                    </i:Interaction.Behaviors>
+                                    <controls:AudioSpectrum
+                                        x:Name="spectrumCanvas"
+                                        ui:TransitionHelper.Id="image"
+                                        Background="Transparent"
+                                        StrokeWidth="0"
+                                        SmoothingUpFactor=".1"
+                                        SmoothingDownFactor=".1"
+                                        DrawEqLines="True"
+                                        DrawEqLinesStrokeWidth="1"
+                                        DrawEqPoints="True"
+                                        DrawEqPointsRadius="2"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalAlignment="Stretch"/>
+                                </Button>
+                                <FontIcon
+                                    IsHitTestVisible="False" Glyph="&#xE740;" FontSize="15"
+                                    HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                    Margin="9"/>
+                            </Grid>
+                        </Border>
+                    </controls:StickVerticalBottom>
                 </Grid>
             </ListView.Header>
 

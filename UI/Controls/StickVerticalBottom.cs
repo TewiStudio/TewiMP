@@ -14,13 +14,13 @@ public partial class StickVerticalBottom : ContentControl
 
     public StickVerticalBottom()
     {
-        RegisterPropertyChangedCallback(VerticalAlignmentProperty, VerticalAlignmentChanged);
         DefaultStyleKey = typeof(StickVerticalBottom);
     }
 
     #region Stick Header
     private ScrollViewer _cachedScrollViewer;
     private ItemsStackPanel _cachedItemsStackPanel;
+    private ContentControl _cachedContentControl;
     private CompositionPropertySet _scrollerPropSet;
     private Compositor _compositor;
     private ExpressionAnimation _offsetAnim;
@@ -48,6 +48,17 @@ public partial class StickVerticalBottom : ContentControl
         return null;
     }
 
+    private ContentControl GetContentControl(DependencyObject root)
+    {
+        if (_cachedContentControl != null) return _cachedContentControl;
+        if (CodeHelper.FindParent<ContentControl>(root) is ContentControl contentControl)
+        {
+            _cachedContentControl = contentControl;
+            return _cachedContentControl;
+        }
+        return null;
+    }
+
     public void UpdateStickHeader()
     {
         var scrollViewer = GetScrollViewer(this);
@@ -58,7 +69,7 @@ public partial class StickVerticalBottom : ContentControl
             _scrollerPropSet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
             _compositor = _scrollerPropSet.Compositor;
 
-            Canvas.SetZIndex(CodeHelper.FindParent<ContentControl>(this), 1);
+            Canvas.SetZIndex(GetContentControl(this), 1);
         }
 
         // Visuals
@@ -116,14 +127,11 @@ public partial class StickVerticalBottom : ContentControl
         OnSizeChanged();
     }
 
-    private void VerticalAlignmentChanged(DependencyObject sender, DependencyProperty dp)
-    {
-        //OnSizeChanged();
-    }
-
     private void OnSizeChanged()
     {
-        GetItemsStackPanel(this)?.Margin = new(0, 0, 0, _PART_Root.ActualHeight);
+        var itemsStackPanel = GetItemsStackPanel(this);
+        itemsStackPanel.Margin = new(itemsStackPanel.Margin.Left, itemsStackPanel.Margin.Top, itemsStackPanel.Margin.Right, _PART_Root.ActualHeight);
+
         UpdateStickHeader();
     }
     #endregion

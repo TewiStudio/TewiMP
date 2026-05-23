@@ -12,21 +12,23 @@
     <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None" Padding="0,0,0,12">
 
         <ListView.Header>
-            <controls:StickTitleHeader Title="编辑热键"/>
+            <StackPanel>
+                <controls:StickTitleHeader Title="编辑热键" VerticalAlignment="Top"/>
+            </StackPanel>
         </ListView.Header>
 
         <cc:SettingsCard Header="全局热键开关" Margin="0,4,4,0"
-                         Description="打开/关闭全局热键">
+                             Description="打开/关闭全局热键">
             <ToggleSwitch Toggled="ToggleSwitch_Toggled" x:Name="HotkeyEnableToggleSwitch"/>
         </cc:SettingsCard>
 
         <cc:SettingsCard Header="尝试重新应用热键" Margin="0,4,4,0"
-                         Description="如果此程序被其它程序占用的热键被释放，重新注册可以使之前被占用的热键恢复在此程序的功能">
+                             Description="如果此程序被其它程序占用的热键被释放，重新注册可以使之前被占用的热键恢复在此程序的功能">
             <Button Content="重新应用" Click="Button_Click"/>
         </cc:SettingsCard>
 
         <cc:SettingsCard Header="重置热键键位" Margin="0,4,4,0"
-                         Description="将热键键位恢复到程序默认">
+                             Description="将热键键位恢复到程序默认">
             <Button Content="重置键位" Click="Button_Click_1"/>
         </cc:SettingsCard>
 

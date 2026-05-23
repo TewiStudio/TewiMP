@@ -361,7 +361,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
             if (App.Instance.AudioService.MusicData != null)
             {
                 T1.Text = App.Instance.AudioService.MusicData.Title;
-                T2.Text = App.Instance.AudioService.MusicData.ArtistName;
+                T2.Text = App.Instance.AudioService.MusicData.ButtonName;
             }
 
             T1.Foreground = lrcForeground;
@@ -391,7 +391,7 @@ public sealed partial class DesktopLyricWindow : WindowEx
         if (nowLyricsData.Lyric is null)
         {
             T1.Text = App.Instance.AudioService.MusicData.Title;
-            T2.Text = App.Instance.AudioService.MusicData.ArtistName;
+            T2.Text = App.Instance.AudioService.MusicData.ButtonName;
             T1.Foreground = lrcForeground;
             T2.Foreground = lrcForeground;
             T1Shadow.Color = lrcForeground.Color;

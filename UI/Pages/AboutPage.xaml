@@ -143,7 +143,14 @@
                                          Tag="https://microsoft.github.io/Win2D/WinUI3/html/Introduction.htm"
                                          Header="Microsoft.Graphics.Win2D"
                                          Description="An easy-to-use Windows Runtime API for immediate mode 2D graphics rendering. For WinUI."/>
-                        
+
+                        <cc:SettingsCard IsClickEnabled="True"
+                                         ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
+                                         Click="SettingsCard_Click"
+                                         Tag="https://github.com/ghost1372/DevWinUI"
+                                         Header="DevWinUI"
+                                         Description="DevWinUI is a collection of useful classes, controls, styles, and codes for WinUI 3. Create a WinUI 3 app in less than a minute with the built-in project templates and scaffolding tools.  "/>
+
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
                                          Click="SettingsCard_Click"
@@ -266,11 +273,18 @@
                         
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
-                                         CornerRadius="0,0,4,4"
                                          Click="SettingsCard_Click"
                                          Tag="https://github.com/Cutano/Kawazu"
                                          Header="Kawazu"
                                          Description="A C# library for converting Japanese sentence to Hiragana, Katakana or Romaji with furigana and okurigana modes supported. Inspired by project Kuroshiro."/>
+                        
+                        <cc:SettingsCard IsClickEnabled="True"
+                                         ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
+                                         CornerRadius="0,0,4,4"
+                                         Click="SettingsCard_Click"
+                                         Tag="https://github.com/KSemenenko/ColorThief"
+                                         Header="ksemenenko.ColorThief"
+                                         Description="A code for grabbing the color palette from an image. Uses C# and .NET to make it happen."/>
                     </cc:SettingsExpander.Items>
                 </cc:SettingsExpander>
 
