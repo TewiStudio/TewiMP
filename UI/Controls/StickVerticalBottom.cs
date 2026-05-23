@@ -1,23 +1,26 @@
 ﻿using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using System.Diagnostics;
 using TewiMP.Helpers;
 
 namespace TewiMP.UI.Controls;
 
-public partial class StickVertical : ContentControl
+public partial class StickVerticalBottom : ContentControl
 {
     public ScrollViewer CachedScrollviewer => GetScrollViewer(this);
 
-    public StickVertical()
+    public StickVerticalBottom()
     {
-        DefaultStyleKey = typeof(StickVertical);
+        RegisterPropertyChangedCallback(VerticalAlignmentProperty, VerticalAlignmentChanged);
+        DefaultStyleKey = typeof(StickVerticalBottom);
     }
 
     #region Stick Header
     private ScrollViewer _cachedScrollViewer;
+    private ItemsStackPanel _cachedItemsStackPanel;
     private CompositionPropertySet _scrollerPropSet;
     private Compositor _compositor;
     private ExpressionAnimation _offsetAnim;
@@ -34,7 +37,17 @@ public partial class StickVertical : ContentControl
         return null;
     }
 
-    private ContentControl _parent;
+    private ItemsStackPanel GetItemsStackPanel(DependencyObject root)
+    {
+        if (_cachedItemsStackPanel != null) return _cachedItemsStackPanel;
+        if (CodeHelper.FindParent<ItemsPresenter>(root) is ItemsPresenter itemsPresenter)
+        {
+            _cachedItemsStackPanel = CodeHelper.FindDescendant<ItemsStackPanel>(itemsPresenter);
+            return _cachedItemsStackPanel;
+        }
+        return null;
+    }
+
     public void UpdateStickHeader()
     {
         var scrollViewer = GetScrollViewer(this);
@@ -42,29 +55,33 @@ public partial class StickVertical : ContentControl
 
         if (_scrollerPropSet is null)
         {
-            _parent = CodeHelper.FindParent<ContentControl>(this);
             _scrollerPropSet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
             _compositor = _scrollerPropSet.Compositor;
         }
 
         // Visuals
-        var headerRootVisual = ElementCompositionPreview.GetElementVisual(_parent);
+        var headerRootVisual = ElementCompositionPreview.GetElementVisual(_PART_Root);
 
         // Offset Y
-        if (_offsetAnim is null)
+        if (true || _offsetAnim is null)
         {
-            string exp = $"-scroller.Translation.Y";
+            string exp = $"-scroller.Translation.Y + pageHeight - height";
             _offsetAnim = _compositor.CreateExpressionAnimation(exp);
             _offsetAnim.SetReferenceParameter("scroller", _scrollerPropSet);
         }
+        _offsetAnim.SetScalarParameter("pageHeight", scrollViewer.ActualSize.Y);
+        _offsetAnim.SetScalarParameter("height", ActualSize.Y);
         headerRootVisual.StartAnimation("Offset.Y", _offsetAnim);
     }
     #endregion
 
     #region Events
+    private Border _PART_Root;
     protected override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
+
+        _PART_Root = GetTemplateChild("PART_Root") as Border;
 
         Loaded -= StickHeaderListView_Loaded;
         Loaded += StickHeaderListView_Loaded;
@@ -74,22 +91,37 @@ public partial class StickVertical : ContentControl
 
     private void StickHeaderListView_Loaded(object sender, RoutedEventArgs e)
     {
-        VerticalAlignment = VerticalAlignment.Top;
+        SizeChanged += StickVerticalBottom_SizeChanged;
         GetScrollViewer(this).SizeChanged += StickVertical_SizeChanged;
-        Height = GetScrollViewer(this).ActualHeight;
-        UpdateStickHeader();
+        OnSizeChanged();
     }
 
     private void StickHeaderListView_Unloaded(object sender, RoutedEventArgs e)
     {
+        SizeChanged -= StickVerticalBottom_SizeChanged;
         GetScrollViewer(this).SizeChanged -= StickVertical_SizeChanged;
         Loaded -= StickHeaderListView_Loaded;
         Unloaded -= StickHeaderListView_Unloaded;
     }
 
+    private void StickVerticalBottom_SizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        OnSizeChanged();
+    }
+
     private void StickVertical_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        Height = GetScrollViewer(this).ActualHeight;
+        OnSizeChanged();
+    }
+
+    private void VerticalAlignmentChanged(DependencyObject sender, DependencyProperty dp)
+    {
+        //OnSizeChanged();
+    }
+
+    private void OnSizeChanged()
+    {
+        GetItemsStackPanel(this)?.Margin = new(0, 0, 0, _PART_Root.ActualHeight);
         UpdateStickHeader();
     }
     #endregion

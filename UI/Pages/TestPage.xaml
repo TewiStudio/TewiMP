@@ -10,7 +10,16 @@
     <ListView>
         <ListView.Header>
             <Grid>
-                <controls:StickTitleHeader Title="Test设置" VerticalAlignment="Top"/>
+                <controls:StickTitleHeader Background="#21000000" BorderBrush="red" BorderThickness="1" Title="Test设置" VerticalAlignment="Top">
+                    <controls:StickTitleHeader.CommandBar>
+                        <Rectangle Fill="#21000000" Stroke="Blue" StrokeThickness="1" Height="40" Width="400"/>
+                    </controls:StickTitleHeader.CommandBar>
+                </controls:StickTitleHeader>
+                <controls:StickVerticalBottom>
+                    <Grid>
+                        <Rectangle Stroke="Red" StrokeThickness="1" Fill="#21000000" Height="19"/>
+                    </Grid>
+                </controls:StickVerticalBottom>
             </Grid>
         </ListView.Header>
         <x:String>a</x:String>
@@ -30,9 +39,6 @@
         <x:String>o</x:String>
         <x:String>p</x:String>
         <x:String>q</x:String>
-        <Popup IsOpen="True">
-            <Rectangle Fill="red" Width="100" Height="100"/>
-        </Popup>
         <x:String>r</x:String>
         <x:String>s</x:String>
         <x:String>t</x:String>

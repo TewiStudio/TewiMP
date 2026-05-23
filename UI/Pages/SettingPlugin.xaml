@@ -31,23 +31,15 @@
         <ListView.Header>
             <controls:StickTitleHeader Title="插件设置">
                 <controls:StickTitleHeader.CommandBar>
-                    <CommandBar VerticalAlignment="Bottom" Margin="0,0,0,0"
+                    <CommandBar VerticalAlignment="Bottom" Margin="0,0,10,0"
                                 OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
+                        <AppBarButton Label="浏览插件文件夹" AccessKey="R" Click="SettingsCard_Click_2"
+                                      Icon="{ui:FontIcon Glyph=&#xE8DE;}"/>
                         <AppBarButton Label="重新加载插件" AccessKey="R" Click="SettingsCard_Click">
-                            <AppBarButton.Resources>
-                                <StaticResource x:Key="AppBarButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
-                                <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
-                                <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
-                                <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
-                                <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
-                                <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
-                            </AppBarButton.Resources>
                             <AppBarButton.Icon>
                                 <FontIcon Glyph="&#xE72C;"/>
                             </AppBarButton.Icon>
                         </AppBarButton>
-                        <AppBarButton Label="浏览插件文件夹" AccessKey="R" Click="SettingsCard_Click_2"
-                                      Icon="{ui:FontIcon Glyph=&#xE8DE;}"/>
                     </CommandBar>
                 </controls:StickTitleHeader.CommandBar>
             </controls:StickTitleHeader>

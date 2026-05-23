@@ -21,19 +21,11 @@
             <ListView.Header>
                 <c:StickTitleHeader x:Name="StickTitleHeader" Title="播放列表">
                     <c:StickTitleHeader.CommandBar>
-                        <CommandBar VerticalAlignment="Bottom" Margin="0,0,0,0"
+                        <CommandBar VerticalAlignment="Bottom" Margin="0,0,8,0"
                                     OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
-                            <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
-                                <AppBarButton.Resources>
-                                    <StaticResource x:Key="AppBarButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
-                                    <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
-                                    <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
-                                    <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
-                                    <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
-                                    <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
-                                </AppBarButton.Resources>
+                            <AppBarButton Label="添加/导入" AccessKey="A" Click="AppBarButton_Click_1">
                                 <AppBarButton.Icon>
-                                    <FontIcon Glyph="&#xE72C;"/>
+                                    <FontIcon Glyph="&#xE710;"/>
                                 </AppBarButton.Icon>
                             </AppBarButton>
                             <AppBarButton Label="排序" AccessKey="L" Click="AppBarButton_Click_2">
@@ -41,9 +33,9 @@
                                     <FontIcon Glyph="&#xE8CB;"/>
                                 </AppBarButton.Icon>
                             </AppBarButton>
-                            <AppBarButton Label="添加/导入" AccessKey="A" Click="AppBarButton_Click_1">
+                            <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
                                 <AppBarButton.Icon>
-                                    <FontIcon Glyph="&#xE710;"/>
+                                    <FontIcon Glyph="&#xE72C;"/>
                                 </AppBarButton.Icon>
                             </AppBarButton>
                         </CommandBar>

@@ -16,23 +16,7 @@
             <controls:StickTitleHeader x:Name="StickTitleHeader" Title="下载">
                 <controls:StickTitleHeader.CommandBar>
                     <CommandBar HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                            DefaultLabelPosition="Right">
-                        <AppBarButton Click="PausePlayBtn_Click"
-                                  Label="暂停下载"
-                                  AccessKey="P"
-                                  x:Name="PausePlayBtn">
-                            <AppBarButton.Resources>
-                                <StaticResource x:Key="AppBarButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
-                                <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
-                                <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
-                                <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
-                                <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
-                                <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
-                            </AppBarButton.Resources>
-                            <AppBarButton.Icon>
-                                <FontIcon Glyph="&#xE769;" x:Name="PausePlayIcon"/>
-                            </AppBarButton.Icon>
-                        </AppBarButton>
+                                DefaultLabelPosition="Right" Margin="0,0,8,0">
                         <AppBarButton x:Name="ToSettingBtn"
                                   Click="ToSettingBtn_Click"
                                   Label="选项"
@@ -43,6 +27,14 @@
                                         <m:AnimatedSettingsVisualSource/>
                                     </AnimatedIcon.Source>
                                 </AnimatedIcon>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton Click="PausePlayBtn_Click"
+                                  Label="暂停下载"
+                                  AccessKey="P"
+                                  x:Name="PausePlayBtn">
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="&#xE769;" x:Name="PausePlayIcon"/>
                             </AppBarButton.Icon>
                         </AppBarButton>
                     </CommandBar>
