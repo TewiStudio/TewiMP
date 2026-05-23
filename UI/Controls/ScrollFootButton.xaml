@@ -26,23 +26,15 @@
             <ColumnDefinition Width="auto"/>
             <ColumnDefinition Width="auto"/>
         </Grid.ColumnDefinitions>
-        <SystemBackdropElement CornerRadius="4">
-            <SystemBackdropElement.SystemBackdrop>
-                <DesktopAcrylicBackdrop/>
-            </SystemBackdropElement.SystemBackdrop>
-        </SystemBackdropElement>
-        <SystemBackdropElement Grid.Column="1" Margin="8,0,0,0" CornerRadius="4">
-            <SystemBackdropElement.SystemBackdrop>
-                <DesktopAcrylicBackdrop/>
-            </SystemBackdropElement.SystemBackdrop>
-        </SystemBackdropElement>
         <StackPanel
             Orientation="Horizontal"
             BorderThickness="1" CornerRadius="4"
+            Background="{ThemeResource AcrylicNormal}"
             BorderBrush="{ThemeResource ControlElevationBorderBrush}">
             <Button
-                x:FieldModifier="Public" x:Name="PositionToBottom_Button"
+                x:Name="PositionToBottom_Button"
                 AccessKey="C" CornerRadius="4,0,0,4"
+                Click="PositionToBottom_Button_Click"
                 ToolTipService.ToolTip="滚动到底部">
                 <AnimatedIcon>
                     <AnimatedIcon.Source>
@@ -51,8 +43,9 @@
                 </AnimatedIcon>
             </Button>
             <Button
-                x:FieldModifier="Public" x:Name="PositionToTop_Button"
+                x:Name="PositionToTop_Button"
                 AccessKey="V" CornerRadius="0,4,4,0"
+                Click="PositionToTop_Button_Click"
                 ToolTipService.ToolTip="滚动到顶部">
                 <AnimatedIcon
                     ui:VisualExtensions.RotationAngleInDegrees="180"
@@ -66,13 +59,14 @@
         <Border
             x:Name="PositionToNowPlaying_Root"
             BorderThickness="1" CornerRadius="4" Margin="8,0,0,0"
+            Background="{ThemeResource AcrylicNormal}"
             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
             Visibility="{Binding ElementName=PositionToNowPlaying_Button, Path=Visibility}"
             Grid.Column="1">
             <Button
                 x:Name="PositionToNowPlaying_Button"
-                x:FieldModifier="Public"
                 AccessKey="N"
+                Click="PositionToNowPlaying_Button_Click"
                 ToolTipService.ToolTip="滚动到当前正在播放的歌曲">
                 <FontIcon Glyph="&#xE759;" FontSize="16"/>
             </Button>

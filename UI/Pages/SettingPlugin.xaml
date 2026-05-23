@@ -9,7 +9,7 @@
     xmlns:controls="using:TewiMP.UI.Controls"
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
-    mc:Ignorable="d" SizeChanged="Page_SizeChanged" Loaded="Page_Loaded">
+    mc:Ignorable="d" Loaded="Page_Loaded">
 
     <Page.Resources>
         <Style TargetType="cc:SettingsExpander">
@@ -29,28 +29,28 @@
     <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None" Padding="0,0,0,12">
 
         <ListView.Header>
-            <StackPanel Orientation="Vertical">
-                <Grid x:Name="HeaderBaseGrid">
-                    <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
-                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                            BorderThickness="0,0,0,1"/>
-                    <TextBlock x:Name="HeaderBaseTextBlock" Text="插件设置" Style="{ThemeResource TBHeader}"/>
-                </Grid>
-                <cc:SettingsCard
-                    Header="重新加载所有插件"
-                    IsClickEnabled="True"
-                    ClickMode="Press"
-                    ActionIcon="{ui:FontIcon Glyph=&#xE72C;}"
-                    Click="SettingsCard_Click"
-                    Margin="16,0,16,4"/>
-                <cc:SettingsCard
-                    Header="浏览插件文件夹"
-                    IsClickEnabled="True"
-                    ClickMode="Press"
-                    ActionIcon="{ui:FontIcon Glyph=&#xE8DE;}"
-                    Click="SettingsCard_Click_2"
-                    Margin="16,0,16,0"/>
-            </StackPanel>
+            <controls:StickTitleHeader Title="插件设置">
+                <controls:StickTitleHeader.CommandBar>
+                    <CommandBar VerticalAlignment="Bottom" Margin="0,0,0,0"
+                                OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
+                        <AppBarButton Label="重新加载插件" AccessKey="R" Click="SettingsCard_Click">
+                            <AppBarButton.Resources>
+                                <StaticResource x:Key="AppBarButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
+                                <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+                                <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+                                <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
+                                <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
+                                <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
+                            </AppBarButton.Resources>
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="&#xE72C;"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton Label="浏览插件文件夹" AccessKey="R" Click="SettingsCard_Click_2"
+                                      Icon="{ui:FontIcon Glyph=&#xE8DE;}"/>
+                    </CommandBar>
+                </controls:StickTitleHeader.CommandBar>
+            </controls:StickTitleHeader>
         </ListView.Header>
 
         <cc:SettingsExpander

@@ -237,10 +237,9 @@ namespace TewiMP.UI.Pages
             ToolsCommandBar.Width = double.NaN;
         }
 
-        private async void PositionToButton_Click(object sender, RoutedEventArgs e)
+        private async void ItemsList_Header_Foot_Buttons_PositionButtonClick(object sender, RoutedEventArgs e)
         {
-            var btn = sender as Button;
-            switch ((ScrollFootButton.ButtonType)btn.Tag)
+            switch ((ScrollFootButton.ButtonType)sender)
             {
                 case ScrollFootButton.ButtonType.NowPlaying:
                     foreach (var i in MusicDataList)
@@ -262,13 +261,6 @@ namespace TewiMP.UI.Pages
 
         private void menu_border_Loaded(object sender, RoutedEventArgs e)
         {
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click += PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click += PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click += PositionToButton_Click;
-
             if (scrollViewer is null)
             {
                 scrollViewer = (VisualTreeHelper.GetChild(Children, 0) as Border).Child as ScrollViewer;
@@ -287,9 +279,6 @@ namespace TewiMP.UI.Pages
 
         private void Artist_Image_Unloaded(object sender, RoutedEventArgs e)
         {
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
         }
 
         private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)

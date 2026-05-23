@@ -51,9 +51,6 @@ namespace TewiMP.UI.Pages
 
         private async void LeavingPageDo()
         {
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
             SearchBox.SearchingAItem -= SearchBox_SearchingAItem;
             SearchBox.IsOpenChanged -= SearchBox_IsOpenChanged;
             App.MainWindowInstance.InKeyDownEvent -= MainWindow_InKeyDownEvent;
@@ -434,12 +431,6 @@ namespace TewiMP.UI.Pages
             SearchBox.IsOpenChanged += SearchBox_IsOpenChanged;
             SearchBox.SearchingAItem -= SearchBox_SearchingAItem;
             SearchBox.SearchingAItem += SearchBox_SearchingAItem;
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click += PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click += PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click += PositionToButton_Click;
         }
 
         private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
@@ -735,6 +726,28 @@ namespace TewiMP.UI.Pages
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             LeavingPageDo();
+        }
+
+        private async void ItemsList_Header_Foot_Buttons_PositionButtonClick(object sender, RoutedEventArgs e)
+        {
+            switch ((ScrollFootButton.ButtonType)sender)
+            {
+                case ScrollFootButton.ButtonType.NowPlaying:
+                    foreach (var i in MusicDataList)
+                    {
+                        if (i.MusicData != App.Instance.AudioService.MusicData) continue;
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
+                        MusicDataItem.TryHighlightPlayingItem();
+                    }
+                    break;
+                case ScrollFootButton.ButtonType.Top:
+                    scrollViewer.ChangeView(null, 0, null);
+                    break;
+                case ScrollFootButton.ButtonType.Bottom:
+                    scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
+                    break;
+            }
         }
     }
 }

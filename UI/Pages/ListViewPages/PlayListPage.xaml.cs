@@ -439,17 +439,17 @@ public sealed partial class PlayListPage : Page
         _cmdBarOffsetAnim.SetScalarParameter("EndY", imgVisualH * imageSizeEnd - cmdBarH + 6);
         commandBarVisual.StartAnimation(nameof(commandBarVisual.Offset), _cmdBarOffsetAnim);
 
-        //// Header Foot Root Offset 动画
-        //if (_footerOffsetAnim is null)
-        //{
-        //    string exp = $"Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), {ProgressExp})";
-        //    _footerOffsetAnim = compositor.CreateExpressionAnimation(exp);
-        //    _footerOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
-        //}
-        //_footerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
-        //_footerOffsetAnim.SetScalarParameter("StartY", actualH - visualH - 8);
-        //_footerOffsetAnim.SetScalarParameter("EndY", anotherHeight + actualH - visualH - 8);
-        //headerFootRootVisual.StartAnimation("Offset", _footerOffsetAnim);
+        // Header Foot Root Offset 动画
+        if (_footerOffsetAnim is null)
+        {
+            string exp = $"Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), {ProgressExp})";
+            _footerOffsetAnim = compositor.CreateExpressionAnimation(exp);
+            _footerOffsetAnim.SetReferenceParameter("scroller", scrollerPropertySet);
+        }
+        _footerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
+        _footerOffsetAnim.SetScalarParameter("StartY", actualH - visualH - 8);
+        _footerOffsetAnim.SetScalarParameter("EndY", anotherHeight + actualH - visualH - 8);
+        headerFootRootVisual.StartAnimation("Offset", _footerOffsetAnim);
     }
     void DisposeVisuals()
     {
@@ -582,12 +582,6 @@ public sealed partial class PlayListPage : Page
         ItemList_Header_Search_Control.SearchingAItem += ItemList_Header_Search_Control_SearchingAItem;
         ItemList_Header_Search_Control.IsOpenChanged -= ItemList_Header_Search_Control_IsOpenChanged;
         ItemList_Header_Search_Control.IsOpenChanged += ItemList_Header_Search_Control_IsOpenChanged;
-        ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToNowPlaying_Button_Click;
-        ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click += PositionToNowPlaying_Button_Click;
-        ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToNowPlaying_Button_Click;
-        ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click += PositionToNowPlaying_Button_Click;
-        ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToNowPlaying_Button_Click;
-        ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click += PositionToNowPlaying_Button_Click;
     }
 
     void RemoveEvents()
@@ -597,9 +591,6 @@ public sealed partial class PlayListPage : Page
         App.MainWindowInstance.MusicPageViewStateChanged -= MainWindowInstance_MusicPageViewStateChanged;
         ItemList_Header_Search_Control.SearchingAItem -= ItemList_Header_Search_Control_SearchingAItem;
         ItemList_Header_Search_Control.IsOpenChanged -= ItemList_Header_Search_Control_IsOpenChanged;
-        ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToNowPlaying_Button_Click;
-        ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToNowPlaying_Button_Click;
-        ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToNowPlaying_Button_Click;
     }
 
     async Task InitAccentColor()
@@ -676,8 +667,6 @@ public sealed partial class PlayListPage : Page
         ItemsList.ItemsSource = musicListBind;
         ItemList_Header_Search_Control.SongItemBinds = musicListBind;
 
-        ItemsList_Header_Foot_Root.XamlRoot = this.XamlRoot;
-        ItemsList_Header_Foot_Root.IsOpen = true;
         LogService.Elapsed("PlayListPage", "Loaded in {0}.", time);
     }
 
@@ -749,10 +738,9 @@ public sealed partial class PlayListPage : Page
         InitShyHeader();
     }
 
-    private async void PositionToNowPlaying_Button_Click(object sender, RoutedEventArgs e)
+    private async void ItemsList_Header_Foot_Buttons_PositionButtonClick(object sender, RoutedEventArgs e)
     {
-        var btn = sender as Button;
-        switch ((ScrollFootButton.ButtonType)btn.Tag)
+        switch ((ScrollFootButton.ButtonType)sender)
         {
             case ScrollFootButton.ButtonType.NowPlaying:
                 foreach (var i in musicListBind)
@@ -771,7 +759,6 @@ public sealed partial class PlayListPage : Page
                 break;
         }
     }
-
     private async void AppBarButton_Click(object sender, RoutedEventArgs e)
     {
         var btn = sender as AppBarButton;
@@ -969,10 +956,6 @@ public sealed partial class PlayListPage : Page
 
     private void MainWindowInstance_MusicPageViewStateChanged(MusicPages.MusicPageViewState musicPageViewState)
     {
-        if (musicPageViewState == MusicPages.MusicPageViewState.Hidden)
-            ItemsList_Header_Foot_Root.IsOpen = true;
-        else
-            ItemsList_Header_Foot_Root.IsOpen = false;
     }
 
     private async void Page_ActualThemeChanged(FrameworkElement sender, object args)

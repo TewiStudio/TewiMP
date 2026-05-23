@@ -230,7 +230,8 @@
                         <controlszn:ScrollFootButton
                             x:Name="ItemsList_Header_Foot_Buttons"
                             VerticalAlignment="Bottom"
-                            HorizontalAlignment="Right"/>
+                            HorizontalAlignment="Right"
+                            PositionButtonClick="ItemsList_Header_Foot_Buttons_PositionButtonClick"/>
                     </Grid>
                 </Grid>
             </ListView.Header>

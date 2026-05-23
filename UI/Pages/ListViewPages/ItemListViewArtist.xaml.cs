@@ -233,13 +233,6 @@ namespace TewiMP.UI.Pages
         Vector3 ATBOffset = default;
         private void menu_border_Loaded(object sender, RoutedEventArgs e)
         {
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click += PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click += PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click += PositionToButton_Click;
-
             if (scrollViewer is null)
             {
                 scrollViewer = (VisualTreeHelper.GetChild(Children, 0) as Border).Child as ScrollViewer;
@@ -258,9 +251,6 @@ namespace TewiMP.UI.Pages
 
         private void Artist_Image_Unloaded(object sender, RoutedEventArgs e)
         {
-            ItemsList_Header_Foot_Buttons.PositionToBottom_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToNowPlaying_Button.Click -= PositionToButton_Click;
-            ItemsList_Header_Foot_Buttons.PositionToTop_Button.Click -= PositionToButton_Click;
         }
 
         private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
@@ -477,31 +467,25 @@ namespace TewiMP.UI.Pages
                     break;
             }
         }
-        private async void Button_Click_7(object sender, RoutedEventArgs e)
+
+        private async void ItemsList_Header_Foot_Buttons_PositionButtonClick(object sender, RoutedEventArgs e)
         {
-            switch ((sender as Button).Tag)
+            switch ((ScrollFootButton.ButtonType)sender)
             {
-                case "0":
-                    scrollViewer.ChangeView(null, 0, null);
-                    break;
-                case "1":
-                    scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
-                    break;
-                case "2":
+                case ScrollFootButton.ButtonType.NowPlaying:
                     foreach (var i in MusicDataList)
                     {
-                        if (i.MusicData == App.Instance.AudioService.MusicData)
-                        {
-                            await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
-                            await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, true);
-                            foreach (var j in SongItem.StaticSongItems)
-                            {
-                                if (j != null)
-                                    if (j.MusicData == App.Instance.AudioService.MusicData)
-                                        j.AnimateStroke();
-                            }
-                        }
+                        if (i.MusicData != App.Instance.AudioService.MusicData) continue;
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
+                        await Children.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
+                        MusicDataItem.TryHighlightPlayingItem();
                     }
+                    break;
+                case ScrollFootButton.ButtonType.Top:
+                    scrollViewer.ChangeView(null, 0, null);
+                    break;
+                case ScrollFootButton.ButtonType.Bottom:
+                    scrollViewer.ChangeView(null, scrollViewer.ScrollableHeight, null);
                     break;
             }
         }

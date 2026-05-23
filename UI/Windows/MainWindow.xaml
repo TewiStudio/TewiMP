@@ -226,10 +226,10 @@
                         </cc:OpacityMaskView.OpacityMask>
                         <Grid>-->
                         <Frame
-                                x:Name="ContentFrame"
-                                IsTabStop="True"
-                                CornerRadius="0"
-                                Padding="0,0,0,86"/>
+                            x:Name="ContentFrame"
+                            IsTabStop="True"
+                            CornerRadius="0"
+                            Padding="0,0,0,86"/>
                         <!--<Rectangle VerticalAlignment="Bottom" Height="86" Fill="Transparent"/>-->
                         <!--<devWinui:LinearGradientBlurPanel VerticalAlignment="Bottom" MaxBlurAmount="50" Height="86" StartPoint="0,1" EndPoint="0,0"/>-->
                         <!--</Grid>
@@ -474,21 +474,25 @@
                                     AccessKey="BV"
                                     PointerWheelChanged="VolumeAppButton_PointerWheelChanged">
                                     <AppBarButton.Resources>
-                                        <Flyout x:Name="VolumePopup">
-                                            <Flyout.SystemBackdrop>
-                                                <DesktopAcrylicBackdrop/>
-                                            </Flyout.SystemBackdrop>
+                                        <Flyout x:Name="VolumePopup" ShouldConstrainToRootBounds="False">
                                             <Flyout.FlyoutPresenterStyle>
                                                 <Style TargetType="FlyoutPresenter" BasedOn="{StaticResource DefaultFlyoutPresenterStyle}">
+                                                    <Setter Property="Background" Value="Transparent"/>
                                                     <Setter Property="MinWidth" Value="0"/>
                                                     <Setter Property="MinHeight" Value="0"/>
-                                                    <Setter Property="Padding" Value="8"/>
+                                                    <Setter Property="Padding" Value="0"/>
                                                     <Setter Property="CornerRadius" Value="4"/>
                                                 </Style>
                                             </Flyout.FlyoutPresenterStyle>
-                                            <TextBlock/>
+                                            <Grid>
+                                                <SystemBackdropElement CornerRadius="4">
+                                                    <SystemBackdropElement.SystemBackdrop>
+                                                        <DesktopAcrylicBackdrop/>
+                                                    </SystemBackdropElement.SystemBackdrop>
+                                                </SystemBackdropElement>
+                                                <TextBlock x:Name="VolumeAppButton_FlyoutText" Margin="8"/>
+                                            </Grid>
                                         </Flyout>
-
                                     </AppBarButton.Resources>
                                     <Grid>
                                         <FontIcon Glyph="&#xE995;" Opacity="{ThemeResource VolumeOpacity}"/>
@@ -665,7 +669,8 @@
                                         <controls:ScrollFootButton
                                                 x:Name="PlayingListScrollControl"
                                                 HorizontalAlignment="Right"
-                                                VerticalAlignment="Bottom">
+                                                VerticalAlignment="Bottom"
+                                                PositionButtonClick="ItemsList_Header_Foot_Buttons_PositionButtonClick">
                                         </controls:ScrollFootButton>
                                     </Grid>
                                 </ListView.Header>

@@ -7,7 +7,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <controls:StickHeaderListView>
+    <ListView>
+        <ListView.Header>
+            <Grid>
+                <controls:StickTitleHeader Title="Test设置" VerticalAlignment="Top"/>
+            </Grid>
+        </ListView.Header>
         <x:String>a</x:String>
         <x:String>b</x:String>
         <x:String>c</x:String>
@@ -25,6 +30,9 @@
         <x:String>o</x:String>
         <x:String>p</x:String>
         <x:String>q</x:String>
+        <Popup IsOpen="True">
+            <Rectangle Fill="red" Width="100" Height="100"/>
+        </Popup>
         <x:String>r</x:String>
         <x:String>s</x:String>
         <x:String>t</x:String>
@@ -38,5 +46,5 @@
         <x:String>a</x:String>
         <x:String>a</x:String>
         <x:String>a</x:String>
-    </controls:StickHeaderListView>
+    </ListView>
 </Page>

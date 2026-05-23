@@ -720,7 +720,7 @@ namespace TewiMP.Helpers
             return await OpenInBrowser(new Uri(url));
         }
 
-        public static T FindDescendant<T>(DependencyObject root)
+        public static T FindDescendant<T>(DependencyObject root) where T : DependencyObject
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
             {
@@ -734,7 +734,22 @@ namespace TewiMP.Helpers
                     return result;
             }
 
-            return default;
+            return null;
+        }
+
+        public static T FindParent<T>(DependencyObject child) where T : DependencyObject
+        {
+            DependencyObject parent = VisualTreeHelper.GetParent(child);
+
+            while (parent != null)
+            {
+                if (parent is T t)
+                    return t;
+
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+
+            return null;
         }
     }
 

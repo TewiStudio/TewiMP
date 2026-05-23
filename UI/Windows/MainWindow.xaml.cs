@@ -347,26 +347,6 @@ public sealed partial class MainWindow : WindowEx
         SetBackdrop(CurrentBackdrop);
         App.Instance.PlayListReader.Updated += UpdatePlayListButtonUI;
         App.Instance.AudioService.VolumeChanged += AudioService_VolumeChanged;
-        PlayingListScrollControl.PositionToNowPlaying_Button.Click += async (_, __) =>
-        {
-            if (PlayingListBaseView.Items.Contains(App.Instance.AudioService.MusicData))
-            {
-                await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.AudioService.MusicData, ScrollItemPlacement.Center);
-                await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.AudioService.MusicData, ScrollItemPlacement.Center, true);
-            }
-        };
-        PlayingListScrollControl.PositionToTop_Button.Click += (_, __) =>
-        {
-            if (PlayingListBaseViewScrollViewer is null)
-                PlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
-            PlayingListBaseViewScrollViewer.ChangeView(null, 0, null);
-        };
-        PlayingListScrollControl.PositionToBottom_Button.Click += (_, __) =>
-        {
-            if (PlayingListBaseViewScrollViewer is null)
-                PlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
-            PlayingListBaseViewScrollViewer.ChangeView(null, PlayingListBaseViewScrollViewer.ScrollableHeight, null);
-        };
         /*
                 BottomPlayGrid.Lights.Add(new DevWinUI.AmbLight());
                 BottomPlayGrid.Lights.Add(new DevWinUI.HoverLight());
@@ -388,6 +368,30 @@ public sealed partial class MainWindow : WindowEx
 #if DEBUG
         DebugViewPopup.IsOpen = true;
 #endif
+    }
+
+    private async void ItemsList_Header_Foot_Buttons_PositionButtonClick(object sender, RoutedEventArgs e)
+    {
+        switch ((ScrollFootButton.ButtonType)sender)
+        {
+            case ScrollFootButton.ButtonType.NowPlaying:
+                if (PlayingListBaseView.Items.Contains(App.Instance.AudioService.MusicData))
+                {
+                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.AudioService.MusicData, ScrollItemPlacement.Center);
+                    await PlayingListBaseView.SmoothScrollIntoViewWithItemAsync(App.Instance.AudioService.MusicData, ScrollItemPlacement.Center, true);
+                }
+                break;
+            case ScrollFootButton.ButtonType.Top:
+                if (PlayingListBaseViewScrollViewer is null)
+                    PlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
+                PlayingListBaseViewScrollViewer.ChangeView(null, 0, null);
+                break;
+            case ScrollFootButton.ButtonType.Bottom:
+                if (PlayingListBaseViewScrollViewer is null)
+                    PlayingListBaseViewScrollViewer = (VisualTreeHelper.GetChild(PlayingListBaseView, 0) as Border).Child as ScrollViewer;
+                PlayingListBaseViewScrollViewer.ChangeView(null, PlayingListBaseViewScrollViewer.ScrollableHeight, null);
+                break;
+        }
     }
 
     private async void WindowGridBase_ActualThemeChanged(FrameworkElement sender, object args)
@@ -1583,7 +1587,7 @@ public sealed partial class MainWindow : WindowEx
         else
             App.Instance.AudioService.Volume -= 1f;
 
-        (VolumePopup.Content as TextBlock).Text = $"音量：{App.Instance.AudioService.Volume}";
+        VolumeAppButton_FlyoutText.Text = $"音量：{App.Instance.AudioService.Volume}";
         VolumePopup.ShowAt(sender as DependencyObject, new() { Placement = FlyoutPlacementMode.Top, ShowMode = FlyoutShowMode.Transient });
         volumePopupCounter++;
         await Task.Delay(3000);

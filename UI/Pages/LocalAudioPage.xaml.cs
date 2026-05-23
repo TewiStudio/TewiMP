@@ -227,12 +227,6 @@ namespace TewiMP.UI.Pages
             App.Instance.LocalMusicManagerService.DataChanging += LocalMusicManager_DataChanging;
             App.Instance.LocalMusicManagerService.DataChanged -= LocalMusicManager_DataChanged;
             App.Instance.LocalMusicManagerService.DataChanged += LocalMusicManager_DataChanged;
-            ItemsList_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
-            ItemsList_BottomButtons.PositionToNowPlaying_Button.Click += Position_Button_Click;
-            ItemsList_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
-            ItemsList_BottomButtons.PositionToTop_Button.Click += Position_Button_Click;
-            ItemsList_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
-            ItemsList_BottomButtons.PositionToBottom_Button.Click += Position_Button_Click;
             ItemsList_SearchControl.SearchingAItem -= ItemsList_SearchControl_SearchingAItem;
             ItemsList_SearchControl.SearchingAItem += ItemsList_SearchControl_SearchingAItem;
             ItemsList_SearchControl.IsOpenChanged -= ItemsList_SearchControl_IsOpenChanged;
@@ -247,9 +241,6 @@ namespace TewiMP.UI.Pages
             App.Instance.LocalMusicManagerService.DataAnalyzed -= LocalMusicManager_DataAnalyzed;
             App.Instance.LocalMusicManagerService.DataChanging -= LocalMusicManager_DataChanging;
             App.Instance.LocalMusicManagerService.DataChanged -= LocalMusicManager_DataChanged;
-            ItemsList_BottomButtons.PositionToNowPlaying_Button.Click -= Position_Button_Click;
-            ItemsList_BottomButtons.PositionToTop_Button.Click -= Position_Button_Click;
-            ItemsList_BottomButtons.PositionToBottom_Button.Click -= Position_Button_Click;
             ItemsList_SearchControl.SearchingAItem -= ItemsList_SearchControl_SearchingAItem;
             ItemsList_SearchControl.IsOpenChanged -= ItemsList_SearchControl_IsOpenChanged;
         }
@@ -411,10 +402,9 @@ namespace TewiMP.UI.Pages
             }
         }
 
-        private async void Position_Button_Click(object sender, RoutedEventArgs e)
+        private async void ItemsList_Header_Foot_Buttons_PositionButtonClick(object sender, RoutedEventArgs e)
         {
-            var btn = sender as Button;
-            switch ((ScrollFootButton.ButtonType)btn.Tag)
+            switch ((ScrollFootButton.ButtonType)sender)
             {
                 case ScrollFootButton.ButtonType.NowPlaying:
                     foreach (var i in App.Instance.LocalMusicManagerService.LocalMusicItems)
@@ -422,11 +412,7 @@ namespace TewiMP.UI.Pages
                         if (i.MusicData != App.Instance.AudioService.MusicData) continue;
                         await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center);
                         await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
-                        await ItemsList.SmoothScrollIntoViewWithItemAsync(i, ScrollItemPlacement.Center, disableAnimation: true);
                         MusicDataItem.TryHighlightPlayingItem();
-                        await Task.Delay(200);
-                        MusicDataItem.TryHighlightPlayingItem();
-                        break;
                     }
                     break;
                 case ScrollFootButton.ButtonType.Top:
@@ -437,7 +423,6 @@ namespace TewiMP.UI.Pages
                     break;
             }
         }
-
 
         private void ItemsList_Header_Segmented_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

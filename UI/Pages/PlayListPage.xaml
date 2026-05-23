@@ -12,48 +12,45 @@
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:controls="using:CommunityToolkit.WinUI.Controls"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded"
-    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
+    mc:Ignorable="d">
 
     <Grid>
-        <GridView x:Name="BaseGridView"
+        <ListView x:Name="BaseGridView"
                   SelectionMode="None"
-                  animations:Connected.ListItemKey="listItem"
-                  animations:Connected.ListItemElementName="ItemThumbnail"
-                  animations:ItemsReorderAnimation.Duration="00:00:00.2000000">
-            <GridView.Header>
-                <Grid x:Name="BaseGridView_HeaderGrid">
-                    <Border x:Name="BaseGridView_HeaderRectangle" Background="{ThemeResource AcrylicNormal}"    
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1"/>
-                    <TextBlock x:Name="BaseGridView_HeaderTextBlock" Text="播放列表" Style="{ThemeResource TBHeader}"/>
-                    <Grid x:Name="BaseGridView_HeaderGrid_Foot_Root">
-                        <c:ScrollFootButton
-                        x:Name="BaseGridView_HeaderGrid_Foot_Buttons"
-                        IsPositionToNowPlayingButtonShow="False"
-                        VerticalAlignment="Bottom"
-                        HorizontalAlignment="Right"/>
-                    </Grid>
-                    <CommandBar VerticalAlignment="Bottom" Margin="0,0,10,-6" Background="Transparent"
-                            OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
-                        <AppBarButton Label="排序" AccessKey="L" Click="AppBarButton_Click_2">
-                            <AppBarButton.Icon>
-                                <FontIcon Glyph="&#xE8CB;"/>
-                            </AppBarButton.Icon>
-                        </AppBarButton>
-                        <AppBarButton Label="添加/导入" AccessKey="A" Click="AppBarButton_Click_1">
-                            <AppBarButton.Icon>
-                                <FontIcon Glyph="&#xE710;"/>
-                            </AppBarButton.Icon>
-                        </AppBarButton>
-                        <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
-                            <AppBarButton.Icon>
-                                <FontIcon Glyph="&#xE72C;"/>
-                            </AppBarButton.Icon>
-                        </AppBarButton>
-                    </CommandBar>
-                </Grid>
-            </GridView.Header>
-            <ItemsView x:Name="ItemsViewer" SelectionMode="None" Margin="16,12,12,44"
+                  ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}">
+            <ListView.Header>
+                <c:StickTitleHeader x:Name="StickTitleHeader" Title="播放列表">
+                    <c:StickTitleHeader.CommandBar>
+                        <CommandBar VerticalAlignment="Bottom" Margin="0,0,0,0"
+                                    OverflowButtonVisibility="Auto" DefaultLabelPosition="Right">
+                            <AppBarButton Label="刷新" AccessKey="R" Click="AppBarButton_Click">
+                                <AppBarButton.Resources>
+                                    <StaticResource x:Key="AppBarButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
+                                    <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+                                    <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+                                    <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
+                                    <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
+                                    <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
+                                </AppBarButton.Resources>
+                                <AppBarButton.Icon>
+                                    <FontIcon Glyph="&#xE72C;"/>
+                                </AppBarButton.Icon>
+                            </AppBarButton>
+                            <AppBarButton Label="排序" AccessKey="L" Click="AppBarButton_Click_2">
+                                <AppBarButton.Icon>
+                                    <FontIcon Glyph="&#xE8CB;"/>
+                                </AppBarButton.Icon>
+                            </AppBarButton>
+                            <AppBarButton Label="添加/导入" AccessKey="A" Click="AppBarButton_Click_1">
+                                <AppBarButton.Icon>
+                                    <FontIcon Glyph="&#xE710;"/>
+                                </AppBarButton.Icon>
+                            </AppBarButton>
+                        </CommandBar>
+                    </c:StickTitleHeader.CommandBar>
+                </c:StickTitleHeader>
+            </ListView.Header>
+            <ItemsView x:Name="ItemsViewer" SelectionMode="None" Margin="16,0,16,44"
                        HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ItemsView.Resources>
                     <SolidColorBrush x:Key="ItemContainerPointerOverBackground" Color="Transparent"/>
@@ -70,6 +67,6 @@
                     </DataTemplate>
                 </ItemsView.ItemTemplate>
             </ItemsView>
-        </GridView>
+        </ListView>
     </Grid>
 </Page>

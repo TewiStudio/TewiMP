@@ -9,7 +9,7 @@
     xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:community="using:CommunityToolkit.WinUI.Controls"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
-    mc:Ignorable="d" Loaded="Page_Loaded" SizeChanged="Page_SizeChanged" KeyDown="Page_KeyDown">
+    mc:Ignorable="d" Loaded="Page_Loaded" KeyDown="Page_KeyDown">
 
     <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None"
               Padding="0,0,0,24">
@@ -34,12 +34,7 @@
         </ListView.Resources>
 
         <ListView.Header>
-            <Grid x:Name="HeaderBaseGrid">
-                <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1"/>
-                <TextBlock x:Name="HeaderBaseTextBlock" Text="设置" Style="{ThemeResource TBHeader}"/>
-            </Grid>
+            <control:StickTitleHeader Title="设置"/>
         </ListView.Header>
 
         <cc:SettingsExpander Header="缓存"

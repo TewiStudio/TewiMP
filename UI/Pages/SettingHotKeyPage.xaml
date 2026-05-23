@@ -7,17 +7,12 @@
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    mc:Ignorable="d" SizeChanged="Page_SizeChanged" Loaded="Page_Loaded">
+    mc:Ignorable="d" Loaded="Page_Loaded">
 
     <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None" Padding="0,0,0,12">
 
         <ListView.Header>
-            <Grid x:Name="HeaderBaseGrid">
-                <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1"/>
-                <TextBlock x:Name="HeaderBaseTextBlock" Text="编辑热键" Style="{ThemeResource TBHeader}"/>
-            </Grid>
+            <controls:StickTitleHeader Title="编辑热键"/>
         </ListView.Header>
 
         <cc:SettingsCard Header="全局热键开关" Margin="0,4,4,0"

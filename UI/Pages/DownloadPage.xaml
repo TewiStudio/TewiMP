@@ -8,40 +8,46 @@
     xmlns:data="using:TewiMP.Core"
     xmlns:controls="using:TewiMP.UI.Controls"
     xmlns:m="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
-    mc:Ignorable="d" SizeChanged="Page_SizeChanged">
+    mc:Ignorable="d">
 
     <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None">
 
         <ListView.Header>
-            <Grid x:Name="HeaderBaseGrid">
-                <Border x:Name="HeaderBaseRectangle" Background="{ThemeResource AcrylicNormal}"    
-                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                        BorderThickness="0,0,0,1"/>
-                <TextBlock x:Name="HeaderBaseTextBlock" Text="下载" Style="{ThemeResource TBHeader}"/>
-                <CommandBar HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,14,-6"
+            <controls:StickTitleHeader x:Name="StickTitleHeader" Title="下载">
+                <controls:StickTitleHeader.CommandBar>
+                    <CommandBar HorizontalAlignment="Right" VerticalAlignment="Bottom"
                             DefaultLabelPosition="Right">
-                    <AppBarButton Click="PausePlayBtn_Click"
+                        <AppBarButton Click="PausePlayBtn_Click"
                                   Label="暂停下载"
                                   AccessKey="P"
                                   x:Name="PausePlayBtn">
-                        <AppBarButton.Icon>
-                            <FontIcon Glyph="&#xE769;" x:Name="PausePlayIcon"/>
-                        </AppBarButton.Icon>
-                    </AppBarButton>
-                    <AppBarButton x:Name="ToSettingBtn"
+                            <AppBarButton.Resources>
+                                <StaticResource x:Key="AppBarButtonBackground" ResourceKey="MusicAlbumAccentBrush" />
+                                <StaticResource x:Key="AppBarButtonBackgroundPointerOver" ResourceKey="MusicAlbumAccentBrushDark1" />
+                                <StaticResource x:Key="AppBarButtonBackgroundPressed" ResourceKey="MusicAlbumAccentBrushDark2" />
+                                <StaticResource x:Key="AppBarButtonForeground" ResourceKey="TextOnMusicAlbumAccentForegroundBrush" />
+                                <StaticResource x:Key="AppBarButtonForegroundPointerOver" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark1" />
+                                <StaticResource x:Key="AppBarButtonForegroundPressed" ResourceKey="TextOnMusicAlbumAccentForegroundBrushDark2" />
+                            </AppBarButton.Resources>
+                            <AppBarButton.Icon>
+                                <FontIcon Glyph="&#xE769;" x:Name="PausePlayIcon"/>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                        <AppBarButton x:Name="ToSettingBtn"
                                   Click="ToSettingBtn_Click"
                                   Label="选项"
                                   AccessKey="D">
-                        <AppBarButton.Icon>
-                            <AnimatedIcon>
-                                <AnimatedIcon.Source>
-                                    <m:AnimatedSettingsVisualSource/>
-                                </AnimatedIcon.Source>
-                            </AnimatedIcon>
-                        </AppBarButton.Icon>
-                    </AppBarButton>
-                </CommandBar>
-            </Grid>
+                            <AppBarButton.Icon>
+                                <AnimatedIcon>
+                                    <AnimatedIcon.Source>
+                                        <m:AnimatedSettingsVisualSource/>
+                                    </AnimatedIcon.Source>
+                                </AnimatedIcon>
+                            </AppBarButton.Icon>
+                        </AppBarButton>
+                    </CommandBar>
+                </controls:StickTitleHeader.CommandBar>
+            </controls:StickTitleHeader>
         </ListView.Header>
 
         <ListView.Footer>

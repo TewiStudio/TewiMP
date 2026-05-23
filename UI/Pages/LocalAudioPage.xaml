@@ -21,65 +21,6 @@
             </ResourceDictionary.MergedDictionaries>
             <x:Double x:Key="GroupItemWidth">60</x:Double>
             <x:Double x:Key="GroupHeaderPanelMaxWidth">500</x:Double>
-            <Style TargetType="ListViewItem">
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="ListViewItem">
-                            <ListViewItemPresenter
-                                Padding="0"
-                                ContentTransitions="{TemplateBinding ContentTransitions}"
-                                Control.IsTemplateFocusTarget="True"
-                                FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
-                                FocusVisualPrimaryBrush="{TemplateBinding FocusVisualPrimaryBrush}"
-                                FocusVisualPrimaryThickness="{TemplateBinding FocusVisualPrimaryThickness}"
-                                FocusVisualSecondaryBrush="{TemplateBinding FocusVisualSecondaryBrush}"
-                                FocusVisualSecondaryThickness="{TemplateBinding FocusVisualSecondaryThickness}"
-                                SelectionCheckMarkVisualEnabled="{ThemeResource ListViewItemSelectionCheckMarkVisualEnabled}"
-                                CheckBrush="{ThemeResource ListViewItemCheckBrush}"
-                                CheckBoxBrush="{ThemeResource ListViewItemCheckBoxBrush}"
-                                DragBackground="{ThemeResource ListViewItemDragBackground}"
-                                DragForeground="{ThemeResource ListViewItemDragForeground}"
-                                FocusBorderBrush="{ThemeResource ListViewItemFocusBorderBrush}"
-                                FocusSecondaryBorderBrush="{ThemeResource ListViewItemFocusSecondaryBorderBrush}"
-                                PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}"
-                                PointerOverBackground="{ThemeResource ListViewItemBackgroundPointerOver}"
-                                PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}"
-                                SelectedBackground="{ThemeResource ListViewItemBackgroundSelected}"
-                                SelectedForeground="{ThemeResource ListViewItemForegroundSelected}"
-                                SelectedPointerOverBackground="{ThemeResource ListViewItemBackgroundSelectedPointerOver}"
-                                PressedBackground="{ThemeResource ListViewItemBackgroundPressed}"
-                                SelectedPressedBackground="{ThemeResource ListViewItemBackgroundSelectedPressed}"
-                                DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
-                                DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
-                                ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
-                                CheckMode="{ThemeResource ListViewItemCheckMode}"
-                                CornerRadius="{ThemeResource ListViewItemCornerRadius}"
-                                CheckPressedBrush="{ThemeResource ListViewItemCheckPressedBrush}"
-                                CheckDisabledBrush="{ThemeResource ListViewItemCheckDisabledBrush}"
-                                CheckBoxPointerOverBrush="{ThemeResource ListViewItemCheckBoxPointerOverBrush}"
-                                CheckBoxPressedBrush="{ThemeResource ListViewItemCheckBoxPressedBrush}"
-                                CheckBoxDisabledBrush="{ThemeResource ListViewItemCheckBoxDisabledBrush}"
-                                CheckBoxSelectedBrush="{ThemeResource ListViewItemCheckBoxSelectedBrush}"
-                                CheckBoxSelectedPointerOverBrush="{ThemeResource ListViewItemCheckBoxSelectedPointerOverBrush}"
-                                CheckBoxSelectedPressedBrush="{ThemeResource ListViewItemCheckBoxSelectedPressedBrush}"
-                                CheckBoxSelectedDisabledBrush="{ThemeResource ListViewItemCheckBoxSelectedDisabledBrush}"
-                                CheckBoxBorderBrush="{ThemeResource ListViewItemCheckBoxBorderBrush}"
-                                CheckBoxPointerOverBorderBrush="{ThemeResource ListViewItemCheckBoxPointerOverBorderBrush}"
-                                CheckBoxPressedBorderBrush="{ThemeResource ListViewItemCheckBoxPressedBorderBrush}"
-                                CheckBoxDisabledBorderBrush="{ThemeResource ListViewItemCheckBoxDisabledBorderBrush}"
-                                CheckBoxCornerRadius="{ThemeResource ListViewItemCheckBoxCornerRadius}"
-                                SelectionIndicatorCornerRadius="{ThemeResource ListViewItemSelectionIndicatorCornerRadius}"
-                                SelectionIndicatorVisualEnabled="{ThemeResource ListViewItemSelectionIndicatorVisualEnabled}"
-                                SelectionIndicatorBrush="{ThemeResource ListViewItemSelectionIndicatorBrush}"
-                                SelectionIndicatorPointerOverBrush="{ThemeResource ListViewItemSelectionIndicatorPointerOverBrush}"
-                                SelectionIndicatorPressedBrush="{ThemeResource ListViewItemSelectionIndicatorPressedBrush}"
-                                SelectionIndicatorDisabledBrush="{ThemeResource ListViewItemSelectionIndicatorDisabledBrush}"
-                                SelectedDisabledBackground="{ThemeResource ListViewItemBackgroundSelectedDisabled}">
-                            </ListViewItemPresenter>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
             <Style TargetType="ListViewHeaderItem">
                 <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}" />
                 <Setter Property="FontSize" Value="{ThemeResource ListViewHeaderItemThemeFontSize}" />
@@ -470,6 +411,7 @@
                     <ListView
                         x:Name="ItemsList"
                         ItemsSource="{Binding Source={StaticResource ItemsList_SongGroup}}"
+                        ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
                         SelectionMode="None"
                         ui:ScrollViewerExtensions.VerticalScrollBarMargin="0,0,0,0">
                         <ListView.Footer>
@@ -529,7 +471,8 @@
                 x:Name="ItemsList_BottomButtons"
                 VerticalAlignment="Bottom"
                 HorizontalAlignment="Right"
-                Margin="0,0,16,8">
+                Margin="0,0,16,8"
+                PositionButtonClick="ItemsList_Header_Foot_Buttons_PositionButtonClick">
             </controls:ScrollFootButton>
         </Grid>
         <Grid x:Name="ItemsList_Analyzing_Root"
