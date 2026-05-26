@@ -1,17 +1,24 @@
 # TewiMP
 
-基于 WinUI3、NAudio+FFmpeg 的 Windows 本地/在线音乐播放器，
+基于 WinUI3、NAudio + FFmpeg 的 Windows 本地/在线音乐播放器，
 
 仅支持 Windows 11（Windows 10 未经测试）。
 
-* 可获取线上歌曲
-* 可导入外部歌单
-* 可搜索线上歌单、专辑和艺术家
+目前的功能有
+* 获取线上歌曲
+* 导入外部歌单
+* 搜索线上歌单、专辑和艺术家
 * 支持各种音频输出接口，如 Wasapi、Asio 等
-* 支持读取本地音频文件
-* 支持显示歌词
+* 可自定义的均衡器
 * 自动显示日语歌词罗马音
 * 使用热键控制播放
+* 其它
+
+> 你也可以通过继承 [MusicSourcePlugin](https://github.com/TewiStudio/TewiMP/blob/master/Services/Plugin/MusicSourcePlugin.cs) 类型以实现自己的歌曲源 :)
+> 
+> 内置示例 [NeteaseMusicSource](https://github.com/TewiStudio/TewiMP/blob/master/Services/Plugin/BuildInPlugins/NeteaseMusicSource/Main.cs)
+>
+> API 还在初始阶段，未来可能会更改。
 
 # 运行方法
 
