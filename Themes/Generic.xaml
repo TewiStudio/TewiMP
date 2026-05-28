@@ -71,6 +71,36 @@
         </Setter>
     </Style>
 
+    <Style TargetType="local2:StickContentHeader">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local2:StickContentHeader">
+                    <Grid x:Name="PART_Root"
+                          Background="{TemplateBinding Background}"
+                          BorderBrush="{TemplateBinding BorderBrush}"
+                          BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto"/>
+                            <RowDefinition Height="auto"/>
+                        </Grid.RowDefinitions>
+                        <Border x:Name="PART_Background" Background="Transparent"    
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="0,0,0,1" Grid.Row="1"/>
+                        <Grid x:Name="PART_Info_Root">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="PART_TitleTextBlock" Text="{TemplateBinding Title}" Style="{ThemeResource TBHeader}" TextTrimming="WordEllipsis"/>
+                            <ContentPresenter x:Name="PART_CommandBar" Content="{TemplateBinding CommandBar}" Margin="0,0,0,0" VerticalAlignment="Bottom" Grid.Column="1"/>
+                        </Grid>
+                        <ContentPresenter x:Name="PART_Content" Content="{TemplateBinding Content}" Grid.Row="1"/>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="local2:StickTitleHeader">
         <Setter Property="Template">
             <Setter.Value>

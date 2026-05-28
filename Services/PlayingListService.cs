@@ -1,21 +1,21 @@
-﻿using DevWinUI;
-using Melanchall.DryWetMidi.Core;
-using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using NAudio;
-using System;
-using System.Collections.ObjectModel;
+﻿using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using TewiMP.Core.Music;
+using System.Collections.ObjectModel;
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
+using Windows.UI.ViewManagement;
+using NAudio;
+using Melanchall.DryWetMidi.Core;
 using TewiMP.Helpers;
+using TewiMP.UI.Windows;
+using TewiMP.Core.Music;
+using TewiMP.Services.Storage;
 using TewiMP.Services.Media;
 using TewiMP.Services.Media.Audio;
-using TewiMP.Services.Storage;
-using TewiMP.UI.Windows;
-using Windows.UI.ViewManagement;
 
 namespace TewiMP.Services;
 
@@ -55,6 +55,7 @@ public class PlayingListService
 
     public bool PauseWhenPreviousPause { get; set; } = true;
     public bool NextWhenPlayError { get; set; } = true;
+    public bool UseSystemAccentColor { get; set; } = false;
 
     bool lastIsRandomPlay = false;
     private PlayBehavior _playBehavior = PlayBehavior.循环播放;
@@ -469,7 +470,7 @@ public class PlayingListService
         Windows.UI.Color albumColor, albumColorReverse, textColorOnAlbum;
 
         // 是重置默认还是提取新颜色
-        if (string.IsNullOrEmpty(nowImagePath))
+        if (UseSystemAccentColor || string.IsNullOrEmpty(nowImagePath))
         {
             // 路径为空，重置为系统主题色
             var systemAccent = App.Instance.UISettings.GetColorValue(
@@ -531,7 +532,7 @@ public class PlayingListService
         UpdateColorResource("TextOnMusicAlbumAccentForegroundBrushDark1", textColorOnAlbum.Darken(.1f));
         UpdateColorResource("TextOnMusicAlbumAccentForegroundBrushDark2", textColorOnAlbum.Darken(.2f));
 
-        // 更新 GradientStop (特殊处理)
+        // 更新 GradientStop
         if (App.Current.Resources.TryGetValue("TextControlElevationBorderMusicAlbumAccentColorFocusedBrush", out var brushObj)
             && brushObj is LinearGradientBrush lgb
             && lgb.GradientStops.Count > 0)
@@ -540,12 +541,34 @@ public class PlayingListService
         }
     }
 
-    // 安全更新 SolidColorBrush
-    private void UpdateColorResource(string resourceKey, Windows.UI.Color newColor)
+    private void UpdateColorResource(string resourceKey, Windows.UI.Color newColor, bool animate = false)
     {
-        if (App.Current.Resources.TryGetValue(resourceKey, out var obj) && obj is SolidColorBrush brush)
+        if (App.Current.Resources.TryGetValue(resourceKey, out var obj)
+            && obj is SolidColorBrush brush)
         {
-            brush.Color = newColor;
+            if (animate)
+            {
+                LogService.LogDebug($"{resourceKey} from {brush.Color} to {newColor}");
+                var storyboard = new Storyboard();
+
+                var animation = new ColorAnimation
+                {
+                    To = newColor,
+                    Duration = new Duration(TimeSpan.FromMilliseconds(450)),
+                    EnableDependentAnimation = true,
+                };
+
+                Storyboard.SetTarget(animation, brush);
+                Storyboard.SetTargetProperty(animation, "Color");
+
+                storyboard.Children.Add(animation);
+
+                storyboard.Begin();
+            }
+            else
+            {
+                brush.Color = newColor;
+            }
         }
     }
 }

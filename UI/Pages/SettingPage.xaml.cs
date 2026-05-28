@@ -483,17 +483,22 @@ namespace TewiMP.UI.Pages
 
         private void ComboBox_SelectionChanged_6(object sender, SelectionChangedEventArgs e)
         {
+            accentcolor_applysettings_button.Visibility = Visibility.Collapsed;
+            accentcolor_colorpicker.Visibility = Visibility.Collapsed;
+            App.Instance.PlayingListService.UseSystemAccentColor = false;
             switch ((sender as ComboBox).SelectedIndex)
             {
                 case 0:
-                    accentcolor_applysettings_button.Visibility = Visibility.Collapsed;
-                    accentcolor_colorpicker.Visibility = Visibility.Collapsed;
                     break;
                 case 1:
+                    App.Instance.PlayingListService.UseSystemAccentColor = true;
+                    break;
+                case 2:
                     accentcolor_applysettings_button.Visibility = Visibility.Visible;
                     accentcolor_colorpicker.Visibility = Visibility.Visible;
                     break;
             }
+            App.Instance.PlayingListService.UpdateImageColor(true);
         }
 
         private void ColorPicker_ColorChanged(Microsoft.UI.Xaml.Controls.ColorPicker sender, ColorChangedEventArgs args)

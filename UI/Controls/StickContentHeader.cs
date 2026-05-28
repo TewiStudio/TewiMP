@@ -3,24 +3,32 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Controls;
 using TewiMP.Helpers;
+using Microsoft.UI.Xaml.Markup;
 
 namespace TewiMP.UI.Controls;
 
-public partial class StickTitleHeader : Control
+public partial class StickContentHeader : ContentControl
 {
     #region Dependency Propertys
     public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(
         nameof(Title),
         typeof(string),
-        typeof(StickTitleHeader),
+        typeof(StickContentHeader),
         new PropertyMetadata("Title")
+    );
+
+    public static readonly DependencyProperty BackgroundStartOpacityProperty = DependencyProperty.Register(
+        nameof(BackgroundStartOpacity),
+        typeof(double),
+        typeof(StickContentHeader),
+        new PropertyMetadata(0.0)
     );
     
     public static readonly DependencyProperty CommandBarProperty =
         DependencyProperty.Register(
             nameof(CommandBar),
             typeof(object),
-            typeof(StickTitleHeader),
+            typeof(StickContentHeader),
             new PropertyMetadata(null));
     #endregion
 
@@ -30,17 +38,23 @@ public partial class StickTitleHeader : Control
         set => SetValue(TitleProperty, value);
     }
 
+    public double BackgroundStartOpacity
+    {
+        get => (double)GetValue(BackgroundStartOpacityProperty);
+        set => SetValue(BackgroundStartOpacityProperty, value);
+    }
+
     public object CommandBar
     {
         get => GetValue(CommandBarProperty);
         set => SetValue(CommandBarProperty, value);
     }
 
-    public ScrollViewer CachedScrollviewer => GetScrollViewer(this);
+    public ScrollViewer CachedScrollViewer => GetScrollViewer(this);
 
-    public StickTitleHeader()
+    public StickContentHeader()
     {
-        DefaultStyleKey = typeof(StickTitleHeader);
+        DefaultStyleKey = typeof(StickContentHeader);
     }
 
     #region Stick Header
@@ -53,9 +67,6 @@ public partial class StickTitleHeader : Control
 
     private ExpressionAnimation _offsetAnim;
     private ExpressionAnimation _itemsStackClipAnim;
-    private ExpressionAnimation _titleScaleAnim;
-    private ExpressionAnimation _titleOffsetAnim;
-    private ExpressionAnimation _infoOffsetAnim;
     private ExpressionAnimation _bgOpacityAnim;
 
     private const string ProgressExp = "Clamp(-scroller.Translation.Y / Padding, 0, 1.0)";
@@ -113,13 +124,11 @@ public partial class StickTitleHeader : Control
             _compositor = _scrollerPropSet.Compositor;
         }
 
-        float stickScale = .74f;
-        float paddingSize = (int)(_PART_Root.ActualHeight - _PART_TitleTextBlock.ActualSize.Y * stickScale);
+        float paddingSize = _PART_Root.ActualSize.Y - _PART_Content.ActualSize.Y;
 
         // Visuals
         var headerRootVisual = ElementCompositionPreview.GetElementVisual(_PART_Root);
         var headerBackgroundVisual = ElementCompositionPreview.GetElementVisual(_PART_Background);
-        var titleVisual = ElementCompositionPreview.GetElementVisual(_PART_TitleTextBlock);
 
         // Header Offset Y
         if (_offsetAnim is null)
@@ -146,37 +155,16 @@ public partial class StickTitleHeader : Control
             _itemsStackPanelClip.StartAnimation(nameof(_itemsStackPanelClip.TopInset), _itemsStackClipAnim);
         }
 
-        // Title Scale
-        if (_titleScaleAnim is null)
-        {
-            string exp = $"Lerp(Vector2(1,1), Vector2(stickScale, stickScale), {ProgressExp})";
-            _titleScaleAnim = _compositor.CreateExpressionAnimation(exp);
-            _titleScaleAnim.SetReferenceParameter("scroller", _scrollerPropSet);
-        }
-        _titleScaleAnim.SetScalarParameter("stickScale", stickScale);
-        _titleScaleAnim.SetScalarParameter("Padding", paddingSize);
-        titleVisual.StartAnimation("Scale.xy", _titleScaleAnim);
-
-        // Title Offset
-        // X: 0 -> -12, Y: 0 -> 24
-        if (true || _titleOffsetAnim is null)
-        {
-            string exp = $"Lerp(Vector3(0,0,0), Vector3(-12, Padding - 12, 0), {ProgressExp})";
-            _titleOffsetAnim = _compositor.CreateExpressionAnimation(exp);
-            _titleOffsetAnim.SetReferenceParameter("scroller", _scrollerPropSet);
-        }
-        _titleOffsetAnim.SetScalarParameter("Padding", paddingSize);
-        titleVisual.StartAnimation(nameof(titleVisual.Offset), _titleOffsetAnim);
-
         // --------------
         // Background Opacity
         if (_bgOpacityAnim is null)
         {
-            string exp = $"Lerp(0, 1, {ProgressExp})";
+            string exp = $"Lerp(opacity, 1, {ProgressExp})";
             _bgOpacityAnim = _compositor.CreateExpressionAnimation(exp);
             _bgOpacityAnim.SetReferenceParameter("scroller", _scrollerPropSet);
         }
         _bgOpacityAnim.SetScalarParameter("Padding", paddingSize);
+        _bgOpacityAnim.SetScalarParameter("opacity", (float)BackgroundStartOpacity);
         headerBackgroundVisual.StartAnimation("Opacity", _bgOpacityAnim);
     }
     #endregion
@@ -184,18 +172,20 @@ public partial class StickTitleHeader : Control
     #region Events
     private Grid _PART_Root;
     private Border _PART_Background;
-    private StackPanel _PART_Info_Root;
+    private Grid _PART_Info_Root;
     private TextBlock _PART_TitleTextBlock;
     private ContentPresenter _PART_CommandBar;
+    private ContentPresenter _PART_Content;
     protected override void OnApplyTemplate()
     {
         base.OnApplyTemplate();
 
         _PART_Root = GetTemplateChild("PART_Root") as Grid;
         _PART_Background = GetTemplateChild("PART_Background") as Border;
-        _PART_Info_Root = GetTemplateChild("PART_Info_Root") as StackPanel;
+        _PART_Info_Root = GetTemplateChild("PART_Info_Root") as Grid;
         _PART_TitleTextBlock = GetTemplateChild("PART_TitleTextBlock") as TextBlock;
         _PART_CommandBar = GetTemplateChild("PART_CommandBar") as ContentPresenter;
+        _PART_Content = GetTemplateChild("PART_Content") as ContentPresenter;
 
         Loaded -= StickHeaderListView_Loaded;
         Loaded += StickHeaderListView_Loaded;

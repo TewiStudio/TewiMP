@@ -158,7 +158,7 @@ public class MusicData : IEquatable<MusicData>
         // 如果源不一样，直接返回
         if (From != other.From) return false;
 
-        if (GetMusicSourcePlugin() is not null && other.GetMusicSourcePlugin() is not null)
+        if (GetMusicSourcePlugin(false) is not null && other.GetMusicSourcePlugin(false) is not null)
         {
             if (GetMusicSourcePlugin() != other.GetMusicSourcePlugin()) return false;
         }

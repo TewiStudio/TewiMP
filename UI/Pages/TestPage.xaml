@@ -10,11 +10,14 @@
     <ListView>
         <ListView.Header>
             <Grid>
-                <controls:StickTitleHeader Background="#21000000" BorderBrush="red" BorderThickness="1" Title="Test abc ABC gjy 设置 播放列表" VerticalAlignment="Top">
-                    <controls:StickTitleHeader.CommandBar>
-                        <Rectangle Fill="#21000000" Stroke="Blue" StrokeThickness="1" Height="40" Width="400"/>
-                    </controls:StickTitleHeader.CommandBar>
-                </controls:StickTitleHeader>
+                <controls:StickContentHeader Background="#21000000" BorderBrush="red" BorderThickness="1" Title="Test abc ABC gjy 设置 播放列表" VerticalAlignment="Top">
+                    <controls:StickContentHeader.CommandBar>
+                        <CommandBar Margin="0,0,10,0">
+                            <AppBarButton Content="Apply"/>
+                        </CommandBar>
+                    </controls:StickContentHeader.CommandBar>
+                    <Rectangle Fill="#21000000" Stroke="Blue" StrokeThickness="1" Height="50" Margin="16,4" RadiusX="8" RadiusY="8" HorizontalAlignment="Stretch"/>
+                </controls:StickContentHeader>
                 <controls:StickVerticalBottom>
                     <Grid Background="#21000000" BorderBrush="Red" BorderThickness="1">
                         <controls:ScrollFootButton HorizontalAlignment="Right" Margin="0,0,16,8"/>

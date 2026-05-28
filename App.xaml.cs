@@ -1,37 +1,37 @@
-﻿namespace TewiMP;
-
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using NAudio.Wave;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.UI.Popups;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using Windows.Media;
 using Windows.Storage;
 using Windows.Media.Playback;
 using Windows.Storage.Streams;
 using Windows.ApplicationModel.Core;
-using TewiMP.UI.Pages;
-using TewiMP.Services;
-using TewiMP.Services.Storage;
-using TewiMP.UI.Windows;
+using Windows.UI.Popups;
+using Windows.UI.ViewManagement;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NAudio.Wave;
+using WinRT.Interop;
 using TewiMP.Helpers;
+using TewiMP.UI.Pages;
+using TewiMP.UI.Windows;
+using TewiMP.Services;
+using TewiMP.Services.Plugin;
+using TewiMP.Services.Storage;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Media.Audio.AudioEffects;
 using TewiMP.Core;
 using TewiMP.Core.Audio;
 using TewiMP.Core.Music;
-using WinRT.Interop;
-using TewiMP.Services.Plugin;
-using Windows.UI.ViewManagement;
+
+namespace TewiMP;
 
 /// <summary>
 /// Provides application-specific behavior to supplement the default Application class.
@@ -534,6 +534,7 @@ public partial class App : Application
             HotKeyService.WillRegisterHotKeysList = hkd.ToObject<List<HotKey>>();
             HotKeyService.EnableHotKey = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.HotKeyEnable);
             LyricService.UseRomajiLyric = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.UseRomajiLyric);
+            PlayingListService.UseSystemAccentColor = SettingEditHelper.GetSetting<bool>(settingData, DataFolderBase.SettingParams.UseSystemAccentColor);
 
             var audioEffects = SettingEditHelper.GetSetting<JArray>(audioEffectData, DataFolderBase.AudioEffectFlag.AudioEffectDatas);
 
@@ -635,6 +636,7 @@ public partial class App : Application
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.TopNavigationStyle, MainWindowInstance.NavView.PaneDisplayMode == NavigationViewPaneDisplayMode.Top);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.LocalMusicPageItemSortBy, LocalAudioPage.ItemSortBy);
             SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.UseRomajiLyric, LyricService.UseRomajiLyric);
+            SettingEditHelper.EditSetting(settingData, DataFolderBase.SettingParams.UseSystemAccentColor, PlayingListService.UseSystemAccentColor);
 
             List<float> c = [];
             foreach (var d in AudioEqualizerBands.CustomBands) c.Add(d[2]);

@@ -258,6 +258,7 @@ public static class DataFolderBase
         { SettingParams.HotKeySettings.ToString(), JArray.FromObject(HotKeyService.DefaultRegisterHotKeysList) },
         { SettingParams.StartupWithWindows.ToString(), false },
         { SettingParams.UseRomajiLyric.ToString(), false },
+        { SettingParams.UseSystemAccentColor.ToString(), false },
     };
     
     /// <summary>
@@ -340,7 +341,8 @@ public static class DataFolderBase
         HotKeyEnable,
         HotKeySettings,
         StartupWithWindows,
-        UseRomajiLyric
+        UseRomajiLyric,
+        UseSystemAccentColor,
     }
 
     public enum AudioEffectFlag

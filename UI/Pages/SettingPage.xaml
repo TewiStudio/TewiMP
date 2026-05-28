@@ -313,9 +313,9 @@
                         <community:WrapPanel HorizontalSpacing="12"
                                              VerticalSpacing="12"
                                              Margin="0,4,0,0">
-                            <ComboBox IsEnabled="False" Loaded="ComboBox_Loaded_4" SelectionChanged="ComboBox_SelectionChanged_6">
+                            <ComboBox Loaded="ComboBox_Loaded_4" SelectionChanged="ComboBox_SelectionChanged_6">
                                 <x:String>专辑主题色</x:String>
-                                <x:String>自定义</x:String>
+                                <x:String>系统主题色</x:String>
                             </ComboBox>
                             <Border Height="32" HorizontalAlignment="Left"
                                     CornerRadius="4" VerticalAlignment="Top"
