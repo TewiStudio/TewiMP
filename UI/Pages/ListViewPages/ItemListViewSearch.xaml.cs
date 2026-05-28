@@ -25,7 +25,7 @@ namespace TewiMP.UI.Pages
 {
     public partial class ItemListViewSearch : Page
     {
-        private ScrollViewer scrollViewer { get; set; }
+        private ScrollViewer scrollViewer => StickContentHeader.CachedScrollViewer;
         public object NavToObj { get; set; }
         public SearchDataType NowSearchMode { get; set; } = SearchDataType.歌曲;
         public MusicSourcePlugin NowMusicFrom { get; set; }
@@ -77,12 +77,11 @@ namespace TewiMP.UI.Pages
             SearchPageSelector.Visibility = Visibility.Collapsed;
             SearchPageSelectorCustom.Visibility = Visibility.Collapsed;
 
-            SearchResult_BaseGrid.Visibility = Visibility.Visible;
             SearchPageSelector.Visibility = Visibility.Visible;
             SearchPageSelectorCustom.Visibility = Visibility.Visible;
             SearchHomeButton.Visibility = Visibility.Visible;
             var searchData = NavToObj as string;
-            Result_Search_Header.Text = $"\"{searchData}\" {NowSearchMode}的搜索结果";
+            //StickContentHeader.Title = $"\"{searchData}\" {NowSearchMode}的搜索结果";
             NowPage.Text = pageNumber.ToString();
 
             MusicDataList.Clear();
@@ -181,60 +180,6 @@ namespace TewiMP.UI.Pages
             }
 
             LoadingTipControl.UnShowLoading();
-            UpdateShyHeader();
-        }
-
-        CompositionPropertySet scrollerPropertySet;
-        Compositor compositor;
-        Visual headerVisual;
-        Visual backgroundVisual;
-        Visual logoVisual;
-        Visual stackVisual;
-        Visual headerFootRootVisual;
-        public void UpdateShyHeader()
-        {
-            if (scrollViewer is null) return;
-
-            double anotherHeight = HeaderBaseGrid.ActualHeight;
-            String progress = $"Clamp(-scroller.Translation.Y / {anotherHeight}, 0, 1.0)";
-
-            if (scrollerPropertySet is null)
-            {
-                scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
-                compositor = scrollerPropertySet.Compositor;
-                headerVisual = ElementCompositionPreview.GetElementVisual(menu_border);
-                backgroundVisual = ElementCompositionPreview.GetElementVisual(BackColorBaseRectangle);
-                headerFootRootVisual = ElementCompositionPreview.GetElementVisual(ItemsList_Header_Foot_Root);
-            }
-
-            var offsetExpression = compositor.CreateExpressionAnimation($"-scroller.Translation.Y - {progress} * {anotherHeight}");
-            offsetExpression.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerVisual.StartAnimation("Offset.Y", offsetExpression);
-
-            var backgroundVisualOpacityAnimation = compositor.CreateExpressionAnimation($"Lerp(0, 1, {progress})");
-            backgroundVisualOpacityAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            backgroundVisual.StartAnimation("Opacity", backgroundVisualOpacityAnimation);
-
-            var headerFootRootVisualOffsetAnimation = compositor.CreateExpressionAnimation(
-                $"Lerp(" +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"Vector3(" +
-                        $"-16," +
-                        $"{anotherHeight} + {ActualHeight} - {headerFootRootVisual.Size.Y} - 8," +
-                        $"0)," +
-                    $"{progress})");
-            headerFootRootVisualOffsetAnimation.SetReferenceParameter("scroller", scrollerPropertySet);
-            headerFootRootVisual.StartAnimation("Offset", headerFootRootVisualOffsetAnimation);
-        }
-
-        private async void UpdateCommandToolBarWidth()
-        {
-            ToolsCommandBar.Width = 0;
-            await Task.Delay(1);
-            ToolsCommandBar.Width = double.NaN;
         }
 
         private async void ItemsList_Header_Foot_Buttons_PositionButtonClick(object sender, RoutedEventArgs e)
@@ -261,34 +206,15 @@ namespace TewiMP.UI.Pages
 
         private void menu_border_Loaded(object sender, RoutedEventArgs e)
         {
-            if (scrollViewer is null)
-            {
-                scrollViewer = (VisualTreeHelper.GetChild(Children, 0) as Border).Child as ScrollViewer;
-                scrollViewer.CanContentRenderOutsideBounds = true;
-                scrollViewer.ViewChanging += ScrollViewer_ViewChanging;
-
-                // 设置header为顶层
-                var headerPresenter = (UIElement)VisualTreeHelper.GetParent((UIElement)Children.Header);
-                var headerContainer = (UIElement)VisualTreeHelper.GetParent(headerPresenter);
-                Canvas.SetZIndex(headerContainer, 1);
-            }
-
-            UpdateShyHeader();
-            UpdateCommandToolBarWidth();
         }
 
         private void Artist_Image_Unloaded(object sender, RoutedEventArgs e)
         {
         }
 
-        private void ScrollViewer_ViewChanging(object sender, ScrollViewerViewChangingEventArgs e)
-        {
-            headerVisual.IsPixelSnappingEnabled = true;
-        }
-
         private void Result_BaseGrid_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            UpdateShyHeader();
+
         }
 
         private async void Button_Click(object sender, RoutedEventArgs e)
@@ -356,7 +282,6 @@ namespace TewiMP.UI.Pages
             }
             MusicDataItem.SetIsCloseMouseEvent(SelectItemButton.IsChecked == true);
             App.MainWindowInstance.AllowDragEvents = SelectItemButton.IsChecked == false;
-            UpdateCommandToolBarWidth();
         }
 
         private void Button_Click_3(object sender, RoutedEventArgs e)
@@ -529,7 +454,6 @@ namespace TewiMP.UI.Pages
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = this;
-            UpdateShyHeader();
             InitData();
         }
 
