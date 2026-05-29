@@ -159,7 +159,7 @@ namespace TewiMP.UI.Pages
                 Gain = 0,
                 Channel = 1,
                 IsEnable = true,
-                Index = AudioFilterStatic.ParametricEqDatas.Count,
+                Index = AudioFilterStatic.ParametricEqDatas.Count + 1,
                 Color = Color.FromArgb(255, (byte)r.Next(0, 255), (byte)r.Next(0, 255), (byte)r.Next(0, 255))
             });
         }
