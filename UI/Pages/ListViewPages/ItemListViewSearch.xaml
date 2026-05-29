@@ -24,79 +24,23 @@
     <Grid>
         <ListView x:Name="Children"
                   Background="Transparent"
-                  Padding="0,0,0,58"
+                  Padding="0,0,0,0"
                   ItemsSource="{x:Bind MusicDataList}"
+                  ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
                   SelectionMode="None"
                   SizeChanged="Result_BaseGrid_SizeChanged">
-            <ListView.Resources>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="Template">
-                        <Setter.Value>
-                            <ControlTemplate TargetType="ListViewItem">
-                                <ListViewItemPresenter
-                                    Padding="0"
-                                    ContentTransitions="{TemplateBinding ContentTransitions}"
-                                    Control.IsTemplateFocusTarget="True"
-                                    FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
-                                    FocusVisualPrimaryBrush="{TemplateBinding FocusVisualPrimaryBrush}"
-                                    FocusVisualPrimaryThickness="{TemplateBinding FocusVisualPrimaryThickness}"
-                                    FocusVisualSecondaryBrush="{TemplateBinding FocusVisualSecondaryBrush}"
-                                    FocusVisualSecondaryThickness="{TemplateBinding FocusVisualSecondaryThickness}"
-                                    SelectionCheckMarkVisualEnabled="{ThemeResource ListViewItemSelectionCheckMarkVisualEnabled}"
-                                    CheckBrush="{ThemeResource ListViewItemCheckBrush}"
-                                    CheckBoxBrush="{ThemeResource ListViewItemCheckBoxBrush}"
-                                    DragBackground="{ThemeResource ListViewItemDragBackground}"
-                                    DragForeground="{ThemeResource ListViewItemDragForeground}"
-                                    FocusBorderBrush="{ThemeResource ListViewItemFocusBorderBrush}"
-                                    FocusSecondaryBorderBrush="{ThemeResource ListViewItemFocusSecondaryBorderBrush}"
-                                    PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}"
-                                    PointerOverBackground="{ThemeResource ListViewItemBackgroundPointerOver}"
-                                    PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}"
-                                    SelectedBackground="{ThemeResource ListViewItemBackgroundSelected}"
-                                    SelectedForeground="{ThemeResource ListViewItemForegroundSelected}"
-                                    SelectedPointerOverBackground="{ThemeResource ListViewItemBackgroundSelectedPointerOver}"
-                                    PressedBackground="{ThemeResource ListViewItemBackgroundPressed}"
-                                    SelectedPressedBackground="{ThemeResource ListViewItemBackgroundSelectedPressed}"
-                                    DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
-                                    DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
-                                    ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
-                                    CheckMode="{ThemeResource ListViewItemCheckMode}"
-                                    CornerRadius="{ThemeResource ListViewItemCornerRadius}"
-                                    CheckPressedBrush="{ThemeResource ListViewItemCheckPressedBrush}"
-                                    CheckDisabledBrush="{ThemeResource ListViewItemCheckDisabledBrush}"
-                                    CheckBoxPointerOverBrush="{ThemeResource ListViewItemCheckBoxPointerOverBrush}"
-                                    CheckBoxPressedBrush="{ThemeResource ListViewItemCheckBoxPressedBrush}"
-                                    CheckBoxDisabledBrush="{ThemeResource ListViewItemCheckBoxDisabledBrush}"
-                                    CheckBoxSelectedBrush="{ThemeResource ListViewItemCheckBoxSelectedBrush}"
-                                    CheckBoxSelectedPointerOverBrush="{ThemeResource ListViewItemCheckBoxSelectedPointerOverBrush}"
-                                    CheckBoxSelectedPressedBrush="{ThemeResource ListViewItemCheckBoxSelectedPressedBrush}"
-                                    CheckBoxSelectedDisabledBrush="{ThemeResource ListViewItemCheckBoxSelectedDisabledBrush}"
-                                    CheckBoxBorderBrush="{ThemeResource ListViewItemCheckBoxBorderBrush}"
-                                    CheckBoxPointerOverBorderBrush="{ThemeResource ListViewItemCheckBoxPointerOverBorderBrush}"
-                                    CheckBoxPressedBorderBrush="{ThemeResource ListViewItemCheckBoxPressedBorderBrush}"
-                                    CheckBoxDisabledBorderBrush="{ThemeResource ListViewItemCheckBoxDisabledBorderBrush}"
-                                    CheckBoxCornerRadius="{ThemeResource ListViewItemCheckBoxCornerRadius}"
-                                    SelectionIndicatorCornerRadius="{ThemeResource ListViewItemSelectionIndicatorCornerRadius}"
-                                    SelectionIndicatorVisualEnabled="{ThemeResource ListViewItemSelectionIndicatorVisualEnabled}"
-                                    SelectionIndicatorBrush="{ThemeResource ListViewItemSelectionIndicatorBrush}"
-                                    SelectionIndicatorPointerOverBrush="{ThemeResource ListViewItemSelectionIndicatorPointerOverBrush}"
-                                    SelectionIndicatorPressedBrush="{ThemeResource ListViewItemSelectionIndicatorPressedBrush}"
-                                    SelectionIndicatorDisabledBrush="{ThemeResource ListViewItemSelectionIndicatorDisabledBrush}"
-                                    SelectedDisabledBackground="{ThemeResource ListViewItemBackgroundSelectedDisabled}">
-                                </ListViewItemPresenter>
-                            </ControlTemplate>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-            </ListView.Resources>
             <ListView.Header>
                 <Grid>
-                    <controlszn:StickContentHeader x:Name="StickContentHeader" Title="1">
+                    <controlszn:StickContentHeader x:Name="StickContentHeader">
+                        <controlszn:StickContentHeader.HeaderCommand>
+                            <Rectangle/>
+                        </controlszn:StickContentHeader.HeaderCommand>
                         <CommandBar DefaultLabelPosition="Right"
                                     HorizontalAlignment="Left"
                                     Margin="18,0,16,0"
                                     AccessKey="Z"
-                                    Background="Transparent">
+                                    Background="Transparent"
+                                    x:Name="CommandBar">
                             <AppBarButton Click="Button_Click"
                                           Label="播放全部（Alt+Q）"
                                           AccessKey="Q"
@@ -146,14 +90,6 @@
                                     <PathIcon Data="{StaticResource 反选}"/>
                                 </AppBarButton.Icon>
                             </AppBarButton>
-                            <AppBarButton x:Name="DeleteSelectedButton"
-                                          Click="DeleteSelectedButton_Click"
-                                          Label="删除选中歌曲"
-                                          ToolTipService.ToolTip="删除选中歌曲">
-                                <AppBarButton.Icon>
-                                    <FontIcon Glyph="&#xE74D;"/>
-                                </AppBarButton.Icon>
-                            </AppBarButton>
                             <AppBarButton x:Name="DownloadSelectedButton"
                                           Click="DownloadSelectedButton_Click"
                                           Label="下载选中歌曲"
@@ -171,9 +107,9 @@
                                 <Viewbox Width="9" Margin="2,0,0,0">
                                     <Grid>
                                         <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
-                                                            VerticalAlignment="Top"/>
+                                                  VerticalAlignment="Top"/>
                                         <FontIcon Glyph="&#xE90B;"
-                                                            VerticalAlignment="Bottom"/>
+                                                  VerticalAlignment="Bottom"/>
                                     </Grid>
                                 </Viewbox>
                             </AppBarButton>
@@ -184,24 +120,15 @@
                                 <Viewbox Width="9" Margin="2,0,0,0" VerticalAlignment="Center">
                                     <Grid>
                                         <FontIcon Glyph="&#xE710;" Scale="0.47,0.47,1" Margin="-10,-2,0,0"
-                                                            VerticalAlignment="Top"/>
+                                                  VerticalAlignment="Top"/>
                                         <FontIcon Glyph="&#xEE4A;"
-                                                            VerticalAlignment="Bottom"/>
+                                                  VerticalAlignment="Bottom"/>
                                     </Grid>
                                 </Viewbox>
                             </AppBarButton>
 
                             <AppBarSeparator x:Name="SearchPageSelectorSeparator"/>
 
-                            <AppBarButton Click="Button_Click_3"
-                                          x:Name="SearchHomeButton"
-                                          Label="首页"
-                                          AccessKey="H"
-                                          ToolTipService.ToolTip="首页">
-                                <AppBarButton.Icon>
-                                    <FontIcon Glyph="&#xE80F;"/>
-                                </AppBarButton.Icon>
-                            </AppBarButton>
                             <AppBarButton x:Name="SearchPageSelectorCustom"
                                           ToolTipService.ToolTip="自定义页面"
                                           AccessKey="P"
@@ -236,6 +163,15 @@
                                         </StackPanel>
                                     </Flyout>
                                 </FlyoutBase.AttachedFlyout>
+                            </AppBarButton>
+                            <AppBarButton Click="Button_Click_3"
+                                          x:Name="SearchHomeButton"
+                                          Label="首页"
+                                          AccessKey="H"
+                                          ToolTipService.ToolTip="首页">
+                                <AppBarButton.Icon>
+                                    <FontIcon Glyph="&#xE845;"/>
+                                </AppBarButton.Icon>
                             </AppBarButton>
                             <AppBarElementContainer x:Name="SearchPageSelector"
                                                     HorizontalContentAlignment="Stretch"
@@ -275,6 +211,7 @@
                             x:Name="ItemsList_Header_Foot_Buttons"
                             VerticalAlignment="Bottom"
                             HorizontalAlignment="Right"
+                            Margin="0,8,16,8"
                             PositionButtonClick="ItemsList_Header_Foot_Buttons_PositionButtonClick"/>
                     </controlszn:StickVerticalBottom>
                 </Grid>

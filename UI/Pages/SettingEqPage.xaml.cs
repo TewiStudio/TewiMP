@@ -7,13 +7,14 @@ using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media;
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
-using TewiMP.UI.Controls;
+using TewiMP.Core;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Media.Audio.AudioEffects;
+using TewiMP.UI.Controls;
 using Windows.UI;
-using TewiMP.Core;
 
 namespace TewiMP.UI.Pages
 {
@@ -158,6 +159,7 @@ namespace TewiMP.UI.Pages
                 Gain = 0,
                 Channel = 1,
                 IsEnable = true,
+                Index = AudioFilterStatic.ParametricEqDatas.Count,
                 Color = Color.FromArgb(255, (byte)r.Next(0, 255), (byte)r.Next(0, 255), (byte)r.Next(0, 255))
             });
         }
@@ -275,6 +277,19 @@ namespace TewiMP.UI.Pages
         private void Button_Click_2(object sender, RoutedEventArgs e)
         {
             AudioSpectrumRoot.Visibility = AudioSpectrumRoot.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private void ListViewBase_DragItemsCompleted(ListViewBase sender, DragItemsCompletedEventArgs args)
+        {
+
+        }
+
+        private void EQList_Loading(FrameworkElement sender, object args)
+        {
+            foreach (var item in AudioFilterStatic.ParametricEqDatas)
+            {
+                item.Index = AudioFilterStatic.ParametricEqDatas.IndexOf(item) + 1;
+            }
         }
     }
 

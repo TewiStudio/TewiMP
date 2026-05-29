@@ -24,9 +24,9 @@ public partial class StickContentHeader : ContentControl
         new PropertyMetadata(0.0)
     );
     
-    public static readonly DependencyProperty CommandBarProperty =
+    public static readonly DependencyProperty HeaderCommandProperty =
         DependencyProperty.Register(
-            nameof(CommandBar),
+            nameof(HeaderCommand),
             typeof(object),
             typeof(StickContentHeader),
             new PropertyMetadata(null));
@@ -44,10 +44,10 @@ public partial class StickContentHeader : ContentControl
         set => SetValue(BackgroundStartOpacityProperty, value);
     }
 
-    public object CommandBar
+    public object HeaderCommand
     {
-        get => GetValue(CommandBarProperty);
-        set => SetValue(CommandBarProperty, value);
+        get => GetValue(HeaderCommandProperty);
+        set => SetValue(HeaderCommandProperty, value);
     }
 
     public ScrollViewer CachedScrollViewer => GetScrollViewer(this);
@@ -124,7 +124,7 @@ public partial class StickContentHeader : ContentControl
             _compositor = _scrollerPropSet.Compositor;
         }
 
-        float paddingSize = _PART_Root.ActualSize.Y - _PART_Content.ActualSize.Y;
+        float paddingSize = _PART_Root.ActualSize.Y - _PART_Content_Root.ActualSize.Y;
 
         // Visuals
         var headerRootVisual = ElementCompositionPreview.GetElementVisual(_PART_Root);
@@ -174,7 +174,8 @@ public partial class StickContentHeader : ContentControl
     private Border _PART_Background;
     private Grid _PART_Info_Root;
     private TextBlock _PART_TitleTextBlock;
-    private ContentPresenter _PART_CommandBar;
+    private ContentPresenter _PART_HeaderCommand;
+    private Border _PART_Content_Root;
     private ContentPresenter _PART_Content;
     protected override void OnApplyTemplate()
     {
@@ -184,7 +185,8 @@ public partial class StickContentHeader : ContentControl
         _PART_Background = GetTemplateChild("PART_Background") as Border;
         _PART_Info_Root = GetTemplateChild("PART_Info_Root") as Grid;
         _PART_TitleTextBlock = GetTemplateChild("PART_TitleTextBlock") as TextBlock;
-        _PART_CommandBar = GetTemplateChild("PART_CommandBar") as ContentPresenter;
+        _PART_HeaderCommand = GetTemplateChild("PART_HeaderCommand") as ContentPresenter;
+        _PART_Content_Root = GetTemplateChild("PART_Content_Root") as Border;
         _PART_Content = GetTemplateChild("PART_Content") as ContentPresenter;
 
         Loaded -= StickHeaderListView_Loaded;

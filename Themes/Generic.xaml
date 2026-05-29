@@ -79,22 +79,23 @@
                           Background="{TemplateBinding Background}"
                           BorderBrush="{TemplateBinding BorderBrush}"
                           BorderThickness="{TemplateBinding BorderThickness}">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="auto"/>
-                            <RowDefinition Height="auto"/>
-                        </Grid.RowDefinitions>
-                        <Border x:Name="PART_Background" Background="Transparent"    
+                        <Border x:Name="PART_Background"
+                                Background="Transparent"    
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                 BorderThickness="0,0,0,1" Grid.Row="1"/>
-                        <Grid x:Name="PART_Info_Root">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock x:Name="PART_TitleTextBlock" Text="{TemplateBinding Title}" Style="{ThemeResource TBHeader}" TextTrimming="WordEllipsis"/>
-                            <ContentPresenter x:Name="PART_CommandBar" Content="{TemplateBinding CommandBar}" Margin="0,0,0,0" VerticalAlignment="Bottom" Grid.Column="1"/>
-                        </Grid>
-                        <ContentPresenter x:Name="PART_Content" Content="{TemplateBinding Content}" Grid.Row="1"/>
+                        <StackPanel>
+                            <Grid x:Name="PART_Info_Root">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="PART_TitleTextBlock" Text="{TemplateBinding Title}" Style="{ThemeResource TBHeader}" TextWrapping="WrapWholeWords" Margin="0,0,14,0"/>
+                                <ContentPresenter x:Name="PART_HeaderCommand" Content="{TemplateBinding HeaderCommand}" Margin="0,0,0,0" VerticalAlignment="Bottom" Grid.Column="1"/>
+                            </Grid>
+                            <Border x:Name="PART_Content_Root">
+                                <ContentPresenter x:Name="PART_Content" Content="{TemplateBinding Content}" Grid.Row="1"/>
+                            </Border>
+                        </StackPanel>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

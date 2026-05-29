@@ -17,7 +17,7 @@
     Holding="UserControl_Holding" MinHeight="64">
     <UserControl.Transitions>
         <TransitionCollection>
-            <PopupThemeTransition/>
+            <EntranceThemeTransition/>
         </TransitionCollection>
     </UserControl.Transitions>
     <Grid>
@@ -162,7 +162,7 @@
                     x:Name="Info_Buttons_StackPanel"
                     XYFocusKeyboardNavigation="Enabled"
                     Orientation="Horizontal"
-                    Spacing="2"
+                    Spacing="4"
                     VerticalAlignment="Center"
                     Grid.Column="1">
                     <StackPanel.Resources>

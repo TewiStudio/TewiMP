@@ -1,4 +1,5 @@
-﻿using Windows.UI;
+﻿using TewiMP.Services.Media.Audio.AudioEffects;
+using Windows.UI;
 
 namespace TewiMP.Core.Audio;
 
@@ -60,5 +61,6 @@ public class EQData
     }
 
     public Color Color { get; set; }
+    public int Index { get; set; }
 }
 

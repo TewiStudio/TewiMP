@@ -1,7 +1,9 @@
-using System;
+Ôªøusing DevWinUI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Media;
+using System;
 using TewiMP.Core.Audio;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Media.Audio.AudioEffects;
@@ -28,12 +30,18 @@ namespace TewiMP.UI.Controls
             QSilder.Value = DataContext.Q;
             FreSilder.Value = DataContext.CentreFrequency;
             gainSilder.Value = DataContext.Gain;
+/*
+            (Resources["accentColor"] as SolidColorBrush).Color = DataContext.Color;
+            (Resources["accentColorD1"] as SolidColorBrush).Color = DataContext.Color.DarkerBy(.1f);
+            (Resources["accentColorD2"] as SolidColorBrush).Color = DataContext.Color.DarkerBy(.2f);*/
+
             inChange = false;
         }
 
         bool inChange = false;
         private void EQCard_Loaded(object sender, RoutedEventArgs e)
         {
+            if (DataContext is null) return;
             App.Instance.AudioService.EqBandChanged -= AudioService_EqBandChanged;
             App.Instance.AudioService.EqBandChanged += AudioService_EqBandChanged;
             ColorPickerPanel.SelectedColor = DataContext.Color;
@@ -57,6 +65,10 @@ namespace TewiMP.UI.Controls
             if (DataContext is null || !IsLoaded) return;
             DataContext.Color = ColorPickerPanel.SelectedColor;
             (ColoredBackground.Fill as SolidColorBrush).Color = ColorPickerPanel.SelectedColor;
+            /*(Resources["accentColor"] as SolidColorBrush).Color = DataContext.Color;
+            (Resources["accentColorD1"] as SolidColorBrush).Color = DataContext.Color.DarkerBy(.1f);
+            (Resources["accentColorD2"] as SolidColorBrush).Color = DataContext.Color.DarkerBy(.2f);*/
+
         }
 
         private void SongHistoryCard_DataContextChanged(FrameworkElement sender, DataContextChangedEventArgs args)
@@ -91,7 +103,7 @@ namespace TewiMP.UI.Controls
 
         private void Grid_RightTapped(object sender, Microsoft.UI.Xaml.Input.RightTappedRoutedEventArgs e)
         {
-            Menu.ShowAt(sender as FrameworkElement, new() { Position = e.GetPosition(sender as UIElement), Placement = Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.Auto });
+            //Menu.ShowAt(sender as FrameworkElement, new() { Position = e.GetPosition(sender as UIElement), Placement = Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode.Auto });
         }
 
         private void MenuFlyoutItem_Click(object sender, RoutedEventArgs e)
@@ -102,7 +114,7 @@ namespace TewiMP.UI.Controls
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            Menu.ShowAt(sender as FrameworkElement);
+            //Menu.ShowAt(sender as FrameworkElement);
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e)
@@ -122,10 +134,10 @@ namespace TewiMP.UI.Controls
                 };
                 string chineseName = btn.Tag switch
                 {
-                    "Quality" => "÷ ¡ø",
-                    "Frequency" => "÷––ƒ∆µ¬ ",
-                    "Gain" => "‘ˆ“Ê",
-                    _ => "Œ¥÷™"
+                    "Quality" => "Ë¥®Èáè",
+                    "Frequency" => "‰∏≠ÂøÉÈ¢ëÁéá",
+                    "Gain" => "Â¢ûÁõä",
+                    _ => "Êú™Áü•"
                 };
                 string unit = btn.Tag switch
                 {
@@ -135,7 +147,7 @@ namespace TewiMP.UI.Controls
                     "Slope" => "dB/Oct",
                     _ => ""
                 };
-                var result = await App.MainWindowInstance.ShowDialog($"…Ë÷√ \"{chineseName} {btn.Tag}{(string.IsNullOrEmpty(unit) ? "" : $"£®{unit}£©")}\" ÷µ", numberBox, "»°œ˚", "»∑∂®", defaultButton: ContentDialogButton.Primary);
+                var result = await App.MainWindowInstance.ShowDialog($"ËÆæÁΩÆ \"{chineseName} {btn.Tag}{(string.IsNullOrEmpty(unit) ? "" : $"Ôºà{unit}Ôºâ")}\" ÂÄº", numberBox, "ÂèñÊ∂à", "Á°ÆÂÆö", defaultButton: ContentDialogButton.Primary);
                 if (result != ContentDialogResult.Primary) return;
                 switch (btn.Tag)
                 {
@@ -163,6 +175,21 @@ namespace TewiMP.UI.Controls
         private void Grid_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
         {
             MoveIcon.Opacity = 0;
+        }
+    }
+
+    public class BoolToTextConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType,
+            object parameter, string language)
+        {
+            return (bool)value ? "ÂºÄ" : "ÂÖ≥";
+        }
+
+        public object ConvertBack(object value, Type targetType,
+            object parameter, string language)
+        {
+            throw new NotImplementedException();
         }
     }
 }

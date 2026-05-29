@@ -3,214 +3,266 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:TewiMP.UI.Controls"
+    xmlns:ui="using:CommunityToolkit.WinUI"
     xmlns:community="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    CornerRadius="8"
-    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+    CornerRadius="0"
     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-    BorderThickness="1"
+    BorderThickness="0,0,0,1"
     PointerEntered="Grid_PointerEntered" PointerExited="Grid_PointerExited"
     Holding="Grid_Holding" RightTapped="Grid_RightTapped"
     Loaded="EQCard_Loaded" Unloaded="EQCard_Unloaded"
     DataContextChanged="SongHistoryCard_DataContextChanged">
 
     <Grid.Resources>
+        <local:BoolToTextConverter x:Key="BoolToTextConverter"/>
         <SolidColorBrush x:Key="ButtonDisabledBackgroundThemeBrush" Color="Transparent"/>
-        <Flyout
-            x:Name="Menu"
-            ShouldConstrainToRootBounds="True">
-            <Flyout.FlyoutPresenterStyle>
-                <Style TargetType="FlyoutPresenter" BasedOn="{StaticResource DefaultFlyoutPresenterStyle}">
-                    <Setter Property="Background" Value="{ThemeResource AcrylicNormal}"/>
-                    <Setter Property="CornerRadius" Value="8" />
-                    <Setter Property="Padding" Value="{ThemeResource MenuFlyoutPresenterThemePadding}" />
-                </Style>
-            </Flyout.FlyoutPresenterStyle>
-            <StackPanel>
-                <StackPanel Margin="12,4">
-                    <TextBlock Text="颜色:" Margin="{StaticResource HubSectionHeaderThemeMargin}"/>
-                    <community:ColorPickerButton
-                        SelectedColor="{Binding Color,Mode=TwoWay}"
-                        LayoutUpdated="ColorPickerPanel_LayoutUpdated"
-                        x:Name="ColorPickerPanel"/>
-                </StackPanel>
-                <MenuFlyoutSeparator/>
-                <MenuFlyoutItem
-                    Text="删除"
-                    Click="MenuFlyoutItem_Click">
-                    <MenuFlyoutItem.Icon>
-                        <FontIcon Glyph="&#xE712;"/>
-                    </MenuFlyoutItem.Icon>
-                </MenuFlyoutItem>
-            </StackPanel>
-        </Flyout>
+
+        <SolidColorBrush x:Key="accentColor" Color="{StaticResource SystemAccentColorLight2}"/>
+        <SolidColorBrush x:Key="accentColorD1" Color="{StaticResource SystemAccentColorLight2}"/>
+        <SolidColorBrush x:Key="accentColorD2" Color="{StaticResource SystemAccentColorLight2}"/>
+
+        <!--
+        <StaticResource x:Key="ToggleSwitchFillOn" ResourceKey="accentColor" />
+        <StaticResource x:Key="ToggleSwitchFillOnPointerOver" ResourceKey="accentColorD1" />
+        <StaticResource x:Key="ToggleSwitchFillOnPressed" ResourceKey="accentColorD2" />
+        
+        <StaticResource x:Key="SliderThumbBackground" ResourceKey="accentColor"/>
+        <StaticResource x:Key="SliderThumbBackgroundPointerOver" ResourceKey="accentColorD1"/>
+        <StaticResource x:Key="SliderThumbBackgroundPressed" ResourceKey="accentColorD2"/>
+        <StaticResource x:Key="SliderTrackValueFill" ResourceKey="accentColor"/>
+        <StaticResource x:Key="SliderTrackValueFillPointerOver" ResourceKey="accentColorD1"/>
+        <StaticResource x:Key="SliderTrackValueFillPressed" ResourceKey="accentColorD2"/>
+        -->
     </Grid.Resources>
 
     <Rectangle
         x:Name="ColoredBackground"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
-        Opacity=".1">
+        Opacity="0">
         <Rectangle.Fill>
             <SolidColorBrush Color="{Binding Color}"/>
         </Rectangle.Fill>
     </Rectangle>
-    
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="auto"/>
-        </Grid.RowDefinitions>
 
-        <StackPanel
-            Orientation="Vertical"
-            Padding="16"
-            Spacing="16"
-            Margin="0">
-            <Grid>
-                <Grid.Resources>
-                    <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
-                        <Setter Property="Padding" Value="0"/>
-                        <Setter Property="Margin" Value="0,-4"/>
-                        <Setter Property="Width" Value="38"/>
-                        <Setter Property="Background" Value="Transparent"/>
-                        <Setter Property="BorderThickness" Value="0"/>
-                        <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                        <Setter Property="VerticalAlignment" Value="Stretch"/>
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-                        <Setter Property="VerticalContentAlignment" Value="Center"/>
-                    </Style>
-                    <Style TargetType="Slider" BasedOn="{StaticResource DefaultSliderStyle}">
-                        <Setter Property="Orientation" Value="Vertical"/>
-                        <Setter Property="Height" Value="120"/>
-                        <Setter Property="TickPlacement" Value="Outside"/>
-                    </Style>
-                </Grid.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <FontIcon x:Name="MoveIcon" Glyph="&#xE7C2;" Margin="12,0,0,20" FontSize="14" HorizontalAlignment="Left" VerticalAlignment="Bottom" Opacity="0">
+            <FontIcon.OpacityTransition>
+                <ScalarTransition/>
+            </FontIcon.OpacityTransition>
+        </FontIcon>
+
+        <Border
+            Margin="0,22,0,0"
+            Width="26"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top">
+            <TextBlock 
+                Opacity=".5"
+                HorizontalAlignment="Right">
+                <Run Text="{Binding Index}"/>.
+            </TextBlock>
+        </Border>
+
+        <Button
+            Grid.Row="0"
+            Click="Button_Click"
+            Visibility="Collapsed"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch"
+            VerticalContentAlignment="Stretch"
+            Background="Transparent"
+            Width="28" Padding="0" Margin="0"
+            CornerRadius="0"
+            BorderThickness="0">
+            <Border 
+                VerticalAlignment="Stretch"
+                Margin="0"
+                BorderThickness="0,0,1,0"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+                <FontIcon Glyph="&#xE712;" FontSize="12" RenderTransformOrigin=".5,.5">
+                    <FontIcon.RenderTransform>
+                        <RotateTransform Angle="90"/>
+                    </FontIcon.RenderTransform>
+                </FontIcon>
+            </Border>
+        </Button>
+        
+        <Grid Padding="4,12,44,12" Grid.Column="1">
+            <Grid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                    <Setter Property="Margin" Value="0,4,4,0"/>
+                    <Setter Property="Padding" Value="12,6"/>
+                    <Setter Property="MinWidth" Value="104"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalAlignment" Value="Stretch"/>
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalContentAlignment" Value="Center"/>
+                </Style>
+                <Style TargetType="Slider" BasedOn="{StaticResource DefaultSliderStyle}">
+                    <Setter Property="Orientation" Value="Horizontal"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="TickPlacement" Value="Outside"/>
+                    <Setter Property="Margin" Value="16,4,0,0"/>
+                </Style>
+                <Style TargetType="StackPanel">
+                    <Setter Property="Orientation" Value="Horizontal"/>
+                </Style>
+            </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+                <RowDefinition Height="auto"/>
+            </Grid.RowDefinitions>
+
+            <Grid 
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Center"
+                Grid.Column="0" Grid.Row="0"
+                Padding="12,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel
-                    Spacing="16"
-                    HorizontalAlignment="Center">
-                    <Slider
-                        x:Name="gainSilder"
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        ValueChanged="Silder_ValueChanged"
-                        Minimum="-20"
-                        Maximum="20"
-                        StepFrequency=".01"
-                        TickFrequency="10"
-                        HorizontalAlignment="Center"/>
+                <TextBlock FontWeight="Bold" Text="启用："/>
+                <TextBlock Text="{Binding ElementName=ToggleOnButton,Path=IsOn,Converter={StaticResource BoolToTextConverter}}" Grid.Column="1" HorizontalAlignment="Right" Margin="0,0,4,0"/>
+            </Grid>
+
+            <Grid
+                Grid.Column="1" Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="auto"/>
+                </Grid.ColumnDefinitions>
+                <ToggleSwitch
+                    x:Name="ToggleOnButton"
+                    OnContent="{x:Null}"
+                    OffContent="{x:Null}"
+                    HorizontalAlignment="Left"
+                    IsOn="{Binding IsEnable,Mode=TwoWay}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultSolidBrush}"
+                    ToolTipService.ToolTip="开关"
+                    Toggled="ToggleOnButton_Checked"/>
+                <StackPanel Grid.Column="1" Spacing="8">
+                        <community:Segmented
+                            x:Name="ChannelSegmented"
+                            Background="Transparent"
+                            HorizontalAlignment="Stretch" Margin="16,0,0,0"
+                            SelectedIndex="{Binding Channel,Mode=TwoWay}"
+                            IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsOn}"
+                            SelectionChanged="Segmented_SelectionChanged">
+                        <community:SegmentedItem
+                            Content="L"
+                            ToolTipService.ToolTip="左声道" />
+                        <community:SegmentedItem
+                            Content="LR"
+                            ToolTipService.ToolTip="双声道" />
+                        <community:SegmentedItem
+                            Content="R"
+                            ToolTipService.ToolTip="右声道" />
+                    </community:Segmented>
+                    <community:ColorPickerButton
+                        x:Name="ColorPickerPanel"
+                        Background="Transparent"
+                        SelectedColor="{Binding Color,Mode=TwoWay}"
+                        LayoutUpdated="ColorPickerPanel_LayoutUpdated"/>
                     <Button
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Click="Button_Click_1" Tag="Gain">
-                        <StackPanel>
-                            <TextBlock
-                                Text="{Binding ElementName=gainSilder,Path=Value}"
-                                TextAlignment="Center"/>
-                            <TextBlock
-                                Text="增益"
-                                FontWeight="Bold"
-                                TextAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <StackPanel
-                    Spacing="16"
-                    Grid.Column="1"
-                    Margin="4,0,0,0"
-                    HorizontalAlignment="Center">
-                    <Slider
-                        x:Name="QSilder"
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        ValueChanged="Silder_ValueChanged"
-                        StepFrequency=".01"
-                        TickFrequency="825"
-                        Minimum=".3"
-                        Maximum="30"
-                        HorizontalAlignment="Center"/>
-                    <Button
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        Click="Button_Click_1" Tag="Quality">
-                        <StackPanel>
-                            <TextBlock
-                                Text="{Binding ElementName=QSilder,Path=Value}"
-                                TextAlignment="Center"/>
-                            <TextBlock
-                                Text="Q"
-                                FontWeight="Bold"
-                                TextAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </StackPanel>
-                <StackPanel
-                    Spacing="16"
-                    Grid.Column="2"
-                    Margin="4,0,0,0">
-                    <Slider
-                        x:Name="FreSilder"
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        ValueChanged="Silder_ValueChanged"
-                        TickFrequency="3995"
-                        Minimum="20"
-                        Maximum="16000"
-                        HorizontalAlignment="Center"/>
-                    <Button
-                        IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                        HorizontalAlignment="Stretch"
-                        Click="Button_Click_1" Tag="Frequency">
-                        <StackPanel>
-                            <TextBlock
-                                Text="{Binding ElementName=FreSilder,Path=Value}"
-                                TextAlignment="Center"/>
-                            <TextBlock
-                                Text="频率"
-                                FontWeight="Bold"
-                                TextAlignment="Center"/>
-                        </StackPanel>
+                        Style="{StaticResource DefaultButtonStyle}"
+                        Background="Transparent"
+                        Height="32"
+                        ToolTipService.ToolTip="删除"
+                        Click="MenuFlyoutItem_Click">
+                        <FontIcon FontSize="16" Glyph="&#xE894;"/>
                     </Button>
                 </StackPanel>
             </Grid>
-            <community:Segmented
-                IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsChecked}"
-                HorizontalAlignment="Stretch"
-                SelectedIndex="{x:Bind DataContext.Channel,Mode=TwoWay}"
-                SelectionChanged="Segmented_SelectionChanged">
-                <community:SegmentedItem
-                    Content="L"
-                    ToolTipService.ToolTip="左声道" />
-                <community:SegmentedItem
-                    Content="LR"
-                    ToolTipService.ToolTip="双声道" />
-                <community:SegmentedItem
-                    Content="R"
-                    ToolTipService.ToolTip="右声道" />
-            </community:Segmented>
-            <ToggleButton
-                x:Name="ToggleOnButton"
-                HorizontalAlignment="Stretch"
-                IsChecked="{Binding IsEnable,Mode=TwoWay}"
-                BorderBrush="{ThemeResource CardStrokeColorDefaultSolidBrush}"
-                ToolTipService.ToolTip="开关"
-                Checked="ToggleOnButton_Checked"/>
-        </StackPanel>
 
-        <Button
-            Grid.Row="1"
-            Click="Button_Click"
-            Visibility="Visible"
-            VerticalAlignment="Bottom"
-            HorizontalAlignment="Stretch"
-            Padding="0"
-            Height="24"
-            CornerRadius="0"
-            BorderThickness="0,1,0,0">
-            <FontIcon Glyph="&#xE712;" FontSize="12"/>
-        </Button>
+            <Button
+                IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsOn}"
+                Grid.Column="0" Grid.Row="2"
+                Click="Button_Click_1" Tag="Gain">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="Bold" Text="增益"/>
+                    <TextBlock Text="{Binding ElementName=gainSilder,Path=Value}" Grid.Column="1" HorizontalAlignment="Right"/>
+                </Grid>
+            </Button>
+            <Slider
+                x:Name="gainSilder"
+                Grid.Column="1" Grid.Row="2"
+                IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsOn}"
+                ValueChanged="Silder_ValueChanged"
+                Minimum="-20"
+                Maximum="20"
+                StepFrequency=".1"
+                TickFrequency="2.5"/>
+
+            <Button
+                IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsOn}"
+                Grid.Column="0" Grid.Row="3"
+                Click="Button_Click_1" Tag="Quality">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="Bold" Text="Q"/>
+                    <TextBlock Text="{Binding ElementName=QSilder,Path=Value}" Grid.Column="1" HorizontalAlignment="Right"/>
+                </Grid>
+            </Button>
+            <Slider
+                x:Name="QSilder"
+                Grid.Column="1" Grid.Row="3"
+                IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsOn}"
+                ValueChanged="Silder_ValueChanged"
+                StepFrequency=".1"
+                TickFrequency="1.85624"
+                Minimum=".3"
+                Maximum="30"/>
+
+            <Button
+                IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsOn}"
+                Grid.Column="0" Grid.Row="1"
+                Click="Button_Click_1" Tag="Frequency">
+                <Grid HorizontalAlignment="Stretch">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock FontWeight="Bold" Text="频率"/>
+                    <TextBlock Text="{Binding ElementName=FreSilder,Path=Value}" Grid.Column="1" HorizontalAlignment="Right"/>
+                </Grid>
+            </Button>
+            <Slider
+                x:Name="FreSilder"
+                Grid.Column="1" Grid.Row="1"
+                IsEnabled="{Binding ElementName=ToggleOnButton,Path=IsOn}"
+                ValueChanged="Silder_ValueChanged"
+                TickFrequency="998.75"
+                Minimum="20"
+                Maximum="16000"/>
+        </Grid>
+
         <!--
     <Grid
         Grid.Row="1"
@@ -221,9 +273,4 @@
         BorderThickness="0,1,0,0">
     </Grid>-->
     </Grid>
-    <FontIcon x:Name="MoveIcon" Glyph="&#xE7C2;" Margin="4" FontSize="18" HorizontalAlignment="Right" VerticalAlignment="Top" Opacity="0">
-        <FontIcon.OpacityTransition>
-            <ScalarTransition/>
-        </FontIcon.OpacityTransition>
-    </FontIcon>
 </Grid>

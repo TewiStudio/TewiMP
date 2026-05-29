@@ -133,15 +133,18 @@ public class Main : MusicSourcePlugin
 
     public MusicListData GetMusicListDataFromJson(JToken playlistJson)
     {
-        MusicListData musicListData = new();
+        MusicListData musicListData = new()
+        {
+            ListShowName = (string)playlistJson["name"],
+            ID = (string)playlistJson["id"],
+            PicturePath = (string)playlistJson["coverImgUrl"],
+            ListFrom = MusicFrom.pluginMusicSource,
+            PluginInfoGUID = PluginInfo.GUID,
+            ListDataType = DataType.Playlist,
+        };
 
-        musicListData.ListShowName = (string)playlistJson["name"];
-        musicListData.ID = (string)playlistJson["id"];
-        musicListData.PicturePath = (string)playlistJson["coverImgUrl"];
-        musicListData.CreationTime = ((long)playlistJson["createTime"]).ToDateTimeFromMillisecondsUnix();
-        musicListData.ListFrom = MusicFrom.pluginMusicSource;
-        musicListData.PluginInfoGUID = PluginInfo.GUID;
-        musicListData.ListDataType = DataType.Playlist;
+        if (playlistJson["createTime"] is not null)
+            musicListData.CreationTime = ((long)playlistJson["createTime"]).ToDateTimeFromMillisecondsUnix();
 
         var plt = playlistJson["tracks"];
         musicListData.Songs = UnpackMusicData(plt);

@@ -47,6 +47,7 @@
             Padding="0,0,0,6">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                    <Setter Property="MaxWidth" Value="1000"/>
                     <Setter Property="Margin" Value="0,2,4,2"/>
                 </Style>
             </ListView.ItemContainerStyle>
@@ -54,7 +55,7 @@
             <ListView.Header>
                 <Grid>
                     <controls:StickTitleHeader Title="音效" VerticalAlignment="Top"/>
-                    <controls:StickVerticalBottom>
+                    <controls:StickVerticalBottom Opacity="1">
                         <Border 
                             Width="140" Height="70"
                             HorizontalAlignment="Right"
@@ -101,7 +102,7 @@
                                 <FontIcon
                                     IsHitTestVisible="False" Glyph="&#xE740;" FontSize="15"
                                     HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                    Margin="9"/>
+                                    Margin="9" Opacity=".6"/>
                             </Grid>
                         </Border>
                     </controls:StickVerticalBottom>
@@ -262,72 +263,65 @@
                     x:Name="ParametricToggleButton"
                     Toggled="ParametricToggleButton_Toggled"/>
                 <controlsPrimitives:SettingsExpander.Items>
-                    <controlsPrimitives:SettingsCard Padding="12">
+                    <controlsPrimitives:SettingsCard Padding="0">
                         <controlsPrimitives:SettingsCard.Description>
-                            <ScrollViewer
-                                HorizontalScrollMode="Auto"
-                                HorizontalScrollBarVisibility="Auto"
-                                VerticalScrollMode="Disabled"
-                                VerticalScrollBarVisibility="Disabled">
-                                <StackPanel
-                                    Orientation="Horizontal">
-                                    <GridView
-                                        x:Name="EQList"
-                                        IsEnabled="{Binding ElementName=ParametricToggleButton, Path=IsOn}"
-                                        CanDragItems="True" AllowDrop="True"
-                                        CanReorderItems="True" SelectionMode="None"
-                                        ScrollViewer.VerticalScrollMode="Disabled"
-                                        ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                                        <GridView.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <VirtualizingStackPanel Orientation="Horizontal"/>
-                                            </ItemsPanelTemplate>
-                                        </GridView.ItemsPanel>
-                                        <GridView.ItemTemplate>
-                                            <DataTemplate x:DataType="data:EQData">
-                                                <controls:EQCard Margin="0,0,0,0"/>
-                                            </DataTemplate>
-                                        </GridView.ItemTemplate>
-                                    </GridView>
-                                    <Button
-                                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                        IsEnabled="{Binding ElementName=ParametricToggleButton, Path=IsOn}"
-                                        CornerRadius="8"
-                                        Padding="16" Margin="12,0"
-                                        Width="120" Height="120"
-                                        HorizontalAlignment="Stretch"
-                                        VerticalAlignment="Center"
-                                        Click="Button_Click">
-                                        <Button.Transitions>
-                                            <TransitionCollection>
-                                                <RepositionThemeTransition/>
-                                            </TransitionCollection>
-                                        </Button.Transitions>
-                                        <StackPanel>
-                                            <Grid>
-                                                <Path
-                                                    Data="{ThemeResource 音波}"
-                                                    Width="30"
-                                                    Height="30"
-                                                    Stretch="Uniform"
-                                                    Fill="{ThemeResource ButtonForegroundThemeBrush}"
-                                                    Opacity="{Binding ElementName=ParametricToggleButton,Path=IsOn,Converter={StaticResource eqIconOpacityValueC}}"/>
-                                                <TextBlock
-                                                    x:Name="EqAddFreTextBlock"
-                                                    Text="+"
-                                                    Margin="4,14,0,0"
-                                                    FontSize="24"
-                                                    HorizontalAlignment="Left"
-                                                    VerticalAlignment="Bottom"/>
-                                            </Grid>
+                            <StackPanel 
+                                Orientation="Vertical"
+                                HorizontalAlignment="Stretch"
+                                Margin="0,0,-24,0">
+                                <ListView
+                                    x:Name="EQList"
+                                    Loading="EQList_Loading"
+                                    DragItemsCompleted="ListViewBase_DragItemsCompleted"
+                                    IsEnabled="{Binding ElementName=ParametricToggleButton, Path=IsOn}"
+                                    ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}"
+                                    CanDragItems="True" AllowDrop="True"
+                                    CanReorderItems="True" SelectionMode="None"
+                                    ScrollViewer.VerticalScrollMode="Disabled"
+                                    ScrollViewer.VerticalScrollBarVisibility="Hidden">
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate x:DataType="data:EQData">
+                                            <controls:EQCard Margin="0,0,0,0"/>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+                                <Button
+                                    Background="Transparent"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    IsEnabled="{Binding ElementName=ParametricToggleButton, Path=IsOn}"
+                                    CornerRadius="0,0,4,4" BorderThickness="0"
+                                    Padding="16"
+                                    HorizontalAlignment="Stretch"
+                                    VerticalAlignment="Stretch"
+                                    Click="Button_Click">
+                                    <Button.Transitions>
+                                        <TransitionCollection>
+                                            <RepositionThemeTransition/>
+                                        </TransitionCollection>
+                                    </Button.Transitions>
+                                    <StackPanel>
+                                        <Grid>
+                                            <Path
+                                                Data="{ThemeResource 音波}"
+                                                Width="30"
+                                                Height="30"
+                                                Stretch="Uniform"
+                                                Fill="{ThemeResource ButtonForegroundThemeBrush}"
+                                                Opacity="{Binding ElementName=ParametricToggleButton,Path=IsOn,Converter={StaticResource eqIconOpacityValueC}}"/>
                                             <TextBlock
-                                                Text="添加频段"
-                                                TextAlignment="Center"/>
-                                        </StackPanel>
-                                    </Button>
-                                </StackPanel>
-                            </ScrollViewer>
+                                                x:Name="EqAddFreTextBlock"
+                                                Text="+"
+                                                Margin="4,14,0,0"
+                                                FontSize="24"
+                                                HorizontalAlignment="Left"
+                                                VerticalAlignment="Bottom"/>
+                                        </Grid>
+                                        <TextBlock
+                                            Text="添加频段"
+                                            TextAlignment="Center"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
                         </controlsPrimitives:SettingsCard.Description>
                     </controlsPrimitives:SettingsCard>
                 </controlsPrimitives:SettingsExpander.Items>
@@ -350,24 +344,19 @@
                                 VerticalScrollBarVisibility="Disabled">
                                 <StackPanel
                                     Orientation="Horizontal">
-                                    <GridView
+                                    <ListView
                                         x:Name="PassFilterList"
                                         IsEnabled="{Binding ElementName=PassFilterToggleButton, Path=IsOn}"
                                         CanDragItems="True" AllowDrop="True"
                                         CanReorderItems="True" SelectionMode="None"
                                         ScrollViewer.VerticalScrollMode="Disabled"
                                         ScrollViewer.VerticalScrollBarVisibility="Hidden">
-                                        <GridView.ItemsPanel>
-                                            <ItemsPanelTemplate>
-                                                <VirtualizingStackPanel Orientation="Horizontal"/>
-                                            </ItemsPanelTemplate>
-                                        </GridView.ItemsPanel>
-                                        <GridView.ItemTemplate>
+                                        <ListView.ItemTemplate>
                                             <DataTemplate x:DataType="data:PassFilterData">
                                                 <controls:PassFilterCard Margin="0,0,0,0"/>
                                             </DataTemplate>
-                                        </GridView.ItemTemplate>
-                                    </GridView>
+                                        </ListView.ItemTemplate>
+                                    </ListView>
                                     <Button
                                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"

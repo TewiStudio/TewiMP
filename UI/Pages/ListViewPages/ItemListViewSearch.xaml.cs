@@ -68,11 +68,10 @@ namespace TewiMP.UI.Pages
             AddSelectedToPlayingListButton.Visibility = Visibility.Collapsed;
             AddSelectedToPlayListButton.Visibility = Visibility.Collapsed;
             DownloadSelectedButton.Visibility = Visibility.Collapsed;
-            DeleteSelectedButton.Visibility = Visibility.Collapsed;
             SelectReverseButton.Visibility = Visibility.Collapsed;
             SelectAllButton.Visibility = Visibility.Collapsed;
             SearchHomeButton.Visibility = Visibility.Collapsed;
-            SearchPageSelectorSeparator.Visibility = Visibility.Collapsed;
+            SearchPageSelectorSeparator.Visibility = Visibility.Visible;
 
             SearchPageSelector.Visibility = Visibility.Collapsed;
             SearchPageSelectorCustom.Visibility = Visibility.Collapsed;
@@ -81,7 +80,7 @@ namespace TewiMP.UI.Pages
             SearchPageSelectorCustom.Visibility = Visibility.Visible;
             SearchHomeButton.Visibility = Visibility.Visible;
             var searchData = NavToObj as string;
-            //StickContentHeader.Title = $"\"{searchData}\" {NowSearchMode}的搜索结果";
+            StickContentHeader.Title = $"搜索{NowSearchMode}：{searchData}";
             NowPage.Text = pageNumber.ToString();
 
             MusicDataList.Clear();
@@ -179,6 +178,7 @@ namespace TewiMP.UI.Pages
                 App.MainWindowInstance.AddNotify("搜索失败", "无相关结果。", NotifySeverity.Error);
             }
 
+            CommandBar.InvalidateMeasure();
             LoadingTipControl.UnShowLoading();
         }
 
@@ -251,7 +251,6 @@ namespace TewiMP.UI.Pages
                 SelectorSeparator.Visibility = Visibility.Visible;
                 AddSelectedToPlayingListButton.Visibility = Visibility.Visible;
                 AddSelectedToPlayListButton.Visibility = Visibility.Visible;
-                DeleteSelectedButton.Visibility = Visibility.Visible;
                 DownloadSelectedButton.Visibility = Visibility.Visible;
                 SelectReverseButton.Visibility = Visibility.Visible;
                 SelectAllButton.Visibility = Visibility.Visible;
@@ -271,7 +270,6 @@ namespace TewiMP.UI.Pages
                 SelectorSeparator.Visibility = Visibility.Collapsed;
                 AddSelectedToPlayingListButton.Visibility = Visibility.Collapsed;
                 AddSelectedToPlayListButton.Visibility = Visibility.Collapsed;
-                DeleteSelectedButton.Visibility = Visibility.Collapsed;
                 DownloadSelectedButton.Visibility = Visibility.Collapsed;
                 SelectReverseButton.Visibility = Visibility.Collapsed;
                 SelectAllButton.Visibility = Visibility.Collapsed;
