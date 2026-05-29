@@ -812,6 +812,7 @@ namespace TewiMP.UI.Controls
                 gds.DrawLine(0, y, width, y, textColor.A(30), 1f, dash);
                 gds.DrawText($"{db} dB", 4, y - 18, textColor.A(150), textFormat);
             }
+            gds.DrawText($"0 dB", 16, 0, textColor.A(150), textFormat);
 
             // 对数频率网格
             double logMin = Math.Log10(MinFreq);

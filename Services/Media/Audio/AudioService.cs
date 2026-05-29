@@ -594,9 +594,10 @@ public class AudioService
         {
             case OutApi.WaveOut:
                 LogService.Log(nameof(AudioService), "Using WaveOut.");
-                NowOutObj = new WaveOutEvent();
-                (NowOutObj as WaveOutEvent).DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
-                (NowOutObj as WaveOutEvent).NumberOfBuffers = Latency;
+                var outApi = new WaveOutEvent();
+                NowOutObj = outApi;
+                outApi.DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
+                outApi.DesiredLatency = Latency;
                 break;
             case OutApi.DirectSound:
                 LogService.Log(nameof(AudioService), "Using DirectSound.");
