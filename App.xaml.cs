@@ -103,7 +103,7 @@ public partial class App : Application
         Available = true,
         SuffixType = SuffixType.Beta,
         Version = Assembly.GetExecutingAssembly().GetName().Version,
-        ReleaseTime = new(2026, 5, 19, 00, 00, 00),
+        ReleaseTime = new(2026, 6, 13, 10, 00, 00),
         ExtendMessage = null
     };
     public Version AppVersion => NowVersion.Version;
