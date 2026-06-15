@@ -299,11 +299,28 @@
                     </cc:SettingsExpander.Transitions>
                     <cc:SettingsExpander.Items>
                         <cc:SettingsCard Loading="SettingsCard_Loading">
-                            <cc:SettingsCard.Header>
-                                <TextBlock x:Name="LicenseHeaderTextBlock"></TextBlock>
-                            </cc:SettingsCard.Header>
                             <cc:SettingsCard.Description>
                                 <TextBlock x:Name="LicenseTextBlock" IsTextSelectionEnabled="True"></TextBlock>
+                            </cc:SettingsCard.Description>
+                        </cc:SettingsCard>
+                    </cc:SettingsExpander.Items>
+                </cc:SettingsExpander>
+
+                <cc:SettingsExpander Header="版权声明"
+                                     HorizontalAlignment="Stretch"
+                                     Margin="0,-4,0,0">
+                    <cc:SettingsExpander.Transitions>
+                        <TransitionCollection>
+                            <RepositionThemeTransition/>
+                        </TransitionCollection>
+                    </cc:SettingsExpander.Transitions>
+                    <cc:SettingsExpander.Items>
+                        <cc:SettingsCard Loading="SettingsCard_Loading">
+                            <cc:SettingsCard.Description>
+本软件源代码采用 GPLv3 许可证发布。
+本软件不对通过软件获取、下载、缓存或播放的音乐内容主张任何版权。相关音乐作品、录音、封面图片及其附属内容的版权归其各自权利人所有。
+用户应自行确认其对相关内容的下载、存储、传播和使用行为符合适用法律法规以及相关服务提供方的许可协议。
+本软件仅作为通用技术工具提供。
                             </cc:SettingsCard.Description>
                         </cc:SettingsCard>
                     </cc:SettingsExpander.Items>

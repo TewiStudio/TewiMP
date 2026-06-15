@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "TewiMP"
-#define MyAppVersion "0.0.7"
+#define MyAppVersion "0.0.7.1"
 #define MyAppPublisher "TewiStudio"
 #define MyAppURL "https://github.com/TewiStudio/TewiMP"
 #define MyAppExeName "TewiMP.exe"
