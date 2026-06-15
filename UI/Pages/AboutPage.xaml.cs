@@ -141,7 +141,7 @@ public partial class AboutPage : Page
 
     private async void Hyperlink_Click_4(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
     {
-        await CodeHelper.OpenInBrowser("https://music.163.com/#/user/home?id=7916651285");
+        await CodeHelper.OpenInBrowser("https://github.com/zilongww");
     }
 
     private async void Hyperlink_Click_5(Microsoft.UI.Xaml.Documents.Hyperlink sender, Microsoft.UI.Xaml.Documents.HyperlinkClickEventArgs args)
