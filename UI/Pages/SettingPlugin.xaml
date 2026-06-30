@@ -45,6 +45,12 @@
             </controls:StickTitleHeader>
         </ListView.Header>
 
+        <ListView.ItemContainerTransitions>
+            <TransitionCollection>
+                <RepositionThemeTransition/>
+            </TransitionCollection>
+        </ListView.ItemContainerTransitions>
+
         <cc:SettingsExpander
             x:Name="PluginMusicSource"
             Header="歌曲源插件"
@@ -62,6 +68,7 @@
         <Button Style="{StaticResource TextBlockButtonStyle}"
                 Content="制作插件示例"
                 Click="Button_Click"
-                Margin="0,0,0,0"/>
+                Margin="0,0,0,0">
+        </Button>
     </ListView>
 </Page>

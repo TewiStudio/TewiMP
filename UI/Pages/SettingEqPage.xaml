@@ -109,6 +109,12 @@
                 </Grid>
             </ListView.Header>
 
+            <ListView.ItemContainerTransitions>
+                <TransitionCollection>
+                    <RepositionThemeTransition/>
+                </TransitionCollection>
+            </ListView.ItemContainerTransitions>
+
             <controlsPrimitives:SettingsCard
                 Header="音效总开关">
                 <ToggleSwitch
@@ -269,6 +275,13 @@
                                 Orientation="Vertical"
                                 HorizontalAlignment="Stretch"
                                 Margin="0,0,-24,0">
+                                
+                                <StackPanel.ChildrenTransitions>
+                                    <TransitionCollection>
+                                        <RepositionThemeTransition />
+                                    </TransitionCollection>
+                                </StackPanel.ChildrenTransitions>
+
                                 <ListView
                                     x:Name="EQList"
                                     Loading="EQList_Loading"
@@ -294,11 +307,6 @@
                                     HorizontalAlignment="Stretch"
                                     VerticalAlignment="Stretch"
                                     Click="Button_Click">
-                                    <Button.Transitions>
-                                        <TransitionCollection>
-                                            <RepositionThemeTransition/>
-                                        </TransitionCollection>
-                                    </Button.Transitions>
                                     <StackPanel>
                                         <Grid>
                                             <Path

@@ -1567,7 +1567,7 @@ public sealed partial class MainWindow : WindowEx
                     .StartAsync(MusicPageBaseGrid);
             }
             else await AnimationBuilder.Create()
-                    .Offset(Axis.Y, 0, duration: TimeSpan.FromSeconds(.4), easingType: EasingType.Circle, easingMode: EasingMode.EaseOut)
+                    .Offset(Axis.Y, 0, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Circle, easingMode: EasingMode.EaseOut)
                     .StartAsync(MusicPageBaseGrid);
 
 

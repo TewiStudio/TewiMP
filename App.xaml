@@ -241,6 +241,12 @@
             <MenuFlyout x:Key="PlayModeSelect">
             </MenuFlyout>
 
+            <Style x:Key="NoPaddingMaxWidthListViewItemStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
+                <Setter Property="MaxWidth" Value="1000"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="CornerRadius" Value="0"/>
+            </Style>
+
             <Style x:Key="NoPaddingListViewItemStyle" TargetType="ListViewItem" BasedOn="{StaticResource DefaultListViewItemStyle}">
                 <Setter Property="Padding" Value="0"/>
                 <Setter Property="CornerRadius" Value="0"/>

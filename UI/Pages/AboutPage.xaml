@@ -15,7 +15,20 @@
             <StackPanel HorizontalAlignment="Stretch"
                         Orientation="Vertical"
                         Margin="16" Spacing="12">
-                <cc:WrapPanel VerticalSpacing="12" HorizontalSpacing="12">
+
+                <StackPanel.Resources>
+                    <Style TargetType="cc:SettingsExpander">
+                        <Setter Property="MaxWidth" Value="1000"/>
+                    </Style>
+                </StackPanel.Resources>
+
+                <StackPanel.ChildrenTransitions>
+                    <TransitionCollection>
+                        <RepositionThemeTransition />
+                    </TransitionCollection>
+                </StackPanel.ChildrenTransitions>
+                
+                <cc:WrapPanel VerticalSpacing="12" HorizontalSpacing="12" MaxWidth="1000">
                     <Border CornerRadius="6"
                             BorderBrush="{ThemeResource ControlElevationBorderBrush}"
                             BorderThickness="1"
@@ -58,15 +71,11 @@
                         </StackPanel>
                     </Grid>
                 </cc:WrapPanel>
+
                 <cc:SettingsExpander Header="更新"
                                      Description="检查新版本"
                                      IsExpanded="True"
                                      x:Name="UpdateExpander">
-                    <cc:SettingsExpander.Transitions>
-                        <TransitionCollection>
-                            <RepositionThemeTransition/>
-                        </TransitionCollection>
-                    </cc:SettingsExpander.Transitions>
                     <cc:SettingsExpander.HeaderIcon>
                         <FontIcon Glyph="&#xE895;"/>
                     </cc:SettingsExpander.HeaderIcon>
@@ -103,11 +112,6 @@
                 <cc:SettingsExpander Header="使用的开源代码库、框架或程序"
                                      HorizontalAlignment="Stretch"
                                      Margin="0,-4,0,0">
-                    <cc:SettingsExpander.Transitions>
-                        <TransitionCollection>
-                            <RepositionThemeTransition/>
-                        </TransitionCollection>
-                    </cc:SettingsExpander.Transitions>
                     <cc:SettingsExpander.Items>
                         <cc:SettingsCard IsClickEnabled="True"
                                          ActionIcon="{ui:FontIcon Glyph=&#xE8A7;}"
@@ -292,11 +296,6 @@
                                      HorizontalAlignment="Stretch"
                                      Margin="0,-4,0,0"
                                      x:Name="LicenseExpander">
-                    <cc:SettingsExpander.Transitions>
-                        <TransitionCollection>
-                            <RepositionThemeTransition/>
-                        </TransitionCollection>
-                    </cc:SettingsExpander.Transitions>
                     <cc:SettingsExpander.Items>
                         <cc:SettingsCard Loading="SettingsCard_Loading">
                             <cc:SettingsCard.Description>
@@ -309,11 +308,6 @@
                 <cc:SettingsExpander Header="版权声明"
                                      HorizontalAlignment="Stretch"
                                      Margin="0,-4,0,0">
-                    <cc:SettingsExpander.Transitions>
-                        <TransitionCollection>
-                            <RepositionThemeTransition/>
-                        </TransitionCollection>
-                    </cc:SettingsExpander.Transitions>
                     <cc:SettingsExpander.Items>
                         <cc:SettingsCard Loading="SettingsCard_Loading">
                             <cc:SettingsCard.Description>
@@ -326,22 +320,14 @@
                     </cc:SettingsExpander.Items>
                 </cc:SettingsExpander>
 
-                <TextBlock HorizontalAlignment="Left">
-                    <TextBlock.Transitions>
-                        <TransitionCollection>
-                            <RepositionThemeTransition/>
-                        </TransitionCollection>
-                    </TextBlock.Transitions>
+                <TextBlock HorizontalAlignment="Stretch"
+                           MaxWidth="1000">
                     图标中的图片来自 <Hyperlink Click="Hyperlink_Click_2">なま</Hyperlink>
                     <LineBreak/>编码：<Hyperlink Click="Hyperlink_Click_4">zilong</Hyperlink>
-                    <LineBreak/>源代码：<Hyperlink Click="Hyperlink_Click_5">github</Hyperlink>
+                    <LineBreak/>源代码：<Hyperlink Click="Hyperlink_Click_5">github</Hyperlink>&#160;
                 </TextBlock>
-                <StackPanel Orientation="Horizontal" Spacing="4">
-                    <StackPanel.Transitions>
-                        <TransitionCollection>
-                            <RepositionThemeTransition/>
-                        </TransitionCollection>
-                    </StackPanel.Transitions>
+
+                <StackPanel Orientation="Horizontal" Spacing="4" MaxWidth="1000">
                     <Button Background="Pink" Click="Button_Click_4">
                         <Button.Resources>
                             <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="LightPink"/>

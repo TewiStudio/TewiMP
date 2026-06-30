@@ -12,7 +12,7 @@
     mc:Ignorable="d" Loaded="Page_Loaded" KeyDown="Page_KeyDown">
 
     <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None"
-              Padding="0,0,0,24">
+              Padding="0,0,0,24" ItemContainerStyle="{StaticResource NoPaddingMaxWidthListViewItemStyle}">
         <ListView.Resources>
             <Style x:Key="STPS" TargetType="StackPanel">
                 <Setter Property="Padding" Value="18,12,0,12"/>
@@ -29,13 +29,19 @@
                 <Setter Property="Margin" Value="0,0,0,14"/>
             </Style>
             <Style TargetType="cc:SettingsExpander">
-                <Setter Property="Margin" Value="0,4,4,0"/>
+                <Setter Property="Margin" Value="16,4,16,0"/>
             </Style>
         </ListView.Resources>
-
+        
         <ListView.Header>
             <control:StickTitleHeader Title="设置"/>
         </ListView.Header>
+
+        <ListView.ItemContainerTransitions>
+            <TransitionCollection>
+                <RepositionThemeTransition/>
+            </TransitionCollection>
+        </ListView.ItemContainerTransitions>
 
         <cc:SettingsExpander Header="缓存"
                              Description="文件路径、清理缓存"
@@ -156,9 +162,6 @@
         <cc:SettingsExpander Header="下载"
                              Description="下载路径、质量、文件命名方式"
                              x:Name="DownloadEpd">
-            <cc:SettingsExpander.TranslationTransition>
-                <Vector3Transition/>
-            </cc:SettingsExpander.TranslationTransition>
             <cc:SettingsExpander.HeaderIcon>
                 <FontIcon Glyph="&#xE896;"/>
             </cc:SettingsExpander.HeaderIcon>
