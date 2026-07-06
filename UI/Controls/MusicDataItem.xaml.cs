@@ -320,16 +320,40 @@ namespace TewiMP.UI.Controls
         {
             if (!IsLoaded && ViewModel is null) return;
             Info_Buttons_Root.Visibility = Visibility.Visible;
-            MouseInOpacityFadeInAnimation.Start(Background_FillRectangle);
-            MouseInOpacityFadeInAnimation.Start(Info_Buttons_Root);
+
+            if (App.Instance.UISettings.AnimationsEnabled)
+            {
+                MouseInOpacityFadeInAnimation.Start(Background_FillRectangle);
+                MouseInOpacityFadeInAnimation.Start(Info_Buttons_Root);
+            }
+            else
+            {
+                if (backgroundFillVisual is not null)
+                {
+                    backgroundFillVisual.Opacity = 1;
+                    rightButtonVisual.Opacity = 1;
+                }
+            }
         }
 
         async Task OnMouseLeave()
         {
             if (!IsLoaded || ViewModel is null) return;
-            var ani1 = MouseInOpacityFadeOutAnimation.StartAsync(Background_FillRectangle);
-            var ani2 = MouseInOpacityFadeOutAnimation.StartAsync(Info_Buttons_Root);
-            await Task.WhenAll(ani1, ani2);
+
+            if (App.Instance.UISettings.AnimationsEnabled)
+            {
+                var ani1 = MouseInOpacityFadeOutAnimation.StartAsync(Background_FillRectangle);
+                var ani2 = MouseInOpacityFadeOutAnimation.StartAsync(Info_Buttons_Root);
+                await Task.WhenAll(ani1, ani2);
+            }
+            else
+            {
+                if (backgroundFillVisual is not null)
+                {
+                    backgroundFillVisual.Opacity = 0;
+                    rightButtonVisual.Opacity = 0;
+                }
+            }
             if (!isPointEnter) Info_Buttons_Root.Visibility = Visibility.Collapsed;
         }
 

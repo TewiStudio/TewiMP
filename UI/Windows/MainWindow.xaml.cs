@@ -180,7 +180,7 @@ public sealed partial class MainWindow : WindowEx
             if (InOpenMusicPage) SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
             else RemoveEvents();
             AppWindow.Hide();
-            WindowGridBase.Opacity = 0;
+            if (App.Instance.UISettings.AnimationsEnabled) WindowGridBase.Opacity = 0;
             isBackground = true;
             return;
         }
@@ -981,48 +981,9 @@ public sealed partial class MainWindow : WindowEx
         PlayTitle.Text = AudioService.MusicData.Title;
         PlayArtist.Text = AudioService.MusicData.ButtonName;
         //PlayingListBaseView.SelectedItem = AudioService.MusicData;
-        MusicDataItem.StartConnectAnimation(AudioService.MusicData);
 
-        foreach (var i in SongItem.StaticSongItems)
-        {
-            if (i != null)
-            {
-                if (i.MusicData == AudioService.MusicData)
-                {
-                    i.InfoRoot.Opacity = 0;
-                    ConnectedAnimation canimation =
-                        ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation", i.AlbumImage_BaseBorder);
-                    canimation.Configuration = new BasicConnectedAnimationConfiguration();
-                    ConnectedAnimation animation =
-                        ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation");
-                    if (animation != null)
-                    {
-                        animation.Completed += (_, __) => i.InfoRoot.Opacity = 1;
-                        animation.TryStart(VisualTreeHelper.GetParent(PlayContent) as UIElement);
-                    }
-
-                    ConnectedAnimation canimation1 =
-                        ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation1", i.TitleTextBlock);
-                    canimation1.Configuration = new BasicConnectedAnimationConfiguration();
-                    ConnectedAnimation animation1 =
-                        ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation1");
-                    if (animation1 != null)
-                    {
-                        animation1.TryStart(PlayTitle);
-                    }
-                    ConnectedAnimation canimation2 =
-                        ConnectedAnimationService.GetForCurrentView().PrepareToAnimate("changeAnimation2", i.ButtonNameTextBlock);
-                    canimation2.Configuration = new BasicConnectedAnimationConfiguration();
-                    ConnectedAnimation animation2 =
-                        ConnectedAnimationService.GetForCurrentView().GetAnimation("changeAnimation2");
-                    if (animation2 != null)
-                    {
-                        animation2.TryStart(PlayArtist);
-                    }
-                }
-                i.IsMusicDataPlaying = i.MusicData == AudioService.MusicData;
-            }
-        }
+        if (App.Instance.UISettings.AnimationsEnabled)
+            MusicDataItem.StartConnectAnimation(AudioService.MusicData);
     }
 
     private void AudioService_PlayStateChanged(AudioService AudioService)
@@ -1497,51 +1458,28 @@ public sealed partial class MainWindow : WindowEx
     {
         if (App.Instance.AudioService.MusicData is null) return;
 
+        bool animation = App.Instance.UISettings.AnimationsEnabled;
         MusicPageBaseFrame.Content = SMusicPage;
         if (InOpenMusicPage)
         {
             InOpenMusicPage = false;
-            isHiddenMusicPageAnimationNotCompleted = true;
-
             GridBase.Visibility = Visibility.Visible;
             InitializeTitleBar(WindowGridBase.ActualTheme);
 
             SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
             MusicPageViewStateChanged?.Invoke(MusicPageViewState.Hidden);
 
-            #region connected animations
-            ConnectedAnimation canimation =
-                ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation");
-            if (canimation != null)
+            if (animation)
             {
-                canimation.TryStart(VisualTreeHelper.GetParent(PlayContent) as UIElement);
+                isHiddenMusicPageAnimationNotCompleted = true;
+                await AnimationBuilder.Create()
+                    .Offset(Axis.Y, MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.22), easingType: EasingType.Circle, easingMode: EasingMode.EaseIn)
+                    .StartAsync(MusicPageBaseGrid);
             }
-            ConnectedAnimation canimation1 =
-                ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation1");
-            if (canimation1 != null)
+            else
             {
-                canimation1.TryStart(PlayTitle);
+                MusicPageBaseGrid.Translation = new(0, 0, 1);
             }
-            ConnectedAnimation canimation2 =
-                ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation2");
-            if (canimation2 != null)
-            {
-                canimation2.TryStart(PlayArtist);
-            }
-            if (App.Instance.LyricService.NowPlayingLyrics.Any())
-            {
-                ConnectedAnimation canimation3 =
-                ConnectedAnimationService.GetForCurrentView().GetAnimation("upAnimation3");
-                if (canimation3 != null)
-                {
-                    canimation3.TryStart(LyricTextBlock);
-                }
-            }
-            #endregion
-
-            await AnimationBuilder.Create()
-                .Offset(Axis.Y, MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.22), easingType: EasingType.Circle, easingMode: EasingMode.EaseIn)
-                .StartAsync(MusicPageBaseGrid);
 
             if (!InOpenMusicPage)
             {
@@ -1559,17 +1497,23 @@ public sealed partial class MainWindow : WindowEx
             SMusicPage.MusicPageViewStateChange(MusicPageViewState.View);
             MusicPageViewStateChanged?.Invoke(MusicPageViewState.View);
 
-            if (isFirstInMusicPage)
+            if (animation)
             {
-                isFirstInMusicPage = false;
-                await AnimationBuilder.Create()
-                    .Offset(Axis.Y, 0, from: MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Cubic, easingMode: EasingMode.EaseOut)
-                    .StartAsync(MusicPageBaseGrid);
+                if (isFirstInMusicPage)
+                {
+                    isFirstInMusicPage = false;
+                    await AnimationBuilder.Create()
+                        .Offset(Axis.Y, 0, from: MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Cubic, easingMode: EasingMode.EaseOut)
+                        .StartAsync(MusicPageBaseGrid);
+                }
+                else await AnimationBuilder.Create()
+                        .Offset(Axis.Y, 0, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Circle, easingMode: EasingMode.EaseOut)
+                        .StartAsync(MusicPageBaseGrid);
             }
-            else await AnimationBuilder.Create()
-                    .Offset(Axis.Y, 0, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Circle, easingMode: EasingMode.EaseOut)
-                    .StartAsync(MusicPageBaseGrid);
-
+            else
+            {
+                MusicPageBaseGrid.Translation = new(0, 0, 1);
+            }
 
             if (InOpenMusicPage && !isHiddenMusicPageAnimationNotCompleted)
             {

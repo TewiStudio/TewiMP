@@ -123,7 +123,14 @@ namespace TewiMP.UI.Controls
         private void SetImageSource(Uri imageSource)
         {
             if (controlVisual is null) return;
-            if (isInitedVisuals || SwitchImageImmediateSetOpacity) controlVisual.Opacity = 0;
+            if (App.Instance.UISettings.AnimationsEnabled)
+            {
+                if (isInitedVisuals || SwitchImageImmediateSetOpacity) controlVisual.Opacity = 0;
+            }
+            else
+            {
+                controlVisual.Opacity = 1;
+            }
             Image_ControlSources.UriSource = null;
             Image_ControlSources.UriSource = imageSource;
         }
@@ -224,7 +231,8 @@ namespace TewiMP.UI.Controls
 
         private void Image_Control_ImageOpened(object sender, RoutedEventArgs e)
         {
-            controlVisual.StartAnimation("Opacity", animationOpacity_SourceChanged);
+            if (App.Instance.UISettings.AnimationsEnabled)
+                controlVisual.StartAnimation("Opacity", animationOpacity_SourceChanged);
             ImageLoaded?.Invoke(true);
         }
 
