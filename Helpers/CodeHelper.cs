@@ -702,7 +702,7 @@ namespace TewiMP.Helpers
             saturation = s + (elementTheme == ElementTheme.Dark ? .1 : .6);
             value = v + (elementTheme == ElementTheme.Dark ? 1 : .1);
             var color2 = CodeHelper.ColorFromHSV(h, double.Clamp(saturation, 0, 1), double.Clamp(value, 0, 1));
-            LogService.Elapsed("CodeHelper.GetThemeColorAsync", $"Get \"{file}\" theme color elapsed: {{0}}.", time);
+            LogService.Elapsed("CodeHelper.GetThemeColorAsync", $"Theme color '{file}' extracted in {{0}}", time);
             return (color1, color2, IsAccentColorDark(color1) ? Colors.White : Windows.UI.Color.FromArgb(228, 0, 0, 0));
         }
 

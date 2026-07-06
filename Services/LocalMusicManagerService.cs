@@ -19,7 +19,7 @@ public class LocalMusicManagerService
 
     public LocalMusicManagerService()
     {
-        LogService.Log("Starting", "初始化 LocalMusicManager.");
+
     }
 
     bool isAnalyzingData = false;

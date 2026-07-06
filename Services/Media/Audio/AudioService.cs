@@ -1,22 +1,23 @@
-﻿using System;
+﻿using Melanchall.DryWetMidi.Core;
+using Melanchall.DryWetMidi.Interaction;
+using Melanchall.DryWetMidi.Multimedia;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using NAudio.CoreAudioApi;
+using NAudio.Wave;
+using SoundTouch;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Media;
-using Melanchall.DryWetMidi.Core;
-using Melanchall.DryWetMidi.Interaction;
-using Melanchall.DryWetMidi.Multimedia;
-using NAudio.Wave;
-using NAudio.CoreAudioApi;
-using SoundTouch;
-using TewiMP.UI.Windows;
 using TewiMP.Core;
 using TewiMP.Core.Music;
 using TewiMP.Services.Media.Audio.AudioEffects;
+using TewiMP.UI.Windows;
 
 namespace TewiMP.Services.Media.Audio;
 
@@ -86,7 +87,7 @@ public class AudioService
                 _equalizerBand = value;
                 if (FileReader != null)
                 {
-                    for (int i = 0; i < value.Count - 1; i++)
+                    for (int i = 0; i < value.Count; i++)
                     {
                         AudioEqualizerBands.NormalBands[i][2] = value[i][2];
                     }
@@ -314,8 +315,6 @@ public class AudioService
 
     public AudioService()
     {
-        LogService.Log("Starting", "初始化 AudioService.");
-
         _timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(200) };
         _timer.Tick += (_, __) => ReCallTiming();
         CompositionTarget.Rendering += CompositionTarget_Rendering;
@@ -330,7 +329,13 @@ public class AudioService
 
     private readonly object _analyzerLock = new();
     public float[] spectrum = null;
-    bool inThread = false;
+
+    private readonly Queue<double> _frameTimes = new();
+    private double _deltaTime = 0;
+    private double _lastDrawTime = 0; 
+    private const double SampleDuration = 1.0;
+    public double AvgFps = 0;
+    public double AvgFrameMs = 0;
     private void CompositionTarget_Rendering(object sender, object e)
     {
         if (VolumeMeter is null) return;
@@ -344,6 +349,26 @@ public class AudioService
             analyzer.Analyze();
             spectrum = analyzer.Spectrum;
         }
+
+        double now = Stopwatch.GetTimestamp() / (double)Stopwatch.Frequency;
+        if (_lastDrawTime > 0)
+        {
+            _deltaTime = now - _lastDrawTime;
+
+            _frameTimes.Enqueue(_deltaTime);
+            // 移除超出统计窗口的旧数据
+            while (_frameTimes.Sum() > SampleDuration)
+                _frameTimes.Dequeue();
+
+            // 计算平均帧时间和FPS
+            if (_frameTimes.Count > 0)
+            {
+                double avgDelta = _frameTimes.Average();
+                AvgFps = 1.0 / avgDelta;
+                AvgFrameMs = avgDelta * 1000.0;
+            }
+        }
+        _lastDrawTime = now;
 
         if (spectrum != null)
             VolumeMeter.Invoke(this, spectrum);

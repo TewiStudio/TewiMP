@@ -51,8 +51,6 @@ public class DownloadService
 
     public DownloadService()
     {
-        LogService.Log("Starting", "初始化 DownloadManager.");
-
         OnDownloaded += (_) =>
         {
             UpdateDownload();

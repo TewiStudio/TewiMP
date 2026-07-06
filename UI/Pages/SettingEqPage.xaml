@@ -68,6 +68,7 @@
                                 BorderThickness="0"
                                 Background="{ThemeResource AcrylicNormal}"
                                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                                
                                 <Button
                                     x:Name="spectrumButton"
                                     Padding="0"
@@ -430,7 +431,12 @@
             HorizontalAlignment="Stretch"
             VerticalAlignment="Stretch"
             x:Name="AudioSpectrumRoot">
-            <Grid Margin="0,0,0,2">
+            <SystemBackdropElement>
+                <SystemBackdropElement.SystemBackdrop>
+                    <MicaBackdrop/>
+                </SystemBackdropElement.SystemBackdrop>
+            </SystemBackdropElement>
+            <Grid Margin="0,0,0,0" Background="{ThemeResource LayerFillColorDefaultBrush}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="auto"/>

@@ -12,6 +12,9 @@
     mc:Ignorable="d">
     <Grid Background="Transparent" x:Name="root" VerticalAlignment="Bottom" SizeChanged="root_SizeChanged"
           BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" Loaded="root_Loaded">
+        <Grid.OpacityTransition>
+            <ScalarTransition/>
+        </Grid.OpacityTransition>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>

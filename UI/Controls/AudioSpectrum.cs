@@ -18,6 +18,7 @@ using TewiMP.Core.Audio;
 using TewiMP.Helpers;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Media.Audio.AudioEffects;
+using TewiMP.Services;
 
 namespace TewiMP.UI.Controls
 {
@@ -63,7 +64,7 @@ namespace TewiMP.UI.Controls
         private const float MaxQ = 33.3f;
         private const float QStep = 0.1f;
 
-        private readonly Queue<double> _frameTimes = new();   // 记录最近一段时间的帧间隔（秒）
+        private readonly Queue<double> _frameTimes = new();
         private double _deltaTime = 0;
         private double _lastDrawTime = 0;
         private double _targetFps = 60;
@@ -71,7 +72,7 @@ namespace TewiMP.UI.Controls
         private double _avgFrameMs = 0;
 
         // 控制统计窗口大小（秒）
-        private const double SampleDuration = 1.0; // 1秒内的平均值
+        private const double SampleDuration = 1.0;
 
         // 滚轮缩放
         private const double MinVisibleFreq = 20;
@@ -103,7 +104,7 @@ namespace TewiMP.UI.Controls
 
         public static readonly DependencyProperty SmoothingDownFactorProperty = DependencyProperty.Register(
             "SmoothingDownFactor", typeof(double), typeof(AudioSpectrum),
-            new PropertyMetadata(.15d, OnPropertyChanged<double>));
+            new PropertyMetadata(.12d, OnPropertyChanged<double>));
 
         public static readonly DependencyProperty SmoothingUpFactorProperty = DependencyProperty.Register(
             "SmoothingUpFactor", typeof(double), typeof(AudioSpectrum),
@@ -188,14 +189,14 @@ namespace TewiMP.UI.Controls
         private double GetEqBandGainDb(double freq, EQData eq)
         {
             if (!eq.IsEnable) return 0;
-            double f0 = eq.CentreFrequency;
-            double Q = eq.Q;
-            double gainDb = eq.Gain;
+            return GetEqBandGainDb(freq, eq.CentreFrequency, eq.Q, eq.Gain);
+        }
 
-            // 带宽影响（简化高斯形状）
-            double ratio = freq / f0;
+        private double GetEqBandGainDb(double freq, double centerFreq, double Q, double gainDb)
+        {
+            // 带宽影响
+            double ratio = freq / centerFreq;
             double response = Math.Exp(-0.5 * Math.Pow(Math.Log(ratio) * Q, 2.0));
-
             return gainDb * response;
         }
 
@@ -213,10 +214,26 @@ namespace TewiMP.UI.Controls
                 _spectrumCanvas.PointerExited += SpectrumCanvas_PointerExited;
                 _spectrumCanvas.PointerWheelChanged += SpectrumCanvas_PointerWheelChanged;
                 SizeChanged += AudioSpectrum_SizeChanged;
+                Unloaded += AudioSpectrum_Unloaded;
 
-                App.Instance.AudioService.VolumeMeter -= AudioService_VolumeMeter;
                 App.Instance.AudioService.VolumeMeter += AudioService_VolumeMeter;
+                App.Instance.AudioService.EqBandChanged += AudioService_EqBandChanged;
             }
+        }
+
+        private void AudioSpectrum_Unloaded(object sender, RoutedEventArgs e)
+        {
+            _spectrumCanvas.Draw -= SpectrumCanvas_Draw;
+            _spectrumCanvas.PointerPressed -= SpectrumCanvas_PointerPressed;
+            _spectrumCanvas.PointerReleased -= SpectrumCanvas_PointerReleased;
+            _spectrumCanvas.PointerMoved -= SpectrumCanvas_PointerMoved;
+            _spectrumCanvas.PointerExited -= SpectrumCanvas_PointerExited;
+            _spectrumCanvas.PointerWheelChanged -= SpectrumCanvas_PointerWheelChanged;
+            SizeChanged -= AudioSpectrum_SizeChanged;
+            Unloaded -= AudioSpectrum_Unloaded;
+
+            App.Instance.AudioService.VolumeMeter -= AudioService_VolumeMeter;
+            App.Instance.AudioService.EqBandChanged -= AudioService_EqBandChanged;
         }
 
         private void AudioService_VolumeMeter(AudioService AudioService, float[] sample)
@@ -225,10 +242,17 @@ namespace TewiMP.UI.Controls
                 _spectrumCanvas.Invalidate();
         }
 
+        private bool _eqDirty = true;
+        private void AudioService_EqBandChanged(AudioService AudioService)
+        {
+            _eqDirty = true;
+        }
+
         private void AudioSpectrum_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             _spectrumCanvas.Width = (float)ActualWidth;
             _spectrumCanvas.Height = (float)ActualHeight;
+            _eqDirty = true;
         }
 
         #region 鼠标命中测试
@@ -400,6 +424,7 @@ namespace TewiMP.UI.Controls
 
             MinFreq = Math.Pow(10, newLogMin);
             MaxFreq = Math.Pow(10, newLogMax);
+            _eqDirty = true;
         }
 
         private void SpectrumCanvas_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
@@ -588,12 +613,11 @@ namespace TewiMP.UI.Controls
             if (DrawLatencyText)
             {
                 // 绘制平均 FPS 信息
-                string info = $"FPS: {_avgFps:0.0} ({_avgFrameMs:0.0} ms)";
+                string info = $"FPS: {_avgFps:0.0} ({_avgFrameMs:0.0} ms) | {App.Instance.AudioService.AvgFps:0.0} ({App.Instance.AudioService.AvgFrameMs:0.0} ms)";
                 ds.DrawText(info, 10, 10, App.Instance.PlayingListService.TextColor, canvasTextFormat ??= new CanvasTextFormat { FontSize = 14 });
             }
         }
 
-        // 内部插值函数
         static double Lerp(double a, double b, double t) => a + (b - a) * t;
 
         private void DrawSpectrum(CanvasControl sender, CanvasDrawingSession ds, float w, float h)
@@ -744,6 +768,7 @@ namespace TewiMP.UI.Controls
                     MinFreq = Lerp(_animMinFreq, _targetMinFreq, easedT);
                     MaxFreq = Lerp(_animMaxFreq, _targetMaxFreq, easedT);
                 }
+                _eqDirty = true;
             }
         }
 
@@ -911,11 +936,22 @@ namespace TewiMP.UI.Controls
             }
         }
 
+        CanvasPathBuilder eqResponseCurvePathBuilder = null;
+        CanvasGeometry eqResponseCurveCanvasGeometry = null;
         private void DrawEqResponseCurve(CanvasDrawingSession ds, float w, float h)
         {
-            if (!AudioFilterStatic.ParametricEqEnable && !AudioFilterStatic.PassFilterEqEnable)
+            if (!AudioFilterStatic.GraphicEqEnable && !AudioFilterStatic.ParametricEqEnable && !AudioFilterStatic.PassFilterEqEnable)
                 return;
 
+            if (_eqDirty)
+                buildEqResponseCurve(ds, w, h);
+
+            ds.DrawGeometry(eqResponseCurveCanvasGeometry, App.Instance.PlayingListService.TextColor.A(180), (float)DrawEqLinesStrokeWidth);
+        }
+
+        void buildEqResponseCurve(CanvasDrawingSession ds, float w, float h)
+        {
+            _eqDirty = false;
             int points = 512; // 曲线精度
             Vector2[] curve = new Vector2[points];
             double logMin = Math.Log10(MinFreq);
@@ -928,7 +964,7 @@ namespace TewiMP.UI.Controls
 
                 double totalDb = 0.0;
 
-                // PassFilter（dB叠加，避免数值溢出）
+                // PassFilter
                 if (AudioFilterStatic.PassFilterEqEnable)
                 {
                     double fs = App.Instance.AudioService?.FileReader?.WaveFormat.SampleRate ?? 44100;
@@ -1025,7 +1061,7 @@ namespace TewiMP.UI.Controls
                     }
                 }
 
-                // ParametricEq（dB直接相加）
+                // ParametricEq
                 if (AudioFilterStatic.ParametricEqEnable)
                 {
                     double parametricDb = 0;
@@ -1037,6 +1073,27 @@ namespace TewiMP.UI.Controls
                     totalDb += parametricDb;
                 }
 
+                if (AudioFilterStatic.GraphicEqEnable)
+                {
+                    double graphicEqDb = 0;
+
+                    foreach (var band in AudioEqualizerBands.NormalBands)
+                    {
+                        float centerFreq = band[0];
+                        float q = band[1];
+                        float gainDb = band[2];
+
+                        if (Math.Abs(gainDb) < 0.001f)
+                            continue;
+
+                        double bandGain = GetEqBandGainDb(freq, centerFreq, q, gainDb);
+
+                        graphicEqDb += bandGain;
+                    }
+
+                    totalDb += graphicEqDb;
+                }
+
                 float x = (float)(i / (double)(points - 1) * w);
                 float y = h / 2 - (float)(totalDb / 24.0 * (h / 2));
                 curve[i] = new Vector2(x, y);
@@ -1046,22 +1103,15 @@ namespace TewiMP.UI.Controls
             if (curve == null || curve.Length < 2)
                 return;
 
-            // 创建路径
-            using (var pathBuilder = new CanvasPathBuilder(ds))
-            {
-                pathBuilder.BeginFigure(curve[0]);
+            eqResponseCurvePathBuilder?.Dispose();
+            eqResponseCurveCanvasGeometry?.Dispose();
 
-                for (int i = 1; i < curve.Length; i++)
-                    pathBuilder.AddLine(curve[i]);
-
-                pathBuilder.EndFigure(CanvasFigureLoop.Open);
-
-                // 绘制曲线
-                using (var geometry = CanvasGeometry.CreatePath(pathBuilder))
-                {
-                    ds.DrawGeometry(geometry, App.Instance.PlayingListService.TextColor.A(180), (float)DrawEqLinesStrokeWidth);
-                }
-            }
+            eqResponseCurvePathBuilder = new CanvasPathBuilder(ds);
+            eqResponseCurvePathBuilder.BeginFigure(curve[0]);
+            for (int i = 1; i < curve.Length; i++)
+                eqResponseCurvePathBuilder.AddLine(curve[i]);
+            eqResponseCurvePathBuilder.EndFigure(CanvasFigureLoop.Open);
+            eqResponseCurveCanvasGeometry = CanvasGeometry.CreatePath(eqResponseCurvePathBuilder);
         }
 
         private void UpdateSpectrumCache(int sampleRate, int barCount, double minFreq, double maxFreq, float w, float h, SpectrumAnalyzer analyzer)

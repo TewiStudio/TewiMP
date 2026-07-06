@@ -20,7 +20,7 @@ public class CacheService
 
     public CacheService()
     {
-        LogService.Log("Starting", "初始化 CacheManager.");
+
     }
 
     /// <summary>

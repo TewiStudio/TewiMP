@@ -181,7 +181,7 @@ public class AudioFileReader : WaveStream, ISampleProvider
                 LogService.Log(nameof(AudioFileReader), $"正在使用 FFmpeg 解码器，文件标识符为：{addr}");
                 _ffmpegProcess.StandardOutput.BaseStream.CopyTo(_ffmpegReadMemory = new());
                 _ffmpegReadMemory.Position = 0;
-                _ffmpegProcess.Kill();
+                _ffmpegProcess.WaitForExit();
                 _ffmpegProcess.Dispose();
                 if (tFile.BitDepth == -1) // 当一些音频数据无位深时
                 {
@@ -272,7 +272,9 @@ public class AudioFileReader : WaveStream, ISampleProvider
             {
                 var filterGroup = new BiQuadFilter[channels];
                 for (int ch = 0; ch < channels; ch++)
+                {
                     filterGroup[ch] = BiQuadFilterPeak(band[0], band[1], band[2]);
+                }
 
                 _filters.Add(filterGroup);
             }

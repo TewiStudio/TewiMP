@@ -52,7 +52,7 @@ public class HotKeyService
 
     public HotKeyService()
     {
-        LogService.Log("Starting", "初始化 HotKeyManager.");
+
     }
 
     public void Init(Window window)

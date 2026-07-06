@@ -367,7 +367,7 @@ public static class DataFolderBase
     /// </summary>
     public static void InitFiles()
     {
-        LogService.Log(nameof(DataFolderBase), "初始化文件目录中...");
+        DateTime elpased = DateTime.Now;
         Directory.CreateDirectory(PluginFolder);
         Directory.CreateDirectory(BaseFolder);
         Directory.CreateDirectory(BaseLocalFolder);
@@ -460,7 +460,7 @@ public static class DataFolderBase
         }
 
         Directory.CreateDirectory(StartupFolder);
-        LogService.Log(nameof(DataFolderBase), "初始化文件目录完成。");
+        LogService.Elapsed(nameof(DataFolderBase), "Folders inited in {0}.", elpased);
     }
 
     public static void InitCacheFolder()

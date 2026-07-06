@@ -82,8 +82,6 @@ public class PlayingListService
 
     public PlayingListService()
     {
-        LogService.Log("Starting", "初始化 PlayingList.");
-
         App.Instance.AudioService.SourceChanged += AudioService_SourceChanged;
         App.Instance.AudioService.PlayEnd += AudioService_PlayEnd;
     }
@@ -379,7 +377,7 @@ public class PlayingListService
         {
             nextErrorCount = 0;
         }
-        LogService.Elapsed("PlayingList.Play", "Setting play in {0}.", time);
+        LogService.Elapsed("PlayingList.Play", "Music setted in {0}", time);
         return clear;
     }
 

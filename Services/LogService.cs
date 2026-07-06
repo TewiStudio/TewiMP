@@ -27,11 +27,11 @@ public class LogService
     public static void Info(string name, string content, bool writeToLogStream = true) => Log(name, content, LogLevel.Info, writeToLogStream);
     public static void Warning(string name, string content, bool writeToLogStream = true) => Log(name, content, LogLevel.Warning, writeToLogStream);
     public static void Error(string name, string content, bool writeToLogStream = true) => Log(name, content, LogLevel.Error, writeToLogStream);
-    public static void LogDebug(string content, bool writeToLogStream = true) => Log("Debug", content, LogLevel.Info, writeToLogStream);
+    public static void LogDebug(string content, bool writeToLogStream = false) => Log("Debug", content, LogLevel.Info, writeToLogStream);
     public static TimeSpan Elapsed(string name, string content, DateTime lastTime, bool writeToLogStream = true)
     {
         var elapsedTime = DateTime.Now - lastTime;
-        Log(name, string.Format(content, elapsedTime), writeToLogStream: writeToLogStream);
+        Log(name, string.Format(content, $"{elapsedTime.TotalMilliseconds:0}ms"), writeToLogStream: writeToLogStream);
         return elapsedTime;
     }
 

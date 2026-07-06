@@ -91,142 +91,142 @@ public static class AudioEqualizerBands
 
     public static List<float[]> NormalBands = new()
     {
-        new float[3] { 31, 1, 0 }, //   0
-        new float[3] { 62, 1, 0 }, //   1
-        new float[3] { 125, 1, 0 }, //  2
-        new float[3] { 250, 1, 0 }, //  3
-        new float[3] { 500, 1, 0 }, //  4
-        new float[3] { 1000, 1, 0 }, // 5
-        new float[3] { 2000, 1, 0 }, // 6
-        new float[3] { 4000, 1, 0 }, // 7
-        new float[3] { 8000, 1, 0 }, // 8
-        new float[3] { 16000, 1, 0 } // 9
+        new float[3] { 31, 1.414f, 0 }, //   0
+        new float[3] { 62, 1.414f, 0 }, //   1
+        new float[3] { 125, 1.414f, 0 }, //  2
+        new float[3] { 250, 1.414f, 0 }, //  3
+        new float[3] { 500, 1.414f, 0 }, //  4
+        new float[3] { 1000, 1.414f, 0 }, // 5
+        new float[3] { 2000, 1.414f, 0 }, // 6
+        new float[3] { 4000, 1.414f, 0 }, // 7
+        new float[3] { 8000, 1.414f, 0 }, // 8
+        new float[3] { 16000, 1.414f, 0 } // 9
     };
 
     public static List<float[]> CustomBands = new()
     {
-        new float[3] { 31, 1, 0 }, //   0
-        new float[3] { 62, 1, 0 }, //   1
-        new float[3] { 125, 1, 0 }, //  2
-        new float[3] { 250, 1, 0 }, //  3
-        new float[3] { 500, 1, 0 }, //  4
-        new float[3] { 1000, 1, 0 }, // 5
-        new float[3] { 2000, 1, 0 }, // 6
-        new float[3] { 4000, 1, 0 }, // 7
-        new float[3] { 8000, 1, 0 }, // 8
-        new float[3] { 16000, 1, 0 } // 9
+        new float[3] { 31, 1.414f, 0 }, //   0
+        new float[3] { 62, 1.414f, 0 }, //   1
+        new float[3] { 125, 1.414f, 0 }, //  2
+        new float[3] { 250, 1.414f, 0 }, //  3
+        new float[3] { 500, 1.414f, 0 }, //  4
+        new float[3] { 1000, 1.414f, 0 }, // 5
+        new float[3] { 2000, 1.414f, 0 }, // 6
+        new float[3] { 4000, 1.414f, 0 }, // 7
+        new float[3] { 8000, 1.414f, 0 }, // 8
+        new float[3] { 16000, 1.414f, 0 } // 9
     };
 
     public static List<float[]> HighBands = new()
     {
-        new float[3] { 31, 1, 0 }, //      0
-        new float[3] { 62, 1, 0 }, //      1
-        new float[3] { 125, 1, 0 }, //     2
-        new float[3] { 250, 1, 0 }, //     3
-        new float[3] { 500, 1, 0 }, //     4
-        new float[3] { 1000, 1, 0 }, //    5
-        new float[3] { 2000, 1, 1 }, //    6
-        new float[3] { 4000, 1, 4 }, //    7
-        new float[3] { 8000, 1, 4.8f }, // 8
-        new float[3] { 16000, 1, 7 } //    9
+        new float[3] { 31, 1.414f, 0 }, //      0
+        new float[3] { 62, 1.414f, 0 }, //      1
+        new float[3] { 125, 1.414f, 0 }, //     2
+        new float[3] { 250, 1.414f, 0 }, //     3
+        new float[3] { 500, 1.414f, 0 }, //     4
+        new float[3] { 1000, 1.414f, 0 }, //    5
+        new float[3] { 2000, 1.414f, 1 }, //    6
+        new float[3] { 4000, 1.414f, 4 }, //    7
+        new float[3] { 8000, 1.414f, 4.8f }, // 8
+        new float[3] { 16000, 1.414f, 7 } //    9
     };
 
     public static List<float[]> LowBands = new()
     {
-        new float[3] { 31, 1, 3 }, //     0
-        new float[3] { 62, 1, 7 }, //     1
-        new float[3] { 125, 1, 4.8f }, // 2
-        new float[3] { 250, 1, 4 }, //    3
-        new float[3] { 500, 1, 1 }, //    4
-        new float[3] { 1000, 1, 0 }, //   5
-        new float[3] { 2000, 1, 0 }, //   6
-        new float[3] { 4000, 1, 0 }, //   7
-        new float[3] { 8000, 1, 0 }, //   8
-        new float[3] { 16000, 1, 0 } //   9
+        new float[3] { 31, 1.414f, 3 }, //     0
+        new float[3] { 62, 1.414f, 7 }, //     1
+        new float[3] { 125, 1.414f, 4.8f }, // 2
+        new float[3] { 250, 1.414f, 4 }, //    3
+        new float[3] { 500, 1.414f, 1 }, //    4
+        new float[3] { 1000, 1.414f, 0 }, //   5
+        new float[3] { 2000, 1.414f, 0 }, //   6
+        new float[3] { 4000, 1.414f, 0 }, //   7
+        new float[3] { 8000, 1.414f, 0 }, //   8
+        new float[3] { 16000, 1.414f, 0 } //   9
     };
 
     public static List<float[]> HeadsetBands = new()
     {
-        new float[3] { 31, 1, 9 }, //      0
-        new float[3] { 62, 1, 7 }, //      1
-        new float[3] { 125, 1, 4.4f }, //  2
-        new float[3] { 250, 1, 3 }, //     3
-        new float[3] { 500, 1, 0.2f }, //  4
-        new float[3] { 1000, 1, 0 }, //    5
-        new float[3] { 2000, 1, 0.5f }, // 6
-        new float[3] { 4000, 1, 3 }, //    7
-        new float[3] { 8000, 1, 2.9f }, // 8
-        new float[3] { 16000, 1, 4 } //    9
+        new float[3] { 31, 1.414f, 9 }, //      0
+        new float[3] { 62, 1.414f, 7 }, //      1
+        new float[3] { 125, 1.414f, 4.4f }, //  2
+        new float[3] { 250, 1.414f, 3 }, //     3
+        new float[3] { 500, 1.414f, 0.2f }, //  4
+        new float[3] { 1000, 1.414f, 0 }, //    5
+        new float[3] { 2000, 1.414f, 0.5f }, // 6
+        new float[3] { 4000, 1.414f, 3 }, //    7
+        new float[3] { 8000, 1.414f, 2.9f }, // 8
+        new float[3] { 16000, 1.414f, 4 } //    9
     };
 
     public static List<float[]> LaptopBands = new()
     {
-        new float[3] { 31, 1, 6 }, //      0
-        new float[3] { 62, 1, 6 }, //      1
-        new float[3] { 125, 1, 5 }, //     2
-        new float[3] { 250, 1, 6 }, //     3
-        new float[3] { 500, 1, 2.6f }, //  4
-        new float[3] { 1000, 1, 2 }, //    5
-        new float[3] { 2000, 1, 2.5f }, // 6
-        new float[3] { 4000, 1, 6 }, //    7
-        new float[3] { 8000, 1, 5.5f }, // 8
-        new float[3] { 16000, 1, 7 } //    9
+        new float[3] { 31, 1.414f, 6 }, //      0
+        new float[3] { 62, 1.414f, 6 }, //      1
+        new float[3] { 125, 1.414f, 5 }, //     2
+        new float[3] { 250, 1.414f, 6 }, //     3
+        new float[3] { 500, 1.414f, 2.6f }, //  4
+        new float[3] { 1000, 1.414f, 2 }, //    5
+        new float[3] { 2000, 1.414f, 2.5f }, // 6
+        new float[3] { 4000, 1.414f, 6 }, //    7
+        new float[3] { 8000, 1.414f, 5.5f }, // 8
+        new float[3] { 16000, 1.414f, 7 } //    9
     };
 
     public static List<float[]> PortableBands = new()
     {
-        new float[3] { 31, 1, 8 }, //      0
-        new float[3] { 62, 1, 8 }, //      1
-        new float[3] { 125, 1, 5.4f }, //  2
-        new float[3] { 250, 1, 5 }, //     3
-        new float[3] { 500, 1, 2.7f }, //  4
-        new float[3] { 1000, 1, 3 }, //    5
-        new float[3] { 2000, 1, 2.3f }, // 6
-        new float[3] { 4000, 1, 4 }, //    7
-        new float[3] { 8000, 1, 3.6f }, // 8
-        new float[3] { 16000, 1, 5 } //    9
+        new float[3] { 31, 1.414f, 8 }, //      0
+        new float[3] { 62, 1.414f, 8 }, //      1
+        new float[3] { 125, 1.414f, 5.4f }, //  2
+        new float[3] { 250, 1.414f, 5 }, //     3
+        new float[3] { 500, 1.414f, 2.7f }, //  4
+        new float[3] { 1000, 1.414f, 3 }, //    5
+        new float[3] { 2000, 1.414f, 2.3f }, // 6
+        new float[3] { 4000, 1.414f, 4 }, //    7
+        new float[3] { 8000, 1.414f, 3.6f }, // 8
+        new float[3] { 16000, 1.414f, 5 } //    9
     };
 
     public static List<float[]> StereoBands = new()
     {
-        new float[3] { 31, 1, 6 }, //      0
-        new float[3] { 62, 1, 6 }, //      1
-        new float[3] { 125, 1, 4.1f }, //  2
-        new float[3] { 250, 1, 4 }, //     3
-        new float[3] { 500, 1, 1.7f }, //  4
-        new float[3] { 1000, 1, 2 }, //    5
-        new float[3] { 2000, 1, 1.7f }, // 6
-        new float[3] { 4000, 1, 4 }, //    7
-        new float[3] { 8000, 1, 4.1f }, // 8
-        new float[3] { 16000, 1, 6 } //    9
+        new float[3] { 31, 1.414f, 6 }, //      0
+        new float[3] { 62, 1.414f, 6 }, //      1
+        new float[3] { 125, 1.414f, 4.1f }, //  2
+        new float[3] { 250, 1.414f, 4 }, //     3
+        new float[3] { 500, 1.414f, 1.7f }, //  4
+        new float[3] { 1000, 1.414f, 2 }, //    5
+        new float[3] { 2000, 1.414f, 1.7f }, // 6
+        new float[3] { 4000, 1.414f, 4 }, //    7
+        new float[3] { 8000, 1.414f, 4.1f }, // 8
+        new float[3] { 16000, 1.414f, 6 } //    9
     };
 
     public static List<float[]> TVBands = new()
     {
-        new float[3] { 31, 1, 3 }, //      0
-        new float[3] { 62, 1, 3 }, //      1
-        new float[3] { 125, 1, 4.5f }, //  2
-        new float[3] { 250, 1, 8 }, //     3
-        new float[3] { 500, 1, 2.8f }, //  4
-        new float[3] { 1000, 1, 0 }, //    5
-        new float[3] { 2000, 1, 1.3f }, // 6
-        new float[3] { 4000, 1, 6 }, //    7
-        new float[3] { 8000, 1, 6.1f }, // 8
-        new float[3] { 16000, 1, 8 } //    9
+        new float[3] { 31, 1.414f, 3 }, //      0
+        new float[3] { 62, 1.414f, 3 }, //      1
+        new float[3] { 125, 1.414f, 4.5f }, //  2
+        new float[3] { 250, 1.414f, 8 }, //     3
+        new float[3] { 500, 1.414f, 2.8f }, //  4
+        new float[3] { 1000, 1.414f, 0 }, //    5
+        new float[3] { 2000, 1.414f, 1.3f }, // 6
+        new float[3] { 4000, 1.414f, 6 }, //    7
+        new float[3] { 8000, 1.414f, 6.1f }, // 8
+        new float[3] { 16000, 1.414f, 8 } //    9
     };
 
     public static List<float[]> CarBands = new()
     {
-        new float[3] { 31, 1, 8 }, //      0
-        new float[3] { 62, 1, 8 }, //      1
-        new float[3] { 125, 1, 4.8f }, //  2
-        new float[3] { 250, 1, 3 }, //     3
-        new float[3] { 500, 1, 0.1f }, //  4
-        new float[3] { 1000, 1, 0 }, //    5
-        new float[3] { 2000, 1, 0.7f }, // 6
-        new float[3] { 4000, 1, 4 }, //    7
-        new float[3] { 8000, 1, 4.8f }, // 8
-        new float[3] { 16000, 1, 7 } //    9
+        new float[3] { 31, 1.414f, 8 }, //      0
+        new float[3] { 62, 1.414f, 8 }, //      1
+        new float[3] { 125, 1.414f, 4.8f }, //  2
+        new float[3] { 250, 1.414f, 3 }, //     3
+        new float[3] { 500, 1.414f, 0.1f }, //  4
+        new float[3] { 1000, 1.414f, 0 }, //    5
+        new float[3] { 2000, 1.414f, 0.7f }, // 6
+        new float[3] { 4000, 1.414f, 4 }, //    7
+        new float[3] { 8000, 1.414f, 4.8f }, // 8
+        new float[3] { 16000, 1.414f, 7 } //    9
     };
 }
 

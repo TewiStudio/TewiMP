@@ -176,7 +176,7 @@ public partial class App : Application
         base.OnLaunched(args);
         var time = DateTime.Now;
         LogService = new();
-        LogService.Log("Staring", "准备初始化...");
+        LogService.Log("App", "Preparing init...");
 
         MainWindow = new MainWindow();
 
@@ -191,7 +191,6 @@ public partial class App : Application
         PlayListReader = new();
         HotKeyService = new();
 
-        LogService.Log("Starting", "初始化 SystemMediaTransportControls.");
         BMP = BackgroundMediaPlayer.Current;
         BMP.AudioCategory = MediaPlayerAudioCategory.Media;
 
@@ -340,7 +339,10 @@ public partial class App : Application
         //LAE = args;=
         LaunchArgs = [.. Environment.GetCommandLineArgs()];
         LaunchArgs.Remove(LaunchArgs.First());
-        LogService.Log("Starting", $"启动参数：{string.Join(", ", LaunchArgs)}.");
+        if (LaunchArgs.Count != 0)
+            LogService.Log("App", $"Starting Args: {string.Join(", ", LaunchArgs)}");
+        else
+            LogService.Log("App", $"Starting Args: None");
 
         HotKeyService.Init(MainWindow);
         if (loadFailed)
@@ -353,7 +355,7 @@ public partial class App : Application
         LaunchAsync();
         PluginService.Init();
         LoadLastPlaying();
-        LogService.Log("Starting", $"初始化完成。耗时：{DateTime.Now - time}");
+        LogService.Elapsed("App", "App inited in {0}", time);
     }
 
     public async void LaunchAsync()
@@ -371,7 +373,7 @@ public partial class App : Application
     public async Task ExitApp()
     {
         IsExited = true;
-        LogService.Log("App", "正在退出程序...");
+        LogService.Log("App", "Exiting application...");
         SaveSettings();
         MainWindowInstance.SetBackdrop(BackdropType.DefaultColor); // 在App.Instance.Exit前将MainWindow的Backdrop释放，否则会报错
         MainWindowInstance.DesktopLyricWindow?.Close();
@@ -465,7 +467,7 @@ public partial class App : Application
         });
         if (jObject is null) return;
         await File.WriteAllTextAsync(path, jObject.ToString());
-        LogService.Log("SaveNowPlaying", $"正在播放列表已保存！Elapsed {DateTime.Now - startTime}");
+        LogService.Elapsed("SaveNowPlaying", "Now playing list saved in {0}", startTime);
     }
     #endregion
 
@@ -476,7 +478,7 @@ public partial class App : Application
 
     public void LoadSettings(bool loadDefaultSettings = false)
     {
-        LogService.Log("App", "正在读取设置...");
+        DateTime elapsdTime = DateTime.Now;
         try
         {
             JObject settingData = loadDefaultSettings ? DataFolderBase.SettingDefault : DataFolderBase.JSettingData;
@@ -565,7 +567,7 @@ public partial class App : Application
             DataFolderBase.JSettingData = DataFolderBase.SettingDefault;
             LoadSettings(true);
         }
-        LogService.Log("App", "读取设置完成。");
+        LogService.Elapsed("App", "Settings loaded in {0}", elapsdTime);
     }
 
     private readonly Lock _saveSettingsLock = new();
@@ -573,7 +575,6 @@ public partial class App : Application
     {
         lock (_saveSettingsLock)
         {
-            LogService.Log("App", "正在保存设置...");
             var startTime = DateTime.Now;
             var settingData = DataFolderBase.JSettingData;
             var audioEffectData = DataFolderBase.JAudioEffectData;
@@ -657,7 +658,7 @@ public partial class App : Application
             DataFolderBase.JAudioEffectData = audioEffectData;
             PluginService.SavePluginInfoSettings();
 
-            LogService.Log("App", $"设置配置已存储。Elapsed {DateTime.Now - startTime}");
+            LogService.Elapsed("App", "Settings saved in {0}", startTime);
         }
     }
 

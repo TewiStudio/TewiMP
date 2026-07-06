@@ -65,8 +65,6 @@ public class LyricService
 
     public LyricService()
     {
-        LogService.Log("Starting", "初始化 LyricManager.");
-
         timer = new DispatcherTimer() { Interval = TimeSpan.FromMilliseconds(UpdateInterval) };
         timer.Tick += (_, __) =>
         {
@@ -130,7 +128,7 @@ public class LyricService
                     }
                 });
                 await InitLyricList(tagfile);
-                
+
                 return;
             }
 
@@ -166,7 +164,7 @@ public class LyricService
         }
 
         await InitLyricList(resultPath);
-        LogService.Log(nameof(LyricService), $"初始化歌词成功： \"{musicData.Title}\"。Elapsed {DateTime.Now - startTime}");
+        LogService.Elapsed(nameof(LyricService), $"Lyric '{resultPath}' inited in {{0}}", startTime);
     }
 
     public async Task InitLyricList(TagLib.File file)

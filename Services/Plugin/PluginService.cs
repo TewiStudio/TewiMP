@@ -18,7 +18,7 @@ public static class PluginService
 
     public static void Init()
     {
-        LogService.Log(nameof(PluginService), "初始化 PluginManager.");
+        DateTime dateTime = DateTime.Now;
         RemoveAllPlugin();
 
 #if !DEBUG
@@ -50,6 +50,8 @@ public static class PluginService
         LoadPluginInfoSettings();
         foreach (var p in Plugins) EnablePlugin(p);
         foreach (var p in MusicSourcePlugins) EnablePlugin(p);
+
+        LogService.Elapsed(nameof(PluginService), "Plugins inited in {0}", dateTime);
     }
 
     public static void RemoveAllPlugin()
@@ -110,39 +112,39 @@ public static class PluginService
             return;
         }
         Plugins.Add(plugin);
-        LogService.Log(nameof(PluginService), $"Loaded plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
+        LogService.Log(nameof(PluginService), $"Loaded plugin: {plugin.PluginInfo.Name}, guid: {plugin.PluginInfo.GUID}");
     }
 
     public static void AddPlugin(MusicSourcePlugin plugin)
     {
         MusicSourcePlugins.Add(plugin);
-        LogService.Log(nameof(PluginService), $"Loaded source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
+        LogService.Log(nameof(PluginService), $"Loaded source plugin: {plugin.PluginInfo.Name}, guid: {plugin.PluginInfo.GUID}");
     }
 
     public static void RemovePlugin(Plugin plugin)
     {
         DisablePlugin(plugin);
         Plugins.Remove(plugin);
-        LogService.Log(nameof(PluginService), $"Removed plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
+        LogService.Log(nameof(PluginService), $"Removed plugin: {plugin.PluginInfo.Name}, guid: {plugin.PluginInfo.GUID}");
     }
 
     public static void RemovePlugin(MusicSourcePlugin plugin)
     {
         DisablePlugin(plugin);
         MusicSourcePlugins.Remove(plugin);
-        LogService.Log(nameof(PluginService), $"Removed source plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
+        LogService.Log(nameof(PluginService), $"Removed source plugin: {plugin.PluginInfo.Name}, guid: {plugin.PluginInfo.GUID}");
     }
 
     public static void EnablePlugin(Plugin plugin)
     {
         plugin.OnEnable();
-        LogService.Log(nameof(PluginService), $"Enabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
+        LogService.Log(nameof(PluginService), $"Enabled plugin: {plugin.PluginInfo.Name}, guid: {plugin.PluginInfo.GUID}");
     }
 
     public static void DisablePlugin(Plugin plugin)
     {
         plugin.OnDisable();
-        LogService.Log(nameof(PluginService), $"Disabled plugin: {plugin.PluginInfo.Name}, Guid: {plugin.PluginInfo.GUID}.");
+        LogService.Log(nameof(PluginService), $"Disabled plugin: {plugin.PluginInfo.Name}, guid: {plugin.PluginInfo.GUID}");
     }
 
     public static void UpdatePluginInfoSettings()

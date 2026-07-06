@@ -1,26 +1,27 @@
-﻿using WinRT;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Runtime.InteropServices;
+﻿using DevWinUI;
 using Microsoft.UI;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
-using Windows.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using NAudio.Wave;
-using Vanara.PInvoke;
-using WinUIEx;
-using TewiMP.UI.Pages;
+using System;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using TewiMP.Core;
+using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services;
-using TewiMP.UI.WindowHelpers;
 using TewiMP.Services.Media.Audio;
-using TewiMP.Core.Music;
 using TewiMP.Services.Storage;
-using TewiMP.Core;
+using TewiMP.UI.Pages;
+using TewiMP.UI.WindowHelpers;
+using Vanara.PInvoke;
+using Windows.UI;
+using WinRT;
+using WinUIEx;
 
 namespace TewiMP.UI.Windows;
 
@@ -50,7 +51,6 @@ public sealed partial class NotifyIconWindow : Window
     nint hwnd = 0;
     public NotifyIconWindow()
     {
-        LogService.Log("Starting", "初始化 NotifyIconWindow.");
         InitializeComponent();
 
         notifyIcon = new System.Windows.Forms.NotifyIcon();
@@ -128,6 +128,7 @@ public sealed partial class NotifyIconWindow : Window
     {
         if (args.WindowActivationState == WindowActivationState.Deactivated)
         {
+            root.Opacity = 0;
 #if !DEBUG
             AppWindow.Hide();
 #endif
@@ -160,6 +161,7 @@ public sealed partial class NotifyIconWindow : Window
             ArtistTBBase.Pause = false;
             AlbumTBBase.Pause = false;
             UpdateDatas();
+            root.Opacity = 1;
             LogService.Log(nameof(NotifyIconWindow), "Added Events");
         }
     }

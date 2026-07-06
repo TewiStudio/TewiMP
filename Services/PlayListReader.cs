@@ -24,7 +24,7 @@ public class PlayListReader
 
     public PlayListReader()
     {
-        LogService.Log("Starting", "初始化 PlayListReader.");
+
     }
 
     bool inRefresh = false;

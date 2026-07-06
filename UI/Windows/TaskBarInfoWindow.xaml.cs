@@ -23,8 +23,6 @@ public partial class TaskBarInfoWindow : Window
 
     public TaskBarInfoWindow()
     {
-        LogService.Log("Starting", "初始化 TaskBarInfoWindow.");
-
         InitializeComponent();
         Handle = WindowHelpers.WindowHelper.GetWindowHandle(this);
 

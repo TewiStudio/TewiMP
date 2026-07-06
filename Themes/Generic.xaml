@@ -53,6 +53,24 @@
         </Setter>
     </Style>
 
+    <Style TargetType="local2:AudioSpectrum">
+
+        <Setter Property="Foreground"
+            Value="{ThemeResource MusicAlbumAccentBrush}"/>
+
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="local2:AudioSpectrum">
+                    <canvas:CanvasControl
+                        x:Name="PART_SpectrumCanvas"
+                        ClearColor="Transparent"
+                        Background="Transparent"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        
+    </Style>
+    
     <Style TargetType="local2:StickVerticalBottom">
         <Setter Property="VerticalAlignment" Value="Top"/>
         <Setter Property="Template">
@@ -150,23 +168,6 @@
                             </Grid>
                         </Grid>
                     </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <Style TargetType="local2:AudioSpectrum">
-
-        <Setter Property="Foreground"
-            Value="{ThemeResource MusicAlbumAccentBrush}"/>
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="local2:AudioSpectrum">
-                    <canvas:CanvasControl
-                        x:Name="PART_SpectrumCanvas"
-                        ClearColor="Transparent"
-                        Background="Transparent"/>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
