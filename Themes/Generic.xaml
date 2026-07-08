@@ -102,7 +102,7 @@
                                 BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                                 BorderThickness="0,0,0,1" Grid.Row="1"/>
                         <StackPanel>
-                            <Grid x:Name="PART_Info_Root">
+                            <Grid x:Name="PART_Info_Root" Margin="0,0,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="auto"/>

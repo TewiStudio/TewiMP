@@ -5,6 +5,7 @@
     xmlns:primitives="using:Microsoft.UI.Xaml.Controls.Primitives"
     xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
     xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:cmedia="using:CommunityToolkit.WinUI.Media"
     xmlns:local="using:TewiMP">
     <Application.Resources>
         <ResourceDictionary>
@@ -60,7 +61,7 @@
                     <StaticResource x:Key="MusicPageSelectLyricForeground" ResourceKey="AccentTextFillColorSecondaryBrush"/>
                     <Color x:Key="BlurImageAcrylicBrush">#E5E5E5</Color>
                     <AcrylicBrush x:Key="MusicPageImageAcrylicBrush" TintLuminosityOpacity="0.85" TintOpacity="0.0" FallbackColor="#CADDDDDD" TintColor="#EEEEEE" Opacity="1"/>
-                    <Color x:Key="PlayingListShadow">#20222222</Color>
+                    <Color x:Key="PlayingListShadow">#1F000000</Color>
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
             
@@ -72,6 +73,10 @@
             <SolidColorBrush x:Key="MusicAlbumAccentBrushDark2" Color="{StaticResource SystemAccentColorLight2}"/>
             <SolidColorBrush x:Key="MusicAlbumAccentBrushReverse" Color="{StaticResource SystemAccentColorLight2}"/>
 
+            <cmedia:AttachedCardShadow x:Key="CommonHeaderShadow"
+                                       Color="{ThemeResource PlayingListShadow}"
+                                       BlurRadius="24" Offset="0" Opacity="0"/>
+            
             <!-- 重写控件主题色 -->
             <!-- Slider -->
             <StaticResource x:Key="SliderThumbBackground" ResourceKey="MusicAlbumAccentBrush"/>

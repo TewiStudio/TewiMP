@@ -133,6 +133,9 @@
                 x:FieldModifier="public"
                 ScrollViewer.VerticalScrollBarVisibility="Hidden"
                 AccessKey="MO">
+                <NavigationView.Resources>
+                    <SolidColorBrush x:Key="NavigationViewContentBackground" Color="Transparent" />
+                </NavigationView.Resources>
                 <NavigationView.MenuItems>
                     <NavigationViewItemHeader Content="网络"/>
                     <NavigationViewItem Content="搜索" AccessKey="MS">
@@ -229,7 +232,8 @@
                             x:Name="ContentFrame"
                             IsTabStop="True"
                             CornerRadius="0"
-                            Padding="0,0,0,86"/>
+                            Padding="0,0,0,86"
+                            Background="{ThemeResource LayerFillColorDefaultBrush}"/>
                         <!--<Rectangle VerticalAlignment="Bottom" Height="86" Fill="Transparent"/>-->
                         <!--<devWinui:LinearGradientBlurPanel VerticalAlignment="Bottom" MaxBlurAmount="50" Height="86" StartPoint="0,1" EndPoint="0,0"/>-->
                         <!--</Grid>
@@ -240,6 +244,8 @@
                         Height="86"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="0,1,0,0"
+                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                        ui:Effects.Shadow="{StaticResource CommonHeaderShadow}"
                         x:Name="BottomPlayGrid">
                         <Button
                             Background="Transparent"
@@ -591,8 +597,6 @@
                                             </Setter.Value>
                                         </Setter>
                                     </Style>
-                                    <cmedia:AttachedCardShadow x:Key="CommonShadow"
-                                        Offset="0,0" CornerRadius="0" BlurRadius="32" Color="{ThemeResource PlayingListShadow}"/>
                                 </ListView.Resources>
                                 <ListView.Header>
                                     <Grid x:Name="PlayingListHeader">
@@ -603,7 +607,7 @@
                                             x:Name="PlayingListHeaderBaseGrid"
                                             BorderBrush="{ThemeResource SurfaceStrokeColorFlyoutBrush}"
                                             BorderThickness="0,0,0,1" Margin="0,0,0,8"
-                                            ui:Effects.Shadow="{StaticResource CommonShadow}"
+                                            ui:Effects.Shadow="{StaticResource CommonHeaderShadow}"
 >
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition/>

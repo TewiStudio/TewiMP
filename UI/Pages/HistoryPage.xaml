@@ -35,17 +35,15 @@
         <ListView.Header>
             <controls:StickContentHeader x:Name="StickContentHeader" Title="历史" Margin="0,0,0,8" BackgroundStartOpacity="1">
                 <controls:StickContentHeader.HeaderCommand>
-                    <cc:Segmented x:Name="HeaderSelectBase" Margin="0,0,16,12" SelectedIndex="1"
+                    <cc:Segmented x:Name="HeaderSelectBase" Margin="0,0,16,0" SelectedIndex="1"
                                   SelectionChanged="HeaderSelectBase_SelectionChanged_1">
                         <cc:SegmentedItem Content="统计"/>
                         <cc:SegmentedItem Content="播放历史"/>
                     </cc:Segmented>
                 </controls:StickContentHeader.HeaderCommand>
                 <Grid x:Name="HeaderText" VerticalAlignment="Bottom" Opacity="1"
-                      Grid.Row="1" CornerRadius="4" BorderThickness="1"
-                      Margin="16,16,16,16"
-                      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                      BorderBrush="{ThemeResource ControlElevationBorderBrush}">
+                      Grid.Row="1"
+                      Margin="16,8,16,8">
                     <Grid Margin="12,4,140,4">
                         <Grid.Resources>
                             <Style TargetType="TextBlock">

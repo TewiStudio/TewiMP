@@ -5,11 +5,12 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:c="using:CommunityToolkit.WinUI"
+    xmlns:cmedia="using:CommunityToolkit.WinUI.Media"
+    xmlns:op="using:CommunityToolkit.WinUI.Controls"
     xmlns:models="using:TewiMP.Core.Models"
     xmlns:data="using:TewiMP.Services.Storage"
     xmlns:controls="using:TewiMP.UI.Controls"
     xmlns:local="using:TewiMP.UI.Pages.ListViewPages"
-    xmlns:op="using:CommunityToolkit.WinUI.Controls"
     mc:Ignorable="d"
     Loaded="Page_Loaded" Unloaded="Page_Unloaded"
     SizeChanged="Page_SizeChanged" ActualThemeChanged="Page_ActualThemeChanged">
@@ -43,7 +44,8 @@
                         x:Name="ItemsList_Header_ImageInfo_BackgroundFill"
                         BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                         BorderThickness="0,0,0,1" Margin="-4,-4,-4,0"
-                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch"/>
+                        VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                        c:Effects.Shadow="{StaticResource CommonHeaderShadow}"/>
                     <Grid x:Name="ItemsList_Header_Info_Base" Margin="16">
                         <Grid
                             x:Name="ItemsList_Header_Image_Root"

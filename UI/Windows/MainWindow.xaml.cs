@@ -1090,7 +1090,7 @@ public sealed partial class MainWindow : WindowEx
     {
         NavViewContentBase_RGClip.Rect = new global::Windows.Foundation.Rect(0, 0,
             NavViewContentBase.ActualWidth,
-            NavViewContentBase.ActualHeight - BottomPlayGrid.ActualHeight);
+            NavViewContentBase.ActualHeight - BottomPlayGrid.ActualHeight + BottomPlayGrid.BorderThickness.Top);
     }
 
     public void SetNavViewContent(Type type, object param = null, NavigationTransitionInfo navigationTransitionInfo = null)
