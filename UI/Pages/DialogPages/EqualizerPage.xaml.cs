@@ -271,7 +271,7 @@ namespace TewiMP.UI.Pages.DialogPages
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             App.MainWindowInstance.HideDialog();
-            if (App.MainWindowInstance.InOpenMusicPage) App.MainWindowInstance.OpenOrCloseMusicPage();
+            if (App.MainWindowInstance.IsMusicPageOpened) App.MainWindowInstance.OpenOrCloseMusicPage();
             App.MainWindowInstance.SetNavViewContent(typeof(SettingEqPage));
         }
     }

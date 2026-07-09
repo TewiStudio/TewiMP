@@ -1,37 +1,38 @@
-﻿using CommunityToolkit.WinUI;
-using CommunityToolkit.WinUI.Animations;
-using Microsoft.UI;
-using Microsoft.UI.Composition;
-using Microsoft.UI.Composition.SystemBackdrops;
-using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Hosting;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Media.Animation;
-using NAudio.Wave;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Numerics;
 using System.Threading.Tasks;
+using Microsoft.UI;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Input;
+using Microsoft.UI.Xaml.Hosting;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Animation;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Composition;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Windows.UI;
+using Windows.Storage;
+using Windows.Graphics;
+using Windows.ApplicationModel.DataTransfer;
+using CommunityToolkit.WinUI;
+using CommunityToolkit.WinUI.Animations;
+using TewiMP.UI.Controls;
+using TewiMP.UI.Pages;
+using TewiMP.UI.Pages.MusicPages;
 using TewiMP.Core;
 using TewiMP.Core.Music;
 using TewiMP.Helpers;
 using TewiMP.Services;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Storage;
-using TewiMP.UI.Controls;
-using TewiMP.UI.Pages;
-using TewiMP.UI.Pages.MusicPages;
-using Windows.ApplicationModel.DataTransfer;
-using Windows.Graphics;
-using Windows.Storage;
-using Windows.UI;
 using WinRT;
 using WinUIEx;
+using NAudio.Wave;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -177,7 +178,7 @@ public sealed partial class MainWindow : WindowEx
         if (RunInBackground)
         {
             args.Cancel = true;
-            if (InOpenMusicPage) SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
+            if (IsMusicPageOpened) SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
             else RemoveEvents();
             AppWindow.Hide();
             if (App.Instance.UISettings.AnimationsEnabled) WindowGridBase.Opacity = 0;
@@ -498,7 +499,7 @@ public sealed partial class MainWindow : WindowEx
             {
                 isMinSize = false;
                 WindowViewStateChanged?.Invoke(true);
-                if (InOpenMusicPage) SMusicPage.MusicPageViewStateChange(MusicPageViewState.View);
+                if (IsMusicPageOpened) SMusicPage.MusicPageViewStateChange(MusicPageViewState.View);
                 else
                 {
                     AddEvents();
@@ -516,7 +517,7 @@ public sealed partial class MainWindow : WindowEx
 
                 isMinSize = true;
                 WindowViewStateChanged?.Invoke(false);
-                if (InOpenMusicPage) SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
+                if (IsMusicPageOpened) SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
                 else RemoveEvents();
                 WindowGridBase.Opacity = 0;
             }
@@ -567,7 +568,7 @@ public sealed partial class MainWindow : WindowEx
     {
         try
         {
-            if (InOpenMusicPage)
+            if (IsMusicPageOpened)
                 PlayingListBaseGrid.Height = WindowGridBase.ActualHeight - 130;
             else
                 PlayingListBaseGrid.Height = WindowGridBase.ActualHeight - 155;
@@ -1205,7 +1206,7 @@ public sealed partial class MainWindow : WindowEx
 
     public bool TryGoBack()
     {
-        if (InOpenMusicPage)
+        if (IsMusicPageOpened)
         {
             OpenOrCloseMusicPage();
             return ContentFrame.CanGoBack;
@@ -1451,49 +1452,24 @@ public sealed partial class MainWindow : WindowEx
         }
     }
 
-    public bool InOpenMusicPage { get; set; } = false;
+    public bool IsMusicPageOpened => musicPageAnimationVersion % 2 == 0;
+    uint musicPageAnimationVersion = 1;
     bool isFirstInMusicPage = true;
-    bool isHiddenMusicPageAnimationNotCompleted = false;
     public async Task OpenOrCloseMusicPage()
     {
         if (App.Instance.AudioService.MusicData is null) return;
+        MusicPageBaseFrame.Content = SMusicPage;
 
         bool animation = App.Instance.UISettings.AnimationsEnabled;
-        MusicPageBaseFrame.Content = SMusicPage;
-        if (InOpenMusicPage)
+        bool muiscPageOpened = IsMusicPageOpened;
+        uint version = ++musicPageAnimationVersion;
+
+        if (!animation) // Make translation set to zero.
+            AnimationBuilder.Create().Translation(Axis.Y, 0, from: 0, duration: TimeSpan.FromMilliseconds(1)).Start(MusicPageBaseGrid);
+
+        if (!muiscPageOpened) // show MusicPage
         {
-            InOpenMusicPage = false;
-            GridBase.Visibility = Visibility.Visible;
-            InitializeTitleBar(WindowGridBase.ActualTheme);
-
-            SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
-            MusicPageViewStateChanged?.Invoke(MusicPageViewState.Hidden);
-
-            if (animation)
-            {
-                isHiddenMusicPageAnimationNotCompleted = true;
-                await AnimationBuilder.Create()
-                    .Offset(Axis.Y, MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.22), easingType: EasingType.Circle, easingMode: EasingMode.EaseIn)
-                    .StartAsync(MusicPageBaseGrid);
-            }
-            else
-            {
-                MusicPageBaseGrid.Translation = new(0, 0, 1);
-            }
-
-            if (!InOpenMusicPage)
-            {
-                MusicPageBaseFrame.Visibility = Visibility.Collapsed;
-                isHiddenMusicPageAnimationNotCompleted = false;
-            }
-        }
-        else
-        {
-            InOpenMusicPage = true;
-
             MusicPageBaseFrame.Visibility = Visibility.Visible;
-            InitializeTitleBar(SMusicPage.pageRoot.ActualTheme);
-
             SMusicPage.MusicPageViewStateChange(MusicPageViewState.View);
             MusicPageViewStateChanged?.Invoke(MusicPageViewState.View);
 
@@ -1502,22 +1478,41 @@ public sealed partial class MainWindow : WindowEx
                 if (isFirstInMusicPage)
                 {
                     isFirstInMusicPage = false;
-                    await AnimationBuilder.Create()
-                        .Offset(Axis.Y, 0, from: MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Cubic, easingMode: EasingMode.EaseOut)
-                        .StartAsync(MusicPageBaseGrid);
+                    await AnimationBuilder.Create().Translation(Axis.Y, MusicPageBaseGrid.ActualHeight, from: MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromMilliseconds(1)).StartAsync(MusicPageBaseGrid);
                 }
-                else await AnimationBuilder.Create()
-                        .Offset(Axis.Y, 0, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Circle, easingMode: EasingMode.EaseOut)
-                        .StartAsync(MusicPageBaseGrid);
+
+                await AnimationBuilder.Create()
+                    .Translation(Axis.Y, 0, duration: TimeSpan.FromSeconds(.5), easingType: EasingType.Circle, easingMode: EasingMode.EaseOut)
+                    .StartAsync(MusicPageBaseGrid);
+
+                if (version == musicPageAnimationVersion)
+                    GridBase.Visibility = Visibility.Collapsed;
             }
             else
             {
-                MusicPageBaseGrid.Translation = new(0, 0, 1);
-            }
-
-            if (InOpenMusicPage && !isHiddenMusicPageAnimationNotCompleted)
-            {
+                isFirstInMusicPage = true;
                 GridBase.Visibility = Visibility.Collapsed;
+            }
+        }
+        else
+        {
+            GridBase.Visibility = Visibility.Visible;
+            SMusicPage.MusicPageViewStateChange(MusicPageViewState.Hidden);
+            MusicPageViewStateChanged?.Invoke(MusicPageViewState.Hidden);
+
+            if (animation)
+            {
+                await AnimationBuilder.Create()
+                    .Translation(Axis.Y, MusicPageBaseGrid.ActualHeight, duration: TimeSpan.FromSeconds(.22), easingType: EasingType.Circle, easingMode: EasingMode.EaseIn)
+                    .StartAsync(MusicPageBaseGrid);
+
+                if (version == musicPageAnimationVersion)
+                    MusicPageBaseFrame.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                isFirstInMusicPage = true;
+                MusicPageBaseFrame.Visibility = Visibility.Collapsed;
             }
         }
     }
