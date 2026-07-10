@@ -7,31 +7,19 @@
     xmlns:local="using:TewiMP.UI.Controls"
     xmlns:background="using:TewiMP.Core"
     xmlns:community="using:CommunityToolkit.WinUI.Controls"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     mc:Ignorable="d"
     DataContextChanged="UserControl_DataContextChanged"
     Loaded="UserControl_Loaded"
     Unloaded="UserControl_Unloaded"
     ActualThemeChanged="UserControl_ActualThemeChanged">
     <Grid>
-        <community:SwitchPresenter x:Name="swp"
-                                   TargetType="background:LogLevel"
-                                   Value="Info">
-            <community:Case Value="Info">
-                <Rectangle Fill="Transparent" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-            </community:Case>
-            <community:Case Value="Warning">
-                <Rectangle Fill="{ThemeResource SystemFillColorCautionBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity=".8" Margin="0,1,0,1"/>
-            </community:Case>
-            <community:Case Value="Error">
-                <Rectangle Fill="{ThemeResource SystemFillColorCriticalBrush}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Opacity=".8" Margin="0,1,0,1"/>
-            </community:Case>
-        </community:SwitchPresenter>
         <TextBlock
             x:Name="t2" Grid.Row="1"
             IsTextSelectionEnabled="True"
             TextWrapping="WrapWholeWords"
-            Padding="12,8">
-            <Run x:Name="t1_1" FontWeight="SemiBold"/><Run x:Name="t1_2" FontWeight="SemiBold"/><Run x:Name="t2_1" FontWeight="Bold"/><Run x:Name="t2_2"/>
+            Padding="12,0">
+            <Run x:Name="t1_1"/><Run x:Name="t1_2"/><Run x:Name="t2_1"/><Run x:Name="t2_2"/>
         </TextBlock>
     </Grid>
 </UserControl>

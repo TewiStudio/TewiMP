@@ -1,17 +1,20 @@
-﻿using Microsoft.UI.Windowing;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Media;
-using System;
+﻿using System;
 using System.IO;
 using System.Threading.Tasks;
-using TewiMP.Services;
-using TewiMP.Helpers;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Controls.Primitives;
+using Microsoft.UI.Composition.SystemBackdrops;
+using Windows.UI;
 using Windows.Storage;
 using Windows.Storage.Streams;
-using Windows.UI;
 using WinRT.Interop;
+using PInvoke;
+using WinUIEx;
+using TewiMP.Helpers;
+using TewiMP.Services;
 
 namespace TewiMP.UI.Windows;
 
@@ -22,18 +25,26 @@ public partial class ImageViewerWindow : Window
         var window = new ImageViewerWindow();
         window.SetSource(image);
         window.SetSaveName(saveName);
-        window.SystemBackdrop = new DesktopAcrylicBackdrop();
-        window.AppWindow.TitleBar.IconShowOptions = Microsoft.UI.Windowing.IconShowOptions.HideIconAndSystemMenu;
+
+        window.AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
         window.AppWindow.TitleBar.ExtendsContentIntoTitleBar = true;
         window.AppWindow.TitleBar.ButtonBackgroundColor = Color.FromArgb(0, 0, 0, 0);
         window.AppWindow.TitleBar.ButtonInactiveBackgroundColor = Color.FromArgb(0, 0, 0, 0);
         window.AppWindow.TitleBar.ButtonForegroundColor =
             App.Current.RequestedTheme == ApplicationTheme.Light ? Color.FromArgb(255, 0, 0, 0) : Color.FromArgb(255, 255, 255, 255);
-        window.AppWindow.Resize(new(500,500));
-        window.Maximize();
+
+        if (MicaController.IsSupported())
+            window.SystemBackdrop = new MicaBackdrop();
+        else
+            window.SystemBackdrop = new DesktopAcrylicBackdrop();
+
+        var p = User32.GetCursorPos();
+        window.SetWindowSize(900, 600);
+        window.Move(p.x - 900 / 2, Math.Max(p.y - 616, 0));
+
+        window.Title = "图片";
+        window.SetIcon(Path.Combine("Images", "Icons", "icon.ico"));
         window.Activate();
-        window.Title = "查看图片";
-        window.AppWindow.SetIcon(Path.Combine("Images", "Icons", "icon.ico"));
         return window;
     }
 
@@ -62,6 +73,7 @@ public partial class ImageViewerWindow : Window
     public void SetSaveName(string name)
     {
         SaveName = name;
+        TitleTextblock.Text = name;
     }
 
     private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)

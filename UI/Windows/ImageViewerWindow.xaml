@@ -13,7 +13,7 @@
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
         <ScrollViewer Grid.Row="1" x:Name="ImageScrollView"
-                      CanContentRenderOutsideBounds="True"
+                      CanContentRenderOutsideBounds="False"
                       ZoomMode="Enabled"
                       HorizontalScrollMode="Enabled"
                       HorizontalScrollBarVisibility="Auto"
@@ -27,73 +27,57 @@
                 </Image.Source>
             </Image>
         </ScrollViewer>
-        <Grid x:Name="TitleBar" Background="{ThemeResource CardStrokeColorDefault}"
-              VerticalAlignment="Top" Height="32">
-            <Rectangle Fill="{ThemeResource CardStrokeColorDefault}"
-                       HorizontalAlignment="Right"
-                       Width="138"/>
-            <TextBlock Text="" VerticalAlignment="Center" Padding="8,0,0,0"/>
+        <Grid x:Name="TitleBar"
+              VerticalAlignment="Top" Height="32" BorderThickness="0,0,0,1"
+              Background="{ThemeResource LayerFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+            <TextBlock x:Name="TitleTextblock" VerticalAlignment="Center" Margin="0,0,138,0" Padding="18,8,0,8" TextTrimming="WordEllipsis"/>
         </Grid>
-        <StackPanel x:Name="ToolBarGrid" Grid.Row="1"
-                    VerticalAlignment="Bottom"
-                    HorizontalAlignment="Right"
-                    Orientation="Vertical"
-                    Margin="18" Spacing="4">
-            <Grid BorderBrush="{ThemeResource CircleElevationBorderBrush}"
-                  Background="{ThemeResource AcrylicNormal}"
-                  BorderThickness="1"
-                  Height="44"
-                  Width="44"
-                  CornerRadius="22"
-                  HorizontalAlignment="Right">
-                <Button Content="1:1"
-                        VerticalAlignment="Stretch"
-                        HorizontalAlignment="Stretch"
-                        BorderThickness="0"
-                        Background="Transparent"
-                        Click="Button_Click_1" Tag="0"
-                        CornerRadius="22"/>
-            </Grid>
-            <Grid BorderBrush="{ThemeResource CircleElevationBorderBrush}"
-                  Background="{ThemeResource AcrylicNormal}"
-                  BorderThickness="1"
-                  Height="44"
-                  CornerRadius="22">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1.1*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="1.1*"/>
-                </Grid.ColumnDefinitions>
-                <RepeatButton Background="Transparent"
-                              BorderThickness="0"
-                              CornerRadius="22,0,0,22"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch"
-                              Click="RepeatButton_Click" Tag="1">
-                    <FontIcon Glyph="&#xE949;"
+
+        <Grid Grid.Row="3" Padding="6" BorderThickness="0,1,0,0"
+              Background="{ThemeResource LayerFillColorDefaultBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}">
+
+            <Grid.Resources>
+                <Style TargetType="Button" BasedOn="{StaticResource DefaultButtonStyle}">
+                    <Setter Property="Padding" Value="11,7,11,8"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                </Style>
+                <Style TargetType="RepeatButton" BasedOn="{StaticResource DefaultRepeatButtonStyle}">
+                    <Setter Property="Padding" Value="11,7,11,8"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                </Style>
+            </Grid.Resources>
+
+            <StackPanel x:Name="ToolBarGrid"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal"
+                        Spacing="4">
+                <Button Content="1:1" Click="Button_Click_1" Tag="0"/>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <RepeatButton HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Stretch"
+                                  Click="RepeatButton_Click" Tag="1">
+                        <FontIcon Glyph="&#xE949;"
                               FontSize="16"/>
-                </RepeatButton>
-                <TextBlock Text="100%" Grid.Column="1"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center"
-                           x:Name="ZoomTextBlock"/>
-                <RepeatButton Background="Transparent"
-                              BorderThickness="0"
-                              CornerRadius="0,22,22,0"
-                              VerticalAlignment="Stretch"
-                              HorizontalAlignment="Stretch"
-                              Grid.Column="2"
-                              Click="RepeatButton_Click" Tag="2">
-                    <FontIcon Glyph="&#xE948;"
-                              FontSize="16"/>
-                </RepeatButton>
-            </Grid>
-            <Button Style="{ThemeResource AccentButtonStyle}"
-                    BorderThickness="1"
-                    BorderBrush="{ThemeResource CircleElevationBorderBrush}"
-                    Height="44"
-                    Padding="20,0"
-                    CornerRadius="22"
+                    </RepeatButton>
+                    <TextBlock Text="100%" Grid.Column="1"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               x:Name="ZoomTextBlock"/>
+                    <RepeatButton VerticalAlignment="Stretch"
+                                  HorizontalAlignment="Stretch"
+                                  Grid.Column="2"
+                                  Click="RepeatButton_Click" Tag="2">
+                        <FontIcon Glyph="&#xE948;"
+                                  FontSize="16"/>
+                    </RepeatButton>
+                </StackPanel>
+            </StackPanel>
+
+            <Button Padding="12,7,12,8"
                     Click="Button_Click">
                 <StackPanel Orientation="Horizontal"
                             Spacing="12">
@@ -101,6 +85,6 @@
                     <TextBlock Text="保存到文件..."/>
                 </StackPanel>
             </Button>
-        </StackPanel>
+        </Grid>
     </Grid>
 </Window>

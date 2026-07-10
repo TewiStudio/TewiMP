@@ -9,6 +9,7 @@
     xmlns:control="using:TewiMP.UI.Controls"
     xmlns:data="using:TewiMP.Core"
     xmlns:community="using:CommunityToolkit.Labs.WinUI"
+    xmlns:c="using:CommunityToolkit.WinUI.Controls"
     mc:Ignorable="d"
     Closed="LogWindow_Closed">
 
@@ -18,78 +19,22 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="auto"/>
         </Grid.RowDefinitions>
-        <Grid x:Name="TitleBar" VerticalAlignment="Top">
+        <Grid x:Name="TitleBar"
+              VerticalAlignment="Top">
             <TextBlock Text="Log Viewer" Margin="18,8" FontSize="12"/>
         </Grid>
         <Grid
-            x:Name="LogArea" Grid.Row="1"
-            Margin="4,0,4,0" CornerRadius="4" BorderThickness="1"
-            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+            x:Name="LogArea"
+            Grid.Row="1"
+            Margin="6,0,6,0"
+            CornerRadius="4"
+            BorderThickness="1"
+            Background="{ThemeResource LayerFillColorAltBrush}"
+            BorderBrush="{ThemeResource ControlElevationBorderBrush}">
             <ListView
                 x:Name="LogList"
-                SelectionMode="None">
-                <ListView.Resources>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="ListViewItem">
-                                    <ListViewItemPresenter
-                                    Padding="0"
-                                    ContentTransitions="{TemplateBinding ContentTransitions}"
-                                    Control.IsTemplateFocusTarget="True"
-                                    FocusVisualMargin="{TemplateBinding FocusVisualMargin}"
-                                    FocusVisualPrimaryBrush="{TemplateBinding FocusVisualPrimaryBrush}"
-                                    FocusVisualPrimaryThickness="{TemplateBinding FocusVisualPrimaryThickness}"
-                                    FocusVisualSecondaryBrush="{TemplateBinding FocusVisualSecondaryBrush}"
-                                    FocusVisualSecondaryThickness="{TemplateBinding FocusVisualSecondaryThickness}"
-                                    SelectionCheckMarkVisualEnabled="{ThemeResource ListViewItemSelectionCheckMarkVisualEnabled}"
-                                    CheckBrush="{ThemeResource ListViewItemCheckBrush}"
-                                    CheckBoxBrush="{ThemeResource ListViewItemCheckBoxBrush}"
-                                    DragBackground="{ThemeResource ListViewItemDragBackground}"
-                                    DragForeground="{ThemeResource ListViewItemDragForeground}"
-                                    FocusBorderBrush="{ThemeResource ListViewItemFocusBorderBrush}"
-                                    FocusSecondaryBorderBrush="{ThemeResource ListViewItemFocusSecondaryBorderBrush}"
-                                    PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}"
-                                    PointerOverBackground="{ThemeResource ListViewItemBackgroundPointerOver}"
-                                    PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}"
-                                    SelectedBackground="{ThemeResource ListViewItemBackgroundSelected}"
-                                    SelectedForeground="{ThemeResource ListViewItemForegroundSelected}"
-                                    SelectedPointerOverBackground="{ThemeResource ListViewItemBackgroundSelectedPointerOver}"
-                                    PressedBackground="{ThemeResource ListViewItemBackgroundPressed}"
-                                    SelectedPressedBackground="{ThemeResource ListViewItemBackgroundSelectedPressed}"
-                                    DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}"
-                                    DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}"
-                                    ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}"
-                                    CheckMode="{ThemeResource ListViewItemCheckMode}"
-                                    CornerRadius="0"
-                                    CheckPressedBrush="{ThemeResource ListViewItemCheckPressedBrush}"
-                                    CheckDisabledBrush="{ThemeResource ListViewItemCheckDisabledBrush}"
-                                    CheckBoxPointerOverBrush="{ThemeResource ListViewItemCheckBoxPointerOverBrush}"
-                                    CheckBoxPressedBrush="{ThemeResource ListViewItemCheckBoxPressedBrush}"
-                                    CheckBoxDisabledBrush="{ThemeResource ListViewItemCheckBoxDisabledBrush}"
-                                    CheckBoxSelectedBrush="{ThemeResource ListViewItemCheckBoxSelectedBrush}"
-                                    CheckBoxSelectedPointerOverBrush="{ThemeResource ListViewItemCheckBoxSelectedPointerOverBrush}"
-                                    CheckBoxSelectedPressedBrush="{ThemeResource ListViewItemCheckBoxSelectedPressedBrush}"
-                                    CheckBoxSelectedDisabledBrush="{ThemeResource ListViewItemCheckBoxSelectedDisabledBrush}"
-                                    CheckBoxBorderBrush="{ThemeResource ListViewItemCheckBoxBorderBrush}"
-                                    CheckBoxPointerOverBorderBrush="{ThemeResource ListViewItemCheckBoxPointerOverBorderBrush}"
-                                    CheckBoxPressedBorderBrush="{ThemeResource ListViewItemCheckBoxPressedBorderBrush}"
-                                    CheckBoxDisabledBorderBrush="{ThemeResource ListViewItemCheckBoxDisabledBorderBrush}"
-                                    CheckBoxCornerRadius="{ThemeResource ListViewItemCheckBoxCornerRadius}"
-                                    SelectionIndicatorCornerRadius="{ThemeResource ListViewItemSelectionIndicatorCornerRadius}"
-                                    SelectionIndicatorVisualEnabled="{ThemeResource ListViewItemSelectionIndicatorVisualEnabled}"
-                                    SelectionIndicatorBrush="{ThemeResource ListViewItemSelectionIndicatorBrush}"
-                                    SelectionIndicatorPointerOverBrush="{ThemeResource ListViewItemSelectionIndicatorPointerOverBrush}"
-                                    SelectionIndicatorPressedBrush="{ThemeResource ListViewItemSelectionIndicatorPressedBrush}"
-                                    SelectionIndicatorDisabledBrush="{ThemeResource ListViewItemSelectionIndicatorDisabledBrush}"
-                                    SelectedDisabledBackground="{ThemeResource ListViewItemBackgroundSelectedDisabled}">
-                                    </ListViewItemPresenter>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </ListView.Resources>
+                SelectionMode="None"
+                ItemContainerStyle="{StaticResource NoPaddingListViewItemStyle}">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="data:LogData">
                         <control:LogItem/>
@@ -97,7 +42,8 @@
                 </ListView.ItemTemplate>
             </ListView>
         </Grid>
-        <Grid Grid.Row="2" Margin="4,4,4,4">
+        <Grid Grid.Row="2"
+              Padding="6">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="auto"/>

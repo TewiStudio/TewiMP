@@ -1,19 +1,20 @@
-﻿namespace TewiMP.UI.Windows;
-
-using System;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Collections.ObjectModel;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml.Controls;
-using CommunityToolkit.WinUI;
+using Microsoft.UI.Windowing;
+using Microsoft.UI.Composition.SystemBackdrops;
 using WinUIEx;
+using CommunityToolkit.WinUI;
+using TewiMP.Core;
 using TewiMP.Helpers;
 using TewiMP.Services;
-using TewiMP.Core;
 using TewiMP.Services.Storage;
+
+namespace TewiMP.UI.Windows;
 
 public partial class LogWindow : Window
 {
@@ -37,7 +38,12 @@ public partial class LogWindow : Window
         AppWindow.SetIcon(DataFolderBase.IconICOPath);
         AppWindow.Resize(new(800, 600));
         AppWindow.SetPresenter(overlappedPresenter);
-        SystemBackdrop = new DesktopAcrylicBackdrop();
+
+        if (MicaController.IsSupported())
+            SystemBackdrop = new MicaBackdrop();
+        else
+            SystemBackdrop = new DesktopAcrylicBackdrop();
+
     }
 
     private void LogWindow_Closed(object sender, WindowEventArgs args)

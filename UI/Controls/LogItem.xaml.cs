@@ -1,4 +1,4 @@
-using Microsoft.UI.Xaml;
+ï»¿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Controls;
 using TewiMP.Core;
@@ -24,13 +24,13 @@ namespace TewiMP.UI.Controls
             }
             else if (DataContext.LogLevel == LogLevel.Warning)
             {
-                t2.Foreground = App.Current.Resources["TextOnAccentFillColorPrimaryBrush"] as SolidColorBrush;
-                t1_2.Foreground = App.Current.Resources["SystemFillColorCautionBackgroundBrush"] as SolidColorBrush;
+                t2.Foreground = App.Current.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush;
+                t1_2.Foreground = App.Current.Resources["SystemFillColorCautionBrush"] as SolidColorBrush;
             }
             else if (DataContext.LogLevel == LogLevel.Error)
             {
-                t2.Foreground = App.Current.Resources["TextOnAccentFillColorPrimaryBrush"] as SolidColorBrush;
-                t1_2.Foreground = App.Current.Resources["SystemFillColorCriticalBackgroundBrush"] as SolidColorBrush;
+                t2.Foreground = App.Current.Resources["TextFillColorPrimaryBrush"] as SolidColorBrush;
+                t1_2.Foreground = App.Current.Resources["SystemFillColorCriticalBrush"] as SolidColorBrush;
             }
         }
 
@@ -39,10 +39,9 @@ namespace TewiMP.UI.Controls
             if (DataContext is null) return;
             t1_1.Text = $"[{DataContext.LogTime}]";
             t1_2.Text = $"[{DataContext.LogLevel}]";
-            t2_1.Text = $" ¡ñ {DataContext.LogName}£º";
+            t2_1.Text = $"[{DataContext.LogName}] ";
             t2_2.Text = $"{DataContext.LogContent}";
             t1_2_ColorManager();
-            swp.Value = DataContext.LogLevel;
         }
 
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
