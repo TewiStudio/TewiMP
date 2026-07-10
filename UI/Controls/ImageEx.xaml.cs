@@ -154,8 +154,11 @@ namespace TewiMP.UI.Controls
             }
             else
             {
-                image_GammaMassVisual.Opacity = 1;
-                rootVisual.Scale = new(1.07f);
+                if (image_GammaMassVisual is not null)
+                {
+                    image_GammaMassVisual.Opacity = 1;
+                    rootVisual.Scale = new(1.07f);
+                }
                 //mouseEnteredSizeNoDurationAnimation.Start(root);
             }
 
@@ -174,8 +177,11 @@ namespace TewiMP.UI.Controls
             }
             else
             {
-                image_GammaMassVisual.Opacity = 0;
-                rootVisual.Scale = Vector3.One;
+                if (image_GammaMassVisual is not null)
+                {
+                    image_GammaMassVisual.Opacity = 0;
+                    rootVisual.Scale = Vector3.One;
+                }
             }
 
             root_Background.Visibility = Visibility.Collapsed;
