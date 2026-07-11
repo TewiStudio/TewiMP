@@ -7,14 +7,14 @@
     xmlns:local="using:TewiMP.UI.Controls"
     xmlns:data="using:TewiMP.Core"
     xmlns:cc="using:CommunityToolkit.WinUI.Controls"
-    mc:Ignorable="d" Margin="-16,0,-8,0">
+    mc:Ignorable="d">
     <Page.Resources>
         <local:HMConverter x:Key="HMConverter"/>
         <local:IsUsedConverter x:Key="IsUsedConverter"/>
         <local:IsUsedVisibleConverter x:Key="IsUsedVisibleConverter"/>
         <local:IsDisabledConverter x:Key="IsDisabledConverter"/>
     </Page.Resources>
-    <ListView x:Name="HotKeyRoot" SelectionMode="None">
+    <ListView x:Name="HotKeyRoot" SelectionMode="None" ItemContainerStyle="{StaticResource NoPaddingMaxWidthListViewItemStyle}">
         <ListView.ItemTemplate>
             <DataTemplate x:DataType="data:HotKey">
                 <cc:SettingsCard Header="{Binding HotKeyID,Converter={StaticResource HMConverter}}"

@@ -13,7 +13,7 @@
 
     <Page.Resources>
         <Style TargetType="cc:SettingsExpander">
-            <Setter Property="Margin" Value="0,4,4,0"/>
+            <Setter Property="Margin" Value="16,4,16,0"/>
         </Style>
         <DataTemplate x:Key="PluginDataTemplate" x:DataType="plugin:Plugin">
             <cc:SettingsCard 
@@ -26,7 +26,11 @@
         </DataTemplate>
     </Page.Resources>
     
-    <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None" Padding="0,0,0,12">
+    <ListView x:Name="ListViewBase"
+              HorizontalContentAlignment="Center"
+              SelectionMode="None"
+              Padding="0,0,0,24"
+              ItemContainerStyle="{StaticResource NoPaddingMaxWidthListViewItemStyle}">
 
         <ListView.Header>
             <controls:StickTitleHeader Title="插件设置">
@@ -68,7 +72,7 @@
         <Button Style="{StaticResource TextBlockButtonStyle}"
                 Content="制作插件示例"
                 Click="Button_Click"
-                Margin="0,0,0,0">
+                Margin="8,0,0,0">
         </Button>
     </ListView>
 </Page>

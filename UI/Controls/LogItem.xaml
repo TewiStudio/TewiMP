@@ -17,7 +17,7 @@
         <TextBlock
             x:Name="t2" Grid.Row="1"
             IsTextSelectionEnabled="True"
-            TextWrapping="WrapWholeWords"
+            TextWrapping="Wrap"
             Padding="12,0">
             <Run x:Name="t1_1"/><Run x:Name="t1_2"/><Run x:Name="t2_1"/><Run x:Name="t2_2"/>
         </TextBlock>

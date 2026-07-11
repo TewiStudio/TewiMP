@@ -9,30 +9,48 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Loaded="Page_Loaded">
 
-    <ListView x:Name="ListViewBase" HorizontalContentAlignment="Center" SelectionMode="None" Padding="0,0,0,12">
+    <ListView x:Name="ListViewBase" 
+              HorizontalContentAlignment="Center"
+              SelectionMode="None" Padding="0,0,0,24"
+              ItemContainerStyle="{StaticResource NoPaddingMaxWidthListViewItemStyle}">
 
+        <ListView.ItemContainerTransitions>
+            <TransitionCollection>
+                <RepositionThemeTransition/>
+            </TransitionCollection>
+        </ListView.ItemContainerTransitions>
+
+        <ListView.Resources>
+            <Style TargetType="cc:SettingsExpander">
+                <Setter Property="Margin" Value="16,4,16,0"/>
+            </Style>
+            <Style TargetType="cc:SettingsCard">
+                <Setter Property="Margin" Value="16,4,16,0"/>
+            </Style>
+        </ListView.Resources>
+        
         <ListView.Header>
             <StackPanel>
                 <controls:StickTitleHeader Title="编辑热键" VerticalAlignment="Top"/>
             </StackPanel>
         </ListView.Header>
 
-        <cc:SettingsCard Header="全局热键开关" Margin="0,4,4,0"
+        <cc:SettingsCard Header="全局热键开关"
                              Description="打开/关闭全局热键">
             <ToggleSwitch Toggled="ToggleSwitch_Toggled" x:Name="HotkeyEnableToggleSwitch"/>
         </cc:SettingsCard>
 
-        <cc:SettingsCard Header="尝试重新应用热键" Margin="0,4,4,0"
+        <cc:SettingsCard Header="尝试重新应用热键"
                              Description="如果此程序被其它程序占用的热键被释放，重新注册可以使之前被占用的热键恢复在此程序的功能">
             <Button Content="重新应用" Click="Button_Click"/>
         </cc:SettingsCard>
 
-        <cc:SettingsCard Header="重置热键键位" Margin="0,4,4,0"
+        <cc:SettingsCard Header="重置热键键位"
                              Description="将热键键位恢复到程序默认">
             <Button Content="重置键位" Click="Button_Click_1"/>
         </cc:SettingsCard>
 
-        <controls:HotKeyPresenter/>
+        <controls:HotKeyPresenter Margin="16,0"/>
 
     </ListView>
 </Page>
