@@ -39,18 +39,6 @@
             Stroke="{ThemeResource MusicAlbumAccentBrush}"
             StrokeThickness="2"
             HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
-        <Rectangle
-            x:Name="Background_PlayingRectangle"
-            HorizontalAlignment="Left"
-            Width="3"
-            Fill="{ThemeResource MusicAlbumAccentBrush}"
-            Margin="3,20"
-            RadiusX="1.5" RadiusY="1.5"
-            Opacity="0">
-            <Rectangle.OpacityTransition>
-                <ScalarTransition/>
-            </Rectangle.OpacityTransition>
-        </Rectangle>
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
@@ -93,7 +81,7 @@
                         Foreground="{ThemeResource ApplicationSecondaryForegroundThemeBrush}"
                         FontSize="13"
                         TextTrimming="CharacterEllipsis">
-<Run x:Name="Info_Texts_CountRun" Text="{x:Bind ViewModel.CountText,Mode=OneWay}"/><Run x:Name="Info_Texts_TitleRun" Text="{x:Bind ViewModel.Title,Mode=OneWay}" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="14"/><Run x:Name="Info_Texts_Title2Run" Text="{x:Bind ViewModel.Title2,Mode=OneWay}"/></TextBlock>
+<Run x:Name="PlayingText" FontSize="14" Foreground="{ThemeResource MusicAlbumAccentBrush}"/><Run x:Name="Info_Texts_CountRun" Text="{x:Bind ViewModel.CountText,Mode=OneWay}"/><Run x:Name="Info_Texts_TitleRun" Text="{x:Bind ViewModel.Title,Mode=OneWay}" Foreground="{ThemeResource ApplicationForegroundThemeBrush}" FontSize="14"/><Run x:Name="Info_Texts_Title2Run" Text="{x:Bind ViewModel.Title2,Mode=OneWay}"/></TextBlock>
                     <Grid>
                         <TextBlock
                             x:Name="Info_Texts_ButtonNameTextBlock"

@@ -35,7 +35,7 @@
         <ListView.Header>
             <controls:StickContentHeader x:Name="StickContentHeader" Title="历史" Margin="0,0,0,8" BackgroundStartOpacity="1">
                 <controls:StickContentHeader.HeaderCommand>
-                    <cc:Segmented x:Name="HeaderSelectBase" Margin="0,0,16,0" SelectedIndex="1"
+                    <cc:Segmented x:Name="HeaderSelectBase" Margin="0,0,16,2" SelectedIndex="1"
                                   SelectionChanged="HeaderSelectBase_SelectionChanged_1">
                         <cc:SegmentedItem Content="统计"/>
                         <cc:SegmentedItem Content="播放历史"/>

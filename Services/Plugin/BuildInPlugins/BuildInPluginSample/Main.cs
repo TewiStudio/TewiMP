@@ -3,6 +3,7 @@
 using System.Collections.Generic;
 using TewiMP.Services;
 using TewiMP.Services.Plugin;
+using Windows.Services.Maps.OfflineMaps;
 
 // 每个插件的入口，需要继承自 Plugin 类，否则无法被识别为插件
 public class Main : Plugin
@@ -56,9 +57,10 @@ public class Main : Plugin
     public override string GetUserViewPluginSettingDescribe(string keyString)
     {
         if (keyString == "Settings Test List")
-        {
             return "This is a test list setting.";
-        }
+        else if (keyString == "Settings Test String")
+            return "This is a test string.";
+
         return base.GetUserViewPluginSettingDescribe(keyString);
     }
 

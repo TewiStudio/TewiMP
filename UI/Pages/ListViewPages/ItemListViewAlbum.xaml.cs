@@ -230,7 +230,6 @@ namespace TewiMP.UI.Pages
         {
             if (scrollViewer is null) return;
 
-            // 1. 初始化 Visuals (只执行一次)
             if (scrollerPropertySet is null)
             {
                 scrollerPropertySet = ElementCompositionPreview.GetScrollViewerManipulationPropertySet(scrollViewer);
@@ -252,18 +251,12 @@ namespace TewiMP.UI.Pages
                 CrateShadow();
             }
 
-            // 2. 准备参数 (提取变量，避免在表达式里重复计算)
             float anotherHeight = 168f;
             float sizeDouble = 0.391f;
 
-            // 更新中心点 (CenterPoint 依赖 Size，如果 Size 会变，这行必须保留)
-            // 注意：Vector3 的 Z 轴设为 1 没问题，但在 2D 变换中通常用不到
             logoVisual.CenterPoint = new System.Numerics.Vector3(0, logoVisual.Size.Y, 1);
             logoShadowVisual.CenterPoint = new System.Numerics.Vector3(0, logoVisual.Size.Y, 1);
 
-            // --------------------------------------------------------------------------
-            // 动画 1: Header Offset
-            // --------------------------------------------------------------------------
             if (_headerOffsetAnim is null)
             {
                 string exp = $"-scroller.Translation.Y - ({ProgressExp} * HeightParam)";
@@ -273,10 +266,6 @@ namespace TewiMP.UI.Pages
             _headerOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
             headerVisual.StartAnimation("Offset.Y", _headerOffsetAnim);
 
-            // --------------------------------------------------------------------------
-            // 动画 2 & 3: Opacity (Blur & Mass)
-            // --------------------------------------------------------------------------
-            // Blur: Lerp(1, 0, P)
             if (_blurOpacityAnim is null)
             {
                 string exp = $"Lerp(1, 0, {ProgressExp})";
@@ -286,7 +275,6 @@ namespace TewiMP.UI.Pages
             _blurOpacityAnim.SetScalarParameter("HeightParam", anotherHeight);
             blurAlbumRootVisual.StartAnimation("Opacity", _blurOpacityAnim);
 
-            // Mass: Lerp(0, 1, P)
             if (_massOpacityAnim is null)
             {
                 string exp = $"Lerp(0, 1, {ProgressExp})";
@@ -296,9 +284,6 @@ namespace TewiMP.UI.Pages
             _massOpacityAnim.SetScalarParameter("HeightParam", anotherHeight);
             massAlbumRootVisual.StartAnimation("Opacity", _massOpacityAnim);
 
-            // --------------------------------------------------------------------------
-            // 动画 4: Describee Opacity (使用独立的进度 /80)
-            // --------------------------------------------------------------------------
             if (_describeeOpacityAnim is null)
             {
                 string exp = $"Lerp(1, 0, {DescProgressExp})";
@@ -307,9 +292,6 @@ namespace TewiMP.UI.Pages
             }
             describeeRootVisual.StartAnimation("Opacity", _describeeOpacityAnim);
 
-            // --------------------------------------------------------------------------
-            // 动画 5: Image Scroll Offset
-            // --------------------------------------------------------------------------
             if (_imgScrollOffsetAnim is null)
             {
                 // Lerp(0, TargetY, P)
@@ -321,9 +303,6 @@ namespace TewiMP.UI.Pages
             _imgScrollOffsetAnim.SetScalarParameter("TargetY", anotherHeight / 1.2f);
             ImageScrollVisual.StartAnimation("Offset", _imgScrollOffsetAnim);
 
-            // --------------------------------------------------------------------------
-            // 动画 6 & 7: Logo & Shadow Scale (共用一个动画对象！)
-            // --------------------------------------------------------------------------
             if (_logoScaleAnim is null)
             {
                 string exp = $"Lerp(Vector3(1, 1, 1), Vector3(TargetScale, TargetScale, 1), {ProgressExp})";
@@ -337,9 +316,6 @@ namespace TewiMP.UI.Pages
             logoVisual.StartAnimation("Scale", _logoScaleAnim);
             logoShadowVisual.StartAnimation("Scale", _logoScaleAnim);
 
-            // --------------------------------------------------------------------------
-            // 动画 8: CommandBar Offset Y
-            // --------------------------------------------------------------------------
             if (_cmdBarOffsetAnim is null)
             {
                 string exp = $"Lerp(StartY, EndY, {ProgressExp})";
@@ -348,13 +324,10 @@ namespace TewiMP.UI.Pages
             }
             float cmdBarH = commandbarVisual.Size.Y;
             _cmdBarOffsetAnim.SetScalarParameter("HeightParam", anotherHeight);
-            _cmdBarOffsetAnim.SetScalarParameter("StartY", 282f - cmdBarH);
-            _cmdBarOffsetAnim.SetScalarParameter("EndY", 114f - cmdBarH);
+            _cmdBarOffsetAnim.SetScalarParameter("StartY", 281f - cmdBarH);
+            _cmdBarOffsetAnim.SetScalarParameter("EndY", 112f - cmdBarH);
             commandbarVisual.StartAnimation("Offset.Y", _cmdBarOffsetAnim);
 
-            // --------------------------------------------------------------------------
-            // 动画 9: Info Text Root Offset
-            // --------------------------------------------------------------------------
             if (_infoTextOffsetAnim is null)
             {
                 // Start: (StartX, 0, 0) -> End: (EndX, HeightParam, 0)
@@ -368,9 +341,6 @@ namespace TewiMP.UI.Pages
             _infoTextOffsetAnim.SetScalarParameter("EndX", logoW * sizeDouble + 12f);
             infoTextsRootVisual.StartAnimation("Offset", _infoTextOffsetAnim);
 
-            // --------------------------------------------------------------------------
-            // 动画 10: Search Base Offset
-            // --------------------------------------------------------------------------
             if (_searchBaseOffsetAnim is null)
             {
                 // StartY -> EndY
@@ -383,9 +353,6 @@ namespace TewiMP.UI.Pages
             _searchBaseOffsetAnim.SetScalarParameter("EndY", anotherHeight + 132f + 12f);
             searchBaseVisual.StartAnimation("Offset", _searchBaseOffsetAnim);
 
-            // --------------------------------------------------------------------------
-            // 动画 11: Header Foot Root Offset
-            // --------------------------------------------------------------------------
             if (_footerOffsetAnim is null)
             {
                 string exp = $"Lerp(Vector3(-16, StartY, 0), Vector3(-16, EndY, 0), {ProgressExp})";

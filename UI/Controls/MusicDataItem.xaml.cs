@@ -258,6 +258,7 @@ namespace TewiMP.UI.Controls
         }
 
         bool last_IsMusicDataPlaying = false;
+        static readonly string PlayingIcon = "● ";
         void InitPlayingState()
         {
             if (IsMusicDataPlaying)
@@ -266,7 +267,7 @@ namespace TewiMP.UI.Controls
                 App.Instance.AudioService.PlayStateChanged += AudioService_PlayStateChanged;
                 SetPlayingIcon(App.Instance.AudioService.PlaybackState);
                 OnMouseIn();
-                Background_PlayingRectangle.Opacity = 1;
+                PlayingText.Text = PlayingIcon;
                 last_IsMusicDataPlaying = true;
             }
             else
@@ -276,7 +277,7 @@ namespace TewiMP.UI.Controls
                 {
                     SetPlayingIcon(NAudio.Wave.PlaybackState.Paused);
                     OnMouseLeave();
-                    Background_PlayingRectangle.Opacity = 0;
+                    PlayingText.Text = string.Empty;
                 }
                 last_IsMusicDataPlaying = false;
             }
