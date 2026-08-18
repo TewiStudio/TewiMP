@@ -56,6 +56,7 @@ public class PlayingListService
     public bool PauseWhenPreviousPause { get; set; } = true;
     public bool NextWhenPlayError { get; set; } = true;
     public bool UseSystemAccentColor { get; set; } = false;
+    public bool LastIsRandomPlay { get => lastIsRandomPlay; private set => lastIsRandomPlay = value; }
 
     bool lastIsRandomPlay = false;
     private PlayBehavior _playBehavior = PlayBehavior.循环播放;

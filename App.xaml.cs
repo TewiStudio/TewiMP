@@ -1,35 +1,35 @@
-﻿using System;
+﻿using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
+using NAudio.Wave;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Windows.Media;
-using Windows.Storage;
-using Windows.Media.Playback;
-using Windows.Storage.Streams;
-using Windows.ApplicationModel.Core;
-using Windows.UI.Popups;
-using Windows.UI.ViewManagement;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NAudio.Wave;
-using WinRT.Interop;
-using TewiMP.Helpers;
-using TewiMP.UI.Pages;
-using TewiMP.UI.Windows;
 using TewiMP.Core;
 using TewiMP.Core.Audio;
 using TewiMP.Core.Music;
+using TewiMP.Helpers;
 using TewiMP.Services;
-using TewiMP.Services.Plugin;
-using TewiMP.Services.Storage;
 using TewiMP.Services.Media.Audio;
 using TewiMP.Services.Media.Audio.AudioEffects;
+using TewiMP.Services.Plugin;
+using TewiMP.Services.Storage;
+using TewiMP.UI.Pages;
+using TewiMP.UI.Windows;
+using Windows.ApplicationModel.Core;
+using Windows.Media;
+using Windows.Media.Playback;
+using Windows.Storage;
+using Windows.Storage.Streams;
+using Windows.UI.Popups;
+using Windows.UI.ViewManagement;
+using WinRT.Interop;
 
 
 namespace TewiMP;
@@ -104,7 +104,7 @@ public partial class App : Application
         Available = true,
         SuffixType = SuffixType.Beta,
         Version = Assembly.GetExecutingAssembly().GetName().Version,
-        ReleaseTime = new(2026, 6, 13, 10, 00, 00),
+        ReleaseTime = new(2026, 8, 18, 14, 00, 00),
         ExtendMessage = null
     };
     public Version AppVersion => NowVersion.Version;
@@ -192,132 +192,8 @@ public partial class App : Application
         PlayListReader = new();
         HotKeyService = new();
 
-        BMP = BackgroundMediaPlayer.Current;
-        BMP.AudioCategory = MediaPlayerAudioCategory.Media;
+        InitSMTC();
 
-        SMTC = BMP?.SystemMediaTransportControls;
-        SMTC.IsPlayEnabled = true;
-        SMTC.IsPauseEnabled = true;
-        SMTC.IsNextEnabled = true;
-        SMTC.IsPreviousEnabled = true;
-        SMTC.IsStopEnabled = true;
-        SMTC.DisplayUpdater.Type = MediaPlaybackType.Music;
-        SMTC.DisplayUpdater.AppMediaId = AppName;
-        SMTC.DisplayUpdater.MusicProperties.Title = AppName;
-        SMTC.DisplayUpdater.MusicProperties.Artist = "没有正在播放的歌曲";
-        SMTC.DisplayUpdater.Update();
-
-        int saveSettingsWhenSourceChangedCount = 0;
-        AudioService.SourceChanged += async (AudioService) =>
-        {
-            AudioService.AudioThread.Invoke(async () => await SongHistoryHelper.AddHistory(new() { MusicData = AudioService.MusicData, Time = DateTime.Now })
-                );
-            if (saveSettingsWhenSourceChangedCount > 4)
-            {
-                saveSettingsWhenSourceChangedCount = 0;
-                await SaveNowPlaying();
-                SaveSettings();
-            }
-            saveSettingsWhenSourceChangedCount++;
-        };
-        AudioService.CacheLoadingChanged += (_, __) =>
-        {
-            try
-            {
-                SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData?.Title;
-                SMTC.DisplayUpdater.MusicProperties.Artist = "加载中...";
-                SMTC.DisplayUpdater.Update();
-            }
-            catch { }
-        };
-        AudioService.CacheLoadedChanged += (_) =>
-        {
-            try
-            {
-                if (_.MusicData is null)
-                {
-                    SMTC.DisplayUpdater.MusicProperties.Title = _.FileReader?.FileName;
-                    MainWindowInstance.AppWindow.Title = AppName;
-                }
-                else
-                {
-                    SMTC.DisplayUpdater.MusicProperties.Title = _.MusicData.Title;
-                    SMTC.DisplayUpdater.MusicProperties.Artist = _.MusicData.ButtonName;
-                    MainWindowInstance.AppWindow.Title = $"{_.MusicData.Title} - {_.MusicData.ArtistName} · {AppName}";
-                }
-                SMTC.DisplayUpdater.Update();
-            }
-            catch { }
-        };
-        AudioService.PlayStateChanged += (_) =>
-        {
-            try
-            {
-                if (_.PlaybackState == PlaybackState.Playing)
-                {
-                    SMTC.PlaybackStatus = MediaPlaybackStatus.Playing;
-                }
-                else
-                {
-                    SMTC.PlaybackStatus = MediaPlaybackStatus.Paused;
-                }
-            }
-            catch { }
-        };
-        PlayingListService.NowPlayingImageLoading += (_, __) =>
-        {
-            try
-            {
-                SMTC.DisplayUpdater.Thumbnail = null;
-                SMTC.DisplayUpdater.Update();
-            }
-            catch { }
-        };
-        SMTC.ButtonPressed += (_, __) =>
-        {
-            MainWindowInstance.Invoke(() =>
-            {
-                switch (__.Button)
-                {
-                    case SystemMediaTransportControlsButton.Play:
-                        AudioService.SetPlay();
-                        break;
-                    case SystemMediaTransportControlsButton.Pause:
-                        AudioService.SetPause();
-                        break;
-                    case SystemMediaTransportControlsButton.Previous:
-                        PlayingListService.PlayPrevious();
-                        break;
-                    case SystemMediaTransportControlsButton.Next:
-                        PlayingListService.PlayNext();
-                        break;
-                    case SystemMediaTransportControlsButton.Stop:
-                        AudioService.SetStop();
-                        break;
-                }
-            });
-        };
-        PlayingListService.NowPlayingImageLoaded += async (_, __) =>
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(__))
-                {
-                    SMTC.DisplayUpdater.Thumbnail = null;
-                }
-                else
-                {
-                    try
-                    {
-                        SMTC.DisplayUpdater.Thumbnail = RandomAccessStreamReference.CreateFromFile(await StorageFile.GetFileFromPathAsync(__));
-                    }
-                    catch { }
-                }
-
-                SMTC.DisplayUpdater.Update();
-            }
-            catch { }
-        };
         UISettings.ColorValuesChanged += async (uiSettings, obj) =>
         {
             MainWindowInstance.Invoke(async () =>
@@ -407,6 +283,193 @@ public partial class App : Application
                 File.Delete(DataFolderBase.StartupShortcutPath);
             }
         });
+    }
+    #endregion
+
+    #region SMTC
+    private void InitSMTC()
+    {
+        BMP = BackgroundMediaPlayer.Current;
+        BMP.AudioCategory = MediaPlayerAudioCategory.Media;
+
+        SMTC = BMP?.SystemMediaTransportControls;
+        SMTC.IsPlayEnabled = true;
+        SMTC.IsPauseEnabled = true;
+        SMTC.IsNextEnabled = true;
+        SMTC.IsPreviousEnabled = true;
+        SMTC.IsStopEnabled = true;
+        SMTC.DisplayUpdater.Type = MediaPlaybackType.Music;
+        SMTC.DisplayUpdater.AppMediaId = AppName;
+        SMTC.DisplayUpdater.MusicProperties.Title = AppName;
+        SMTC.DisplayUpdater.MusicProperties.Artist = "没有正在播放的歌曲";
+        SMTC.DisplayUpdater.Update();
+
+        bool mediaChanging = false;
+        int saveSettingsWhenSourceChangedCount = 0;
+
+        AudioService.SourceChanged += async (AudioService) =>
+        {
+            AudioService.AudioThread.Invoke(async () =>
+                await SongHistoryHelper.AddHistory(new() { MusicData = AudioService.MusicData, Time = DateTime.Now })
+            );
+            if (saveSettingsWhenSourceChangedCount > 4)
+            {
+                saveSettingsWhenSourceChangedCount = 0;
+                await SaveNowPlaying();
+                SaveSettings();
+            }
+            saveSettingsWhenSourceChangedCount++;
+        };
+        AudioService.CacheLoadingChanged += (s, __) =>
+        {
+            try
+            {
+                SMTC.DisplayUpdater.Thumbnail = null;
+                SMTC.DisplayUpdater.Update();
+                mediaChanging = true;
+            }
+            catch { }
+        };
+        AudioService.CacheLoadedChanged += (s) =>
+        {
+            try
+            {
+                if (s.MusicData is null)
+                {
+                    SMTC.DisplayUpdater.MusicProperties.Title = s.FileReader?.FileName;
+                    MainWindowInstance.AppWindow.Title = AppName;
+                }
+                else
+                {
+                    SMTC.DisplayUpdater.MusicProperties.Title = s.MusicData.Title;
+                    SMTC.DisplayUpdater.MusicProperties.Artist = s.MusicData.ArtistName;
+                    MainWindowInstance.AppWindow.Title = $"{s.MusicData.Title} - {s.MusicData.ArtistName} · {AppName}";
+                }
+                SMTC.DisplayUpdater.Update();
+            }
+            catch { }
+        };
+        AudioService.PlayStateChanged += (s) =>
+        {
+            try
+            {
+                if (s.PlaybackState == PlaybackState.Playing)
+                {
+                    SMTC.PlaybackStatus = MediaPlaybackStatus.Playing;
+                }
+                else
+                {
+                    SMTC.PlaybackStatus = MediaPlaybackStatus.Paused;
+                }
+            }
+            catch { }
+        };
+        AudioService.TimingChanged += (audioService) =>
+        {
+            var timeline = new SystemMediaTransportControlsTimelineProperties
+            {
+                StartTime = TimeSpan.Zero,
+                EndTime = audioService.TotalTime,
+                Position = audioService.CurrentTime,
+                MinSeekTime = TimeSpan.Zero,
+                MaxSeekTime = audioService.TotalTime
+            };
+            SMTC.UpdateTimelineProperties(timeline);
+        };
+        PlayingListService.NowPlayingImageLoading += (_, __) =>
+        {
+            try
+            {
+                SMTC.DisplayUpdater.Thumbnail = null;
+                SMTC.DisplayUpdater.Update();
+            }
+            catch { }
+        };
+        PlayingListService.PlayBehaviorChanged += (playBehavior) =>
+        {
+            SMTC.ShuffleEnabled = playBehavior == PlayBehavior.随机播放;
+
+            SMTC.AutoRepeatMode = playBehavior switch
+            {
+                PlayBehavior.播放完成后停止 => MediaPlaybackAutoRepeatMode.None,
+                PlayBehavior.单曲循环 => MediaPlaybackAutoRepeatMode.Track,
+                PlayBehavior.循环播放 => MediaPlaybackAutoRepeatMode.List,
+                _ => MediaPlaybackAutoRepeatMode.None
+            };
+        };
+        SMTC.ButtonPressed += (_, e) =>
+        {
+            MainWindowInstance.Invoke(() =>
+            {
+                switch (e.Button)
+                {
+                    case SystemMediaTransportControlsButton.Play:
+                        AudioService.SetPlay();
+                        break;
+                    case SystemMediaTransportControlsButton.Pause:
+                        AudioService.SetPause();
+                        break;
+                    case SystemMediaTransportControlsButton.Previous:
+                        PlayingListService.PlayPrevious();
+                        break;
+                    case SystemMediaTransportControlsButton.Next:
+                        PlayingListService.PlayNext();
+                        break;
+                    case SystemMediaTransportControlsButton.Stop:
+                        AudioService.SetStop();
+                        break;
+                }
+            });
+        };
+        SMTC.PlaybackPositionChangeRequested += (s, e) =>
+        {
+            MainWindowInstance.Invoke(() =>
+            {
+                AudioService.CurrentTime = e.RequestedPlaybackPosition;
+            });
+        };
+        SMTC.ShuffleEnabledChangeRequested += (_, __) =>
+        {
+            MainWindowInstance.Invoke(() =>
+            {
+                PlayingListService.PlayBehavior =
+                    PlayingListService.PlayBehavior == PlayBehavior.随机播放 ? PlayBehavior.循环播放 : PlayBehavior.随机播放;
+            });
+        };
+        SMTC.AutoRepeatModeChangeRequested += (_, e) =>
+        {
+            MainWindowInstance.Invoke(() =>
+            {
+                PlayingListService.PlayBehavior = e.RequestedAutoRepeatMode switch
+                {
+                    MediaPlaybackAutoRepeatMode.None => PlayBehavior.播放完成后停止,
+                    MediaPlaybackAutoRepeatMode.Track => PlayBehavior.单曲循环,
+                    MediaPlaybackAutoRepeatMode.List => PlayBehavior.循环播放,
+                    _ => PlayBehavior.播放完成后停止
+                };
+            });
+        };
+        PlayingListService.NowPlayingImageLoaded += async (_, e) =>
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(e))
+                {
+                    SMTC.DisplayUpdater.Thumbnail = null;
+                }
+                else
+                {
+                    try
+                    {
+                        SMTC.DisplayUpdater.Thumbnail = RandomAccessStreamReference.CreateFromFile(await StorageFile.GetFileFromPathAsync(e));
+                    }
+                    catch { }
+                }
+
+                SMTC.DisplayUpdater.Update();
+            }
+            catch { }
+        };
     }
     #endregion
 

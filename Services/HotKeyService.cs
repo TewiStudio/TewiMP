@@ -238,7 +238,7 @@ public class HotKeyService
                     App.MainWindowInstance.OpenDesktopLyricWindow();
                     break;
                 case HotKeyID.RandomPlay:
-                    App.Instance.PlayingListService.PlayBehavior = App.Instance.PlayingListService.PlayBehavior == Services.PlayBehavior.随机播放 ? Services.PlayBehavior.顺序播放 : Services.PlayBehavior.随机播放;
+                    App.Instance.PlayingListService.PlayBehavior = App.Instance.PlayingListService.PlayBehavior == PlayBehavior.随机播放 ? PlayBehavior.顺序播放 : PlayBehavior.随机播放;
                     break;
                 case HotKeyID.OpenMainWindow:
                     App.MainWindowInstance.Restore();
