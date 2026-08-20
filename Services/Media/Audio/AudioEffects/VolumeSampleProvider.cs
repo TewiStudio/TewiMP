@@ -29,16 +29,18 @@ public class VolumeSampleProvider : ISampleProvider
 
     public WaveFormat WaveFormat { get; }
 
-    public int Read(float[] buffer, int offset, int count)
+    public int Read(Span<float> buffer)
     {
-        int samplesRead = sourceProvider.Read(buffer, offset, count);
+        int samplesRead = sourceProvider.Read(buffer);
+
         if (volume != 1.0f && samplesRead > 0)
         {
             for (int n = 0; n < samplesRead; n++)
             {
-                buffer[offset + n] *= volume;
+                buffer[n] *= volume;
             }
         }
+
         return samplesRead;
     }
 }

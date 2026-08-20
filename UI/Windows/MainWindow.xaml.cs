@@ -332,7 +332,7 @@ public sealed partial class MainWindow : WindowEx
         {
             foreach (var musicData in await MusicData.FromFile(str))
             {
-                App.Instance.PlayingListService.Add(musicData); mlist.Add(musicData);
+                App.Instance.PlayingListService.Add(musicData, insert: true); mlist.Add(musicData);
             }
         }
         if (mlist.Count > 0)
@@ -509,7 +509,7 @@ public sealed partial class MainWindow : WindowEx
         }
         else
         {
-            if (CodeHelper.IsIconic(Handle))
+            if (CodeHelper.IsIconic(Handle) && !App.IsExited)
             {
                 App.Instance.SaveNowPlaying();
                 App.Instance.SaveSettings();

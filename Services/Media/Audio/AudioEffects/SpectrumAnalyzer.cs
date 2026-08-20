@@ -89,9 +89,9 @@ public class SpectrumAnalyzer : ISampleProvider
         }
     }
 
-    public int Read(float[] buffer, int offset, int count)
+    public int Read(Span<float> buffer)
     {
-        int read = _source.Read(buffer, offset, count);
+        int read = _source.Read(buffer);
         if (read <= 0) return read;
 
         int channels = _source.WaveFormat.Channels;
@@ -109,13 +109,13 @@ public class SpectrumAnalyzer : ISampleProvider
                 // 手动展开常用声道数循环
                 if (channels == 2)
                 {
-                    sample = (buffer[offset + sourceIdx] + buffer[offset + sourceIdx + 1]) * 0.5f;
+                    sample = (buffer[sourceIdx] + buffer[sourceIdx + 1]) * 0.5f;
                     sourceIdx += 2;
                 }
                 else
                 {
                     for (int c = 0; c < channels; c++)
-                        sample += buffer[offset + sourceIdx + c];
+                        sample += buffer[sourceIdx + c];
                     sample /= channels;
                     sourceIdx += channels;
                 }

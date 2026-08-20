@@ -1,14 +1,16 @@
-﻿using System;
-using System.IO;
-using System.Diagnostics;
-using System.Collections.Generic;
-using NAudio.Dsp;
+﻿using NAudio.Dsp;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
-using TewiMP.Helpers;
-using TewiMP.Services.Storage;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
 using TewiMP.Core.Audio;
+using TewiMP.Helpers;
 using TewiMP.Services.Media.Audio.AudioEffects;
+using TewiMP.Services.Storage;
 
 namespace TewiMP.Services.Media.Audio;
 
@@ -208,13 +210,6 @@ public class AudioFileReader : WaveStream, ISampleProvider
         }
     }
 
-    public override int Read(byte[] buffer, int offset, int count)
-    {
-        WaveBuffer waveBuffer = new WaveBuffer(buffer);
-        int count2 = count / 4;
-        return Read(waveBuffer.FloatBuffer, offset / 4, count2) * 4;
-    }
-
     // 均衡器
     public void CreateFilters()
     {
@@ -279,8 +274,20 @@ public class AudioFileReader : WaveStream, ISampleProvider
                 _filters.Add(filterGroup);
             }
         }
+
+        UpdateFilters(_passFilters, _filters);
     }
 
+    public void UpdateFilters(
+        List<BiQuadFilter[]> passFilters,
+        List<BiQuadFilter[]> filters)
+    {
+        var passSnapshot = passFilters?.ToArray() ?? Array.Empty<BiQuadFilter[]>();
+        var filterSnapshot = filters?.ToArray() ?? Array.Empty<BiQuadFilter[]>();
+
+        _passFiltersSnapshot = passSnapshot;
+        _filtersSnapshot = filterSnapshot;
+    }
 
     /// <summary>
     /// 判断滤波器是否应用于当前声道
@@ -336,22 +343,33 @@ public class AudioFileReader : WaveStream, ISampleProvider
         return filter;
     }
 
+    private BiQuadFilter[][] _passFiltersSnapshot = Array.Empty<BiQuadFilter[]>();
+    private BiQuadFilter[][] _filtersSnapshot = Array.Empty<BiQuadFilter[]>();
+
+    public override int Read(byte[] buffer, int offset, int count)
+    {
+        var floatBuffer = MemoryMarshal.Cast<byte, float>(
+            buffer.AsSpan(offset, count));
+
+        return Read(floatBuffer) * sizeof(float);
+    }
+
     // 在读取音频数据时加入均衡器数据
-    public int Read(float[] buffer, int offset, int count)
+    public int Read(Span<float> buffer)
     {
         int samplesRead;
 
         // 尽可能缩小锁范围（避免音频阻塞）
         lock (lockObject)
         {
-            samplesRead = sampleChannel.Read(buffer, offset, count);
+            samplesRead = sampleChannel.Read(buffer);
             if (samplesRead <= 0 || !EqEnabled)
                 return samplesRead;
         }
 
         // 创建安全副本（防止UI线程修改滤波器列表）
-        var localPassFilters = _passFilters?.ToArray();
-        var localFilters = _filters?.ToArray();
+        var passFilters = _passFiltersSnapshot;
+        var filters = _filtersSnapshot;
 
         int channels = WaveFormat.Channels;
         if (channels <= 0)
@@ -360,59 +378,70 @@ public class AudioFileReader : WaveStream, ISampleProvider
         int samplesPerChannel = samplesRead / channels;
 
         // Pass Filters
-        if (localPassFilters != null)
+        for (int i = 0; i < passFilters.Length; i++)
         {
-            foreach (var filterArray in localPassFilters)
+            var filterArray = passFilters[i];
+
+            if (filterArray == null || filterArray.Length == 0)
+                continue;
+
+            int stagesCount = filterArray.Length / channels;
+
+            if (stagesCount <= 0)
+                continue;
+
+            for (int ch = 0; ch < channels; ch++)
             {
-                if (filterArray == null || filterArray.Length == 0)
-                    continue;
+                int filterBaseIndex = ch * stagesCount;
 
-                int stagesCount = filterArray.Length / channels;
-                if (stagesCount <= 0) continue;
-
-                // 按通道处理
-                for (int ch = 0; ch < channels; ch++)
+                for (int n = 0; n < samplesPerChannel; n++)
                 {
-                    for (int n = 0; n < samplesPerChannel; n++)
+                    int sampleIndex = n * channels + ch;
+
+                    float sample = buffer[sampleIndex];
+
+                    for (int s = 0; s < stagesCount; s++)
                     {
-                        int idx = offset + n * channels + ch;
-                        float sample = buffer[idx];
+                        int filterIndex = filterBaseIndex + s;
 
-                        for (int s = 0; s < stagesCount; s++)
-                        {
-                            int filterIdx = ch * stagesCount + s;
-                            if (filterIdx < filterArray.Length)
-                            {
-                                var filter = filterArray[filterIdx];
-                                if (filter != null)
-                                    sample = filter.Transform(sample);
-                            }
-                        }
+                        if (filterIndex >= filterArray.Length)
+                            break;
 
-                        buffer[idx] = sample;
+                        var filter = filterArray[filterIndex];
+
+                        if (filter != null)
+                            sample = filter.Transform(sample);
                     }
+
+                    buffer[sampleIndex] = sample;
                 }
             }
         }
 
         // EQ Filters
-        if (localFilters != null)
+        for (int i = 0; i < filters.Length; i++)
         {
-            foreach (var filterArray in localFilters)
+            var filterArray = filters[i];
+
+            if (filterArray == null || filterArray.Length == 0)
+                continue;
+
+            for (int ch = 0; ch < channels; ch++)
             {
-                if (filterArray == null || filterArray.Length == 0)
+                if (ch >= filterArray.Length)
+                    break;
+
+                var filter = filterArray[ch];
+
+                if (filter == null)
                     continue;
 
-                for (int ch = 0; ch < channels; ch++)
+                for (int n = 0; n < samplesPerChannel; n++)
                 {
-                    var filter = (ch < filterArray.Length) ? filterArray[ch] : null;
-                    if (filter == null) continue;
+                    int sampleIndex = n * channels + ch;
 
-                    for (int n = 0; n < samplesPerChannel; n++)
-                    {
-                        int idx = offset + n * channels + ch;
-                        buffer[idx] = filter.Transform(buffer[idx]);
-                    }
+                    buffer[sampleIndex] =
+                        filter.Transform(buffer[sampleIndex]);
                 }
             }
         }

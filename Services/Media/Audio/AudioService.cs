@@ -126,7 +126,7 @@ public class AudioService
         {
             _wasapiOnly = value;
             if (NowOutObj is null) return;
-            if (NowOutObj.GetType() == typeof(WasapiOut))
+            if (NowOutObj.GetType() == typeof(WasapiPlayer))
             {
                 SetReloadAsync();
             }
@@ -322,9 +322,10 @@ public class AudioService
         App.Instance.CacheService.AddingCacheMusicData += CacheManager_AddingCacheMusicData;
         App.Instance.CacheService.CachedMusicData += CacheManager_CachedMusicData;
         App.Instance.CacheService.CachingStateChangeMusicData += CacheManager_CachingStateChangeMusicData;
-        ClientDeviceEvents.notificationClient.OnDefaultDeviceChangedEvent += NotificationClient_OnDefaultDeviceChangedEvent;
-        ClientDeviceEvents.notificationClient.OnDeviceStateChangedEvent += NotificationClient_OnDeviceStateChangedEvent;
-        ClientDeviceEvents.notificationClient.OnDeviceRemovedEvent += NotificationClient_OnDeviceRemovedEvent;
+
+        ClientDeviceEvents.DeviceNotificationClient.DefaultDeviceChanged += DeviceNotificationClient_DefaultDeviceChanged;
+        ClientDeviceEvents.DeviceNotificationClient.DeviceStateChanged += DeviceNotificationClient_DeviceStateChanged;
+        ClientDeviceEvents.DeviceNotificationClient.DeviceRemoved += DeviceNotificationClient_DeviceRemoved;
     }
 
     private readonly object _analyzerLock = new();
@@ -392,14 +393,13 @@ public class AudioService
         CacheLoadingChanged?.Invoke(this, value);
     }
 
-    int loadCounter = 0;
-    bool isInErrorDialog = false;
-    private async void NotificationClient_OnDefaultDeviceChangedEvent(DataFlow dataFlow, Role deviceRole, string defaultDeviceId)
+    int defaultDeviceChangedCounter = 0;
+    private async void DeviceNotificationClient_DefaultDeviceChanged(object sender, DefaultDeviceChangedEventArgs _)
     {
-        //loadCounter++;
-        //await Task.Delay(100); // 不加会导致 集合被修改 的错误，DirectSound 导致的 >:(
-        //loadCounter--;
-        //if (loadCounter != 0) return;
+        defaultDeviceChangedCounter++;
+        await Task.Delay(100); // 不加会导致 集合被修改 的错误，DirectSound 导致的 >:(
+        defaultDeviceChangedCounter--;
+        if (defaultDeviceChangedCounter != 0) return;
 
         var devices = await OutDevice.GetOutDevicesAsync();
         if (NowOutObj is null)
@@ -430,10 +430,10 @@ public class AudioService
             if (isPlaying) SetPlay();
             else SetPause();
         });
-        if (NowOutObj.GetType() != typeof(DirectSoundOut) && NowOutObj.GetType() != typeof(WasapiOut)) return;
+        if (NowOutObj.GetType() != typeof(DirectSoundOut) && NowOutObj.GetType() != typeof(WasapiPlayer)) return;
         if (!NowOutDevice.IsDefaultDevice) return;
 
-        if (NowOutObj.GetType() == typeof(WasapiOut)) NowOutDevice = OutDevice.GetWasapiDefaultDevice();
+        if (NowOutObj.GetType() == typeof(WasapiPlayer)) NowOutDevice = OutDevice.GetWasapiDefaultDevice();
         else if (NowOutObj.GetType() == typeof(DirectSoundOut)) NowOutDevice = OutDevice.GetDirectSoundOutDefaultDevice();
         App.MainWindowInstance.Invoke(() =>
         {
@@ -441,16 +441,15 @@ public class AudioService
         });
     }
 
-    private void NotificationClient_OnDeviceStateChangedEvent(string deviceId, DeviceState newState)
+    private void DeviceNotificationClient_DeviceStateChanged(object sender, DeviceStateChangedEventArgs e)
     {
-        if (newState == DeviceState.Disabled)
-            NotificationClient_OnDefaultDeviceChangedEvent(DataFlow.All, Role.Multimedia, deviceId);
+        if (e.NewState== DeviceState.Disabled)
+            DeviceNotificationClient_DefaultDeviceChanged(sender, null);
     }
 
-
-    private void NotificationClient_OnDeviceRemovedEvent(string deviceId)
+    private void DeviceNotificationClient_DeviceRemoved(object sender, DeviceNotificationEventArgs e)
     {
-        LogService.Log("DeviceManager", "Device Removed.");
+        LogService.Log("DeviceManager", $"Device {e.DeviceId} Removed.");
     }
 
     private CancellationTokenSource _loadCts;
@@ -619,10 +618,10 @@ public class AudioService
         {
             case OutApi.WaveOut:
                 LogService.Log(nameof(AudioService), "Using WaveOut.");
-                var outApi = new WaveOutEvent();
+                var outApi = new WaveOut();
                 NowOutObj = outApi;
                 outApi.DeviceNumber = NowOutDevice.Device is null ? -1 : (int)NowOutDevice.Device;
-                outApi.DesiredLatency = Latency;
+                outApi.BufferMilliseconds = Latency;
                 break;
             case OutApi.DirectSound:
                 LogService.Log(nameof(AudioService), "Using DirectSound.");
@@ -638,10 +637,15 @@ public class AudioService
             case OutApi.Wasapi:
                 LogService.Log(nameof(AudioService), "Using Wasapi.");
                 _wasapiMMDevice = new MMDeviceEnumerator().GetDevice(NowOutDevice.Device as string);
-                NowOutObj = new WasapiOut(
-                    _wasapiMMDevice,
-                    WasapiOnly ? AudioClientShareMode.Exclusive : AudioClientShareMode.Shared, false,
-                    Latency);
+                var builder = new WasapiPlayerBuilder()
+                    .WithLatency(Latency)
+                    .WithDevice(_wasapiMMDevice);
+
+                builder = WasapiOnly
+                    ? builder.WithExclusiveMode()
+                    : builder.WithSharedMode();
+
+                NowOutObj = builder.Build();
                 break;
             case OutApi.Asio:
                 LogService.Log(nameof(AudioService), "Using Asio.");

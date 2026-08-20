@@ -104,7 +104,7 @@ public partial class App : Application
         Available = true,
         SuffixType = SuffixType.Beta,
         Version = Assembly.GetExecutingAssembly().GetName().Version,
-        ReleaseTime = new(2026, 8, 18, 14, 00, 00),
+        ReleaseTime = new(2026, 8, 20, 18, 40, 00),
         ExtendMessage = null
     };
     public Version AppVersion => NowVersion.Version;
@@ -249,21 +249,36 @@ public partial class App : Application
     public static bool IsExited = false;
     public async Task ExitApp()
     {
-        IsExited = true;
-        LogService.Log("App", "Exiting application...");
-        SaveSettings();
-        MainWindowInstance.SetBackdrop(BackdropType.DefaultColor); // 在App.Instance.Exit前将MainWindow的Backdrop释放，否则会报错
-        MainWindowInstance.DesktopLyricWindow?.Close();
-        NotifyIconWindow.HideIcon();
-        NotifyIconWindow.Close();
-        taskBarInfoWindow.Close();
-        SMTC.DisplayUpdater.ClearAll();
-        SMTC.DisplayUpdater.Update();
-        AudioService.DisposeAll();
-        HotKeyService.UnregisterHotKeys([.. HotKeyService.RegisteredHotKeys]);
-        await SaveNowPlaying();
-        MainWindowInstance.Close();
-        LogService.DisposeNowLogStream();
+        try
+        {
+            IsExited = true;
+            LogService.Log("App", "Exiting application...");
+            MainWindowInstance.AppWindow.Hide();
+            MainWindowInstance.SetBackdrop(BackdropType.DefaultColor); // 在App.Instance.Exit前将MainWindow的Backdrop释放，否则会报错
+            AudioService.SetPause();
+            SaveSettings();
+            await SaveNowPlaying();
+            MainWindowInstance.DesktopLyricWindow?.Close();
+            NotifyIconWindow.HideIcon();
+            NotifyIconWindow.Close();
+            LogWindow.CloseWindow();
+            taskBarInfoWindow.Close();
+            SMTC.PlaybackStatus = MediaPlaybackStatus.Closed;
+            SMTC.DisplayUpdater.ClearAll();
+            SMTC.DisplayUpdater.Update();
+            AudioService.DisposeAll();
+            HotKeyService.UnregisterHotKeys([.. HotKeyService.RegisteredHotKeys]);
+            LogService.DisposeNowLogStream();
+        }
+        catch (Exception ex)
+        {
+            MainWindowInstance.AddNotify("退出时出现错误", "退出程序时发生错误，请检查日志文件。", NotifySeverity.Error);
+            LogService.Error("App", $"ExitApp Error: {ex}");
+        }
+        finally
+        {
+            IsExited = false;
+        }
         Current.Exit();
     }
 
@@ -321,14 +336,14 @@ public partial class App : Application
             saveSettingsWhenSourceChangedCount++;
         };
         AudioService.CacheLoadingChanged += (s, __) =>
-        {
+        {/*
             try
             {
                 SMTC.DisplayUpdater.Thumbnail = null;
                 SMTC.DisplayUpdater.Update();
                 mediaChanging = true;
             }
-            catch { }
+            catch { }*/
         };
         AudioService.CacheLoadedChanged += (s) =>
         {
@@ -504,9 +519,12 @@ public partial class App : Application
         await PlayingListService.Play(musicData, false);
     }
 
+    bool savingNowPlaying = false;
     public async Task SaveNowPlaying()
     {
+        if (savingNowPlaying) return;
         if (AudioService.MusicData is null) return;
+        savingNowPlaying = true;
 
         var path = DataFolderBase.LastPlayedDataPath;
         if (!LoadLastExitPlayingSongAndSongList)
@@ -532,6 +550,8 @@ public partial class App : Application
         if (jObject is null) return;
         await File.WriteAllTextAsync(path, jObject.ToString());
         LogService.Elapsed("SaveNowPlaying", "Now playing list saved in {0}", startTime);
+
+        savingNowPlaying = false;
     }
     #endregion
 

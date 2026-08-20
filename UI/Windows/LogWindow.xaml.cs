@@ -67,6 +67,15 @@ public partial class LogWindow : Window
         }
     }
 
+    public static void CloseWindow()
+    {
+        if (logWindowStatic is not null)
+        {
+            logWindowStatic.Close();
+            logWindowStatic = null;
+        }
+    }
+
     private void UpdateLogListItemSource(LogData newData = null)
     {
         //LogList.ItemsSource = null;

@@ -161,7 +161,7 @@ namespace SoundTouch
         }
 
         /// <inheritdoc/>
-        public override int Read(byte[] buffer, int offset, int count) => _provider.Read(buffer, offset, count);
+        public override int Read(byte[] buffer, int offset, int count) => _provider.Read(buffer.AsSpan(offset, count));
 
         /// <inheritdoc/>
         public override void Flush()

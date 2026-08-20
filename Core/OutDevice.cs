@@ -43,10 +43,15 @@ public class OutDevice : OnlyClass
     public static OutDevice GetWasapiDefaultDevice(MMDeviceEnumerator enumerator)
     {
         var dout = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-        var od = new OutDevice(OutApi.Wasapi, dout.ID, dout.FriendlyName) { IsDefaultDevice = true };
-        od.SampleRate = dout.AudioClient.MixFormat.SampleRate;
-        od.Channels = dout.AudioClient.MixFormat.Channels;
-        return od;
+        
+        using var audioClient = dout.CreateAudioClient();
+
+        return new OutDevice(OutApi.Wasapi, dout.ID, dout.FriendlyName)
+        {
+            IsDefaultDevice = true,
+            SampleRate = audioClient.MixFormat.SampleRate,
+            Channels = audioClient.MixFormat.Channels
+        };
     }
 
     public static OutDevice GetWasapiDefaultDevice()
@@ -91,8 +96,9 @@ public class OutDevice : OnlyClass
             foreach (var wasapi in enumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active))
             {
                 OutDevice outDevice = new(OutApi.Wasapi, wasapi.ID, wasapi.FriendlyName);
-                outDevice.SampleRate = wasapi.AudioClient.MixFormat.SampleRate;
-                outDevice.Channels = wasapi.AudioClient.MixFormat.Channels;
+                using var audioClient = wasapi.CreateAudioClient();
+                outDevice.SampleRate = audioClient.MixFormat.SampleRate;
+                outDevice.Channels = audioClient.MixFormat.Channels;
                 outDevices.Add(outDevice);
             }
             enumerator.Dispose();
@@ -173,75 +179,23 @@ public class OutDevice : OnlyClass
     }
 }
 
-public class NotificationClientImplementation : IMMNotificationClient
-{
-    public delegate void OnDefaultDeviceChangedDelegate(DataFlow dataFlow, Role deviceRole, string defaultDeviceId);
-    public event OnDefaultDeviceChangedDelegate OnDefaultDeviceChangedEvent;
-
-    public delegate void OnPropertyValueChangedDelegate(string deviceId);
-    public event OnPropertyValueChangedDelegate OnDeviceAddedEvent;
-    public event OnPropertyValueChangedDelegate OnDeviceRemovedEvent;
-
-    public delegate void OnDeviceStateChangedDelegate(string deviceId, DeviceState newState);
-    public event OnDeviceStateChangedDelegate OnDeviceStateChangedEvent;
-
-    public delegate void OnOnPropertyValueChangedDelegate(string deviceId, PropertyKey propertyKey);
-    public event OnOnPropertyValueChangedDelegate OnPropertyValueChangedEvent;
-
-    int defaultDeviceChangedCounter = 0;
-    public async void OnDefaultDeviceChanged(DataFlow dataFlow, Role deviceRole, string defaultDeviceId)
-    {
-        if (deviceRole != Role.Multimedia) return;
-
-        defaultDeviceChangedCounter++;
-        await Task.Delay(100);
-        defaultDeviceChangedCounter--;
-        if (defaultDeviceChangedCounter != 0) return;
-
-        LogService.Log("DeviceManager", $"系统默认设备已变更为：\"{defaultDeviceId}\"");
-        OnDefaultDeviceChangedEvent?.Invoke(dataFlow, deviceRole, defaultDeviceId);
-    }
-
-    public void OnDeviceAdded(string deviceId)
-    {
-        LogService.Log("DeviceManager", $"新增设备：\"{deviceId}\"");
-        OnDeviceAddedEvent?.Invoke(deviceId);
-    }
-
-    public void OnDeviceRemoved(string deviceId)
-    {
-        LogService.Log("DeviceManager", $"已移除设备：\"{deviceId}\"");
-        OnDeviceRemovedEvent?.Invoke(deviceId);
-    }
-
-    public void OnDeviceStateChanged(string deviceId, DeviceState newState)
-    {
-        LogService.Log("DeviceManager", $"设备状态已更新。deviceId:{deviceId} / newState:{newState}");
-        OnDeviceStateChangedEvent?.Invoke(deviceId, newState);
-    }
-
-    public void OnPropertyValueChanged(string deviceId, PropertyKey propertyKey)
-    {
-        LogService.Log("DeviceManager", $"设备属性已更新。deviceId: {deviceId} / propertyKey:{propertyKey.formatId.ToString()}");
-        OnPropertyValueChangedEvent?.Invoke(deviceId, propertyKey);
-    }
-
-    public NotificationClientImplementation()
-    {
-
-    }
-}
-
 public class ClientDeviceEvents
 {
-    private MMDeviceEnumerator deviceEnum = new MMDeviceEnumerator();
-    public NotificationClientImplementation notificationClient;
-    public IMMNotificationClient notifyClient;
+    private MMDeviceEnumerator? _deviceEnumerator;
+    private MMDeviceNotificationClient? _notificationClient;
+
+    public MMDeviceNotificationClient DeviceNotificationClient => _notificationClient;
 
     public ClientDeviceEvents()
     {
-        notificationClient = new NotificationClientImplementation();
-        notifyClient = notificationClient;
-        deviceEnum.RegisterEndpointNotificationCallback(notifyClient);
+        InitializeDeviceNotification();
+    }
+
+    private void InitializeDeviceNotification()
+    {
+        _deviceEnumerator = new MMDeviceEnumerator();
+
+        _notificationClient =
+            _deviceEnumerator.CreateNotificationClient();
     }
 }

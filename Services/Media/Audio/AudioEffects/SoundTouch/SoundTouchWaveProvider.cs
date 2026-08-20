@@ -33,7 +33,7 @@ namespace SoundTouch
     {
         private readonly IWaveProvider _sourceProvider;
         private readonly SoundTouchProcessor _processor;
-        private readonly byte[] _buffer = new byte[4096];
+        private readonly byte[] _buffer = new byte[4096 * sizeof(float)];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SoundTouchWaveProvider"/> class.
@@ -233,73 +233,88 @@ namespace SoundTouch
             }
         }
 
+
+
         /// <inheritdoc/>
-        public int Read(byte[] buffer, int offset, int count)
+        public int Read(Span<byte> buffer)
         {
-            bool unUsingEffect = //false;
-                Tempo == 1f && Rate == 1f && Pitch == 1f;
+            bool unUsingEffect =
+                Tempo == 1f &&
+                Rate == 1f &&
+                Pitch == 1f;
 
-            if (!unUsingEffect)
+            if (unUsingEffect)
+                return _sourceProvider.Read(buffer);
+
+            int channels = WaveFormat.Channels;
+            int outputFloatCount = buffer.Length / sizeof(float);
+            int samplesRequired = outputFloatCount / channels;
+
+            try
             {
-                int samplesRequired = count / sizeof(float);
-                try
+                lock (SyncLock)
                 {
-                    lock (SyncLock)
+                    while (_processor.AvailableSamples < samplesRequired)
                     {
-                        // Iterate until enough samples are available for output:
-                        // - read samples from input stream
-                        // - put samples to SoundTouch processor.
-                        while (_processor.AvailableSamples < samplesRequired)
+                        int bytesRead;
+
+                        try
                         {
-                            int bytes;
-                            try
-                            {
-                                bytes = _sourceProvider.Read(_buffer, 0, _buffer.Length);
-                            }
-                            catch (EndOfStreamException)
-                            {
-                                bytes = 0;
-                            }
-
-                            if (bytes == 0)
-                            {
-                                // end of stream. flush final samples from SoundTouch buffers to output.
-                                if (!IsFlushed)
-                                {
-                                    IsFlushed = true;
-                                    _processor.Flush();
-                                }
-
-                                break;
-                            }
-
-                            var ptr = MemoryMarshal.Cast<byte, float>(_buffer.AsSpan().Slice(0, bytes));
-                            _processor.PutSamples(ptr, ptr.Length / WaveFormat.Channels);
+                            bytesRead = _sourceProvider.Read(_buffer);
+                        }
+                        catch (EndOfStreamException)
+                        {
+                            bytesRead = 0;
                         }
 
-                        // get processed out samples from the SoundTouch processor.
-                        var output = MemoryMarshal.Cast<byte, float>(buffer.AsSpan().Slice(offset, count));
-                        output.Clear();
+                        if (bytesRead == 0)
+                        {
+                            if (!IsFlushed)
+                            {
+                                IsFlushed = true;
+                                _processor.Flush();
+                            }
 
-                        int samplesRead = _processor.ReceiveSamples(output, output.Length / WaveFormat.Channels);
+                            break;
+                        }
 
-                        return samplesRead * sizeof(float) * WaveFormat.Channels;
+                        // byte → float
+                        ReadOnlySpan<float> input =
+                            MemoryMarshal.Cast<byte, float>(
+                                _buffer.AsSpan(0, bytesRead));
+
+                        int inputSamples = input.Length;
+
+                        _processor.PutSamples(
+                            input,
+                            inputSamples / channels);
                     }
-                }
-                catch (Exception exception)
-                {
-                    var eventArgs = new UnobservedExceptionEventArgs(exception);
-                    UnobservedException(this, eventArgs);
 
-                    if (!eventArgs.IsObserved)
-                        throw;
+                    // byte buffer → float Span
+                    Span<float> output =
+                        MemoryMarshal.Cast<byte, float>(buffer);
 
-                    return 0;
+                    output.Clear();
+
+                    int samplesRead =
+                        _processor.ReceiveSamples(
+                            output,
+                            output.Length / channels);
+
+                    return samplesRead * channels * sizeof(float);
                 }
             }
-            else
+            catch (Exception exception)
             {
-                return _sourceProvider.Read(buffer, 0, count);
+                var eventArgs =
+                    new UnobservedExceptionEventArgs(exception);
+
+                UnobservedException(this, eventArgs);
+
+                if (!eventArgs.IsObserved)
+                    throw;
+
+                return 0;
             }
         }
     }

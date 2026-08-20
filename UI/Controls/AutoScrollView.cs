@@ -75,7 +75,11 @@ public sealed partial class AutoScrollView : Control
 
     public bool Pause
     {
-        get => (bool)GetValue(PauseProperty);
+        get
+        {
+            if (!IsLoaded) return true;
+            return (bool)GetValue(PauseProperty);
+        }
         set
         {
             SetValue(PauseProperty, value);
