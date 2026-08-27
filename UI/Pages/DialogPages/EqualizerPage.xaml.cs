@@ -76,10 +76,8 @@ namespace TewiMP.UI.Pages.DialogPages
 
         public EqualizerPage()
         {
-            InitializeComponent();
             DataContext = this;
-            Loaded += EqualizerPage_Loaded;
-            Unloaded += EqualizerPage_Unloaded;
+            InitializeComponent();
         }
 
         private void EqualizerPage_Loaded(object sender, RoutedEventArgs e)
@@ -106,6 +104,7 @@ namespace TewiMP.UI.Pages.DialogPages
         private void EqualizerPage_Unloaded(object sender, RoutedEventArgs e)
         {
             //if (!IsLoaded || AudioService is null) return;
+            DataContext = null;
             foreach (StackPanel slider in SliderStackBase.Children.Cast<StackPanel>())
             {
                 var a = slider.Children[0] as Slider;
@@ -256,11 +255,6 @@ namespace TewiMP.UI.Pages.DialogPages
             (sender as Button).IsEnabled = false;
             await App.Instance.AudioService.Reload();
             (sender as Button).IsEnabled = true;
-        }
-
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            AudioService_SourceChanged(App.Instance.AudioService);
         }
 
         private void EqEnableTS_Toggled(object sender, RoutedEventArgs e)

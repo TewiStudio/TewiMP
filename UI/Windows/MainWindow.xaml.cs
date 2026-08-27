@@ -692,8 +692,10 @@ public sealed partial class MainWindow : WindowEx
                 result = await AsyncDialog.ShowAsync();
                 dialogShow = false;
 
-                if (dialogShowObjects.Any())
+                if (dialogShowObjects.Count != 0)
                 {
+                    isFirstDialogShow = false;
+
                     var a = dialogShowObjects[0];
                     dialogShowObjects.Remove(a);
                     await ShowDialog(a[0], a[1], (string)a[2], (string)a[3], (string)a[4], (ContentDialogButton)a[5], (bool)a[6]);

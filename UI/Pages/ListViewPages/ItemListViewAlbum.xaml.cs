@@ -252,7 +252,7 @@ namespace TewiMP.UI.Pages
             }
 
             float anotherHeight = 168f;
-            float sizeDouble = 0.391f;
+            float sizeDouble = 0.392f;
 
             logoVisual.CenterPoint = new System.Numerics.Vector3(0, logoVisual.Size.Y, 1);
             logoShadowVisual.CenterPoint = new System.Numerics.Vector3(0, logoVisual.Size.Y, 1);

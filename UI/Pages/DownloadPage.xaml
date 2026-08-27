@@ -47,29 +47,24 @@
                 <TextBlock Text="到底了~"
                            HorizontalAlignment="Center"
                            VerticalAlignment="Bottom"
-                           Margin="12" x:Name="AtListBottomTb"
+                           Margin="12,32" x:Name="AtListBottomTb"
                            Foreground="{ThemeResource TextFillColorSecondary}"/>
                 <Grid VerticalAlignment="Bottom"
                       HorizontalAlignment="Center"
                       Background="{ThemeResource AcrylicNormal}"
                       BorderThickness="1" CornerRadius="4"
                       BorderBrush="{ThemeResource ControlElevationBorderBrush}"
-                      Margin="12,12,12,54" x:Name="ListEmptyPopup" Visibility="Collapsed">
+                      Margin="12,12,12,32" x:Name="ListEmptyPopup">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition/>
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
                         <Grid>
-                            <FontIcon Glyph="&#xE896;" FontSize="20" Margin="12"
+                            <FontIcon Glyph="&#xE7BA;" FontSize="20" Margin="12"
                                       Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"/>
-                            <TextBlock Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}"
-                                       Text="+" FontSize="16"
-                                       VerticalAlignment="Top"
-                                       HorizontalAlignment="Right"
-                                       Margin="0,5,12,0"/>
                         </Grid>
-                        <TextBlock Text="没有正在下载的歌曲，去添加歌曲吧！"
+                        <TextBlock Text="没有正在下载的歌曲"
                                    VerticalAlignment="Center" Grid.Column="1"
                                    FontSize="16" TextWrapping="WrapWholeWords"
                                    Margin="0,12,12,12"/>

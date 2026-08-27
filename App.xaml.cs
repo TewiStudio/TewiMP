@@ -316,7 +316,7 @@ public partial class App : Application
         SMTC.DisplayUpdater.Type = MediaPlaybackType.Music;
         SMTC.DisplayUpdater.AppMediaId = AppName;
         SMTC.DisplayUpdater.MusicProperties.Title = AppName;
-        SMTC.DisplayUpdater.MusicProperties.Artist = "没有正在播放的歌曲";
+        SMTC.DisplayUpdater.MusicProperties.Artist = "TewiStudio";
         SMTC.DisplayUpdater.Update();
 
         bool mediaChanging = false;

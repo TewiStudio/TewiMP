@@ -7,7 +7,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:animations="using:CommunityToolkit.WinUI.Animations"
     xmlns:community="using:CommunityToolkit.WinUI.Controls"
-    mc:Ignorable="d" Loaded="Page_Loaded">
+    mc:Ignorable="d"
+    Loaded="EqualizerPage_Loaded" Unloaded="EqualizerPage_Unloaded">
     <Page.Resources>
         <local:ThumbToolTipValueConverter x:Key="thumbToolTipValueC"/>
     </Page.Resources>
@@ -161,8 +162,8 @@
                             <TextBlock x:Name="OutDevicesTextBlock"/>
                         </DropDownButton>
                     </StackPanel>
-                    <NumberBox x:Name="LatencyNumberBox" Header="音频缓冲时间" AccessKey="L" Width="140" Value="{Binding Latency,Mode=TwoWay}" PlaceholderText="整数（ms）" Maximum="1000" Minimum="50" SpinButtonPlacementMode="Compact"/>
-                    <ToggleSwitch Header="Wasapi独占声卡" AccessKey="W" IsOn="{Binding WasapiOnly,Mode=TwoWay}"/>
+                    <NumberBox x:Name="LatencyNumberBox" Header="音频缓冲时间 (ms)" AccessKey="L" Width="140" Value="{Binding Latency,Mode=TwoWay}" PlaceholderText="整数（ms）" Maximum="1000" Minimum="50" SpinButtonPlacementMode="Compact"/>
+                    <ToggleSwitch Header="Wasapi独占模式" AccessKey="W" IsOn="{Binding WasapiOnly,Mode=TwoWay}"/>
                     <StackPanel Background="Transparent"
                                 ToolTipService.ToolTip="当播放中断或出错时尝试重新加载">
                         <TextBlock Text="重新加载音频" Margin="{StaticResource HubSectionHeaderThemeMargin}"/>

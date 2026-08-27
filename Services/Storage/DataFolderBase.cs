@@ -272,7 +272,7 @@ public static class DataFolderBase
 
     public static JObject AudioEffectDefault = new()
     {
-        { AudioEffectFlag.GraphicEqEnable.ToString(), false },
+        { AudioEffectFlag.GraphicEqEnable.ToString(), true },
         { AudioEffectFlag.ParametricEqEnable.ToString(), false },
         { AudioEffectFlag.PassFilterEqEnable.ToString(), false },
         { AudioEffectFlag.EffectEnable.ToString(), false },
