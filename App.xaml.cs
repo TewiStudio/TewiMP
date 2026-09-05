@@ -104,7 +104,7 @@ public partial class App : Application
         Available = true,
         SuffixType = SuffixType.Beta,
         Version = Assembly.GetExecutingAssembly().GetName().Version,
-        ReleaseTime = new(2026, 8, 20, 18, 40, 00),
+        ReleaseTime = new(2026, 9, 5, 12, 00, 00),
         ExtendMessage = null
     };
     public Version AppVersion => NowVersion.Version;
@@ -254,10 +254,10 @@ public partial class App : Application
             IsExited = true;
             LogService.Log("App", "Exiting application...");
             MainWindowInstance.AppWindow.Hide();
-            MainWindowInstance.SetBackdrop(BackdropType.DefaultColor); // 在App.Instance.Exit前将MainWindow的Backdrop释放，否则会报错
             AudioService.SetPause();
             SaveSettings();
             await SaveNowPlaying();
+            MainWindowInstance.SetBackdrop(BackdropType.DefaultColor); // 在App.Instance.Exit前将MainWindow的Backdrop释放，否则会报错
             MainWindowInstance.DesktopLyricWindow?.Close();
             NotifyIconWindow.HideIcon();
             NotifyIconWindow.Close();
@@ -777,7 +777,7 @@ public partial class App : Application
             MainWindowInstance.AddNotify(
                 "有新版本！",
                 $"可更新到版本 {newestVersion.Version} {newestVersion.SuffixType}，当前版本为 {NowVersion.Version} {NowVersion.SuffixType}。" +
-                    (string.IsNullOrEmpty(newestVersion.ExtendMessage) ? "" : $"\n{newestVersion.ExtendMessage}"),
+                    (string.IsNullOrEmpty(newestVersion.ExtendMessage) ? string.Empty : $"\n{newestVersion.ExtendMessage}"),
                 NotifySeverity.Warning, TimeSpan.FromMilliseconds(10000),
                 "更新", () =>
                 {
